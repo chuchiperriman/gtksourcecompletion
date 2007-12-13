@@ -1,0 +1,26 @@
+This package was debianized by Jesús Barbero Rodríguez <chuchiperriman@gmail.com> on
+Mon, 10 Dec 2007 02:32:27 +0100.
+
+It was downloaded from <url://example.com>
+
+Upstream Author(s): 
+		Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+Copyright: 
+
+    <Copyright (C) 2007 Jesús Barbero Rodríguez>
+		This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.)
+
+The Debian packaging is (C) 2007, iJesús Barbero Rodríguez <chuchiperriman@gmail.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.

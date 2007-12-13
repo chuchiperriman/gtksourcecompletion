@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gtksourcecompletion
+Description: Adds completion support to GtkSourceView 
+Version: 0.2.2
+Requires: gtksourceview-1.0
+Libs: -L${libdir} -lgtksourcecompletion-1.0
+Cflags: -I${includedir}/gtksourcecompletion-1.0

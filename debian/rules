@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# $Id: rules 8276 2007-01-09 21:41:21Z kilian $
+# (C) 2002 Colin Walters
+
+# CDBS Classes & Rules
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/utils.mk
+include /usr/share/cdbs/1/class/gnome.mk
+include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
+include /usr/share/gnome-pkg-tools/1/rules/clean-la.mk
+include /usr/share/gnome-pkg-tools/1/rules/gnome-version.mk
+-include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
+
+# Compile options
+# DEB_CONFIGURE_EXTRA_FLAGS += --enable-static
+
+# Debhelper Arguments
+# DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourceview1.0-0 (>= 1.7.2)'
+
+# Record build-time version information
+# binary-post-install/libgtksourceview-common::
+#	dh_buildinfo -plibgtksourceview-common

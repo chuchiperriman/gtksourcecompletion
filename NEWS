@@ -1,0 +1,11 @@
+===========================
+ gtksourcecompletion 0.1.0
+===========================
+
+New Features and fixes
+======================
+- Support generic GtkTextView completion 
+- Support providers registering
+- Two defaults events: user-request and autocompletion
+- Provider document-words: complete words previously written
+

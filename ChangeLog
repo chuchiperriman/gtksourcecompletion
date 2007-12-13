@@ -1,0 +1,35 @@
+2007-11-10  chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion-events: Added new function to change a delay of an
+	autocompletion event.
+
+2007-11-09	chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion-events: Added new function
+	gtk_source_completion_autocompletion_event_disable and renamed activate
+	function to gtk_source_completion_autocompletion_event_enable
+	* fixed #15: We can disable autocompletion event
+
+=== Version 0.2.1 ===
+
+2007-11-06	chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion-provider.c: Added get_name to the interface and
+	adapted all providers to support it.
+	* gtksourcecompletion.c: Added method gtk_source_completion_have_provider
+	* gtksourcecompletion.c: Added method gtk_source_completion_get_from_view
+
+2007-11-06	chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion-events.c: Autocompletion now set a delay to raise the
+	event because if the user write very fast, completion can annoy to the user.
+
+2007-09-22 	chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion: Added functions to register events and we control
+	events in the same gtksourcecompletion.(You can not activate the same
+	event twice in the same gtksourcecompletion)
+
+2007-09-09  chuchiperriman  <chuchiperriman@gmail.com>
+	* fixed #28 gtksourcecompletion: We show the info at right (or left if we cannot
+	show it at right). In the info window we have an scroll now.
+
+2007-08-08  chuchiperriman  <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion: initial version.
+
