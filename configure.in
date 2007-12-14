@@ -39,7 +39,8 @@ AC_STRUCT_ST_BLOCKS
 AC_FUNC_CLOSEDIR_VOID
 AC_CHECK_FUNCS(mkfifo)
 AC_CHECK_FUNC(mknod)
-
+# check for gtk-doc
+GTK_DOC_CHECK(1.8)
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
@@ -50,4 +51,6 @@ gtksourcecompletion-1.0.pc
 gtksourcecompletion.lsm
 gtksourcecompletion.spec
 gtksourcecompletion/Makefile
+docs/Makefile
+docs/reference/Makefile
 ])

@@ -1,6 +1,8 @@
 #!/bin/sh
 # Run this to generate all the initial makefiles, etc.
 
+gtkdocize || exit 1
+
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 srcdir=`cd $srcdir && pwd`

@@ -1,0 +1,3 @@
+gsc_documentwords_provider_get_type
+gtk_source_completion_get_type
+gtk_source_completion_provider_get_type

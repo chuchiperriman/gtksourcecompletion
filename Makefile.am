@@ -1,4 +1,4 @@
-SUBDIRS = gtksourcecompletion
+SUBDIRS = gtksourcecompletion docs
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gtksourcecompletion-1.0.pc

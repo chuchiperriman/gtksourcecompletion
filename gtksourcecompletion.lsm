@@ -1,7 +1,7 @@
 Begin3
 Title:		gtksourcecompletion
 Version:	0.2.2
-Entered-date:	2007-12-13
+Entered-date:	2007-12-14
 Description:	Adds Completion support to GtkSourceView
 		gtksourcecompletion.lsm.  Generated from gtksourcecompletion.lsm.in by configure.
 		Please edit gtksourcecompletion.lsm.in to fix the Keywords and
