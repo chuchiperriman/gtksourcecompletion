@@ -23,8 +23,9 @@ CFILE_GLOB = $(top_srcdir)/gtksourcecompletion/*.c
 # Headers to ignore
 IGNORE_HFILES =					\
 	config.h		\
-	provider-template.c	\
-	provider-template.h	
+	xmalloc.h		\
+	provider-template.h			\
+	provider-template.c
 
 # Extra options to supply to gtkdoc-mkdb
 MKDB_OPTIONS = --sgml-mode --output-format=xml --ignore-files=trio

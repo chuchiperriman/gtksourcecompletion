@@ -34,8 +34,6 @@ G_BEGIN_DECLS
 #define GTK_IS_SOURCE_COMPLETION_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION))
 #define GTK_SOURCE_COMPLETION_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionClass))
 
-#define WORD_COMPLETION_EVENT  "word-completion-event"
-
 typedef struct _GtkSourceCompletionPrivate GtkSourceCompletionPrivate;
 
 typedef struct _GtkSourceCompletionClass GtkSourceCompletionClass;

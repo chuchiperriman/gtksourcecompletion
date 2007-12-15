@@ -1,0 +1,148 @@
+<!-- ##### SECTION Title ##### -->
+GtkSourceCompletion
+
+<!-- ##### SECTION Short_Description ##### -->
+This object adds a generic popup and mechanism to add completion providers to GtkSourceView
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+You must create a new GtkSourceCompletion and assing it the GtkSourceView. With the 
+GtkSourceCompletion you have the core of the completion support. Now you need
+connect an event (see events) and register one or more providers. The events
+will say to GtkSourceCompletion when it must call the providers to get the data
+to be shown in the completion popup.
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT GtkSourceCompletionPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GtkSourceCompletionItem ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GtkSourceCompletion ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gtk_source_completion_new ##### -->
+<para>
+
+</para>
+
+@view: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_raise_event ##### -->
+<para>
+
+</para>
+
+@completion: 
+@event_name: 
+@event_data: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_register_provider ##### -->
+<para>
+
+</para>
+
+@completion: 
+@provider: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_unregister_provider ##### -->
+<para>
+
+</para>
+
+@completion: 
+@provider: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_get_view ##### -->
+<para>
+
+</para>
+
+@completion: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_is_visible ##### -->
+<para>
+
+</para>
+
+@completion: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_get_from_view ##### -->
+<para>
+
+</para>
+
+@view: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_have_provider ##### -->
+<para>
+
+</para>
+
+@completion: 
+@provider_name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_item_new ##### -->
+<para>
+
+</para>
+
+@id: 
+@name: 
+@icon: 
+@priority: 
+@user_data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_item_get_name ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_item_get_user_data ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+

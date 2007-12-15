@@ -121,6 +121,17 @@ gtk_source_completion_item_free(GtkSourceCompletionItem *item)
 	g_free(item);
 }
 
+/**
+ * gtk_source_completion_item_new:
+ * @id: An id for identify this item
+ * @name: Item name that will be shown in the completion popup
+ * @icon: Item icon that will be shown in the completion popup
+ * @priority: The item priority. Items with high priority will be
+ * 				shown first in the completion popup
+ * @user_data: User data used by the providers
+ *
+ * Returns The new GtkSourceCompletionItem
+ */
 GtkSourceCompletionItem*
 gtk_source_completion_item_new(int id,
 							const gchar *name,
@@ -137,12 +148,24 @@ gtk_source_completion_item_new(int id,
 	return item;
 }
 
+/**
+ * gtk_source_completion_item_get_name:
+ * @item: The GtkSourceCompletionItem
+ *
+ * Returns The item name
+ */
 gchar*
 gtk_source_completion_item_get_name(GtkSourceCompletionItem *item)
 {
 	return item->name;
 }
 
+/**
+ * gtk_source_completion_item_get_user_data:
+ * @item: The GtkSourceCompletionItem
+ *
+ * Returns the user data of this item
+ */
 gchar*
 gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item)
 {
@@ -929,7 +952,7 @@ gtk_source_completion_get_type (void)
  * gtk_source_completion_new:
  * @view: a #GtkSourceView.
  *
- * Create a new #GtkSourceCompletion
+ * Creates a new #GtkSourceCompletion asociated to a GtkSourceView
  *
  * Returns: value: A new #GtkSourceCompletion
  **/
@@ -977,7 +1000,7 @@ gtk_source_completion_new (GtkTextView *view)
  * This function register the provider into the completion and reference it. When 
  * an event is raised, completion call to the provider to get the data. When the user
  * select an item, it call the provider to tell it this action and the provider do
- * that it want 
+ * that it want (normally inserts some text)
  * 
  **/
 void
@@ -993,10 +1016,7 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
  * @completion: the #GtkSourceCompletion
  * @provider: The event #GtkSourceCompletionProvider.
  *
- * This function register the provider into the completion and reference it. When 
- * an event is raised, completion call to the provider to get the data. When the user
- * select an item, it call the provider to tell it this action and the provider do
- * that it want 
+ * This function unregister the provider.
  * 
  **/
 void
@@ -1027,8 +1047,8 @@ gtk_source_completion_get_view(GtkSourceCompletion *completion)
  * @event_name: The event name to raise
  * @event_data: This object will be passed to the providers to give them some special information of the event
  *
- * Calling this function, the completion call to all provider to get data and, if 
- * they return data, it show the completion to the user. 
+ * Calling this function, the completion call to all providers to get data and, if 
+ * they return data, it shows the completion to the user. 
  * 
  **/
 void
@@ -1122,6 +1142,14 @@ gtk_source_completion_raise_event(GtkSourceCompletion *completion,
 	
 }
 
+
+/**
+ * gtk_source_completion_is_visible:
+ * @completion: The #GtkSourceCompletion
+ *
+ * Returns TRUE if the completion popup is visible.
+ *
+ */
 gboolean
 gtk_source_completion_is_visible(GtkSourceCompletion *completion)
 {
@@ -1131,9 +1159,6 @@ gtk_source_completion_is_visible(GtkSourceCompletion *completion)
 /**
  * gtk_source_completion_get_from_view:
  * @view: the GtkSourceView
- *
- * Calling this function, the completion call to all provider to get data and, if 
- * they return data, it show the completion to the user. 
  *
  * Returns NULL if the GtkTextView haven't got an associated GtkSourceCompletion
  * or the GtkSourceCompletion of the GtkTextView
@@ -1151,8 +1176,8 @@ gtk_source_completion_get_from_view(
  * @completion: The #GtkSourceCompletion
  * @provider_name: Provider's name that you are looking for.
  *
- * Returns TRUE if the completion have this provider registered or 
- * FALSE if not
+ * Returns TRUE if the completion has this provider registered or 
+ * FALSE if not.
  *
  */
 gboolean

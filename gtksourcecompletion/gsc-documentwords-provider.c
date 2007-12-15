@@ -298,6 +298,12 @@ GType gsc_documentwords_provider_get_type ()
 	return g_define_type_id;
 }
 
+/**
+ * gsc_documentwords_provider_new:
+ *
+ * Returns The new #GscDocumentwordsProvider
+ *
+ */
 GscDocumentwordsProvider*
 gsc_documentwords_provider_new()
 {

@@ -28,7 +28,6 @@
 
 G_BEGIN_DECLS
 
-
 #define TYPE_GSC_DOCUMENTWORDS_PROVIDER (gsc_documentwords_provider_get_type ())
 #define GSC_DOCUMENTWORDS_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProvider))
 #define GSC_DOCUMENTWORDS_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderClass))

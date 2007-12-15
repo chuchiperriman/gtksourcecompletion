@@ -62,7 +62,7 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
  * gtk_source_completion_provider_data_selected:
  * @self: the #GtkSourceCompletionProvider
  * @view: The #GtkTextView.
- * @data: The data selected by the user.
+ * @item: The data selected by the user.
  *
  * The completion call this function when the user select an item of this provider.
  * The provider may insert the text in the view of do something.
@@ -72,20 +72,17 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
 					GtkTextView* view, 
-					GtkSourceCompletionItem* data)
+					GtkSourceCompletionItem* item)
 {
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, view, data);
+	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, view, item);
 }
 
 /**
- * gtk_source_completion_provider_data_selected:
+ * gtk_source_completion_provider_end_completion:
  * @self: the #GtkSourceCompletionProvider
  * @view: The #GtkTextView.
- * @data: The data selected by the user.
  *
- * The completion call this function when the user select an item of this provider.
- * The provider may insert the text in the view of do something.
- *
+ * The completion call this function when it is goint to hide the popup
  * 
  **/
 void 

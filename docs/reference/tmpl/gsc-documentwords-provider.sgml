@@ -1,0 +1,111 @@
+<!-- ##### SECTION Title ##### -->
+GscDocumentwordsProvider
+
+<!-- ##### SECTION Short_Description ##### -->
+
+GtkSourceCompletionProvider that complete the preiously written 
+words in the current document.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+GtkSourceCompletionProvider that complete the preiously written 
+words in the current document. When an event occurs, it returns to 
+GtkSourceCompletion a list of previously written words in the current 
+document filtered by the current word written in the document. 
+</para>
+<para>
+You don't need do anything, only create the provider and register it into 
+the GtkSourceCompletion. If you have created a completion event, when this
+event occurs, the data will be shown in the completion popup.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO TYPE_GSC_DOCUMENTWORDS_PROVIDER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_CLASS ##### -->
+<para>
+
+</para>
+
+@klass: 
+
+
+<!-- ##### MACRO IS_GSC_DOCUMENTWORDS_PROVIDER ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO IS_GSC_DOCUMENTWORDS_PROVIDER_CLASS ##### -->
+<para>
+
+</para>
+
+@klass: 
+
+
+<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_NAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT GscDocumentwordsProviderPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GscDocumentwordsProvider ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gsc_documentwords_provider_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gsc_documentwords_provider_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+

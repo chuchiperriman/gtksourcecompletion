@@ -22,9 +22,11 @@
 
 /**
 * gtk_source_view_get_last_word_and_iter:
-* @text_view: editor
-* @start_iter: if != NULL then assign it the start position of the word
-* Returns: the last word founded or ""
+* @text_view: The #GtkTextView
+* @start_word: if != NULL then assign it the start position of the word
+* @end_word: if != NULL then assing it the end position of the word
+* 
+* Returns: the last word written in the #GtkTextView or ""
 *
 **/
 gchar*
@@ -96,13 +98,26 @@ gtk_source_view_get_last_word_and_iter(GtkTextView *text_view,
 	return text;
 }
  
+/**
+ * gtk_source_view_get_last_word:
+ * @text_view: The #GtkTextView
+ *
+ * Returns: the last word written in the #GtkTextView or ""
+ */
 gchar*
 gtk_source_view_get_last_word(GtkTextView *text_view)
 {
 	return gtk_source_view_get_last_word_and_iter(text_view, NULL, NULL);
 }
 
-
+/** 
+ * gtk_source_view_get_cursor_pos:
+ * @text_view: The #GtkTextView
+ * @x: Assign the x position of the cursor
+ * @y: Assign the y position of the cursor
+ *
+ * Gets the cursor position on the screen.
+ */
 void
 gtk_source_view_get_cursor_pos(GtkTextView *text_view, 
 					gint *x, 
@@ -135,6 +150,12 @@ gtk_source_view_get_cursor_pos(GtkTextView *text_view,
 	*y = win_y + yy + location.height;
 }
 
+/**
+ * gtc_gsv_get_text: 
+ * @text_view: The #GtkTextView 
+ *
+ * Returns the #GtkTextView content .
+ */
 gchar*
 gtc_gsv_get_text(GtkTextView *text_view)
 {
@@ -148,6 +169,14 @@ gtc_gsv_get_text(GtkTextView *text_view)
 	
 }
 
+/**
+ * gtk_source_view_replace_actual_word:
+ * @text_view: The #GtkTextView
+ * @text: The text to be inserted instead of the current word
+ * 
+ * Replaces the current word in the #GtkTextView with the new word
+ *
+ */
 void
 gtk_source_view_replace_actual_word(GtkTextView *text_view, 
 					const gchar* text)
