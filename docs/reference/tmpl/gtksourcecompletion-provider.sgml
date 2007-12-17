@@ -1,0 +1,97 @@
+<!-- ##### SECTION Title ##### -->
+gtksourcecompletion-provider
+
+<!-- ##### SECTION Short_Description ##### -->
+Provider interface
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+You must implement this interface if you want to create a new provider. There 
+is a program that creates the skeleton to you. You can find it in 
+gtksourcecompletion package in the tools folder.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE ##### -->
+<para>
+
+</para>
+
+@obj: 
+
+
+<!-- ##### STRUCT GtkSourceCompletionProvider ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GtkSourceCompletionProviderIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@get_name: 
+@get_data: 
+@data_selected: 
+@end_completion: 
+@get_item_info_markup: 
+
+<!-- ##### FUNCTION gtk_source_completion_provider_get_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_provider_get_data ##### -->
+<para>
+
+</para>
+
+@self: 
+@view: 
+@event_name: 
+@event_data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_provider_data_selected ##### -->
+<para>
+
+</para>
+
+@self: 
+@view: 
+@item: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_provider_end_completion ##### -->
+<para>
+
+</para>
+
+@self: 
+@view: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_provider_get_item_info_markup ##### -->
+<para>
+
+</para>
+
+@self: 
+@item: 
+@Returns: 
+
+

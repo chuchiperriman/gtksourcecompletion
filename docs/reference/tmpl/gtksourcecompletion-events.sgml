@@ -1,0 +1,91 @@
+<!-- ##### SECTION Title ##### -->
+gtksourcecompletion-events
+
+<!-- ##### SECTION Short_Description ##### -->
+Completion events implementations
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+There are two completion events already implemented
+</para>
+<para>
+User Request event: This event occurs when the user press control+Return.
+This keys will be configurables soon.
+</para>
+<para>
+Autocompletion event: This event occurs the user writtes the first three 
+characters of a word. If you writte more characters the event will be raised
+again. You can configure a delay and the event will be raised when this delay 
+pass.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO USER_REQUEST_EVENT_NAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION gtk_source_completion_active_user_request_event ##### -->
+<para>
+
+</para>
+
+@comp: 
+
+
+<!-- ##### MACRO AUTOCOMPLETION_EVENT_NAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT AutoCompletionEvent ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gtk_source_completion_autocompletion_event_enable ##### -->
+<para>
+
+</para>
+
+@comp: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_autocompletion_event_disable ##### -->
+<para>
+
+</para>
+
+@comp: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_autocompletion_event_delay ##### -->
+<para>
+
+</para>
+
+@comp: 
+@delay: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_autocompletion_get_word ##### -->
+<para>
+
+</para>
+
+@event: 
+@Returns: 
+
+

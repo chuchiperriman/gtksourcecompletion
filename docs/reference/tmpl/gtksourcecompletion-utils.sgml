@@ -1,0 +1,67 @@
+<!-- ##### SECTION Title ##### -->
+gtksourcecompletion-utils
+
+<!-- ##### SECTION Short_Description ##### -->
+Internal utilities
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION gtk_source_view_get_last_word_and_iter ##### -->
+<para>
+
+</para>
+
+@text_view: 
+@start_word: 
+@end_word: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_view_get_last_word ##### -->
+<para>
+
+</para>
+
+@text_view: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_view_get_cursor_pos ##### -->
+<para>
+
+</para>
+
+@text_view: 
+@x: 
+@y: 
+
+
+<!-- ##### FUNCTION gtc_gsv_get_text ##### -->
+<para>
+
+</para>
+
+@text_view: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_view_replace_actual_word ##### -->
+<para>
+
+</para>
+
+@text_view: 
+@text: 
+
+

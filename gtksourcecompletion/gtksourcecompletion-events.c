@@ -105,6 +105,14 @@ ur_weak_ref_completion(gpointer event, GObject completion)
 	g_signal_handler_disconnect(ur_event->view,ur_event->signals[URS_GTK_TEXT_VIEW_KP]);
 }
 
+/**
+ * gtk_source_completion_active_user_request_event:
+ * @comp: The #GtkSourceCompletion where we want to active the event
+ * 
+ * This function activate the user request event. This event call to
+ * completion when the user press control+Return.
+ * 
+ */
 void
 gtk_source_completion_active_user_request_event(GtkSourceCompletion *comp)
 {
@@ -204,7 +212,6 @@ autocompletion_key_release_cb (GtkWidget *view,
 		}
 		else if (GDK_BackSpace == keyval)
 		{
-			/*TODO Only do this if completion is visible*/
 			if (gtk_source_completion_is_visible(completion))
 			{
 				word = gtk_source_view_get_last_word_and_iter(GTK_TEXT_VIEW(source_view), NULL, NULL);
@@ -266,6 +273,14 @@ ac_weak_ref_completion(gpointer event, GObject completion)
 	g_signal_handler_disconnect(ac_event->view,ac_event->signals[AS_GTK_TEXT_VIEW_KR]);
 }
 
+/**
+ * gtk_source_completion_autocompletion_event_enable:
+ * @comp: The #GtkSourceCompletion where we want to active the event
+ *
+ * This function activate the autocompletion event. Autocompletion event
+ * occurs when the user writes three letters (only numbers and characters).
+ * This is the default but you can modify this properties
+ */
 void
 gtk_source_completion_autocompletion_event_enable(GtkSourceCompletion *comp)
 {
@@ -299,6 +314,13 @@ gtk_source_completion_autocompletion_event_enable(GtkSourceCompletion *comp)
 	event_control_add_event(view,event,EC_AC_EVENT);
 }
 
+/**
+ * gtk_source_completion_autocompletion_event_disable:
+ * @comp: The #GtkSourceCompletion where we want to active the event
+ *
+ * This function disable the autocompletion event previously activated
+ * in this #GtkSourceCompletion
+ */
 void 
 gtk_source_completion_autocompletion_event_disable(GtkSourceCompletion *comp)
 {
@@ -320,6 +342,16 @@ gtk_source_completion_autocompletion_event_disable(GtkSourceCompletion *comp)
 	}
 }
 
+/**
+ * gtk_source_completion_autocompletion_event_delay:
+ * @comp: The #GtkSourceCompletion where we want to active the event
+ * @delay: milliseconds to delay the autocompletion event.
+ *
+ * This function assign the autocompletion delay. The event wait the 
+ * delay and test again if we must show the completion popup. Perhaps in the 
+ * delay the user has written another word or the user is writting very fast
+ * and we must not disturb the user.
+ */
 void 
 gtk_source_completion_autocompletion_event_delay(GtkSourceCompletion *comp,guint delay)
 {
@@ -331,6 +363,16 @@ gtk_source_completion_autocompletion_event_delay(GtkSourceCompletion *comp,guint
 	}
 }
 
+/**
+ * gtk_source_completion_autocompletion_get_word:
+ * @event: The #AutoCompletionEvent object
+ *
+ * This function is an utility to get the current word of the document.
+ * The #AutoCompletionEvent object already has the word cached and 
+ * it doesn't need research the word.
+ *
+ * Returns the current word of the document (the word to complete)
+ */
 const gchar*
 gtk_source_completion_autocompletion_get_word(AutoCompletionEvent *event)
 {
