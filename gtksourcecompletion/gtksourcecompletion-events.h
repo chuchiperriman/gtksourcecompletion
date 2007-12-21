@@ -35,6 +35,9 @@ G_BEGIN_DECLS
 void
 gtk_source_completion_active_user_request_event(GtkSourceCompletion *comp);
 
+void
+gtk_source_completion_user_request_event_keys(GtkSourceCompletion *comp, const gchar* keys);
+
 /******************************************************/
 
 /***************** Autocompletion Event *****************/

@@ -67,6 +67,8 @@ struct _UserRequestEvent
 	gulong signals[URS_LAST_SIGNAL];
 	GtkSourceCompletion *completion;
 	GtkTextView *view;
+	guint key;
+	GdkModifierType mod;
 };
 
 static gboolean
@@ -81,7 +83,7 @@ user_request_view_key_press_event_cb(GtkWidget *view,
 	if (completion != NULL)
 	{
 		
-		if ((event->state & GDK_CONTROL_MASK) && event->keyval == GDK_Return)
+		if ((event->state & ur_event->mod) && event->keyval == ur_event->key)
 		{
 			gtk_source_completion_raise_event(completion,USER_REQUEST_EVENT_NAME,NULL);
 			return TRUE;
@@ -122,6 +124,8 @@ gtk_source_completion_active_user_request_event(GtkSourceCompletion *comp)
 		return;
 	}
 	UserRequestEvent *event = g_malloc0(sizeof(UserRequestEvent));
+	gtk_accelerator_parse("<Control>Return",&event->key,&event->mod);
+
 	g_assert(GTK_IS_TEXT_VIEW(view));
 	event->signals[URS_GTK_TEXT_VIEW_KP] =  
 			g_signal_connect_data(view,
@@ -134,6 +138,28 @@ gtk_source_completion_active_user_request_event(GtkSourceCompletion *comp)
 	event->view = view;
 	g_object_weak_ref(G_OBJECT(comp),(GWeakNotify)ur_weak_ref_completion,event);
 	event_control_add_event(view,event,EC_UR_EVENT);
+}
+
+/**
+ * gtk_source_completion_user_request_event_keys:
+ * @comp: The #GtkSourceCompletion with the event active
+ * @keys: The string representation of the keys that we will
+ * use to activate the user request event. You can get this 
+ * string with #gtk_accelerator_name
+ *
+ * Assign the keys that we will use to activate the user request event
+ */
+void
+gtk_source_completion_user_request_event_keys(GtkSourceCompletion *comp, const gchar* keys)
+{
+	GtkTextView *view = gtk_source_completion_get_view(comp);
+	UserRequestEvent *event = event_control_get_event(view,EC_UR_EVENT);
+	if (event!=NULL)
+	{
+		gtk_accelerator_parse(keys,&event->key,&event->mod);
+		g_debug("user request keys: %s",keys);
+		//event->delay = delay;
+	}
 }
 
 /******************************************************/
