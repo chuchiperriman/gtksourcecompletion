@@ -42,7 +42,7 @@ typedef struct _GtkSourceCompletionItem GtkSourceCompletionItem;
 
 
 #include "gtksourcecompletion-provider.h"
-
+#include "gtksourcecompletion-trigger.h"
 
 struct _GtkSourceCompletionClass
 {
@@ -88,8 +88,21 @@ gtk_source_completion_get_from_view(
 								GtkTextView *view);
 
 gboolean
-gtk_source_completion_have_provider(GtkSourceCompletion *completion,
+gtk_source_completion_has_provider(GtkSourceCompletion *completion,
 								const gchar* provider_name);
+
+void
+gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
+								GtkSourceCompletionTrigger *trigger);
+								
+void
+gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
+								GtkSourceCompletionTrigger *trigger);
+void
+gtk_source_completion_activate(GtkSourceCompletion *completion);
+
+void
+gtk_source_completion_deactivate(GtkSourceCompletion *completion);
 
 /* GtkSourceCompletionItem functions */
 GtkSourceCompletionItem*

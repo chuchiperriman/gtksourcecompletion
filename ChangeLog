@@ -1,6 +1,10 @@
 2007-12-22  chuchiperriman  <chuchiperriman@gmail.com>
  * Events: New version because I am changing the events. Now I have created a
  new Trigger interface instead of the current events
+ * gtksourcecompletion: 
+ 		- Added register and unregister trigger methods.
+ 		- Added activate and deactivate methods. Now is mandatory call to 
+ 		activate if you want to activate the completion
 
 === Version 0.2.2 ===
 

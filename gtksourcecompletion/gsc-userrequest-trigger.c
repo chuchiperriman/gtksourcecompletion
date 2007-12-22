@@ -33,7 +33,6 @@ enum
 struct _GscUserRequestTriggerPrivate {
 	gulong signals[URS_LAST_SIGNAL];
 	GtkSourceCompletion *completion;
-	GtkTextView *view;
 	guint key;
 	GdkModifierType mod;
 };
@@ -75,19 +74,6 @@ user_request_view_key_press_event_cb(GtkWidget *view,
 	
 } 
 
-static void
-ur_weak_ref_completion(gpointer event, GObject completion)
-{
-	GscUserRequestTrigger *self = GSC_USERREQUEST_TRIGGER(event);
-	/*
-	 * If we disconnect the key-press-event signal the g_signal_connect_data 
-	 * frees UserRequestEvent
-	 */
-	g_signal_handler_disconnect(self->priv->view,self->priv->signals[URS_GTK_TEXT_VIEW_KP]);
-}
-
-
-
 static const gchar* gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTrigger *self)
 {
 	return GSC_USERREQUEST_TRIGGER_NAME;
@@ -96,11 +82,10 @@ static const gchar* gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTri
 static gboolean
 gsc_userrequest_trigger_real_activate (GtkSourceCompletionTrigger* base)
 {
+	g_debug("Activating UR trigger");
 	GscUserRequestTrigger *self = GSC_USERREQUEST_TRIGGER(base);
 	GtkSourceCompletion* comp = self->priv->completion;
 	GtkTextView *view = gtk_source_completion_get_view(comp);
-
-	gtk_accelerator_parse("<Control>Return",&self->priv->key,&self->priv->mod);
 
 	g_assert(GTK_IS_TEXT_VIEW(view));
 	self->priv->signals[URS_GTK_TEXT_VIEW_KP] =  
@@ -108,16 +93,18 @@ gsc_userrequest_trigger_real_activate (GtkSourceCompletionTrigger* base)
 						"key-press-event",
 						G_CALLBACK(user_request_view_key_press_event_cb),
 						(gpointer) self,
-						(GClosureNotify)g_object_unref,
+						(GClosureNotify)NULL,
 						0);
-	g_object_weak_ref(G_OBJECT(comp),(GWeakNotify)ur_weak_ref_completion,self);
-
 	return TRUE;
 }
 
 static gboolean
 gsc_userrequest_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
 {
+	g_debug("Deactivating UR trigger");
+	GscUserRequestTrigger *self = GSC_USERREQUEST_TRIGGER(base);
+	GtkTextView *view = gtk_source_completion_get_view(self->priv->completion);
+	g_signal_handler_disconnect(view,self->priv->signals[URS_GTK_TEXT_VIEW_KP]);
 	return TRUE;
 }
 
@@ -133,10 +120,13 @@ static void gsc_userrequest_trigger_set_property (GObject * object, guint proper
 static void gsc_userrequest_trigger_init (GscUserRequestTrigger * self)
 {
 	self->priv = g_new0(GscUserRequestTriggerPrivate, 1);
+	gtk_accelerator_parse("<Control>Return",&self->priv->key,&self->priv->mod);
+	g_debug("Init UR trigger");
 }
 
 static void gsc_userrequest_trigger_finalize(GObject *object)
 {
+	g_debug("Finish UR trigger");
 	GscUserRequestTrigger *self;
 	self = GSC_USERREQUEST_TRIGGER(object);
 	G_OBJECT_CLASS(gsc_userrequest_trigger_parent_class)->finalize(object);
@@ -177,9 +167,11 @@ GType gsc_userrequest_trigger_get_type ()
  *
  */
 GscUserRequestTrigger*
-gsc_userrequest_trigger_new()
+gsc_userrequest_trigger_new(GtkSourceCompletion *completion)
 {
-	return GSC_USERREQUEST_TRIGGER (g_object_new (TYPE_GSC_USERREQUEST_TRIGGER, NULL));
+	GscUserRequestTrigger *self = GSC_USERREQUEST_TRIGGER (g_object_new (TYPE_GSC_USERREQUEST_TRIGGER, NULL));
+	self->priv->completion = completion;
+	return self;
 }
 
 /**

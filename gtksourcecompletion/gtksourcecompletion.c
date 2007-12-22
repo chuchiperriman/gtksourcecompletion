@@ -47,10 +47,12 @@ struct _GtkSourceCompletionPrivate
 	GtkTreeView *data_tree_view;
 	GtkWidget *window;
 	GList *providers;
+	GList *triggers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	GtkWidget *info_window;
 	GtkWidget *info_label;
 	GtkToggleButton *info_button;
+	gboolean active;
 	
 };
 
@@ -770,6 +772,23 @@ free_provider_list(gpointer list)
 	
 }
 
+static void
+free_trigger_list(gpointer list)
+{
+	GList *start = (GList*)list;
+	GList *temp = (GList*)list;
+	if (temp != NULL)
+	{
+		do
+		{
+			g_object_unref(G_OBJECT(temp->data));
+			
+		}while((temp = g_list_next(temp)) != NULL);
+		g_list_free(start);
+	}
+	
+}
+
 /*
  * Return TRUE if the position is over the text and FALSE if 
  * the position is under the text.
@@ -855,7 +874,9 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	gint i;
 	completion->priv = GTK_SOURCE_COMPLETION_GET_PRIVATE(completion);
 	
+	completion->priv->active = FALSE;
 	completion->priv->providers = NULL;
+	completion->priv->triggers = NULL;
 	gtcp_create_popup(completion);
 	gtcp_load_tree(completion);
 	gtcp_create_tree_model(completion);
@@ -883,25 +904,19 @@ static void
 gtk_source_completion_finalize (GObject *object)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(object);
+	g_debug("finish GtkSourceCompletion");
+	if (completion->priv->active)
+	{
+		gtk_source_completion_deactivate(completion);
+	}
+	
 	GtkListStore *store;
-	gint i;
 	
 	store = GTK_LIST_STORE(gtk_tree_view_get_model(completion->priv->data_tree_view));
 	clean_model_data(store);
 
 	free_provider_list(completion->priv->providers);
-
-	g_signal_handler_disconnect (completion->priv->data_tree_view,
-				completion->priv->internal_signal_ids[IS_POPUP_ROW_ACTIVATE]);
-	for (i=IS_POPUP_ROW_ACTIVATE;i<IS_LAST_SIGNAL;i++)
-	{
-		if (g_signal_handler_is_connected(completion->priv->text_view, completion->priv->internal_signal_ids[i]))
-		{
-			g_signal_handler_disconnect (completion->priv->text_view,
-				completion->priv->internal_signal_ids[i]);
-		}
-		completion->priv->internal_signal_ids[i] = 0;
-	}
+	free_trigger_list(completion->priv->triggers);
 
 	completion_control_remove_completion(completion->priv->text_view);
 	
@@ -968,26 +983,8 @@ gtk_source_completion_new (GtkTextView *view)
 
 	completion = GTK_SOURCE_COMPLETION (g_object_new (GTK_TYPE_SOURCE_COMPLETION, NULL));
 	completion->priv->text_view = view;
-	
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
-			g_signal_connect(view,
-						"key-press-event",
-						G_CALLBACK(view_key_press_event_cb),
-						(gpointer) completion);
-	g_debug("destroy connected"	);
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
-			g_signal_connect(view,
-							"destroy",
-							G_CALLBACK(view_destroy_event_cb),
-							(gpointer)completion);
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
-			g_signal_connect(view,
-							"focus-out-event",
-							G_CALLBACK(view_focus_out_event_cb),
-							(gpointer)completion);
 
 	completion_control_add_completion(view,completion);
-
 	
 	return completion;
 }
@@ -995,7 +992,7 @@ gtk_source_completion_new (GtkTextView *view)
 /**
  * gtk_source_completion_register_provider:
  * @completion: the #GtkSourceCompletion
- * @provider: The event #GtkSourceCompletionProvider.
+ * @provider: The #GtkSourceCompletionProvider.
  *
  * This function register the provider into the completion and reference it. When 
  * an event is raised, completion call to the provider to get the data. When the user
@@ -1014,7 +1011,7 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 /**
  * gtk_source_completion_unregister_provider:
  * @completion: the #GtkSourceCompletion
- * @provider: The event #GtkSourceCompletionProvider.
+ * @provider: The #GtkSourceCompletionProvider.
  *
  * This function unregister the provider.
  * 
@@ -1172,7 +1169,7 @@ gtk_source_completion_get_from_view(
 }
 
 /**
- * gtk_source_completion_have_provider:
+ * gtk_source_completion_has_provider:
  * @completion: The #GtkSourceCompletion
  * @provider_name: Provider's name that you are looking for.
  *
@@ -1181,7 +1178,7 @@ gtk_source_completion_get_from_view(
  *
  */
 gboolean
-gtk_source_completion_have_provider(GtkSourceCompletion *completion,
+gtk_source_completion_has_provider(GtkSourceCompletion *completion,
 								const gchar* provider_name)
 {
 	GList *plist = completion->priv->providers;
@@ -1201,5 +1198,88 @@ gtk_source_completion_have_provider(GtkSourceCompletion *completion,
 	return FALSE;
 }
 
+void
+gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
+								GtkSourceCompletionTrigger *trigger)
+{
+	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
+	g_object_ref(trigger);
+}
+								
+void
+gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
+								GtkSourceCompletionTrigger *trigger)
+{
+	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);	
+	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
+	g_object_unref(trigger);
+}
 
+void
+gtk_source_completion_activate(GtkSourceCompletion *completion)
+{
+	g_debug("Activating GtkSourceCompletion");
+	completion->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
+			g_signal_connect(completion->priv->text_view,
+						"key-press-event",
+						G_CALLBACK(view_key_press_event_cb),
+						(gpointer) completion);
+	g_debug("destroy connected"	);
+	completion->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
+			g_signal_connect(completion->priv->text_view,
+							"destroy",
+							G_CALLBACK(view_destroy_event_cb),
+							(gpointer)completion);
+	completion->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
+			g_signal_connect(completion->priv->text_view,
+							"focus-out-event",
+							G_CALLBACK(view_focus_out_event_cb),
+							(gpointer)completion);
+	/* We activate the triggers*/
+	GList *plist = completion->priv->triggers;
+	GtkSourceCompletionTrigger *trigger;	
+	if (plist != NULL)
+	{
+		do
+		{
+			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
+			gtk_source_completion_trigger_activate(trigger);
+
+		}while((plist = g_list_next(plist)) != NULL);
+	}	
+	
+	completion->priv->active = TRUE;
+}
+
+void
+gtk_source_completion_deactivate(GtkSourceCompletion *completion)
+{
+	g_debug("Deactivating GtkSourceCompletion");
+	gint i;
+	g_signal_handler_disconnect (completion->priv->data_tree_view,
+				completion->priv->internal_signal_ids[IS_POPUP_ROW_ACTIVATE]);
+	for (i=IS_POPUP_ROW_ACTIVATE;i<IS_LAST_SIGNAL;i++)
+	{
+		if (g_signal_handler_is_connected(completion->priv->text_view, completion->priv->internal_signal_ids[i]))
+		{
+			g_signal_handler_disconnect (completion->priv->text_view,
+				completion->priv->internal_signal_ids[i]);
+		}
+		completion->priv->internal_signal_ids[i] = 0;
+	}
+	
+	GList *plist = completion->priv->triggers;
+	GtkSourceCompletionTrigger *trigger;	
+	if (plist != NULL)
+	{
+		do
+		{
+			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
+			gtk_source_completion_trigger_deactivate(trigger);
+
+		}while((plist = g_list_next(plist)) != NULL);
+	}	
+	
+	completion->priv->active = FALSE;
+}
 
