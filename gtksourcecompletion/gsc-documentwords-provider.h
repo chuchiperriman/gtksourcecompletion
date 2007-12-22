@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef __DOCUMENTWORDS_PLUGIN_H__
-#define __DOCUMENTWORDS_PLUGIN_H__
+#ifndef __DOCUMENTWORDS_PROVIDER_H__
+#define __DOCUMENTWORDS_PROVIDER_H__
 
 #include <glib.h>
 #include <glib-object.h>

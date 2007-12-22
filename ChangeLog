@@ -1,3 +1,9 @@
+2007-12-22  chuchiperriman  <chuchiperriman@gmail.com>
+ * Events: New version because I am changing the events. Now I have created a
+ new Trigger interface instead of the current events
+
+=== Version 0.2.2 ===
+
 2007-12-20  chuchiperriman  <chuchiperriman@gmail.com>
  * gtksourcecompletion-events: Added a function to change the default keys.
  You can configure the keys that will raise the completion trigger

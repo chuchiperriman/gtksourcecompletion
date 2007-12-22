@@ -19,16 +19,20 @@ lib_LTLIBRARIES = \
 
 libgtksourcecompletion_headers = 		\
 	gtksourcecompletion-provider.h		\
+	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion-events.h		\
 	gtksourcecompletion.h			\
+	gsc-userrequest-trigger.h		\
 	gsc-documentwords-provider.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion.c			\
 	gtksourcecompletion-provider.c		\
+	gtksourcecompletion-trigger.c		\
 	gtksourcecompletion-utils.c		\
 	gtksourcecompletion-events.c		\
+	gsc-userrequest-trigger.c			\
 	gsc-documentwords-provider.c		\
 	$(libgtksourcecompletion_headers)
 	
@@ -42,9 +46,11 @@ libgtksourcecompletion_1_0_la_LDFLAGS = \
 
 INST_H_FILES = \
 	gtksourcecompletion-provider.h	\
+	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion-events.h		\
 	gtksourcecompletion.h				\
+	gsc-userrequest-trigger.h			\
 	gtksourcecompletion-providers.h	
 	
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
