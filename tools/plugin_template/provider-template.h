@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef __##(PLUGIN_ID.upper)_PLUGIN_H__
-#define __##(PLUGIN_ID.upper)_PLUGIN_H__
+#ifndef __##(PLUGIN_ID.upper)_PROVIDER_H__
+#define __##(PLUGIN_ID.upper)_PROVIDER_H__
 
 #include <glib.h>
 #include <glib-object.h>

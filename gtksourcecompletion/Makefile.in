@@ -59,8 +59,8 @@ libgtksourcecompletion_1_0_la_DEPENDENCIES =
 am__objects_1 =
 am_libgtksourcecompletion_1_0_la_OBJECTS = gtksourcecompletion.lo \
 	gtksourcecompletion-provider.lo gtksourcecompletion-trigger.lo \
-	gtksourcecompletion-utils.lo gtksourcecompletion-events.lo \
-	gsc-userrequest-trigger.lo gsc-documentwords-provider.lo \
+	gtksourcecompletion-utils.lo gsc-userrequest-trigger.lo \
+	gsc-autocompletion-trigger.lo gsc-documentwords-provider.lo \
 	$(am__objects_1)
 libgtksourcecompletion_1_0_la_OBJECTS =  \
 	$(am_libgtksourcecompletion_1_0_la_OBJECTS)
@@ -220,12 +220,12 @@ lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
 libgtksourcecompletion_headers = \
-	gtksourcecompletion-provider.h		\
+	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
-	gtksourcecompletion-events.h		\
-	gtksourcecompletion.h			\
-	gsc-userrequest-trigger.h		\
+	gtksourcecompletion.h				\
+	gsc-userrequest-trigger.h			\
+	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -233,8 +233,8 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
 	gtksourcecompletion-utils.c		\
-	gtksourcecompletion-events.c		\
 	gsc-userrequest-trigger.c			\
+	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
 	$(libgtksourcecompletion_headers)
 
@@ -249,9 +249,9 @@ INST_H_FILES = \
 	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
-	gtksourcecompletion-events.h		\
 	gtksourcecompletion.h				\
 	gsc-userrequest-trigger.h			\
+	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h	
 
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
@@ -332,9 +332,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsc-autocompletion-trigger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsc-documentwords-provider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsc-userrequest-trigger.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-events.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-provider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-trigger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-utils.Plo@am__quote@

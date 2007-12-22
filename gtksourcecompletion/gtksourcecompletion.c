@@ -1204,6 +1204,10 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 {
 	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
 	g_object_ref(trigger);
+	if (completion->priv->active)
+	{
+		gtk_source_completion_trigger_activate(trigger);
+	}
 }
 								
 void
@@ -1212,7 +1216,32 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 {
 	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);	
 	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
+	if (completion->priv->active)
+	{
+		gtk_source_completion_trigger_deactivate(trigger);
+	}
 	g_object_unref(trigger);
+}
+
+GtkSourceCompletionTrigger*
+gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
+								const gchar* trigger_name)
+{
+	GList *plist = completion->priv->triggers;
+	GtkSourceCompletionTrigger *trigger;	
+	if (plist != NULL)
+	{
+		do
+		{
+			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
+			if (strcmp(gtk_source_completion_trigger_get_name(trigger),trigger_name)==0)
+			{
+				return trigger;
+			}
+		}while((plist = g_list_next(plist)) != NULL);
+	}
+
+	return FALSE;
 }
 
 void

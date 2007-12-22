@@ -5,6 +5,11 @@
  		- Added register and unregister trigger methods.
  		- Added activate and deactivate methods. Now is mandatory call to 
  		activate if you want to activate the completion
+ * gtksourcecompletion-trigger:
+ 		- Created the trigger objects for user request completion and
+		autocompletion.
+ * trigger generator: Created the trigger template and its generator
+ * gtksourcecompletion-events: Deleted old event mechanism
 
 === Version 0.2.2 ===
 

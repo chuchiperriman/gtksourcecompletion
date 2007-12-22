@@ -98,6 +98,11 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger);
+								
+GtkSourceCompletionTrigger*
+gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
+								const gchar* trigger_name);
+
 void
 gtk_source_completion_activate(GtkSourceCompletion *completion);
 

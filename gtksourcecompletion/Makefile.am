@@ -17,13 +17,13 @@ AM_CFLAGS =\
 lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
-libgtksourcecompletion_headers = 		\
-	gtksourcecompletion-provider.h		\
+libgtksourcecompletion_headers = 	\
+	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
-	gtksourcecompletion-events.h		\
-	gtksourcecompletion.h			\
-	gsc-userrequest-trigger.h		\
+	gtksourcecompletion.h				\
+	gsc-userrequest-trigger.h			\
+	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -31,8 +31,8 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
 	gtksourcecompletion-utils.c		\
-	gtksourcecompletion-events.c		\
 	gsc-userrequest-trigger.c			\
+	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
 	$(libgtksourcecompletion_headers)
 	
@@ -48,9 +48,9 @@ INST_H_FILES = \
 	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
-	gtksourcecompletion-events.h		\
 	gtksourcecompletion.h				\
 	gsc-userrequest-trigger.h			\
+	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h	
 	
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion

@@ -31,7 +31,7 @@ import preprocessor
 # Default values of command line options
 options = {
     'language'          : 'python',
-    'description'       : 'Type here a short description of your plugin',
+    'description'       : 'Type here a short description of your trigger',
     'author'            : os.getenv('USERNAME'),
     'email'             : os.getenv('LOGNAME') + '@email.com',
     'standalone'        : False,
@@ -43,10 +43,10 @@ options = {
 }
 
 USAGE = """Usage:
-   %s [OPTIONS...] pluginname
+   %s [OPTIONS...] triggername
 """ % os.path.basename(sys.argv[0])
 HELP = USAGE + """
-generate skeleton source tree for a new GtkTextCompletionProvider.
+generate skeleton source tree for a new GtkSourceCompletionTrigger.
 
 Options:
 Features:
@@ -120,8 +120,8 @@ directives = {
 output_files = {
 }
 
-output_files['provider-template.c'] = '%s/gsc-%s-provider.c' % (plugin_module, plugin_module)
-output_files['provider-template.h'] = '%s/gsc-%s-provider.h' % (plugin_module, plugin_module)
+output_files['trigger-template.c'] = '%s/gsc-%s-trigger.c' % (plugin_module, plugin_module)
+output_files['trigger-template.h'] = '%s/gsc-%s-trigger.h' % (plugin_module, plugin_module)
 
 # Generate the plugin base
 for infile, outfile in output_files.iteritems():
