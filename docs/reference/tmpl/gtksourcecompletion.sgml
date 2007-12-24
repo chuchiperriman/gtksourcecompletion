@@ -105,16 +105,6 @@ to be shown in the completion popup.
 @Returns: 
 
 
-<!-- ##### FUNCTION gtk_source_completion_have_provider ##### -->
-<para>
-
-</para>
-
-@completion: 
-@provider_name: 
-@Returns: 
-
-
 <!-- ##### FUNCTION gtk_source_completion_item_new ##### -->
 <para>
 

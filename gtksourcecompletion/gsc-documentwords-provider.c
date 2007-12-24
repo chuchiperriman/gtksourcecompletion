@@ -132,8 +132,11 @@ clean_current_words(GscDocumentwordsProvider* self)
 {
 	g_completion_clear_items(self->priv->completion);
 	/*Clean the previous data*/
-	g_hash_table_destroy(self->priv->current_words);
-	self->priv->current_words = NULL;
+	if (self->priv->current_words!=NULL)
+	{	
+		g_hash_table_destroy(self->priv->current_words);
+		self->priv->current_words = NULL;
+	}
 	g_list_free(self->priv->temp_list);
 	self->priv->temp_list = NULL;
 }
@@ -246,6 +249,7 @@ static void gsc_documentwords_provider_set_property (GObject * object, guint pro
 
 static void gsc_documentwords_provider_finalize(GObject *object)
 {
+	g_debug("Finish GscDocumentwordsProvider");
 	GscDocumentwordsProvider *self;
 	self = GSC_DOCUMENTWORDS_PROVIDER(object);
 	clean_current_words(self);
@@ -258,6 +262,7 @@ static void gsc_documentwords_provider_finalize(GObject *object)
 
 static void gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass * klass)
 {
+	g_debug("Init GscDocumentwordsProvider");
 	gsc_documentwords_provider_parent_class = g_type_class_peek_parent (klass);
 	G_OBJECT_CLASS (klass)->get_property = gsc_documentwords_provider_get_property;
 	G_OBJECT_CLASS (klass)->set_property = gsc_documentwords_provider_set_property;

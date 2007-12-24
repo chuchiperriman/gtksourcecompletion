@@ -25,7 +25,7 @@
 #include "gsc-autocompletion-trigger.h"
 
 #define MIN_LEN 3
-#define AUTOCOMPLETION_DELAY 500
+#define AUTOCOMPLETION_DELAY 200
 
 
 /* Autocompletion signals */
