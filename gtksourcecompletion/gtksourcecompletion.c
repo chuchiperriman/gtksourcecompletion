@@ -1198,6 +1198,15 @@ gtk_source_completion_has_provider(GtkSourceCompletion *completion,
 	return FALSE;
 }
 
+/**
+ * gtk_source_completion_register_trigger:
+ * @completion: The #GtkSourceCompletion
+ * @trigger: The trigger to register
+ *
+ * This function register a completion trigger. If the completion is actived
+ * then this method activate the trigger. This function reference the trigger
+ * object
+ */
 void
 gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
@@ -1209,7 +1218,16 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 		gtk_source_completion_trigger_activate(trigger);
 	}
 }
-								
+
+/**
+ * gtk_source_completion_unregister_trigger:
+ * @completion: The #GtkSourceCompletion
+ * @trigger: The trigger to unregister
+ *
+ * This function unregister a completion trigger. If the completion is actived
+ * then this method deactivate the trigger. This function reference the trigger
+ * object
+ */								
 void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
@@ -1223,6 +1241,16 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 	g_object_unref(trigger);
 }
 
+/**
+ * gtk_source_completion_get_trigger:
+ * @completion: The #GtkSourceCompletion
+ * @trigger_name: The trigger name to get
+ *
+ * This function return the trigger with this name.
+ *
+ * Returns The trigger or NULL if not exists
+ *
+ */
 GtkSourceCompletionTrigger*
 gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 								const gchar* trigger_name)
@@ -1244,6 +1272,13 @@ gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 	return FALSE;
 }
 
+/**
+ * gtk_source_completion_activate:
+ * @completion: The #GtkSourceCompletion
+ *
+ * This function activate the completion mechanism. The completion connects 
+ * all signals and activate all registered triggers.
+ */
 void
 gtk_source_completion_activate(GtkSourceCompletion *completion)
 {
@@ -1280,6 +1315,13 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 	completion->priv->active = TRUE;
 }
 
+/**
+ * gtk_source_completion_deactivate:
+ * @completion: The #GtkSourceCompletion
+ *
+ * This function deactivate the completion mechanism. The completion disconnect
+ * all signals and deactivate all registered triggers.
+ */
 void
 gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 {
