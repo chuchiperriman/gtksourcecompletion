@@ -1,3 +1,6 @@
+2008-01-02  chuchiperriman  <chuchiperriman@gmail.com>
+	* fixed #1862126: Better autocompletion control.
+
 2007-12-22  chuchiperriman  <chuchiperriman@gmail.com>
  * Events: New version because I am changing the events. Now I have created a
  new Trigger interface instead of the current events

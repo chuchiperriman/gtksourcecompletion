@@ -21,6 +21,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "gtksourcecompletion-utils.h"
+#include "gsc-autocompletion-trigger.h"
 #include "gsc-documentwords-provider.h"
 
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
@@ -164,6 +165,22 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	GtkSourceCompletionItem *data;
 	GList *completion_list = NULL;
 	GList *data_list = NULL;
+	
+	/* 
+	* We must stop the autocompletion event because the word is not correct
+	* (The user wrotte an special character)
+	* TODO This will change when we change to the new trigger API
+	*/
+	if ((strcmp(event_name,GSC_AUTOCOMPLETION_TRIGGER_NAME)==0) &&
+			(current_word == NULL || strcmp("",current_word)==0))
+	{
+		if (self->priv->is_completing)
+		{
+			gsc_documentwords_provider_real_end_completion(base,view);
+		}
+		
+		return NULL;
+	}
 	
 	if (!self->priv->is_completing)
 	{

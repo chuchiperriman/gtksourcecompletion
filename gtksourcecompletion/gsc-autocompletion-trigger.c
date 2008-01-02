@@ -91,10 +91,6 @@ autocompletion_key_release_cb (GtkWidget *view,
 	GtkSourceCompletion *completion = self->priv->completion;
 	if (completion != NULL)
 	{
-		/*
-		* If not is a character key do nothing
-		* TODO There are more characters like (,[]{} etc.
-		*/ 
 		if  ((!(event->state & GDK_CONTROL_MASK))
 			&& ( (GDK_A <= keyval && keyval <= GDK_Z)
 			|| (GDK_a <= keyval && keyval <= GDK_z)
@@ -107,19 +103,17 @@ autocompletion_key_release_cb (GtkWidget *view,
 				self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
 			}
 		}
-		else if (GDK_BackSpace == keyval)
+		else if (keyval < 0xf000 || GDK_BackSpace == keyval)
 		{
+			/*If is not an special key...*/
 			if (gtk_source_completion_is_visible(completion))
 			{
 				word = gtk_source_view_get_last_word_and_iter(GTK_TEXT_VIEW(source_view), NULL, NULL);
-				if((strlen(word) >= MIN_LEN))
-				{
-					g_free(self->priv->actual_word);	
-					self->priv->actual_word = word;
-					gtk_source_completion_raise_event(completion,
-										GSC_AUTOCOMPLETION_TRIGGER_NAME,
-										self);
-				}
+				g_free(self->priv->actual_word);	
+				self->priv->actual_word = word;
+				gtk_source_completion_raise_event(completion,
+									GSC_AUTOCOMPLETION_TRIGGER_NAME,
+									self);
 			}
 		}
 	}
