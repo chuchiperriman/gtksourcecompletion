@@ -1,3 +1,13 @@
+2008-01-03  chuchiperriman  <chuchiperriman@gmail.com>
+	* gtksourcecompletion-provider: Changed the API to support the new trigger
+	API.
+	* gtksourcecompletion: 
+		- Changed the API to support the new provider API.
+		- Changed gtk_source_completion_has_provider to 
+		gtk_source_completion_get_provider
+		- Added gtk_source_completion_finish_completion function
+	
+
 2008-01-02  chuchiperriman  <chuchiperriman@gmail.com>
 	* fixed #1862126: Better autocompletion control.
 

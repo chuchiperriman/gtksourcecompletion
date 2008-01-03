@@ -32,9 +32,9 @@ enum  {
 	GSC_##(PLUGIN_ID.upper)_PROVIDER_DUMMY_PROPERTY,
 };
 static const gchar* gsc_##(PLUGIN_ID.lower)_provider_real_get_name (GtkSourceCompletionProvider* self);
-static GList* gsc_##(PLUGIN_ID.lower)_provider_real_get_data (GtkSourceCompletionProvider* base, GtkTextView* completion, const gchar* event_name, gpointer event_data);
-static void gsc_##(PLUGIN_ID.lower)_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkTextView* view);
-static void gsc_##(PLUGIN_ID.lower)_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkTextView* completion, GtkSourceCompletionItem* data);
+static GList* gsc_##(PLUGIN_ID.lower)_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger *trigger);
+static void gsc_##(PLUGIN_ID.lower)_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion);
+static void gsc_##(PLUGIN_ID.lower)_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data);
 static gchar* gsc_##(PLUGIN_ID.lower)_provider_real_get_item_info_markup (GtkSourceCompletionProvider *self, GtkSourceCompletionItem *item);
 static gpointer gsc_##(PLUGIN_ID.lower)_provider_parent_class = NULL;
 static GtkSourceCompletionProviderIface* gsc_##(PLUGIN_ID.lower)_provider_gtk_source_completion_provider_parent_iface = NULL;
@@ -45,17 +45,17 @@ static const gchar* gsc_##(PLUGIN_ID.lower)_provider_real_get_name (GtkSourceCom
 	return GSC_##(PLUGIN_ID.upper)_PROVIDER_NAME;
 }
 
-static GList* gsc_##(PLUGIN_ID.lower)_provider_real_get_data (GtkSourceCompletionProvider* base, GtkTextView* completion, const gchar* event_name, gpointer event_data)
+static GList* gsc_##(PLUGIN_ID.lower)_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger *trigger)
 {
 	return NULL;
 }
 
-static void gsc_##(PLUGIN_ID.lower)_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkTextView* completion)
+static void gsc_##(PLUGIN_ID.lower)_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion)
 {
 
 }
 
-static void gsc_##(PLUGIN_ID.lower)_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkTextView* text_view, GtkSourceCompletionItem* data)
+static void gsc_##(PLUGIN_ID.lower)_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data)
 {
 	
 }
