@@ -68,7 +68,8 @@ gtk_source_view_get_last_word_and_iter(GtkTextView *text_view,
 		//TODO Do better
 		if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
 			|| ch == ',' || ch == '.' || ch == '(' || ch == ')'
-			|| ch == '{' || ch == '}' || ch == ';' || ch == ':')
+			|| ch == '{' || ch == '}' || ch == ';' || ch == ':'
+			|| ch == '*')
 		{
 			found = TRUE;
 			break;
