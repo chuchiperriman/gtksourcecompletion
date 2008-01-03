@@ -111,7 +111,7 @@ autocompletion_key_release_cb (GtkWidget *view,
 				word = gtk_source_view_get_last_word_and_iter(GTK_TEXT_VIEW(source_view), NULL, NULL);
 				g_free(self->priv->actual_word);	
 				self->priv->actual_word = word;
-				gtk_source_completion_raise_event(completion,
+				gtk_source_completion_trigger_event(completion,
 									GSC_AUTOCOMPLETION_TRIGGER_NAME,
 									self);
 			}
@@ -134,7 +134,7 @@ autocompletion_raise_event(
 	{
 		g_free(self->priv->actual_word);
 		self->priv->actual_word = word;
-		gtk_source_completion_raise_event(completion,
+		gtk_source_completion_trigger_event(completion,
 							GSC_AUTOCOMPLETION_TRIGGER_NAME,
 							self);
 	}

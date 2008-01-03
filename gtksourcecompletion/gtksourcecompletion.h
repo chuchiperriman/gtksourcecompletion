@@ -65,7 +65,7 @@ GtkSourceCompletion*
 gtk_source_completion_new (GtkTextView *view);
 
 void 
-gtk_source_completion_raise_event(GtkSourceCompletion *completion, 
+gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
 					const gchar *event_name, 
 					gpointer event_data);
 
@@ -87,8 +87,8 @@ GtkSourceCompletion*
 gtk_source_completion_get_from_view(
 								GtkTextView *view);
 
-gboolean
-gtk_source_completion_has_provider(GtkSourceCompletion *completion,
+GtkSourceCompletionProvider*
+gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 								const gchar* provider_name);
 
 void
@@ -108,6 +108,9 @@ gtk_source_completion_activate(GtkSourceCompletion *completion);
 
 void
 gtk_source_completion_deactivate(GtkSourceCompletion *completion);
+
+void
+gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
 
 /* GtkSourceCompletionItem functions */
 GtkSourceCompletionItem*

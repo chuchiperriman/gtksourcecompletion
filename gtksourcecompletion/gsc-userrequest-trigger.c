@@ -64,7 +64,7 @@ user_request_view_key_press_event_cb(GtkWidget *view,
 		
 		if ((event->state & self->priv->mod) && event->keyval == self->priv->key)
 		{
-			gtk_source_completion_raise_event(completion,GSC_USERREQUEST_TRIGGER_NAME,NULL);
+			gtk_source_completion_trigger_event(completion,GSC_USERREQUEST_TRIGGER_NAME,NULL);
 			return TRUE;
 		}
 		

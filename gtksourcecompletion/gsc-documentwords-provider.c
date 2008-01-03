@@ -39,9 +39,9 @@ enum  {
 	GSC_DOCUMENTWORDS_PROVIDER_DUMMY_PROPERTY,
 };
 static const gchar* gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self);
-static GList* gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkTextView* completion, const gchar* event_name, gpointer event_data);
-static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkTextView* view);
-static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkTextView* completion, GtkSourceCompletionItem* data);
+static GList* gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger* trigger);
+static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion);
+static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data);
 static gchar* gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCompletionProvider *self, GtkSourceCompletionItem *item);
 static gpointer gsc_documentwords_provider_parent_class = NULL;
 static GtkSourceCompletionProviderIface* gsc_documentwords_provider_gtk_source_completion_provider_parent_iface = NULL;
@@ -157,10 +157,11 @@ static const gchar* gsc_documentwords_provider_real_get_name(GtkSourceCompletion
 }
 
 static GList* 
-gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkTextView* view, const gchar* event_name, gpointer event_data)
+gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger *trigger)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	gchar* text;
+	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gchar* current_word = gtk_source_view_get_last_word(view);
 	GtkSourceCompletionItem *data;
 	GList *completion_list = NULL;
@@ -171,12 +172,12 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	* (The user wrotte an special character)
 	* TODO This will change when we change to the new trigger API
 	*/
-	if ((strcmp(event_name,GSC_AUTOCOMPLETION_TRIGGER_NAME)==0) &&
+	if ( IS_GSC_AUTOCOMPLETION_TRIGGER(trigger) &&
 			(current_word == NULL || strcmp("",current_word)==0))
 	{
 		if (self->priv->is_completing)
 		{
-			gsc_documentwords_provider_real_end_completion(base,view);
+			gsc_documentwords_provider_real_end_completion(base,completion);
 		}
 		
 		return NULL;
@@ -232,7 +233,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	return data_list;
 }
 
-static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkTextView* completion)
+static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	/*Clean current word list*/
@@ -242,9 +243,10 @@ static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionP
 	
 }
 
-static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkTextView* text_view, GtkSourceCompletionItem* data)
+static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data)
 {
-	gtk_source_view_replace_actual_word(text_view,
+	GtkTextView *view = gtk_source_completion_get_view(completion);
+	gtk_source_view_replace_actual_word(view,
 					gtk_source_completion_item_get_name(data));
 }
 

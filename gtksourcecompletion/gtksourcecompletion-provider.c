@@ -38,9 +38,8 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider *self)
 /**
  * gtk_source_completion_provider_get_data:
  * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkTextView.
- * @event_name: The event name raised.
- * @event_data: Some data of the event. Every event have your own data.
+ * @completion: The #GtkSourceCompletion.
+ * @trigger: The #GtkSourceCompletionTrigger that raise the event
  *
  * The completion call this function when an event is raised.
  * This function may return a list of #GtkSourceCompletionItem to be shown
@@ -51,17 +50,16 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider *self)
  **/
 GList* 
 gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
-					GtkTextView* view, 
-					const gchar* event_name, 
-					gpointer event_data)
+					GtkSourceCompletion* completion, 
+					GtkSourceCompletionTrigger *trigger)
 {
-	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_data (self, view, event_name, event_data);
+	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_data (self, completion, trigger);
 }
 
 /**
  * gtk_source_completion_provider_data_selected:
  * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkTextView.
+ * @view: The #GtkSourceCompletion.
  * @item: The data selected by the user.
  *
  * The completion call this function when the user select an item of this provider.
@@ -71,25 +69,25 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
  **/
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					GtkTextView* view, 
+					GtkSourceCompletion* completion, 
 					GtkSourceCompletionItem* item)
 {
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, view, item);
+	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, completion, item);
 }
 
 /**
  * gtk_source_completion_provider_end_completion:
  * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkTextView.
+ * @view: The #GtkSourceCompletion.
  *
  * The completion call this function when it is goint to hide the popup
  * 
  **/
 void 
 gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					GtkTextView* view)
+					GtkSourceCompletion* completion)
 {
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->end_completion(self, view);
+	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->end_completion(self, completion);
 }
 
 /**

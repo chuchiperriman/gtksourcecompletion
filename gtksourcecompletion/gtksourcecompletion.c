@@ -189,10 +189,6 @@ internal_data_compare (gconstpointer v1,
 static void
 end_completion (GtkSourceCompletion *completion)
 {
-	/*
-	* If a provider is registered in two events, they 
-	* will be called twice.
-	*/
 	gtk_widget_hide(completion->priv->window);
 	gtk_widget_hide(completion->priv->info_window);
 
@@ -200,10 +196,9 @@ end_completion (GtkSourceCompletion *completion)
 	do
 	{
 		GtkSourceCompletionProvider *provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers->data);
-		gtk_source_completion_provider_end_completion(provider,completion->priv->text_view);
+		gtk_source_completion_provider_end_completion(provider,completion);
 			
 	}while((providers = g_list_next(providers)) != NULL);
-		
 }
 
 /*
@@ -536,7 +531,7 @@ popup_tree_row_activated_cb (GtkTreeView *tree_view,
 	data = (GtkSourceCompletionItem*)g_value_get_pointer(&value_name);
 	gtk_tree_model_get_value(model,&iter,COL_PROVIDER,&value_prov);
 	provider = GTK_SOURCE_COMPLETION_PROVIDER(g_value_get_pointer(&value_prov));
-	gtk_source_completion_provider_data_selected(provider,completion->priv->text_view, data);
+	gtk_source_completion_provider_data_selected(provider,completion, data);
 	end_completion (completion);
 }
 
@@ -1004,6 +999,7 @@ void
 gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 					GtkSourceCompletionProvider *provider)
 {
+	/*TODO Check if the provider exists in the list*/
 	completion->priv->providers = g_list_append(completion->priv->providers,provider);
 	g_object_ref(provider);
 }
@@ -1039,9 +1035,9 @@ gtk_source_completion_get_view(GtkSourceCompletion *completion)
 }
 
 /**
- * gtk_source_completion_raise_event:
+ * gtk_source_completion_trigger_event:
  * @completion: the #GtkSourceCompletion
- * @event_name: The event name to raise
+ * @trigger_name: The event name to raise
  * @event_data: This object will be passed to the providers to give them some special information of the event
  *
  * Calling this function, the completion call to all providers to get data and, if 
@@ -1049,8 +1045,8 @@ gtk_source_completion_get_view(GtkSourceCompletion *completion)
  * 
  **/
 void
-gtk_source_completion_raise_event(GtkSourceCompletion *completion, 
-					const gchar *event_name, 
+gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+					const gchar *trigger_name, 
 					gpointer event_data)
 {
 	GList* data_list;
@@ -1058,9 +1054,13 @@ gtk_source_completion_raise_event(GtkSourceCompletion *completion,
 	GList* final_list = NULL;
 	GList *providers_list;
 	GtkSourceCompletionProvider *provider;
+	GtkSourceCompletionTrigger *trigger;
 	GtkListStore *store;
 	GtkTreeIter iter;
 	InternalCompletionData *idata = NULL;
+	
+	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	g_return_if_fail(trigger!=NULL);
 	
 	store = GTK_LIST_STORE(gtk_tree_view_get_model(completion->priv->data_tree_view));
 	clean_model_data(store);
@@ -1074,7 +1074,7 @@ gtk_source_completion_raise_event(GtkSourceCompletion *completion,
 		{
 			provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers_list->data);
 			data_list = gtk_source_completion_provider_get_data (
-							provider, completion->priv->text_view, event_name, event_data);
+							provider, completion, trigger);
 			if (data_list != NULL)
 			{
 				original_list = data_list;
@@ -1084,7 +1084,6 @@ gtk_source_completion_raise_event(GtkSourceCompletion *completion,
 					idata->provider = provider;
 					idata->data = (GtkSourceCompletionItem*)data_list->data;
 					final_list = g_list_append(final_list, idata);
-					//gtcp_add_data_to_tree(completion, GTK_SOURCE_COMPLETION_DATA(data_list->data), provider);
 					
 				}while((data_list = g_list_next(data_list)) != NULL);
 				g_list_free(original_list);
@@ -1169,16 +1168,16 @@ gtk_source_completion_get_from_view(
 }
 
 /**
- * gtk_source_completion_has_provider:
+ * gtk_source_completion_get_provider:
  * @completion: The #GtkSourceCompletion
  * @provider_name: Provider's name that you are looking for.
  *
- * Returns TRUE if the completion has this provider registered or 
- * FALSE if not.
+ * Returns The provider if the completion has this provider registered or 
+ * NULL if not.
  *
  */
-gboolean
-gtk_source_completion_has_provider(GtkSourceCompletion *completion,
+GtkSourceCompletionProvider*
+gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 								const gchar* provider_name)
 {
 	GList *plist = completion->priv->providers;
@@ -1190,12 +1189,12 @@ gtk_source_completion_has_provider(GtkSourceCompletion *completion,
 			provider =  GTK_SOURCE_COMPLETION_PROVIDER(plist->data);
 			if (strcmp(gtk_source_completion_provider_get_name(provider),provider_name)==0)
 			{
-				return TRUE;
+				return provider;
 			}
 		}while((plist = g_list_next(plist)) != NULL);
 	}
 
-	return FALSE;
+	return NULL;
 }
 
 /**
@@ -1352,5 +1351,20 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 	}	
 	
 	completion->priv->active = FALSE;
+}
+
+/**
+ * gtk_source_completion_finish_completion:
+ * @completion: The #GtkSourceCompletion
+ *
+ * This function finish the completion if it is active (visible).
+ */
+void
+gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
+{
+	if (gtk_source_completion_is_visible(completion))
+	{
+		end_completion(completion);
+	}
 }
 

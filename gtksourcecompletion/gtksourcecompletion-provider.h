@@ -37,6 +37,7 @@ typedef struct _GtkSourceCompletionProvider GtkSourceCompletionProvider;
 typedef struct _GtkSourceCompletionProviderIface GtkSourceCompletionProviderIface;
 
 #include "gtksourcecompletion.h"
+#include "gtksourcecompletion-trigger.h"
 
 struct _GtkSourceCompletionProviderIface {
 	
@@ -45,15 +46,14 @@ struct _GtkSourceCompletionProviderIface {
 	const gchar* (*get_name) (GtkSourceCompletionProvider *self);
 
 	GList* (*get_data) (GtkSourceCompletionProvider* self,
-	 										GtkTextView* completion, 
-	 										const gchar* event_name, 
-	 										gpointer event_data);
+	 										GtkSourceCompletion* completion, 
+	 										GtkSourceCompletionTrigger *trigger);
 	void (*data_selected) (GtkSourceCompletionProvider* self,
-											GtkTextView* completion, 
+											GtkSourceCompletion* completion, 
 											GtkSourceCompletionItem* data);
 											
 	void (*end_completion) (GtkSourceCompletionProvider* self,
-	 										GtkTextView* completion);
+	 										GtkSourceCompletion* completion);
 	 										
 	gchar* (*get_item_info_markup) (GtkSourceCompletionProvider *self, 
 							GtkSourceCompletionItem *item);
@@ -65,18 +65,17 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider* self);
 
 GList* 
 gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self, 
-					GtkTextView* view, 
-					const gchar* event_name, 
-					gpointer event_data);
+					GtkSourceCompletion* completion, 
+					GtkSourceCompletionTrigger *trigger);
 					
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					GtkTextView* view, 
+					GtkSourceCompletion *completion, 
 					GtkSourceCompletionItem* item);
 					
 void 
 gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					GtkTextView* view);
+					GtkSourceCompletion* completion);
 
 gchar*
 gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
