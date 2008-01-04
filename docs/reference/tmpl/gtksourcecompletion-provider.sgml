@@ -60,9 +60,8 @@ gtksourcecompletion package in the tools folder.
 </para>
 
 @self: 
-@view: 
-@event_name: 
-@event_data: 
+@completion: 
+@trigger: 
 @Returns: 
 
 
@@ -72,7 +71,7 @@ gtksourcecompletion package in the tools folder.
 </para>
 
 @self: 
-@view: 
+@completion: 
 @item: 
 
 
@@ -82,7 +81,7 @@ gtksourcecompletion package in the tools folder.
 </para>
 
 @self: 
-@view: 
+@completion: 
 
 
 <!-- ##### FUNCTION gtk_source_completion_provider_get_item_info_markup ##### -->

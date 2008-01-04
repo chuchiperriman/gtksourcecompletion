@@ -50,16 +50,6 @@ to be shown in the completion popup.
 @Returns: 
 
 
-<!-- ##### FUNCTION gtk_source_completion_raise_event ##### -->
-<para>
-
-</para>
-
-@completion: 
-@event_name: 
-@event_data: 
-
-
 <!-- ##### FUNCTION gtk_source_completion_register_provider ##### -->
 <para>
 

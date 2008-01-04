@@ -1,3 +1,9 @@
+gtksourcecompletion (0.3.0-0) gutsy; urgency=low
+
+  * New stable API
+
+ -- perriman <chuchiperriman@gmail.com>  Thu, 03 Jan 2008 19:05:35 +0100
+
 gtksourcecompletion (0.2.2-1) unstable; urgency=low
 
   * Initial release 
