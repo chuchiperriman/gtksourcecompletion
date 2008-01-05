@@ -11,7 +11,7 @@ DOC_MODULE = gtksourcecompletion-1.0
 DOC_MAIN_SGML_FILE = gtksourcecompletion-docs.sgml
 
 # Extra options to supply to gtkdoc-scan
-SCAN_OPTIONS =
+SCAN_OPTIONS = --rebuild-sections --rebuild-types
 
 # The directory containing the source code. Relative to $(srcdir)
 DOC_SOURCE_DIR = ../..
@@ -25,7 +25,9 @@ IGNORE_HFILES =					\
 	config.h		\
 	xmalloc.h		\
 	provider-template.h			\
-	provider-template.c
+	provider-template.c			\
+	trigger-template.h			\
+	trigger-template.c
 
 # Extra options to supply to gtkdoc-mkdb
 MKDB_OPTIONS = --sgml-mode --output-format=xml --ignore-files=trio

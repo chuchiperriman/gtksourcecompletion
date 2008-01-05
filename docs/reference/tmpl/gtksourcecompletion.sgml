@@ -50,6 +50,16 @@ to be shown in the completion popup.
 @Returns: 
 
 
+<!-- ##### FUNCTION gtk_source_completion_trigger_event ##### -->
+<para>
+
+</para>
+
+@completion: 
+@event_name: 
+@event_data: 
+
+
 <!-- ##### FUNCTION gtk_source_completion_register_provider ##### -->
 <para>
 
@@ -93,6 +103,68 @@ to be shown in the completion popup.
 
 @view: 
 @Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_get_provider ##### -->
+<para>
+
+</para>
+
+@completion: 
+@provider_name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_register_trigger ##### -->
+<para>
+
+</para>
+
+@completion: 
+@trigger: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_unregister_trigger ##### -->
+<para>
+
+</para>
+
+@completion: 
+@trigger: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_get_trigger ##### -->
+<para>
+
+</para>
+
+@completion: 
+@trigger_name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_activate ##### -->
+<para>
+
+</para>
+
+@completion: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_deactivate ##### -->
+<para>
+
+</para>
+
+@completion: 
+
+
+<!-- ##### FUNCTION gtk_source_completion_finish_completion ##### -->
+<para>
+
+</para>
+
+@completion: 
 
 
 <!-- ##### FUNCTION gtk_source_completion_item_new ##### -->
