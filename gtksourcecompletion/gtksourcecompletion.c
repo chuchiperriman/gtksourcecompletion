@@ -21,7 +21,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 #include "gtksourcecompletion.h"
+#include "gtksourcecompletion-i18n.h"
 #include "gtksourcecompletion-utils.h"
+#include "config.h"
 
 #define COL_PIXBUF 0
 #define COL_NAME 1
@@ -30,6 +32,8 @@
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
+
+static gboolean lib_initialized = FALSE;
 
 /* Internal signals */
 enum
@@ -76,8 +80,6 @@ struct _InternalCompletionData
 typedef struct _InternalCompletionData InternalCompletionData;
 
 static GObjectClass* parent_class = NULL;
-
-const gchar* NO_INFO = "There is no info for the current item";
 
 static void 
 show_completion_info		(GtkSourceCompletion *completion);
@@ -701,7 +703,7 @@ gtcp_create_popup(GtkSourceCompletion *completion)
 	gtk_container_add(GTK_CONTAINER(scroll),GTK_WIDGET(completion->priv->data_tree_view));
 	/*Icon list*/
 	GtkWidget *info_icon = gtk_image_new_from_stock(GTK_STOCK_INFO,GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_set_tooltip_text(info_icon, "Show Item Info");
+	gtk_widget_set_tooltip_text(info_icon, _("Show Item Info"));
 	GtkWidget *info_button = gtk_toggle_button_new();
 	completion->priv->info_button = GTK_TOGGLE_BUTTON(info_button);
 	gtk_container_add(GTK_CONTAINER(info_button),info_icon);
@@ -829,7 +831,7 @@ set_current_completion_info(GtkSourceCompletion *completion)
 	}
 	else
 	{
-		gtk_label_set_markup(GTK_LABEL(completion->priv->info_label), NO_INFO);
+		gtk_label_set_markup(GTK_LABEL(completion->priv->info_label), _("There is no info for the current item"));
 	}
 }
 
@@ -866,6 +868,16 @@ show_completion_popup(GtkSourceCompletion *completion)
 static void
 gtk_source_completion_init (GtkSourceCompletion *completion)
 {
+    g_debug("Antes de i18n");
+	if (!lib_initialized)
+	{
+        g_debug("i18 initialized");
+		bindtextdomain (GETTEXT_PACKAGE, GTKSOURCECOMPLETIONLOCALEDIR);
+        g_debug(GETTEXT_PACKAGE);
+        g_debug(GTKSOURCECOMPLETIONLOCALEDIR);
+        bind_textdomain_codeset(GETTEXT_PACKAGE,"UTF-8");
+		lib_initialized = TRUE;
+	}
 	gint i;
 	completion->priv = GTK_SOURCE_COMPLETION_GET_PRIVATE(completion);
 	

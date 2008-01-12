@@ -1,3 +1,6 @@
+2008-01-12  chuchiperriman  <chuchiperriman@gmail.com>
+	* general: Added i18n support to gtksourcecompletion!!
+
 2008-01-03  chuchiperriman  <chuchiperriman@gmail.com>
 	* gtksourcecompletion-provider: Changed the API to support the new trigger
 	API.
