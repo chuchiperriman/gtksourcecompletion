@@ -872,9 +872,10 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	if (!lib_initialized)
 	{
         g_debug("i18 initialized");
-		bindtextdomain (GETTEXT_PACKAGE, GTKSOURCECOMPLETIONLOCALEDIR);
+        g_debug(PACKAGE_LOCALE_DIR);
+		bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
         g_debug(GETTEXT_PACKAGE);
-        g_debug(GTKSOURCECOMPLETIONLOCALEDIR);
+        g_debug(PACKAGE_LOCALE_DIR);
         bind_textdomain_codeset(GETTEXT_PACKAGE,"UTF-8");
 		lib_initialized = TRUE;
 	}

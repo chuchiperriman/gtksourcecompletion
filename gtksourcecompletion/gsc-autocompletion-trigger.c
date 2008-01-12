@@ -62,61 +62,56 @@ autocompletion_raise_event(
 
 
 static gboolean
-autocompletion_key_press_cb (GtkWidget *view,
-					GdkEventKey *event, 
-					gpointer user_data)
-{
-	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
-	if (self->priv->source_id!=0)
-	{
-			/* Stop the event because the user is written very fast*/
-			g_source_remove(self->priv->source_id);
-			self->priv->source_id = 0;
-	}
-	return FALSE;
-}
-
-static gboolean
 autocompletion_key_release_cb (GtkWidget *view,
 					GdkEventKey *event, 
 					gpointer user_data)
 {
-	gchar* word;
-	gboolean res = FALSE;
 	guint keyval = event->keyval;
-	GtkSourceView *source_view = GTK_SOURCE_VIEW(view);
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
 	GtkSourceCompletion *completion = self->priv->completion;
 	if (completion != NULL)
 	{
-		if  ((!(event->state & GDK_CONTROL_MASK))
-			&& ( (GDK_A <= keyval && keyval <= GDK_Z)
-			|| (GDK_a <= keyval && keyval <= GDK_z)
-			|| (GDK_0 <= keyval && keyval <= GDK_9)		
-			|| GDK_underscore == keyval))
+		if (GDK_BackSpace == keyval)
 		{
+			if (self->priv->source_id!=0)
+			{
+				/* Stop the event because the user is written very fast*/
+				g_source_remove(self->priv->source_id);
+				self->priv->source_id = 0;
+			}
+
 			/*raise event in 0,5 seconds*/
-			if (self->priv->source_id==0)
-			{
-				self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
-			}
-		}
-		else if (keyval < 0xf000 || GDK_BackSpace == keyval)
-		{
-			/*If is not an special key...*/
-			if (gtk_source_completion_is_visible(completion))
-			{
-				word = gtk_source_view_get_last_word_and_iter(GTK_TEXT_VIEW(source_view), NULL, NULL);
-				g_free(self->priv->actual_word);	
-				self->priv->actual_word = word;
-				gtk_source_completion_trigger_event(completion,
-									GSC_AUTOCOMPLETION_TRIGGER_NAME,
-									self);
-			}
+			self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
+			
 		}
 	}
 
-	return res;
+	return FALSE;
+}
+
+static void
+autocompletion_insert_text_cb(GtkTextBuffer *buffer,
+											GtkTextIter* location,
+											gchar *text,
+											gint len,
+											gpointer user_data)
+{
+	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
+	g_debug("Inserted: %s, len: %i",text,len);
+	g_debug("Current word: %s",gtk_source_view_get_last_word_and_iter(self->priv->view,NULL,NULL));
+	//TODO see the maximun length of a single UTF-8 character
+	if (len<=2)
+	{
+		if (self->priv->source_id!=0)
+		{
+			/* Stop the event because the user is written very fast*/
+			g_source_remove(self->priv->source_id);
+			self->priv->source_id = 0;
+		}
+
+		/*raise event in 0,5 seconds*/
+		self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
+	}
 }
 
 static gboolean
@@ -149,18 +144,23 @@ gsc_autocompletion_trigger_real_activate (GtkSourceCompletionTrigger* base)
 {
 	g_debug("Activating Autocompletion trigger");
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(base);
-	self->priv->signals[AS_GTK_TEXT_VIEW_KR] = 
-			g_signal_connect_data(self->priv->view,
+	g_signal_connect_data(self->priv->view,
 						"key-release-event",
 						G_CALLBACK(autocompletion_key_release_cb),
 						(gpointer) self,
 						(GClosureNotify)NULL,
 						G_CONNECT_AFTER);
-	self->priv->signals[AS_GTK_TEXT_VIEW_KP] = 
+	/* self->priv->signals[AS_GTK_TEXT_VIEW_KP] = 
 			g_signal_connect(self->priv->view,
 						"key-press-event",
 						G_CALLBACK(autocompletion_key_press_cb),
 						(gpointer) self);
+	*/					
+	g_signal_connect_after(gtk_text_view_get_buffer(self->priv->view),
+						"insert-text",
+						G_CALLBACK(autocompletion_insert_text_cb),
+						(gpointer) self);
+	
 	return TRUE;
 }
 
