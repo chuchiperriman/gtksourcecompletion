@@ -9,18 +9,23 @@ Upstream Author(s):
 Copyright: 
 
     <Copyright (C) 2007 Jesús Barbero Rodríguez>
-		This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    This file is part of gtksourcecompletion.
+
+    gtksourcecompletion is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
     
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.)
+    gtksourcecompletion is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public License
+    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 The Debian packaging is (C) 2007, iJesús Barbero Rodríguez <chuchiperriman@gmail.com> and
-is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+is licensed under the LGPL, see `/usr/share/common-licenses/LGPL'.
 
 # Please also look if there are files or directories which have a
 # different copyright/license attached and list them here.
