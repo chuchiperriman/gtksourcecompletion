@@ -18,8 +18,8 @@ msgstr ""
 
 #: ../gtksourcecompletion/gtksourcecompletion.c:707
 msgid "Show Item Info"
-msgstr "Mostrar información del Elemento"
+msgstr "Afficher l'information sur l'elément"
 
 #: ../gtksourcecompletion/gtksourcecompletion.c:835
 msgid "There is no info for the current item"
-msgstr "No hay información disponible para el elemento actual"
+msgstr "Il n'y a pas d'information disponible sur l'elément"

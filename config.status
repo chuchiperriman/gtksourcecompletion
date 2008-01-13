@@ -641,7 +641,7 @@ s,@INTLTOOL_EXTRACT@,|#_!!_#|$(top_builddir)/intltool-extract,g
 s,@INTLTOOL_MERGE@,|#_!!_#|$(top_builddir)/intltool-merge,g
 s,@INTLTOOL_UPDATE@,|#_!!_#|$(top_builddir)/intltool-update,g
 s,@INTLTOOL_PERL@,|#_!!_#|/usr/bin/perl,g
-s,@ALL_LINGUAS@,|#_!!_#|es,g
+s,@ALL_LINGUAS@,|#_!!_#|es fr it,g
 s,@DATADIRNAME@,|#_!!_#|share,g
 s,@GETTEXT_PACKAGE@,|#_!!_#|gtksourcecompletion,g
 s,@USE_NLS@,|#_!!_#|yes,g
@@ -649,14 +649,14 @@ s,@MSGFMT@,|#_!!_#|/usr/bin/msgfmt,g
 s,@MSGFMT_OPTS@,|#_!!_#|-c,g
 s,@GMSGFMT@,|#_!!_#|/usr/bin/msgfmt,g
 s,@XGETTEXT@,|#_!!_#|/usr/bin/xgettext,g
-s,@CATALOGS@,|#_!!_#| es.gmo,g
+s,@CATALOGS@,|#_!!_#| es.gmo fr.gmo it.gmo,g
 s,@CATOBJEXT@,|#_!!_#|.gmo,g
-s,@GMOFILES@,|#_!!_#| es.gmo,g
+s,@GMOFILES@,|#_!!_#| es.gmo fr.gmo it.gmo,g
 s,@INSTOBJEXT@,|#_!!_#|.mo,g
 s,@INTLLIBS@,|#_!!_#|,g
 s,@PO_IN_DATADIR_TRUE@,|#_!!_#|,g
 s,@PO_IN_DATADIR_FALSE@,|#_!!_#|,g
-s,@POFILES@,|#_!!_#| es.po,g
+s,@POFILES@,|#_!!_#| es.po fr.po it.po,g
 s,@POSUB@,|#_!!_#|po,g
 s,@MKINSTALLDIRS@,|#_!!_#|./mkinstalldirs,g
 s,@gtksourcecompletionlocaledir@,|#_!!_#|${prefix}/${DATADIRNAME}/locale,g

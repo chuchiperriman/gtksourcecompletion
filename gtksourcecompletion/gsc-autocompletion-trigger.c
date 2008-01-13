@@ -30,7 +30,7 @@
 enum
 {
 	AS_GTK_TEXT_VIEW_KR,
-	AS_GTK_TEXT_VIEW_KP,
+	AS_GTK_TEXT_VIEW_IT,
 	AS_LAST_SIGNAL
 };
 
@@ -97,9 +97,7 @@ autocompletion_insert_text_cb(GtkTextBuffer *buffer,
 											gpointer user_data)
 {
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
-	g_debug("Inserted: %s, len: %i",text,len);
-	g_debug("Current word: %s",gtk_source_view_get_last_word_and_iter(self->priv->view,NULL,NULL));
-	//TODO see the maximun length of a single UTF-8 character
+	/*TODO see the maximun length of a single UTF-8 character*/
 	if (len<=2)
 	{
 		if (self->priv->source_id!=0)
@@ -144,19 +142,14 @@ gsc_autocompletion_trigger_real_activate (GtkSourceCompletionTrigger* base)
 {
 	g_debug("Activating Autocompletion trigger");
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(base);
-	g_signal_connect_data(self->priv->view,
+	self->priv->signals[AS_GTK_TEXT_VIEW_KR] = g_signal_connect_data(self->priv->view,
 						"key-release-event",
 						G_CALLBACK(autocompletion_key_release_cb),
 						(gpointer) self,
 						(GClosureNotify)NULL,
 						G_CONNECT_AFTER);
-	/* self->priv->signals[AS_GTK_TEXT_VIEW_KP] = 
-			g_signal_connect(self->priv->view,
-						"key-press-event",
-						G_CALLBACK(autocompletion_key_press_cb),
-						(gpointer) self);
-	*/					
-	g_signal_connect_after(gtk_text_view_get_buffer(self->priv->view),
+
+	self->priv->signals[AS_GTK_TEXT_VIEW_IT] = g_signal_connect_after(gtk_text_view_get_buffer(self->priv->view),
 						"insert-text",
 						G_CALLBACK(autocompletion_insert_text_cb),
 						(gpointer) self);
@@ -169,10 +162,15 @@ gsc_autocompletion_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
 {
 	g_debug("Deactivating Autocompletion trigger");
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(base);
+	gint i;
 	
-	g_signal_handler_disconnect(self->priv->view,self->priv->signals[AS_GTK_TEXT_VIEW_KP]);
-	g_signal_handler_disconnect(self->priv->view,self->priv->signals[AS_GTK_TEXT_VIEW_KR]);
-	
+	for(i=0;i < AS_LAST_SIGNAL;i++)
+	{
+		if (g_signal_handler_is_connected(self->priv->view,self->priv->signals[i]))
+		{
+			g_signal_handler_disconnect(self->priv->view,self->priv->signals[i]);
+		}
+	}
 	return FALSE;
 }
 

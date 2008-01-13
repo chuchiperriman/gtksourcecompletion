@@ -1,8 +1,17 @@
+2008-01-13  chuchiperriman  <chuchiperriman@gmail.com>
+	* general: Closed 0.3.0 version and open 0.3.1
+
 2008-01-12  chuchiperriman  <chuchiperriman@gmail.com>
 	* general: Added i18n support to gtksourcecompletion!!
 		- Changed license from GPL to LGPL
 	* gsc-autocompletion-trigger.c: Better key control using GtkTextBuffer "insert-text"
-	signal.
+	signal. Fixed (#1869881)
+	* gsc-docwordscompletion-provider.c: 
+		- Change get_all_words function. Now it
+		use GtkTextIter instead of the gchar* text of the buffer. It is more easy 
+		- Fixed problem completing non english characters (#1863114)
+
+=== Version 0.3.0 ===
 
 2008-01-03  chuchiperriman  <chuchiperriman@gmail.com>
 	* gtksourcecompletion-provider: Changed the API to support the new trigger

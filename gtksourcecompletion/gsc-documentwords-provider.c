@@ -44,86 +44,76 @@ static gchar* gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCom
 static gpointer gsc_documentwords_provider_parent_class = NULL;
 static GtkSourceCompletionProviderIface* gsc_documentwords_provider_gtk_source_completion_provider_parent_iface = NULL;
 
-const int  NEWLINE = '\n';
-
-static int 
-is_separador(gunichar c)
-{
-	if (g_unichar_isalnum(c) == 0 && c != '_')
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
+/**********************New search methods**************************/
 static gboolean
-is_valid_word(gchar *current_word, gchar *completion_word)
+pred_is_separator(gunichar ch, gpointer user_data)
 {
-	if (g_utf8_collate(current_word,completion_word) == 0 ||
-			g_utf8_strlen(completion_word,5)<4)
+	if (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_"))
+	{
 		return FALSE;
-		
+	}
+	
 	return TRUE;
 }
 
 static GHashTable*
-get_all_words(gchar* text)
+get_all_words( GtkTextBuffer *buffer )
 {
+	GtkTextIter start_iter;
+    GtkTextIter prev_iter;
+    gchar *word;
 	GHashTable *result = g_hash_table_new_full(
 						g_str_hash,
 						g_str_equal,
 						g_free,
 						NULL);
-	gint state, pos = 0, posini = 0, posfin = 0;
-	gchar *inicio = NULL, *fin = NULL, *actual = NULL, *temp = NULL;
-	gunichar character;
-
-	/*state = 0 when we not have a word, state = 1 when we are into a word*/
-	state = 0;
-	actual = text;
-	character = g_utf8_get_char(actual);
-	while (character != 0)
-	{
-		if (is_separador(character))
-		{
-			if (state == 1)
-			{	
-				fin = actual;
-				posfin = pos;
-				/*strncpy(word,inicio, posfin-posini );
-				word[posfin-posini] = '\0';*/
-				temp = g_strndup(inicio,posfin-posini);
-				g_hash_table_insert(result,temp,NULL);
-			}
-			state = 0;
-			
-		}
-		else if (state == 0)
-		{
-			//prev word = blank = new word
-			inicio = actual;
-			posini = pos;
-			state = 1;
-		}
-	    
-		//actual++;
-		actual = g_utf8_next_char(actual);
-		character = g_utf8_get_char(actual);
-		pos++;
-	}
-
-	if (state == 1 && (pos-posini > 0))
-	{
-		/*strncpy(word,inicio, pos-posini );
-		word[pos-posini] = '\0';
-		g_hash_table_insert(result,g_strdup(word),NULL);*/
-		g_hash_table_insert(result,g_strndup(inicio,pos-posini),NULL);
-	}
 	
+	
+	gtk_text_buffer_get_start_iter(buffer,&start_iter);
+    prev_iter = start_iter;
+	while (gtk_text_iter_forward_find_char(
+			&start_iter,
+			(GtkTextCharPredicate)pred_is_separator,
+			NULL,
+			NULL))
+	{
+        word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+        if (strlen(word)>0)
+        {
+            /*TODO Try to eliminate this g_strdup*/
+            g_hash_table_insert(result,g_strdup(word),NULL);
+        }
+        prev_iter = start_iter;
+        gtk_text_iter_forward_char(&prev_iter);
+	}
+
+    if (!gtk_text_iter_is_end(&prev_iter))
+    {
+        gtk_text_buffer_get_end_iter(buffer,&start_iter);
+        word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+        if (strlen(word)>0)
+        {
+            /*TODO Try to eliminate this g_strdup*/
+            g_hash_table_insert(result,g_strdup(word),NULL);
+        }
+        prev_iter = start_iter;
+        gtk_text_iter_forward_char(&prev_iter);
+        
+    }
+			
 	return result;
+}
+
+/******************************************************************/
+
+static gboolean
+is_valid_word(gchar *current_word, gchar *completion_word)
+{
+	if (g_utf8_collate(current_word,completion_word) == 0 ||
+			g_utf8_strlen(completion_word,-1)<4)
+		return FALSE;
+		
+	return TRUE;
 }
 
 static void
@@ -187,14 +177,13 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(view);
 		g_object_get(text_buffer, "text", &text, NULL);
 	
-		self->priv->current_words = get_all_words(text);
+		self->priv->current_words = get_all_words(text_buffer);
 		g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
 		g_completion_add_items(self->priv->completion, self->priv->temp_list);
 		g_free(text);
 		g_list_free(self->priv->temp_list);
 		self->priv->temp_list = NULL;
 	}
-		
 	completion_list = g_completion_complete_utf8(self->priv->completion,current_word,NULL);
 	
 	gint i = 0;
@@ -226,7 +215,6 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 		self->priv->is_completing = FALSE;
 	}
 
-	
 	/* GtkSourceCompletion frees this list and data */
 	return data_list;
 }
