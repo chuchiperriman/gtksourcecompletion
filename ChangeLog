@@ -1,5 +1,8 @@
 2008-01-13  chuchiperriman  <chuchiperriman@gmail.com>
 	* general: Closed 0.3.0 version and open 0.3.1
+	* gsc-docwordscompletion-provider.c: Sort the completion items by length
+	by default.	I have added a new function gsc_documentwords_provider_set_sort_type to
+	set the sort type. (#1852050)
 
 2008-01-12  chuchiperriman  <chuchiperriman@gmail.com>
 	* general: Added i18n support to gtksourcecompletion!!

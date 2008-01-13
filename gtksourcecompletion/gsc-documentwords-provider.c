@@ -30,6 +30,7 @@ struct _GscDocumentwordsProviderPrivate {
 	GHashTable *current_words;
 	GList *temp_list;
 	GdkPixbuf *icon;
+	GscDocumentwordsProviderSortType sort_type;
 };
 
 #define GSC_DOCUMENTWORDS_PROVIDER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderPrivate))
@@ -44,7 +45,6 @@ static gchar* gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCom
 static gpointer gsc_documentwords_provider_parent_class = NULL;
 static GtkSourceCompletionProviderIface* gsc_documentwords_provider_gtk_source_completion_provider_parent_iface = NULL;
 
-/**********************New search methods**************************/
 static gboolean
 pred_is_separator(gunichar ch, gpointer user_data)
 {
@@ -54,6 +54,20 @@ pred_is_separator(gunichar ch, gpointer user_data)
 	}
 	
 	return TRUE;
+}
+
+static gint
+utf8_len_compare(gconstpointer a, gconstpointer b)
+{
+    glong lena,lenb;
+    lena = g_utf8_strlen(gtk_source_completion_item_get_name((GtkSourceCompletionItem*)a),-1);
+    lenb = g_utf8_strlen(gtk_source_completion_item_get_name((GtkSourceCompletionItem*)b),-1);
+    if (lena==lenb)
+        return 0;
+    else if (lena<lenb)
+        return -1;
+    else
+        return 1;
 }
 
 static GHashTable*
@@ -104,8 +118,6 @@ get_all_words( GtkTextBuffer *buffer )
 	return result;
 }
 
-/******************************************************************/
-
 static gboolean
 is_valid_word(gchar *current_word, gchar *completion_word)
 {
@@ -138,6 +150,24 @@ gh_add_key_to_list(gpointer key,
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(user_data);
 	self->priv->temp_list = g_list_append(self->priv->temp_list,key);
 }
+
+static GList*
+_sort_completion_list(GscDocumentwordsProvider *self, GList *data_list)
+{
+	switch(self->priv->sort_type)
+	{
+		case GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH:
+		{
+			data_list = g_list_sort(data_list, (GCompareFunc)utf8_len_compare );
+			break;
+		}
+		default: 
+			break;
+	}
+	
+	return data_list;
+}
+
 
 static const gchar* gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self)
 {
@@ -208,6 +238,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	if (data_list!=NULL)
 	{
 		self->priv->is_completing = TRUE;
+		data_list = _sort_completion_list(self,data_list);
 	}
 	else
 	{
@@ -294,6 +325,7 @@ static void gsc_documentwords_provider_init (GscDocumentwordsProvider * self)
 	self->priv->temp_list = NULL;
 	self->priv->is_completing = FALSE;
 	self->priv->icon = gdk_pixbuf_new_from_file(ICON_FILE,NULL);
+	self->priv->sort_type = GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH;
 }
 
 GType gsc_documentwords_provider_get_type ()
@@ -320,3 +352,15 @@ gsc_documentwords_provider_new()
 	return GSC_DOCUMENTWORDS_PROVIDER (g_object_new (TYPE_GSC_DOCUMENTWORDS_PROVIDER, NULL));
 }
 
+void
+gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
+											 GscDocumentwordsProviderSortType sort_type)
+{
+	prov->priv->sort_type = sort_type;
+}
+
+GscDocumentwordsProviderSortType
+gsc_documentwords_provider_get_sort_type(GscDocumentwordsProvider *prov)
+{
+	return prov->priv->sort_type;
+}

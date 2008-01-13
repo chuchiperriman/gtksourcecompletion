@@ -47,8 +47,20 @@ struct _GscDocumentwordsProviderClass {
 	GObjectClass parent;
 };
 
+typedef enum{
+	GSC_DOCUMENTWORDS_PROVIDER_SORT_NONE,
+	GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH
+} GscDocumentwordsProviderSortType;
+
 GscDocumentwordsProvider* 
 gsc_documentwords_provider_new();
+
+void
+gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
+											 GscDocumentwordsProviderSortType sort_type);
+
+GscDocumentwordsProviderSortType
+gsc_documentwords_provider_get_sort_type(GscDocumentwordsProvider *prov);
 
 GType gsc_documentwords_provider_get_type ();
 
