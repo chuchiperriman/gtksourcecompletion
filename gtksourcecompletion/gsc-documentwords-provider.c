@@ -184,16 +184,14 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	g_free(current_word);
 	/* 
 	* We must stop the autocompletion event because the word is not correct
-	* (The user wrotte an special character)
-	* TODO This will change when we change to the new trigger API
+	* (The user wrotte special characters only)
 	*/
-	if ( IS_GSC_AUTOCOMPLETION_TRIGGER(trigger) && cleaned_word == NULL)
+	if (cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)
 		{
 			gsc_documentwords_provider_real_end_completion(base,completion);
 		}
-		
 		return NULL;
 	}
 	
