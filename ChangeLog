@@ -1,3 +1,8 @@
+2008-01-16  chuchiperriman  <chuchiperriman@gmail.com>
+	* gktsourcecompletion-utils.c: We find the separators correcty (#1873128)
+	* gsc-docwordscompletion-provider.c: We clean special characters at the 
+	start of the word to better completion
+
 2008-01-13  chuchiperriman  <chuchiperriman@gmail.com>
 	* general: Closed 0.3.0 version and open 0.3.1
 	* gsc-docwordscompletion-provider.c: Sort the completion items by length

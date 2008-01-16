@@ -20,6 +20,18 @@
  
 #include "gtksourcecompletion-utils.h"
 
+
+gboolean
+gsc_char_is_separator(const gunichar ch)
+{
+	if (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_"))
+	{
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
 /**
 * gtk_source_view_get_last_word_and_iter:
 * @text_view: The #GtkTextView
@@ -66,10 +78,7 @@ gtk_source_view_get_last_word_and_iter(GtkTextView *text_view,
 	{
 		ch = gtk_text_iter_get_char(start_iter);
 		//TODO Do better
-		if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'
-			|| ch == ',' || ch == '.' || ch == '(' || ch == ')'
-			|| ch == '{' || ch == '}' || ch == ';' || ch == ':'
-			|| ch == '*')
+		if (gsc_char_is_separator(ch))
 		{
 			found = TRUE;
 			break;
@@ -194,4 +203,39 @@ gtk_source_view_replace_actual_word(GtkTextView *text_view,
 	gtk_text_buffer_insert(buffer, &word_start, text,-1);
 	
 	gtk_text_buffer_end_user_action(buffer);
+}
+
+/**
+ * gsc_clear_word:
+ * @word: The word to be cleaned
+ * 
+ * Clean the word eliminates the special characters at the start of this word.
+ * By example "$variable" is cleaned to "variable"
+ *
+ * Returns New allocated string with the word cleaned. If all characters are 
+ * separators, it return NULL;
+ *
+ */
+gchar*
+gsc_clear_word(const gchar* word)
+{
+	int len = g_utf8_strlen(word,-1);
+	int i;
+	const gchar *temp = word;
+	
+	for (i=0;i<len;i++)
+	{
+		if (gsc_char_is_separator(g_utf8_get_char(temp)))
+		{
+			temp = g_utf8_next_char(temp);
+		}
+		else
+		{
+			return g_strdup(temp);
+		}
+		
+	}
+	
+	return NULL;
+
 }

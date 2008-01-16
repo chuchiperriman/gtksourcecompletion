@@ -12,7 +12,8 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
-
+gboolean
+gsc_char_is_separator(gunichar ch, gpointer user_data)
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -42,5 +43,11 @@ gtc_gsv_get_text(GtkTextView *text_view);
 void
 gtk_source_view_replace_actual_word(GtkTextView *text_view, 
 					const gchar* text);
+
+gboolean
+gsc_char_is_separator(gunichar ch);
+
+gchar*
+gsc_clear_word(const gchar* word);
 
 #endif 

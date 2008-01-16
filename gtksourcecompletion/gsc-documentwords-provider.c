@@ -48,12 +48,7 @@ static GtkSourceCompletionProviderIface* gsc_documentwords_provider_gtk_source_c
 static gboolean
 pred_is_separator(gunichar ch, gpointer user_data)
 {
-	if (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_"))
-	{
-		return FALSE;
-	}
-	
-	return TRUE;
+	return gsc_char_is_separator(ch);
 }
 
 static gint
@@ -178,20 +173,21 @@ static GList*
 gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger *trigger)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
-	gchar* text;
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gchar* current_word = gtk_source_view_get_last_word(view);
+	gchar *cleaned_word;
 	GtkSourceCompletionItem *data;
 	GList *completion_list = NULL;
 	GList *data_list = NULL;
 	
+	cleaned_word = gsc_clear_word(current_word);
+	g_free(current_word);
 	/* 
 	* We must stop the autocompletion event because the word is not correct
 	* (The user wrotte an special character)
 	* TODO This will change when we change to the new trigger API
 	*/
-	if ( IS_GSC_AUTOCOMPLETION_TRIGGER(trigger) &&
-			(current_word == NULL || strcmp("",current_word)==0))
+	if ( IS_GSC_AUTOCOMPLETION_TRIGGER(trigger) && cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)
 		{
@@ -205,16 +201,14 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	{
 		/* Load GCompletion */
 		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(view);
-		g_object_get(text_buffer, "text", &text, NULL);
-	
 		self->priv->current_words = get_all_words(text_buffer);
 		g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
 		g_completion_add_items(self->priv->completion, self->priv->temp_list);
-		g_free(text);
 		g_list_free(self->priv->temp_list);
 		self->priv->temp_list = NULL;
 	}
-	completion_list = g_completion_complete_utf8(self->priv->completion,current_word,NULL);
+	
+	completion_list = g_completion_complete_utf8(self->priv->completion, cleaned_word, NULL);
 	
 	gint i = 0;
 	if (completion_list!=NULL)
@@ -227,7 +221,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 				break;
 			}
 			i++;
-			if (is_valid_word(current_word,completion_list->data))
+			if (is_valid_word(cleaned_word,completion_list->data))
 			{
 				data = gtk_source_completion_item_new(0,completion_list->data,self->priv->icon,15,NULL);
 				data_list = g_list_append(data_list,data);
@@ -245,6 +239,8 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 		clean_current_words(self);
 		self->priv->is_completing = FALSE;
 	}
+	
+	g_free(cleaned_word);
 
 	/* GtkSourceCompletion frees this list and data */
 	return data_list;
