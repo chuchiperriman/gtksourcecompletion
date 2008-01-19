@@ -1,6 +1,10 @@
+=== Version 0.3.1 ===
+
 2008-01-17  chuchiperriman  <chuchiperriman@gmail.com>
 	* gtksourcecompletion-item: Created separated files with the
 	GtkSourceCompletionItem functions
+	* gsv-completion-popup: Created a new popup widget!!!! It manages all
+	functions related to the popup.
 
 2008-01-16  chuchiperriman  <chuchiperriman@gmail.com>
 	* gktsourcecompletion-utils.c: We find the separators correcty (#1873128)
