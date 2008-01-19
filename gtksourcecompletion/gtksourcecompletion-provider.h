@@ -38,6 +38,7 @@ typedef struct _GtkSourceCompletionProviderIface GtkSourceCompletionProviderIfac
 
 #include "gtksourcecompletion.h"
 #include "gtksourcecompletion-trigger.h"
+#include "gtksourcecompletion-item.h"
 
 struct _GtkSourceCompletionProviderIface {
 	

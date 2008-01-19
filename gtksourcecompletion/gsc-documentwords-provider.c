@@ -221,7 +221,12 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 			i++;
 			if (is_valid_word(cleaned_word,completion_list->data))
 			{
-				data = gtk_source_completion_item_new(0,completion_list->data,self->priv->icon,15,NULL);
+				data = gtk_source_completion_item_new(0,
+									completion_list->data,
+									self->priv->icon,
+									15,
+									base,
+									NULL);
 				data_list = g_list_append(data_list,data);
 			}
 		}while( (completion_list = g_list_next(completion_list)) != NULL);

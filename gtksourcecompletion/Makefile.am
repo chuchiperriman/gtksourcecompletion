@@ -23,18 +23,22 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
+	gtksourcecompletion-item.h			\
 	gsc-userrequest-trigger.h			\
 	gsc-autocompletion-trigger.h		\
-	gsc-documentwords-provider.h
+	gsc-documentwords-provider.h		\
+	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion.c			\
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
-	gtksourcecompletion-utils.c		\
+	gtksourcecompletion-utils.c			\
+	gtksourcecompletion-item.c			\
 	gsc-userrequest-trigger.c			\
 	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
+	gsv-completion-popup.c				\
 	$(libgtksourcecompletion_headers)
 	
 
@@ -50,9 +54,11 @@ INST_H_FILES = \
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
+	gtksourcecompletion-item.h			\
 	gsc-userrequest-trigger.h			\
 	gsc-autocompletion-trigger.h		\
-	gtksourcecompletion-providers.h	
+	gtksourcecompletion-providers.h		\
+	gsv-completion-popup.h
 	
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
 

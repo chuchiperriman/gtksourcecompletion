@@ -38,8 +38,6 @@ typedef struct _GtkSourceCompletionPrivate GtkSourceCompletionPrivate;
 
 typedef struct _GtkSourceCompletionClass GtkSourceCompletionClass;
 typedef struct _GtkSourceCompletion GtkSourceCompletion;
-typedef struct _GtkSourceCompletionItem GtkSourceCompletionItem;
-
 
 #include "gtksourcecompletion-provider.h"
 #include "gtksourcecompletion-trigger.h"
@@ -111,21 +109,6 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion);
 
 void
 gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
-
-/* GtkSourceCompletionItem functions */
-GtkSourceCompletionItem*
-gtk_source_completion_item_new(int id,
-																const gchar *name,
-																const GdkPixbuf *icon,
-																int priority,
-																gpointer user_data);
-
-gchar*
-gtk_source_completion_item_get_name(GtkSourceCompletionItem *item);
-
-gchar*
-gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item);
-
 
 G_END_DECLS
 
