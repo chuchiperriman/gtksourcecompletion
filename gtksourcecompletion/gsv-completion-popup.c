@@ -19,6 +19,7 @@
  */
  
 #include "gsv-completion-popup.h"
+#include "gsv-completion-tree.h"
 #include "gtksourcecompletion-i18n.h"
 #include "gtksourcecompletion-utils.h"
 #include "gtksourcecompletion-item.h"
@@ -47,10 +48,11 @@ static guint popup_signals[LAST_SIGNAL] = { 0 };
 struct _GsvCompletionPopupPriv
 {
 	GtkWidget *info_window;
-	GtkWidget *data_tree_view;
+	GsvCompletionTree *completion_tree;
 	GtkWidget *info_button;
 	GtkWidget *info_label;
 	GtkWidget *view;
+	GtkWidget *notebook;
 	gboolean destroy_has_run;
 };
 
@@ -140,30 +142,14 @@ _info_toggled_cb(GtkToggleButton *widget,
 }
 
 static void
-_popup_tree_row_activated_cb (GtkTreeView *tree_view,
-										GtkTreePath *path,
-										GtkTreeViewColumn *column,
+_item_selected_cb (GsvCompletionTree *tree, GtkSourceCompletionItem *item,
 										gpointer user_data)
 {
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-	GtkSourceCompletionItem *data;
-	GsvCompletionPopup *self;
-	GValue value_name = {0,};
-	
-	self = GSV_COMPLETION_POPUP(user_data);
-	
-	model = gtk_tree_view_get_model(tree_view);
-	
-	gtk_tree_model_get_iter(model,&iter,path);
-	gtk_tree_model_get_value(model,&iter,COL_DATA,&value_name);
-	data = (GtkSourceCompletionItem*)g_value_get_pointer(&value_name);
-	
-	g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED], 0, data);
+	g_signal_emit (G_OBJECT (user_data), popup_signals[ITEM_SELECTED], 0, item);
 }
 
 static void 
-_selection_changed_cd(GtkTreeSelection *treeselection,
+_selection_changed_cd(GsvCompletionTree *tree, GtkSourceCompletionItem *item,
 					gpointer user_data)
 {
 	GsvCompletionPopup *self = GSV_COMPLETION_POPUP(user_data);
@@ -187,7 +173,7 @@ gsv_completion_popup_show(GtkWidget *widget)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),FALSE);
 		GTK_WIDGET_CLASS (gsv_completion_popup_parent_class)->show (widget);
 	}
-	gtk_tree_view_scroll_to_point(GTK_TREE_VIEW(self->priv->data_tree_view),0,0);
+	gsv_completion_tree_select_first(self->priv->completion_tree);
 }
 
 static void
@@ -270,17 +256,16 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	g_debug("Init GsvCompletionPopup");
 	self->priv = GSV_COMPLETION_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
-		
+
+
+	self->priv->completion_tree = GSV_COMPLETION_TREE(gsv_completion_tree_new());
 	/*HBox. Up the scroll and the tree and down the icon list*/
-	/* Scroll and tree */
-	GtkWidget* scroll = gtk_scrolled_window_new(NULL,NULL);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-						GTK_POLICY_AUTOMATIC,
-						GTK_POLICY_AUTOMATIC);
-	self->priv->data_tree_view = gtk_tree_view_new();
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(self->priv->data_tree_view),FALSE);
-	
-	gtk_container_add(GTK_CONTAINER(scroll),self->priv->data_tree_view);
+	self->priv->notebook = gtk_notebook_new();
+
+	/* TODO Remove all labels when done*/
+	GtkWidget *default_label = gtk_label_new("Default");
+	gtk_notebook_append_page(GTK_NOTEBOOK(self->priv->notebook),
+			GTK_WIDGET(self->priv->completion_tree),default_label);
 	/*Icon list*/
 	GtkWidget *info_icon = gtk_image_new_from_stock(GTK_STOCK_INFO,GTK_ICON_SIZE_SMALL_TOOLBAR);
 	gtk_widget_set_tooltip_text(info_icon, _("Show Item Info"));
@@ -301,7 +286,7 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	/*Packing all*/
 	GtkWidget *vbox = gtk_vbox_new(FALSE,1);
 	gtk_box_pack_start(GTK_BOX(vbox),
-					scroll,
+					self->priv->notebook,
 					TRUE,
 					TRUE,
 					0);
@@ -330,39 +315,15 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	gtk_widget_show(info_scroll);
 	gtk_widget_show(self->priv->info_label);
 	
-	/* Create the Tree */
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
-	GtkCellRenderer* renderer_pixbuf;
-	GtkTreeViewColumn* column_pixbuf;
-	
-	renderer_pixbuf = gtk_cell_renderer_pixbuf_new();
-   column_pixbuf = gtk_tree_view_column_new_with_attributes ("Pixbuf",
-   		renderer_pixbuf, "pixbuf", COL_PIXBUF, NULL);
-	
-	column = gtk_tree_view_column_new();
-	renderer = gtk_cell_renderer_text_new ();
-	gtk_tree_view_column_pack_start (column, renderer, FALSE);
-	gtk_tree_view_column_set_attributes (column,renderer,"text",COL_NAME,NULL);
-
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->data_tree_view), column_pixbuf);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->data_tree_view), column);
-	
-	/* Create the model */
-	GtkListStore *list_store = gtk_list_store_new (4,GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_POINTER, G_TYPE_POINTER);
-		
-	gtk_tree_view_set_model(GTK_TREE_VIEW(self->priv->data_tree_view),GTK_TREE_MODEL(list_store));
-	
 	/* Connect signals */
 	
-	g_signal_connect(self->priv->data_tree_view, 
-						"row-activated",
-						G_CALLBACK(_popup_tree_row_activated_cb),
+	g_signal_connect(self->priv->completion_tree, 
+						"item-selected",
+						G_CALLBACK(_item_selected_cb),
 						(gpointer) self);
 						
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-	g_signal_connect(selection, 
-						"changed",
+	g_signal_connect(self->priv->completion_tree, 
+						"selection-changed",
 						G_CALLBACK(_selection_changed_cd),
 						(gpointer) self);
 }
@@ -380,176 +341,39 @@ void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
 					GtkSourceCompletionItem* data)
 {
-
-	g_assert(data != NULL);
-	
-	GtkTreeIter iter;
-	GtkListStore *store;
-	
-	store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view)));
-	
-	gtk_list_store_append (store,&iter);
-			
-	gtk_list_store_set (store, 
-						&iter,
-						COL_PIXBUF, gtk_source_completion_item_get_icon(data),
-						COL_NAME, gtk_source_completion_item_get_name(data),
-						COL_DATA, data,
-						-1);
+	gsv_completion_tree_add_data(self->priv->completion_tree,data);
 }
 
 void
 gsv_completion_popup_clear(GsvCompletionPopup *self)
 {
-	GtkListStore *store = store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view)));
-	GtkTreeModel *model = GTK_TREE_MODEL(store);
-	GtkTreeIter iter;
-	GtkSourceCompletionItem *data;
-	
-	if (gtk_tree_model_get_iter_first(model,&iter))
-	{
-		do
-		{
-			GValue value_data = {0,};
-			gtk_tree_model_get_value(model,&iter,COL_DATA,&value_data);
-			data = (GtkSourceCompletionItem*)g_value_get_pointer(&value_data);
-			gtk_source_completion_item_free(data);
-		}while(gtk_tree_model_iter_next(model,&iter));
-	}
-	
-	gtk_list_store_clear(store);
+	gsv_completion_tree_clear(self->priv->completion_tree);
 }
 
 gboolean
 gsv_completion_popup_select_first(GsvCompletionPopup *self)
 {
-	GtkTreeIter iter;
-	GtkTreePath* path;
-	GtkTreeModel* model;
-	GtkTreeSelection* selection;
-	if (!GTK_WIDGET_VISIBLE(self))
-		return FALSE;
-	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
-		return FALSE;
-
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view));
-		
-	gtk_tree_model_get_iter_first(model, &iter);
-	gtk_tree_selection_select_iter(selection, &iter);
-	path = gtk_tree_model_get_path(model, &iter);
-	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->data_tree_view), path, NULL, FALSE, 0, 0);
-	gtk_tree_path_free(path);
-	return TRUE;
+	return gsv_completion_tree_select_first(self->priv->completion_tree);
 }
 
 gboolean 
 gsv_completion_popup_select_last(GsvCompletionPopup *self)
 {
-	GtkTreeIter iter;
-	GtkTreeModel* model;
-	GtkTreeSelection* selection;
-	GtkTreePath* path;
-	gint children;
-	
-	if (!GTK_WIDGET_VISIBLE(self))
-		return FALSE;
-	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view));
-	
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
-		return FALSE;
-	
-	children = gtk_tree_model_iter_n_children(model, NULL);
-	if (children > 0)
-	{
-		gtk_tree_model_iter_nth_child(model, &iter, NULL, children - 1);
-	
-		gtk_tree_selection_select_iter(selection, &iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->data_tree_view), path, NULL, FALSE, 0, 0);
-		gtk_tree_path_free(path);
-		return TRUE;
-	}
-	return FALSE;
+	return gsv_completion_tree_select_last(self->priv->completion_tree);
 }
 
 gboolean
 gsv_completion_popup_select_previous(GsvCompletionPopup *self, 
 					gint rows)
 {
-	GtkTreeIter iter;
-	GtkTreePath* path;
-	GtkTreeModel* model;
-	GtkTreeSelection* selection;
-	
-	if (!GTK_WIDGET_VISIBLE(self))
-		return FALSE;
-	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-	
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
-		return FALSE;
-	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter))
-	{
-		gint i;
-		path = gtk_tree_model_get_path(model, &iter);
-		for (i=0; i  < rows; i++)
-			gtk_tree_path_prev(path);
-		
-		if (gtk_tree_model_get_iter(model, &iter, path))
-		{
-			gtk_tree_selection_select_iter(selection, &iter);
-			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->data_tree_view), path, NULL, FALSE, 0, 0);
-		}
-		gtk_tree_path_free(path);
-	}
-	else
-	{
-		return gsv_completion_popup_select_first(self);
-	}
-	
-	return TRUE;
+	return gsv_completion_tree_select_previous(self->priv->completion_tree,rows);
 }
 
 gboolean
 gsv_completion_popup_select_next(GsvCompletionPopup *self, 
 					gint rows)
 {
-	GtkTreeIter iter;
-	GtkTreeModel* model;
-	GtkTreeSelection* selection;
-	
-	if (!GTK_WIDGET_VISIBLE(self))
-		return FALSE;
-	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
-		return FALSE;
-	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter))
-	{
-		gint i;
-		GtkTreePath* path;
-		for (i = 0; i < rows; i++)
-		{
-			if (!gtk_tree_model_iter_next(model, &iter))
-				return gsv_completion_popup_select_last(self);
-		}
-		gtk_tree_selection_select_iter(selection, &iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->data_tree_view), path, NULL, FALSE, 0, 0);
-		gtk_tree_path_free(path);
-	}
-	else
-	{
-		return gsv_completion_popup_select_first(self);
-	}
-	return TRUE;
+	return gsv_completion_tree_select_next(self->priv->completion_tree,rows);
 }
 
 /*Not free the item*/
@@ -557,29 +381,13 @@ gboolean
 gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
 													GtkSourceCompletionItem **item)
 {
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-	GValue value_item = {0,};
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->data_tree_view));
-	if (gtk_tree_selection_get_selected(selection,NULL, &iter))
-	{
-		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view));
-		gtk_tree_model_get_value(model,&iter,COL_DATA,&value_item);
-		*item = (GtkSourceCompletionItem*)g_value_get_pointer(&value_item);
-		
-		return TRUE;
-	}
-	
-	return FALSE;
-	
+	return gsv_completion_tree_get_selected_item(self->priv->completion_tree,item);
 }
 
 gboolean
 gsv_completion_popup_has_items(GsvCompletionPopup *self)
 {
-	GtkTreeIter iter;
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->data_tree_view));
-	return gtk_tree_model_get_iter_first(GTK_TREE_MODEL(model),&iter);
+	return gsv_completion_tree_has_items(self->priv->completion_tree);
 }
 
 void

@@ -65,3 +65,21 @@ Internal utilities
 @text: 
 
 
+<!-- ##### FUNCTION gsc_char_is_separator ##### -->
+<para>
+
+</para>
+
+@ch: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gsc_clear_word ##### -->
+<para>
+
+</para>
+
+@word: 
+@Returns: 
+
+

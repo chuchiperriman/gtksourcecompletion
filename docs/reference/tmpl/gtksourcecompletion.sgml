@@ -29,12 +29,6 @@ to be shown in the completion popup.
 </para>
 
 
-<!-- ##### STRUCT GtkSourceCompletionItem ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT GtkSourceCompletion ##### -->
 <para>
 
@@ -165,36 +159,5 @@ to be shown in the completion popup.
 </para>
 
 @completion: 
-
-
-<!-- ##### FUNCTION gtk_source_completion_item_new ##### -->
-<para>
-
-</para>
-
-@id: 
-@name: 
-@icon: 
-@priority: 
-@user_data: 
-@Returns: 
-
-
-<!-- ##### FUNCTION gtk_source_completion_item_get_name ##### -->
-<para>
-
-</para>
-
-@item: 
-@Returns: 
-
-
-<!-- ##### FUNCTION gtk_source_completion_item_get_user_data ##### -->
-<para>
-
-</para>
-
-@item: 
-@Returns: 
 
 

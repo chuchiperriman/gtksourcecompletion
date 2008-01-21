@@ -93,11 +93,37 @@ event occurs, the data will be shown in the completion popup.
 </para>
 
 
+<!-- ##### ENUM GscDocumentwordsProviderSortType ##### -->
+<para>
+
+</para>
+
+@GSC_DOCUMENTWORDS_PROVIDER_SORT_NONE: 
+@GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH: 
+
 <!-- ##### FUNCTION gsc_documentwords_provider_new ##### -->
 <para>
 
 </para>
 
+@Returns: 
+
+
+<!-- ##### FUNCTION gsc_documentwords_provider_set_sort_type ##### -->
+<para>
+
+</para>
+
+@prov: 
+@sort_type: 
+
+
+<!-- ##### FUNCTION gsc_documentwords_provider_get_sort_type ##### -->
+<para>
+
+</para>
+
+@prov: 
 @Returns: 
 
 

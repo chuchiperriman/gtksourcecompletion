@@ -73,16 +73,19 @@ autocompletion_key_release_cb (GtkWidget *view,
 	{
 		if (GDK_BackSpace == keyval)
 		{
-			if (self->priv->source_id!=0)
+			/* We only actualize the completion if the popup is visible */
+			if (gtk_source_completion_is_visible(self->priv->completion))
 			{
-				/* Stop the event because the user is written very fast*/
-				g_source_remove(self->priv->source_id);
-				self->priv->source_id = 0;
+				if (self->priv->source_id!=0)
+				{
+					/* Stop the event because the user is written very fast*/
+					g_source_remove(self->priv->source_id);
+					self->priv->source_id = 0;
+				}
+	
+				/*raise event in 0,5 seconds*/
+				self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);	
 			}
-
-			/*raise event in 0,5 seconds*/
-			self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
-			
 		}
 	}
 

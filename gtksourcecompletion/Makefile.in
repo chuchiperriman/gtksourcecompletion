@@ -61,8 +61,8 @@ am_libgtksourcecompletion_1_0_la_OBJECTS = gtksourcecompletion.lo \
 	gtksourcecompletion-provider.lo gtksourcecompletion-trigger.lo \
 	gtksourcecompletion-utils.lo gtksourcecompletion-item.lo \
 	gsc-userrequest-trigger.lo gsc-autocompletion-trigger.lo \
-	gsc-documentwords-provider.lo gsv-completion-popup.lo \
-	$(am__objects_1)
+	gsc-documentwords-provider.lo gsv-completion-tree.lo \
+	gsv-completion-popup.lo $(am__objects_1)
 libgtksourcecompletion_1_0_la_OBJECTS =  \
 	$(am_libgtksourcecompletion_1_0_la_OBJECTS)
 libgtksourcecompletion_1_0_la_LINK = $(LIBTOOL) --tag=CC \
@@ -272,6 +272,7 @@ libgtksourcecompletion_headers = \
 	gsc-userrequest-trigger.h			\
 	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h		\
+	gsv-completion-tree.h				\
 	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -283,6 +284,7 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gsc-userrequest-trigger.c			\
 	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
+	gsv-completion-tree.c				\
 	gsv-completion-popup.c				\
 	$(libgtksourcecompletion_headers)
 
@@ -302,6 +304,7 @@ INST_H_FILES = \
 	gsc-userrequest-trigger.h			\
 	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h		\
+	gsv-completion-tree.h				\
 	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
@@ -386,6 +389,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsc-documentwords-provider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsc-userrequest-trigger.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsv-completion-popup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gsv-completion-tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-item.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-provider.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksourcecompletion-trigger.Plo@am__quote@

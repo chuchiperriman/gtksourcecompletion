@@ -1,3 +1,9 @@
+News in 0.3.1
+-------------
+* Better completion triggers
+* Sort the completion items by length
+* Created the new GsvCompletionPopup widget
+
 ===========================
  gtksourcecompletion 0.1.0
 ===========================

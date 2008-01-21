@@ -27,6 +27,7 @@ struct _GtkSourceCompletionItem
 	int priority;
 	GtkSourceCompletionProvider *provider;
 	gpointer user_data;
+	const gchar *page_name;
 };
 
 void
@@ -63,6 +64,23 @@ gtk_source_completion_item_new(int id,
 	item->priority = priority;
 	item->user_data = user_data;
 	item->provider = provider;
+	item->page_name = DEFAULT_PAGE;
+	return item;
+}
+
+GtkSourceCompletionItem*
+gtk_source_completion_item_new_full(int id,
+							const gchar *name,
+							const GdkPixbuf *icon,
+							int priority,
+							GtkSourceCompletionProvider *provider,
+							const gchar *page_name,
+							gpointer user_data)
+{
+	GtkSourceCompletionItem *item; 
+	item = gtk_source_completion_item_new(id,name,icon,priority,provider,user_data);
+	item->page_name = page_name;
+	
 	return item;
 }
 

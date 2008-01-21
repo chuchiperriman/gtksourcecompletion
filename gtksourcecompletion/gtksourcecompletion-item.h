@@ -28,6 +28,8 @@ typedef struct _GtkSourceCompletionItem GtkSourceCompletionItem;
 
 #include "gtksourcecompletion-provider.h"
 
+#define DEFAULT_PAGE "Default"
+
 /* GtkSourceCompletionItem functions */
 GtkSourceCompletionItem*
 gtk_source_completion_item_new(int id,
