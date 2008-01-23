@@ -24,10 +24,6 @@
 #include "gtksourcecompletion-utils.h"
 #include "gtksourcecompletion-item.h"
 
-#define COL_PIXBUF 0
-#define COL_NAME 1
-#define COL_DATA 2
-
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
 
@@ -48,15 +44,22 @@ static guint popup_signals[LAST_SIGNAL] = { 0 };
 struct _GsvCompletionPopupPriv
 {
 	GtkWidget *info_window;
-	GsvCompletionTree *completion_tree;
 	GtkWidget *info_button;
 	GtkWidget *info_label;
 	GtkWidget *view;
 	GtkWidget *notebook;
+	GHashTable *trees;
 	gboolean destroy_has_run;
 };
 
 G_DEFINE_TYPE(GsvCompletionPopup, gsv_completion_popup, GTK_TYPE_WINDOW);
+
+
+static GsvCompletionTree*
+_get_current_tree(GsvCompletionPopup *self)
+{
+	return GSV_COMPLETION_TREE(g_hash_table_lookup(self->priv->trees,DEFAULT_PAGE));
+}
 
 /*
  * Return TRUE if the position is over the text and FALSE if 
@@ -173,7 +176,7 @@ gsv_completion_popup_show(GtkWidget *widget)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),FALSE);
 		GTK_WIDGET_CLASS (gsv_completion_popup_parent_class)->show (widget);
 	}
-	gsv_completion_tree_select_first(self->priv->completion_tree);
+	gsv_completion_tree_select_first(_get_current_tree(self));
 }
 
 static void
@@ -201,6 +204,9 @@ static void
 gsv_completion_popup_finalize (GObject *object)
 {
 	g_debug("Finish GsvCompletionPopup");
+	GsvCompletionPopup *self = GSV_COMPLETION_POPUP(object);
+	
+	g_hash_table_destroy(self->priv->trees);
 	
 	G_OBJECT_CLASS (gsv_completion_popup_parent_class)->finalize (object);
 	
@@ -256,16 +262,19 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	g_debug("Init GsvCompletionPopup");
 	self->priv = GSV_COMPLETION_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
+	self->priv->trees = g_hash_table_new(g_str_hash,g_str_equal);
 
-
-	self->priv->completion_tree = GSV_COMPLETION_TREE(gsv_completion_tree_new());
+	GtkWidget *completion_tree = gsv_completion_tree_new();
+	
+	g_hash_table_insert(self->priv->trees,DEFAULT_PAGE,completion_tree);
+	
 	/*HBox. Up the scroll and the tree and down the icon list*/
 	self->priv->notebook = gtk_notebook_new();
 
 	/* TODO Remove all labels when done*/
-	GtkWidget *default_label = gtk_label_new("Default");
+	GtkWidget *default_label = gtk_label_new(DEFAULT_PAGE);
 	gtk_notebook_append_page(GTK_NOTEBOOK(self->priv->notebook),
-			GTK_WIDGET(self->priv->completion_tree),default_label);
+			GTK_WIDGET(completion_tree),default_label);
 	/*Icon list*/
 	GtkWidget *info_icon = gtk_image_new_from_stock(GTK_STOCK_INFO,GTK_ICON_SIZE_SMALL_TOOLBAR);
 	gtk_widget_set_tooltip_text(info_icon, _("Show Item Info"));
@@ -317,12 +326,12 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	
 	/* Connect signals */
 	
-	g_signal_connect(self->priv->completion_tree, 
+	g_signal_connect(completion_tree, 
 						"item-selected",
 						G_CALLBACK(_item_selected_cb),
 						(gpointer) self);
 						
-	g_signal_connect(self->priv->completion_tree, 
+	g_signal_connect(completion_tree, 
 						"selection-changed",
 						G_CALLBACK(_selection_changed_cd),
 						(gpointer) self);
@@ -341,39 +350,39 @@ void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
 					GtkSourceCompletionItem* data)
 {
-	gsv_completion_tree_add_data(self->priv->completion_tree,data);
+	gsv_completion_tree_add_data(_get_current_tree(self),data);
 }
 
 void
 gsv_completion_popup_clear(GsvCompletionPopup *self)
 {
-	gsv_completion_tree_clear(self->priv->completion_tree);
+	gsv_completion_tree_clear(_get_current_tree(self));
 }
 
 gboolean
 gsv_completion_popup_select_first(GsvCompletionPopup *self)
 {
-	return gsv_completion_tree_select_first(self->priv->completion_tree);
+	return gsv_completion_tree_select_first(_get_current_tree(self));
 }
 
 gboolean 
 gsv_completion_popup_select_last(GsvCompletionPopup *self)
 {
-	return gsv_completion_tree_select_last(self->priv->completion_tree);
+	return gsv_completion_tree_select_last(_get_current_tree(self));
 }
 
 gboolean
 gsv_completion_popup_select_previous(GsvCompletionPopup *self, 
 					gint rows)
 {
-	return gsv_completion_tree_select_previous(self->priv->completion_tree,rows);
+	return gsv_completion_tree_select_previous(_get_current_tree(self),rows);
 }
 
 gboolean
 gsv_completion_popup_select_next(GsvCompletionPopup *self, 
 					gint rows)
 {
-	return gsv_completion_tree_select_next(self->priv->completion_tree,rows);
+	return gsv_completion_tree_select_next(_get_current_tree(self),rows);
 }
 
 /*Not free the item*/
@@ -381,13 +390,13 @@ gboolean
 gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
 													GtkSourceCompletionItem **item)
 {
-	return gsv_completion_tree_get_selected_item(self->priv->completion_tree,item);
+	return gsv_completion_tree_get_selected_item(_get_current_tree(self),item);
 }
 
 gboolean
 gsv_completion_popup_has_items(GsvCompletionPopup *self)
 {
-	return gsv_completion_tree_has_items(self->priv->completion_tree);
+	return gsv_completion_tree_has_items(_get_current_tree(self));
 }
 
 void

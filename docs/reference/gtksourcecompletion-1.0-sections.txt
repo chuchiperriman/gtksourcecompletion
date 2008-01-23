@@ -70,6 +70,7 @@ GSV_COMPLETION_TREE_GET_CLASS
 
 <SECTION>
 <FILE>gsv-completion-popup</FILE>
+DEFAULT_PAGE
 GsvCompletionPopupPriv
 <TITLE>GsvCompletionPopup</TITLE>
 GsvCompletionPopup

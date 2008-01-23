@@ -35,6 +35,8 @@ G_BEGIN_DECLS
 #define GSV_IS_COMPLETION_POPUP_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSV_TYPE_COMPLETION_POPUP))
 #define GSV_COMPLETION_POPUP_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSV_TYPE_COMPLETION_POPUP, GsvCompletionPopupClass))
 
+#define DEFAULT_PAGE "Default"
+
 typedef struct _GsvCompletionPopupPriv GsvCompletionPopupPriv;
 typedef struct _GsvCompletionPopup GsvCompletionPopup;
 typedef struct _GsvCompletionPopupClass GsvCompletionPopupClass;
