@@ -97,6 +97,12 @@ gsv_completion_popup_toggle_item_info(GsvCompletionPopup *self);
 void
 gsv_completion_popup_refresh(GsvCompletionPopup *self);
 
+void
+gsv_completion_popup_page_next(GsvCompletionPopup *self);
+
+void
+gsv_completion_popup_page_previous(GsvCompletionPopup *self);
+
 G_END_DECLS
 
 #endif 

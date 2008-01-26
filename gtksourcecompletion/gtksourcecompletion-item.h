@@ -39,8 +39,20 @@ gtk_source_completion_item_new(int id,
 																GtkSourceCompletionProvider *provider,
 																gpointer user_data);
 
+GtkSourceCompletionItem*
+gtk_source_completion_item_new_full(int id,
+							const gchar *name,
+							const GdkPixbuf *icon,
+							int priority,
+							GtkSourceCompletionProvider *provider,
+							const gchar *page_name,
+							gpointer user_data);
+
 void
 gtk_source_completion_item_free(GtkSourceCompletionItem *item);
+
+int
+gtk_source_completion_item_get_id(GtkSourceCompletionItem *item);
 
 const gchar*
 gtk_source_completion_item_get_name(GtkSourceCompletionItem *item);
@@ -53,6 +65,9 @@ gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item);
 
 GtkSourceCompletionProvider*
 gtk_source_completion_item_get_provider(GtkSourceCompletionItem *item);
+
+const gchar*
+gtk_source_completion_item_get_page_name(GtkSourceCompletionItem *item);
 
 G_END_DECLS
 

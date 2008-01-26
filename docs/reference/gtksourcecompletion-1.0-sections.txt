@@ -85,6 +85,8 @@ gsv_completion_popup_add_data
 gsv_completion_popup_has_items
 gsv_completion_popup_toggle_item_info
 gsv_completion_popup_refresh
+gsv_completion_popup_page_next
+gsv_completion_popup_page_previous
 <SUBSECTION Standard>
 GSV_COMPLETION_POPUP
 GSV_IS_COMPLETION_POPUP
@@ -230,11 +232,13 @@ gsc_documentwords_provider_get_type
 GtkSourceCompletionItem
 DEFAULT_PAGE
 gtk_source_completion_item_new
+gtk_source_completion_item_new_full
 gtk_source_completion_item_free
 gtk_source_completion_item_get_name
 gtk_source_completion_item_get_icon
 gtk_source_completion_item_get_user_data
 gtk_source_completion_item_get_provider
+gtk_source_completion_item_get_page_name
 </SECTION>
 
 <SECTION>

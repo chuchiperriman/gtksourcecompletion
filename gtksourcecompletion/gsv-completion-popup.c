@@ -48,6 +48,7 @@ struct _GsvCompletionPopupPriv
 	GtkWidget *info_label;
 	GtkWidget *view;
 	GtkWidget *notebook;
+	GtkWidget *tab_label;
 	GHashTable *trees;
 	gboolean destroy_has_run;
 };
@@ -55,10 +56,53 @@ struct _GsvCompletionPopupPriv
 G_DEFINE_TYPE(GsvCompletionPopup, gsv_completion_popup, GTK_TYPE_WINDOW);
 
 
+static void
+_item_selected_cb (GsvCompletionTree *tree, GtkSourceCompletionItem *item,
+										gpointer user_data);
+
+static void 
+_selection_changed_cd(GsvCompletionTree *tree, GtkSourceCompletionItem *item,
+					gpointer user_data);
+
+
 static GsvCompletionTree*
 _get_current_tree(GsvCompletionPopup *self)
 {
-	return GSV_COMPLETION_TREE(g_hash_table_lookup(self->priv->trees,DEFAULT_PAGE));
+	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
+	GsvCompletionTree *tree =
+		GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
+	
+	return tree;
+}
+
+static GsvCompletionTree*
+_get_tree_by_name(GsvCompletionPopup *self, const gchar* tree_name)
+{
+	GsvCompletionTree *tree =
+		GSV_COMPLETION_TREE(g_hash_table_lookup(self->priv->trees,tree_name));
+		
+	if (tree==NULL)
+	{
+		/*We create the new trees*/
+		GtkWidget *completion_tree = gsv_completion_tree_new(); 
+		g_hash_table_insert(self->priv->trees,(gpointer)tree_name,completion_tree);
+		GtkWidget *label = gtk_label_new(tree_name);
+		gtk_notebook_append_page(GTK_NOTEBOOK(self->priv->notebook),
+			GTK_WIDGET(completion_tree),label);
+		tree = GSV_COMPLETION_TREE(completion_tree);
+		gtk_widget_show_all(completion_tree);
+		g_signal_connect(completion_tree, 
+						"item-selected",
+						G_CALLBACK(_item_selected_cb),
+						(gpointer) self);
+						
+		g_signal_connect(completion_tree, 
+						"selection-changed",
+						G_CALLBACK(_selection_changed_cd),
+						(gpointer) self);
+	}
+
+	return tree;
 }
 
 /*
@@ -163,6 +207,37 @@ _selection_changed_cd(GsvCompletionTree *tree, GtkSourceCompletionItem *item,
 	}
 }
 
+static gboolean
+_switch_page_cb(GtkNotebook *notebook, GtkNotebookPage *page,
+		gint page_num, gpointer user_data)
+{
+	GsvCompletionPopup *self = GSV_COMPLETION_POPUP(user_data);
+	GtkWidget *tree = gtk_notebook_get_nth_page(notebook,page_num);
+	const gchar* label_text = gtk_notebook_get_tab_label_text(notebook,tree);
+	
+	gtk_label_set_label(GTK_LABEL(self->priv->tab_label),label_text);
+
+	return FALSE;
+}
+
+static void
+_update_pages_visibility(GsvCompletionPopup *self)
+{
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	guint i;
+	gboolean first_set = FALSE;
+	GsvCompletionTree *tree;
+	for(i=0;i<pages;i++)
+	{
+		tree= GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gsv_completion_tree_has_items(tree) && !first_set)
+		{
+			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),i);
+			first_set = TRUE;
+		}
+	}
+}
+
 static void
 gsv_completion_popup_show(GtkWidget *widget)
 {
@@ -170,6 +245,8 @@ gsv_completion_popup_show(GtkWidget *widget)
 	gint x, y;
 	_get_popup_position(self,&x,&y);
 	gtk_window_move(GTK_WINDOW(self), x, y);
+	
+	_update_pages_visibility(self);
 	
 	if (!GTK_WIDGET_VISIBLE(self))
 	{
@@ -268,10 +345,10 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	
 	g_hash_table_insert(self->priv->trees,DEFAULT_PAGE,completion_tree);
 	
-	/*HBox. Up the scroll and the tree and down the icon list*/
 	self->priv->notebook = gtk_notebook_new();
+	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(self->priv->notebook),FALSE);
+	gtk_notebook_set_show_border(GTK_NOTEBOOK(self->priv->notebook),FALSE);
 
-	/* TODO Remove all labels when done*/
 	GtkWidget *default_label = gtk_label_new(DEFAULT_PAGE);
 	gtk_notebook_append_page(GTK_NOTEBOOK(self->priv->notebook),
 			GTK_WIDGET(completion_tree),default_label);
@@ -292,6 +369,13 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 					FALSE,
 					FALSE,
 					0);
+	self->priv->tab_label = gtk_label_new(DEFAULT_PAGE);
+	gtk_box_pack_end(GTK_BOX(hbox),
+					self->priv->tab_label,
+					FALSE,
+					TRUE,
+					10);
+	
 	/*Packing all*/
 	GtkWidget *vbox = gtk_vbox_new(FALSE,1);
 	gtk_box_pack_start(GTK_BOX(vbox),
@@ -335,6 +419,10 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 						"selection-changed",
 						G_CALLBACK(_selection_changed_cd),
 						(gpointer) self);
+	g_signal_connect(self->priv->notebook, 
+						"switch-page",
+						G_CALLBACK(_switch_page_cb),
+						(gpointer) self);
 }
 
 GtkWidget*
@@ -350,13 +438,23 @@ void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
 					GtkSourceCompletionItem* data)
 {
-	gsv_completion_tree_add_data(_get_current_tree(self),data);
+	GsvCompletionTree *tree = _get_tree_by_name(self,
+		gtk_source_completion_item_get_page_name(data));
+	
+	gsv_completion_tree_add_data(tree,data);
 }
 
 void
 gsv_completion_popup_clear(GsvCompletionPopup *self)
 {
-	gsv_completion_tree_clear(_get_current_tree(self));
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	guint i;
+	GsvCompletionTree *tree;
+	for(i=0;i<pages;i++)
+	{
+		tree= GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		gsv_completion_tree_clear(tree);
+	}
 }
 
 gboolean
@@ -396,7 +494,16 @@ gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
 gboolean
 gsv_completion_popup_has_items(GsvCompletionPopup *self)
 {
-	return gsv_completion_tree_has_items(_get_current_tree(self));
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	guint i;
+	GsvCompletionTree *tree;
+	for(i=0;i<pages;i++)
+	{
+		tree= GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gsv_completion_tree_has_items(tree))
+			return TRUE;
+	}
+	return FALSE;
 }
 
 void
@@ -411,5 +518,73 @@ gsv_completion_popup_refresh(GsvCompletionPopup *self)
 {
 	gsv_completion_popup_show(GTK_WIDGET(self));
 }
+
+void
+gsv_completion_popup_page_next(GsvCompletionPopup *self)
+{
+	GsvCompletionTree *tree;
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
+	gint original_page = page;
+	
+	do
+	{
+		page++;
+		if (page == pages)
+			page = 0;
+		
+		tree = GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
+		if (gsv_completion_tree_has_items(tree))
+		{
+			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
+			gsv_completion_tree_select_first(tree);
+			break;
+		}
+	
+	}while(page!=original_page);
+	
+	if (page!=original_page)
+	{
+		if (GTK_WIDGET_VISIBLE(self->priv->info_window))
+		{
+			_show_completion_info(self);
+		}
+	}
+	
+}
+
+void
+gsv_completion_popup_page_previous(GsvCompletionPopup *self)
+{
+	GsvCompletionTree *tree;
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
+	gint original_page = page;
+	
+	do
+	{
+		page--;
+		if (page < 0)
+			page = pages -1;
+	
+		tree = GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));	
+		if (gsv_completion_tree_has_items(tree))
+		{
+			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
+			gsv_completion_tree_select_first(tree);
+			break;
+		}
+	}while(page!=original_page);
+	
+	if (page!=original_page)
+	{
+		if (GTK_WIDGET_VISIBLE(self->priv->info_window))
+		{
+			_show_completion_info(self);
+		}
+	}
+}
+
+
 
 

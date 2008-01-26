@@ -131,3 +131,21 @@ gtk_source_completion_item_get_provider(GtkSourceCompletionItem *item)
 {
 	return item->provider;
 }
+
+/**
+ * gtk_source_completion_item_get_page_name:
+ * @item: The GtkSourceCompletionItem
+ *
+ * Returns the page name where the item will be placed.
+ */
+const gchar*
+gtk_source_completion_item_get_page_name(GtkSourceCompletionItem *item)
+{
+	return item->page_name;
+}
+
+int
+gtk_source_completion_item_get_id(GtkSourceCompletionItem *item)
+{
+	return item->id;
+}

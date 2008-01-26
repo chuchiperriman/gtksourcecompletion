@@ -1,3 +1,8 @@
+2008-01-26  chuchiperriman  <chuchiperriman@gmail.com>
+	* provider template: fixed a bug in the header
+	* completion, popup, item:
+		Added new multipage support!!! 
+
 2008-01-17  chuchiperriman  <chuchiperriman@gmail.com>
 	* gsv-completion-tree: Created a separated tree widget. With it, the popup
 	can create various completion trees to support multipage

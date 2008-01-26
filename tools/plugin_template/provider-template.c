@@ -19,7 +19,7 @@
  
 #include <glib/gprintf.h>
 #include <string.h>
-#include "gtc-##(PLUGIN_ID.lower)-provider.h"
+#include "gsc-##(PLUGIN_ID.lower)-provider.h"
 
 #define ICON_FILE ICON_DIR"/locals.png"
 

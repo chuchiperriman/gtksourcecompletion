@@ -202,6 +202,18 @@ view_key_press_event_cb(GtkWidget *view,
 				ret = gsv_completion_popup_select_last(completion->priv->popup);
 				break;
 			}
+			case GDK_Left:
+			{
+				gsv_completion_popup_page_previous(completion->priv->popup);
+				ret = TRUE;
+				break;
+			}
+			case GDK_Right:
+			{
+				gsv_completion_popup_page_next(completion->priv->popup);
+				ret = TRUE;
+				break;
+			}
 			case GDK_Return:
 			case GDK_Tab:
 			{
