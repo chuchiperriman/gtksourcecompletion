@@ -240,13 +240,16 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = gtksourcecompletion docs po
+SUBDIRS = gtksourcecompletion pixmaps docs po 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gtksourcecompletion-1.0.pc
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
-
-#EXTRA_DIST=gtksourcecompletion.lsm.in gtksourcecompletion.spec.in gtksourcecompletion.texinfo
 EXTRA_DIST = intltool-extract.in intltool-merge.in intltool-update.in
+DISTCLEANFILES = \
+	intltool-extract \
+	intltool-merge \
+	intltool-update
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -635,6 +638,7 @@ clean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

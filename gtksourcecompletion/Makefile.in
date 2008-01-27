@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -51,7 +50,7 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(icondir)" \
+am__installdirs = "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(libgtksourcecompletion_1_0_includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -83,8 +82,6 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libgtksourcecompletion_1_0_la_SOURCES)
 DIST_SOURCES = $(libgtksourcecompletion_1_0_la_SOURCES)
-iconDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(icon_DATA)
 libgtksourcecompletion_1_0_includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(libgtksourcecompletion_1_0_include_HEADERS)
 ETAGS = etags
@@ -244,14 +241,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-icondir = $(datadir)/gtksourcecompletion/pixmaps
-icon_DATA = pixmaps/*.png
 INCLUDES = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DGTKSOURCECOMPLETIONLOCALEDIR=\""$(gtksourcecompletionlocaledir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DICON_DIR=\""$(datadir)/gtksourcecompletion/pixmaps"\"	\
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
-	-DICON_DIR=\""$(icondir)"\" \
 	$(PACKAGE_CFLAGS) \
 	`pkg-config --cflags gtksourceview-1.0` \
 	`pkg-config --cflags libglade-2.0`
@@ -273,6 +268,7 @@ libgtksourcecompletion_headers = \
 	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h		\
 	gsv-completion-tree.h				\
+	gtksourcecompletion-i18n.h			\
 	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -305,17 +301,13 @@ INST_H_FILES = \
 	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h		\
 	gsv-completion-tree.h				\
+	gtksourcecompletion-i18n.h			\
 	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
 libgtksourcecompletion_1_0_include_HEADERS = \
 	$(libgtksourcecompletion_headers)             
 
-
-#headerdir = $(prefix)/include/gtksourcecompletion
-
-#header_DATA = $(INST_H_FILES) 
-EXTRA_DIST = $(icon_DATA)
 all: all-am
 
 .SUFFIXES:
@@ -422,23 +414,6 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-iconDATA: $(icon_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(icondir)" || $(MKDIR_P) "$(DESTDIR)$(icondir)"
-	@list='$(icon_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(iconDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(icondir)/$$f'"; \
-	  $(iconDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(icondir)/$$f"; \
-	done
-
-uninstall-iconDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(icon_DATA)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(icondir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(icondir)/$$f"; \
-	done
 install-libgtksourcecompletion_1_0_includeHEADERS: $(libgtksourcecompletion_1_0_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(libgtksourcecompletion_1_0_includedir)" || $(MKDIR_P) "$(DESTDIR)$(libgtksourcecompletion_1_0_includedir)"
@@ -533,9 +508,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(DATA) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(icondir)" "$(DESTDIR)$(libgtksourcecompletion_1_0_includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(libgtksourcecompletion_1_0_includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -583,8 +558,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-iconDATA \
-	install-libgtksourcecompletion_1_0_includeHEADERS
+install-data-am: install-libgtksourcecompletion_1_0_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -620,7 +594,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-iconDATA uninstall-libLTLIBRARIES \
+uninstall-am: uninstall-libLTLIBRARIES \
 	uninstall-libgtksourcecompletion_1_0_includeHEADERS
 
 .MAKE: install-am install-strip
@@ -631,7 +605,7 @@ uninstall-am: uninstall-iconDATA uninstall-libLTLIBRARIES \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-iconDATA install-info install-info-am \
+	install-html-am install-info install-info-am \
 	install-libLTLIBRARIES \
 	install-libgtksourcecompletion_1_0_includeHEADERS install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -639,9 +613,13 @@ uninstall-am: uninstall-iconDATA uninstall-libLTLIBRARIES \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-iconDATA uninstall-libLTLIBRARIES \
+	uninstall-libLTLIBRARIES \
 	uninstall-libgtksourcecompletion_1_0_includeHEADERS
 
+
+#headerdir = $(prefix)/include/gtksourcecompletion
+
+#header_DATA = $(INST_H_FILES) 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

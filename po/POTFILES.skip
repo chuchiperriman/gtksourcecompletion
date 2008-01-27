@@ -7,3 +7,4 @@ getopt.c
 gtksourcecompletion.c
 gtksourcecompletion/gsv-completion-popup.c
 xmalloc.c
+

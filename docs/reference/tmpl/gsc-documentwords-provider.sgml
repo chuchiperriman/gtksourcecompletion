@@ -3,26 +3,18 @@ GscDocumentwordsProvider
 
 <!-- ##### SECTION Short_Description ##### -->
 
-GtkSourceCompletionProvider that complete the preiously written 
-words in the current document.
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-GtkSourceCompletionProvider that complete the preiously written 
-words in the current document. When an event occurs, it returns to 
-GtkSourceCompletion a list of previously written words in the current 
-document filtered by the current word written in the document. 
+
 </para>
-<para>
-You don't need do anything, only create the provider and register it into 
-the GtkSourceCompletion. If you have created a completion event, when this
-event occurs, the data will be shown in the completion popup.
-</para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 

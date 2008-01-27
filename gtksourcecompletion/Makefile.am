@@ -1,12 +1,9 @@
-icondir = $(datadir)/gtksourcecompletion/pixmaps
-icon_DATA = pixmaps/*.png
-
 INCLUDES = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DGTKSOURCECOMPLETIONLOCALEDIR=\""$(gtksourcecompletionlocaledir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DICON_DIR=\""$(datadir)/gtksourcecompletion/pixmaps"\"	\
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
-	-DICON_DIR=\""$(icondir)"\" \
 	$(PACKAGE_CFLAGS) \
 	`pkg-config --cflags gtksourceview-1.0` \
 	`pkg-config --cflags libglade-2.0`
@@ -28,6 +25,7 @@ libgtksourcecompletion_headers = 	\
 	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h		\
 	gsv-completion-tree.h				\
+	gtksourcecompletion-i18n.h			\
 	gsv-completion-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -61,6 +59,7 @@ INST_H_FILES = \
 	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h		\
 	gsv-completion-tree.h				\
+	gtksourcecompletion-i18n.h			\
 	gsv-completion-popup.h
 	
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
@@ -72,7 +71,4 @@ libgtksourcecompletion_1_0_include_HEADERS =          \
 
 #header_DATA = $(INST_H_FILES) 
 
-EXTRA_DIST = $(icon_DATA)
-	
 ## File created by the gnome-build tools
-

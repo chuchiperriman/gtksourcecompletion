@@ -2,19 +2,19 @@
 gtksourcecompletion-provider
 
 <!-- ##### SECTION Short_Description ##### -->
-Provider interface
+
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-You must implement this interface if you want to create a new provider. There 
-is a program that creates the skeleton to you. You can find it in 
-gtksourcecompletion package in the tools folder.
+
 </para>
+
 
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 
