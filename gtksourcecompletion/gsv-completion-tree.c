@@ -178,6 +178,14 @@ gsv_completion_tree_init (GsvCompletionTree *self)
 }
 
 
+/**
+ * gsv_completion_tree_get_selected_item:
+ * @self: The #GsvCompletionTree
+ * @item: A reference of an item. This function sets the pointer to the selected item.
+ *
+ * @Returns TRUE if there is an item selected
+ *
+ */
 gboolean
 gsv_completion_tree_get_selected_item(GsvCompletionTree *self,
 													GtkSourceCompletionItem **item)
@@ -199,6 +207,14 @@ gsv_completion_tree_get_selected_item(GsvCompletionTree *self,
 	
 }
 
+/**
+ * gsv_completion_tree_add_data:
+ * @self: The #GsvCompletionTree
+ * @data: the item to add to the tree
+ *
+ * Adds a new item into the tree
+ *
+ */
 void
 gsv_completion_tree_add_data(GsvCompletionTree *self,
 					GtkSourceCompletionItem* data)
@@ -221,6 +237,12 @@ gsv_completion_tree_add_data(GsvCompletionTree *self,
 						-1);
 }
 
+/**
+ * gsv_completion_tree_clear:
+ * @self: the #GsvCompletionTree
+ *
+ * Clear the tree model and free the items 
+ */
 void
 gsv_completion_tree_clear(GsvCompletionTree *self)
 {
@@ -243,6 +265,12 @@ gsv_completion_tree_clear(GsvCompletionTree *self)
 	gtk_list_store_clear(store);
 }
 
+/**
+ * gsv_completion_tree_has_items:
+ * @self: The #GsvCompletionTree
+ *
+ * Returns TRUE if the tree has one or more items.
+ */
 gboolean
 gsv_completion_tree_has_items(GsvCompletionTree *self)
 {
@@ -251,6 +279,14 @@ gsv_completion_tree_has_items(GsvCompletionTree *self)
 	return gtk_tree_model_get_iter_first(GTK_TREE_MODEL(model),&iter);
 }
 
+/**
+ * gsv_completion_tree_select_first:
+ * @self: The #GsvCompletionTree
+ *
+ * This functions selects the first item on the tree
+ *
+ * Returns TRUE if there is an item and it has been selected
+ */
 gboolean
 gsv_completion_tree_select_first(GsvCompletionTree *self)
 {
@@ -276,6 +312,14 @@ gsv_completion_tree_select_first(GsvCompletionTree *self)
 	return TRUE;
 }
 
+/**
+ * gsv_completion_tree_select_last:
+ * @self: The #GsvCompletionTree
+ *
+ * This functions selects the last item on the tree
+ *
+ * Returns TRUE if there is an item and it has been selected
+ */
 gboolean 
 gsv_completion_tree_select_last(GsvCompletionTree *self)
 {
@@ -308,6 +352,16 @@ gsv_completion_tree_select_last(GsvCompletionTree *self)
 	return FALSE;
 }
 
+/**
+ * gsv_completion_tree_select_previous:
+ * @self: The #GsvCompletionTree
+ * @rows: the number of the previous items to select
+ *
+ * This functions selects the rows number of items before the current.
+ *
+ * Returns TRUE if there is an item and it has been selected. If rows=5 but the tree
+ * only have 3 items, it returns true too.
+ */
 gboolean
 gsv_completion_tree_select_previous(GsvCompletionTree *self, 
 					gint rows)
@@ -347,6 +401,16 @@ gsv_completion_tree_select_previous(GsvCompletionTree *self,
 	return TRUE;
 }
 
+/**
+ * gsv_completion_tree_select_next:
+ * @self: The #GsvCompletionTree
+ * @rows: the number of the next items to select
+ *
+ * This functions selects the rows number of items after the current.
+ *
+ * Returns TRUE if there is an item and it has been selected. If rows=5 but the tree
+ * only have 3 items, it returns true too.
+ */
 gboolean
 gsv_completion_tree_select_next(GsvCompletionTree *self, 
 					gint rows)
@@ -383,6 +447,14 @@ gsv_completion_tree_select_next(GsvCompletionTree *self,
 	return TRUE;
 }
 
+/**
+ * gsv_completion_tree_new:
+ *
+ * Create a new GsvCompletionTree
+ *
+ * Returns the new #GsvCompletionTree
+ *
+ */
 GtkWidget*
 gsv_completion_tree_new()
 {

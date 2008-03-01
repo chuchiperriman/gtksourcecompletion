@@ -1,3 +1,10 @@
+2008-03-01  perriman  <perriman@portatil>
+
+	* gsc-docwordscompletion-provider.c:
+		- Fixed an important memory lost problem!!
+		- Removed references to g_completion (we don't need it and we safe a
+		lot of memory usage)
+
 2008-01-27  perriman  <perriman@portatil>
 
 	* pixmaps: Moved pixmaps foldel to the root folder.

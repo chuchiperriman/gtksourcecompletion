@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: @PACKAGE_NAME@
 Description: Adds completion support to GtkSourceView 
 Version: @PACKAGE_VERSION@
-Requires: gtksourceview-1.0
+Requires: gtksourceview-2.0
 Libs: -L${libdir} -lgtksourcecompletion-1.0
 Cflags: -I${includedir}/gtksourcecompletion-1.0

@@ -25,11 +25,12 @@
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
 
 struct _GscDocumentwordsProviderPrivate {
-	GCompletion *completion;
 	gboolean is_completing;
 	GHashTable *current_words;
-	GList *temp_list;
+	GList *data_list;
+	gchar *cleaned_word;
 	GdkPixbuf *icon;
+	gint count;
 	GscDocumentwordsProviderSortType sort_type;
 };
 
@@ -79,7 +80,7 @@ get_all_words( GtkTextBuffer *buffer )
 	
 	
 	gtk_text_buffer_get_start_iter(buffer,&start_iter);
-    prev_iter = start_iter;
+   prev_iter = start_iter;
 	while (gtk_text_iter_forward_find_char(
 			&start_iter,
 			(GtkTextCharPredicate)pred_is_separator,
@@ -89,8 +90,7 @@ get_all_words( GtkTextBuffer *buffer )
         word = gtk_text_iter_get_text(&prev_iter,&start_iter);
         if (strlen(word)>0)
         {
-            /*TODO Try to eliminate this g_strdup*/
-            g_hash_table_insert(result,g_strdup(word),NULL);
+            g_hash_table_insert(result,word,NULL);
         }
         prev_iter = start_iter;
         gtk_text_iter_forward_char(&prev_iter);
@@ -102,8 +102,7 @@ get_all_words( GtkTextBuffer *buffer )
         word = gtk_text_iter_get_text(&prev_iter,&start_iter);
         if (strlen(word)>0)
         {
-            /*TODO Try to eliminate this g_strdup*/
-            g_hash_table_insert(result,g_strdup(word),NULL);
+            g_hash_table_insert(result,word,NULL);
         }
         prev_iter = start_iter;
         gtk_text_iter_forward_char(&prev_iter);
@@ -116,34 +115,56 @@ get_all_words( GtkTextBuffer *buffer )
 static gboolean
 is_valid_word(gchar *current_word, gchar *completion_word)
 {
+	gint len_cur = strlen (current_word);
 	if (g_utf8_collate(current_word,completion_word) == 0 ||
 			g_utf8_strlen(completion_word,-1)<4)
-		return FALSE;
-		
-	return TRUE;
+			return FALSE;
+
+	if (strncmp(current_word,completion_word,len_cur)==0)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
+	
 }
 
 static void
 clean_current_words(GscDocumentwordsProvider* self)
 {
-	g_completion_clear_items(self->priv->completion);
 	/*Clean the previous data*/
 	if (self->priv->current_words!=NULL)
 	{	
 		g_hash_table_destroy(self->priv->current_words);
 		self->priv->current_words = NULL;
 	}
-	g_list_free(self->priv->temp_list);
-	self->priv->temp_list = NULL;
 }
 
+/*
+ * Check the hash item and inserts the completion item into the final list
+ */
 static void
 gh_add_key_to_list(gpointer key,
 					gpointer value,
 					gpointer user_data)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(user_data);
-	self->priv->temp_list = g_list_append(self->priv->temp_list,key);
+	if (self->priv->count>=500)
+	{
+		return;
+	}
+	GtkSourceCompletionItem *data;
+	if (is_valid_word(self->priv->cleaned_word,(gchar*)key))
+	{
+		self->priv->count++;
+		data = gtk_source_completion_item_new(0,
+							(gchar*)key,
+							self->priv->icon,
+							15,
+							GTK_SOURCE_COMPLETION_PROVIDER(self),
+							NULL);
+		self->priv->data_list = g_list_append(self->priv->data_list,data);
+	}
 }
 
 static GList*
@@ -175,18 +196,14 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gchar* current_word = gtk_source_view_get_last_word(view);
-	gchar *cleaned_word;
-	GtkSourceCompletionItem *data;
-	GList *completion_list = NULL;
-	GList *data_list = NULL;
 	
-	cleaned_word = gsc_clear_word(current_word);
+	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
 	/* 
 	* We must stop the autocompletion event because the word is not correct
 	* (The user wrotte special characters only)
 	*/
-	if (cleaned_word == NULL)
+	if (self->priv->cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)
 		{
@@ -197,56 +214,30 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	
 	if (!self->priv->is_completing)
 	{
-		/* Load GCompletion */
+		
 		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(view);
 		self->priv->current_words = get_all_words(text_buffer);
-		g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
-		g_completion_add_items(self->priv->completion, self->priv->temp_list);
-		g_list_free(self->priv->temp_list);
-		self->priv->temp_list = NULL;
 	}
 	
-	completion_list = g_completion_complete_utf8(self->priv->completion, cleaned_word, NULL);
+	self->priv->data_list = NULL;
+	self->priv->count = 0;
+	g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
+	g_free(self->priv->cleaned_word);
+	//TODO 	completion_list = g_completion_complete_utf8(self->priv->completion, cleaned_word, NULL);
 	
-	gint i = 0;
-	if (completion_list!=NULL)
-	{
-		do
-		{
-			if (i>500)
-			{
-				g_debug("too many items (>500)");
-				break;
-			}
-			i++;
-			if (is_valid_word(cleaned_word,completion_list->data))
-			{
-				data = gtk_source_completion_item_new(0,
-									completion_list->data,
-									self->priv->icon,
-									15,
-									base,
-									NULL);
-				data_list = g_list_append(data_list,data);
-			}
-		}while( (completion_list = g_list_next(completion_list)) != NULL);
-	}
-	
-	if (data_list!=NULL)
+	if (self->priv->data_list!=NULL)
 	{
 		self->priv->is_completing = TRUE;
-		data_list = _sort_completion_list(self,data_list);
+		self->priv->data_list = _sort_completion_list(self,self->priv->data_list);
 	}
 	else
 	{
 		clean_current_words(self);
 		self->priv->is_completing = FALSE;
 	}
-	
-	g_free(cleaned_word);
 
 	/* GtkSourceCompletion frees this list and data */
-	return data_list;
+	return self->priv->data_list;
 }
 
 static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion)
@@ -288,8 +279,11 @@ static void gsc_documentwords_provider_finalize(GObject *object)
 	GscDocumentwordsProvider *self;
 	self = GSC_DOCUMENTWORDS_PROVIDER(object);
 	clean_current_words(self);
+	g_free(self->priv->cleaned_word);
+	self->priv->data_list = NULL;
+	self->priv->count= 0;
 	gdk_pixbuf_unref (self->priv->icon);
-	g_completion_free(self->priv->completion);
+	//g_completion_free(self->priv->completion);
 	
 	G_OBJECT_CLASS(gsc_documentwords_provider_parent_class)->finalize(object);
 }
@@ -319,10 +313,11 @@ static void gsc_documentwords_provider_gtk_source_completion_provider_interface_
 static void gsc_documentwords_provider_init (GscDocumentwordsProvider * self)
 {
 	self->priv = g_new0(GscDocumentwordsProviderPrivate, 1);
-	self->priv->completion = g_completion_new(NULL);
+	//self->priv->completion = g_completion_new(NULL);
 	self->priv->current_words = NULL;
-	self->priv->temp_list = NULL;
+	//self->priv->temp_list = NULL;
 	self->priv->is_completing = FALSE;
+	self->priv->count=0;
 	self->priv->icon = gdk_pixbuf_new_from_file(ICON_FILE,NULL);
 	self->priv->sort_type = GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH;
 }

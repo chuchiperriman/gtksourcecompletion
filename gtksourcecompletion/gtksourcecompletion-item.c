@@ -144,6 +144,13 @@ gtk_source_completion_item_get_page_name(GtkSourceCompletionItem *item)
 	return item->page_name;
 }
 
+/**
+ * gtk_source_completion_item_get_id:
+ * @item: The GtkSourceCompletionItem
+ *
+ * Returns current item id
+ *
+ */
 int
 gtk_source_completion_item_get_id(GtkSourceCompletionItem *item)
 {
