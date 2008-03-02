@@ -15,7 +15,7 @@ AC_SUBST(ISODATE)
 AC_CANONICAL_HOST
 
 dnl pkg-config configuration
-PKG_CHECK_MODULES(DEP, gtksourceview-1.0)
+PKG_CHECK_MODULES(DEP, gtksourceview-2.0)
 AC_SUBST(DEP_CFLAGS)
 AC_SUBST(DEP_LIBS)
 

@@ -5,7 +5,7 @@ INCLUDES = \
 	-DICON_DIR=\""$(datadir)/gtksourcecompletion/pixmaps"\"	\
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	$(PACKAGE_CFLAGS) \
-	`pkg-config --cflags gtksourceview-1.0` \
+	`pkg-config --cflags gtksourceview-2.0` \
 	`pkg-config --cflags libglade-2.0`
 
 AM_CFLAGS =\
@@ -47,7 +47,7 @@ libgtksourcecompletion_1_0_la_LIBADD = \
 	
 libgtksourcecompletion_1_0_la_LDFLAGS = \
 	-version-info 1:0:0 -module	\
-	`pkg-config --libs gtksourceview-1.0`
+	`pkg-config --libs gtksourceview-2.0`
 
 INST_H_FILES = \
 	gtksourcecompletion-provider.h	\
