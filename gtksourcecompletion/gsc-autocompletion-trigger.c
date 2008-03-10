@@ -135,7 +135,6 @@ autocompletion_raise_event(
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(event);
 	/*Check if the user has changed the cursor position.If yes, we don't complete*/
 	gint offset = _get_text_offset(self);
-	g_debug("offsets: %i-%i",offset,self->priv->text_offset);
 	if (offset != self->priv->text_offset)
 		return FALSE;
 		
