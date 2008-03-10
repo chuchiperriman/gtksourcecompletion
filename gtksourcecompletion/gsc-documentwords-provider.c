@@ -89,9 +89,10 @@ get_all_words( GtkTextBuffer *buffer )
 	{
         word = gtk_text_iter_get_text(&prev_iter,&start_iter);
         if (strlen(word)>0)
-        {
             g_hash_table_insert(result,word,NULL);
-        }
+        else
+        	g_free(word);
+        
         prev_iter = start_iter;
         gtk_text_iter_forward_char(&prev_iter);
 	}
@@ -101,9 +102,10 @@ get_all_words( GtkTextBuffer *buffer )
         gtk_text_buffer_get_end_iter(buffer,&start_iter);
         word = gtk_text_iter_get_text(&prev_iter,&start_iter);
         if (strlen(word)>0)
-        {
             g_hash_table_insert(result,word,NULL);
-        }
+        else
+        	g_free(word);
+
         prev_iter = start_iter;
         gtk_text_iter_forward_char(&prev_iter);
         
@@ -148,6 +150,7 @@ gh_add_key_to_list(gpointer key,
 					gpointer value,
 					gpointer user_data)
 {
+
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(user_data);
 	if (self->priv->count>=500)
 	{
@@ -223,7 +226,6 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	self->priv->count = 0;
 	g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
 	g_free(self->priv->cleaned_word);
-	//TODO 	completion_list = g_completion_complete_utf8(self->priv->completion, cleaned_word, NULL);
 	
 	if (self->priv->data_list!=NULL)
 	{

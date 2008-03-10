@@ -33,6 +33,7 @@ struct _GtkSourceCompletionItem
 void
 gtk_source_completion_item_free(GtkSourceCompletionItem *item)
 {
+	g_debug("Free GtkSourceCompletionItem");
 	g_free(item->name);
 	g_free(item);
 }
@@ -57,6 +58,7 @@ gtk_source_completion_item_new(int id,
 							GtkSourceCompletionProvider *provider,
 							gpointer user_data)
 {
+	g_debug("Created GtkSourceCompletionItem");
 	GtkSourceCompletionItem* item = g_malloc0(sizeof(GtkSourceCompletionItem));
 	item->id = id;
 	item->name = g_strdup(name);
