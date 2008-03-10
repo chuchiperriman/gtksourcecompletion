@@ -1,3 +1,8 @@
+2008-03-09  perriman  <perriman@portatil>
+
+	* fixed #1909908: Break the completion if the user changes
+	the cursor position before the delay
+
 2008-03-01  perriman  <perriman@portatil>
 
 	* gsc-docwordscompletion-provider.c:

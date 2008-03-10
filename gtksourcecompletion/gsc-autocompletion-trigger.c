@@ -41,6 +41,7 @@ struct _GscAutocompletionTriggerPrivate {
 	GtkTextView *view;
 	guint source_id;
 	guint delay;
+	gint text_offset;
 };
 
 #define GSC_AUTOCOMPLETION_TRIGGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_AUTOCOMPLETION_TRIGGER, GscAutocompletionTriggerPrivate))
@@ -60,6 +61,15 @@ static gboolean
 autocompletion_raise_event(
 								gpointer event);
 
+static gint
+_get_text_offset(GscAutocompletionTrigger *self)
+{
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(self->priv->view);
+	GtkTextMark* mark = gtk_text_buffer_get_insert(buffer);
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(buffer,&iter,mark);
+	return gtk_text_iter_get_offset(&iter);
+}
 
 static gboolean
 autocompletion_key_release_cb (GtkWidget *view,
@@ -83,6 +93,7 @@ autocompletion_key_release_cb (GtkWidget *view,
 					self->priv->source_id = 0;
 				}
 	
+				self->priv->text_offset = _get_text_offset(self);
 				/*raise event in 0,5 seconds*/
 				self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);	
 			}
@@ -110,6 +121,7 @@ autocompletion_insert_text_cb(GtkTextBuffer *buffer,
 			self->priv->source_id = 0;
 		}
 
+		self->priv->text_offset = _get_text_offset(self);
 		/*raise event in 0,5 seconds*/
 		self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
 	}
@@ -121,6 +133,12 @@ autocompletion_raise_event(
 {
 	gchar* word;
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(event);
+	/*Check if the user has changed the cursor position.If yes, we don't complete*/
+	gint offset = _get_text_offset(self);
+	g_debug("offsets: %i-%i",offset,self->priv->text_offset);
+	if (offset != self->priv->text_offset)
+		return FALSE;
+		
 	GtkSourceCompletion *completion = self->priv->completion;
 	GtkSourceView *source_view = GTK_SOURCE_VIEW(self->priv->view);
 	word = gtk_source_view_get_last_word_and_iter(GTK_TEXT_VIEW(source_view), NULL, NULL);
