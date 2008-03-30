@@ -47,9 +47,24 @@ struct _GscUserRequestTriggerClass {
 	GObjectClass parent;
 };
 
+/**
+ * gsc_userrequest_trigger_new:
+ *
+ * Returns The new #GscUserRequestTrigger
+ *
+ */
 GscUserRequestTrigger* 
 gsc_userrequest_trigger_new();
 
+/**
+ * gsc_userrequest_trigger_set_keys:
+ * @self: The #GscUserRequestTrigger 
+ * @keys: The string representation of the keys that we will
+ * use to activate the user request event. You can get this 
+ * string with #gtk_accelerator_name
+ *
+ * Assign the keys that we will use to activate the user request event
+ */
 void
 gsc_userrequest_trigger_set_keys(GscUserRequestTrigger * self, const gchar* keys);
 

@@ -38,18 +38,6 @@ gtk_source_completion_item_free(GtkSourceCompletionItem *item)
 	g_free(item);
 }
 
-/**
- * gtk_source_completion_item_new:
- * @id: An id for identify this item
- * @name: Item name that will be shown in the completion popup
- * @icon: Item icon that will be shown in the completion popup
- * @priority: The item priority. Items with high priority will be
- * 				shown first in the completion popup
- * @provider: The provider that creates the item
- * @user_data: User data used by the providers
- *
- * Returns The new GtkSourceCompletionItem
- */
 GtkSourceCompletionItem*
 gtk_source_completion_item_new(int id,
 							const gchar *name,
@@ -86,73 +74,36 @@ gtk_source_completion_item_new_full(int id,
 	return item;
 }
 
-/**
- * gtk_source_completion_item_get_name:
- * @item: The GtkSourceCompletionItem
- *
- * Returns The item name
- */
 const gchar*
 gtk_source_completion_item_get_name(GtkSourceCompletionItem *item)
 {
 	return item->name;
 }
 
-/**
- * gtk_source_completion_item_get_user_data:
- * @item: The GtkSourceCompletionItem
- *
- * Returns the user data of this item
- */
 gchar*
 gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item)
 {
 	return item->user_data;
 }
 
-/**
- * gtk_source_completion_item_get_icon:
- * @item: The GtkSourceCompletionItem
- *
- * Returns the icon of this item
- */
 const GdkPixbuf*
 gtk_source_completion_item_get_icon(GtkSourceCompletionItem *item)
 {
 	return item->icon;
 }
 
-/**
- * gtk_source_completion_item_get_provider:
- * @item: The GtkSourceCompletionItem
- *
- * Returns the #GtkSourceCompletionProvider that did create the Item.
- */
 GtkSourceCompletionProvider*
 gtk_source_completion_item_get_provider(GtkSourceCompletionItem *item)
 {
 	return item->provider;
 }
 
-/**
- * gtk_source_completion_item_get_page_name:
- * @item: The GtkSourceCompletionItem
- *
- * Returns the page name where the item will be placed.
- */
 const gchar*
 gtk_source_completion_item_get_page_name(GtkSourceCompletionItem *item)
 {
 	return item->page_name;
 }
 
-/**
- * gtk_source_completion_item_get_id:
- * @item: The GtkSourceCompletionItem
- *
- * Returns current item id
- *
- */
 int
 gtk_source_completion_item_get_id(GtkSourceCompletionItem *item)
 {

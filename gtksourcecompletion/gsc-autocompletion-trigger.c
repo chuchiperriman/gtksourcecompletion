@@ -246,12 +246,6 @@ GType gsc_autocompletion_trigger_get_type ()
 	return g_define_type_id;
 }
 
-/**
- * gsc_autocompletion_trigger_new:
- *
- * Returns The new #GscAutocompletionTrigger
- *
- */
 GscAutocompletionTrigger*
 gsc_autocompletion_trigger_new(GtkSourceCompletion *completion)
 {

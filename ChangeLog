@@ -1,3 +1,10 @@
+2008-03-29  perriman  <perriman@portatil>
+
+	* fixed #1925665: We don't show the current word.
+	* doc: 
+		- Updated some API documentation
+		- Moved documentation from .c to .h files
+
 2008-03-10  perriman  <perriman@portatil>
 
 	* fixed #1909917: Added a GTK_STOCK_GO_FORWARD if we have two 

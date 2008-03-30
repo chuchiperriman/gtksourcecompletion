@@ -50,12 +50,39 @@ struct _GtkSourceCompletionTriggerIface {
 	
 };
 
+/**
+ * gtk_source_completion_trigger_get_name:
+ * @self: the #GtkSourceCompletionTrigger
+ *
+ * The trigger name. By example: "C autocompletion trigger"
+ *
+ * Returns: The trigger's name
+ * 
+ **/
 const gchar*
 gtk_source_completion_trigger_get_name(GtkSourceCompletionTrigger* self);
 
+/**
+ * gtk_source_completion_trigger_activate:
+ * @self: the #GtkSourceCompletionTrigger
+ *
+ * Activate the completion trigger.
+ *
+ * Returns: TRUE if activation is OK, FALSE if not.
+ * 
+ **/
 gboolean
 gtk_source_completion_trigger_activate (GtkSourceCompletionTrigger* self);
-					
+
+/**
+ * gtk_source_completion_trigger_deactivate:
+ * @self: the #GtkSourceCompletionTrigger
+ *
+ * Deactive the completion trigger
+ *
+ * Returns: TRUE if activation is OK, FALSE if not.
+ * 
+ **/				
 gboolean
 gtk_source_completion_trigger_deactivate (GtkSourceCompletionTrigger* self);
 

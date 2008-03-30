@@ -20,34 +20,12 @@
 
 #include "gtksourcecompletion-provider.h"
 
-
-/**
- * gtk_source_completion_provider_get_name:
- * @self: the #GtkSourceCompletionProvider
- *
- * The provider name. By example: "Document word completion provider"
- *
- * Returns: The provider's name
- * 
- **/
 const gchar*
 gtk_source_completion_provider_get_name(GtkSourceCompletionProvider *self)
 {
 	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_name (self);
 }
-/**
- * gtk_source_completion_provider_get_data:
- * @self: the #GtkSourceCompletionProvider
- * @completion: The #GtkSourceCompletion.
- * @trigger: The #GtkSourceCompletionTrigger that raise the event
- *
- * The completion call this function when an event is raised.
- * This function may return a list of #GtkSourceCompletionItem to be shown
- * in the popup to the user.
- *
- * Returns: a list of #GtkSourceCompletionData or NULL if there are no items
- * 
- **/
+
 GList* 
 gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 					GtkSourceCompletion* completion, 
@@ -56,17 +34,6 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_data (self, completion, trigger);
 }
 
-/**
- * gtk_source_completion_provider_data_selected:
- * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkSourceCompletion.
- * @item: The data selected by the user.
- *
- * The completion call this function when the user select an item of this provider.
- * The provider may insert the text in the view of do something.
- *
- * 
- **/
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
 					GtkSourceCompletion* completion, 
@@ -75,14 +42,6 @@ gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self,
 	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, completion, item);
 }
 
-/**
- * gtk_source_completion_provider_end_completion:
- * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkSourceCompletion.
- *
- * The completion call this function when it is goint to hide the popup
- * 
- **/
 void 
 gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
 					GtkSourceCompletion* completion)
@@ -90,17 +49,6 @@ gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self
 	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->end_completion(self, completion);
 }
 
-/**
- * gtk_source_completion_provider_get_item_info_markup:
- * @self: the #GtkSourceCompletionProvider
- * @item: The selected item.
- *
- * The completion call this function when the user wants to view the 
- * aditional info of the current item.
- *
- * Returns: The pango markup to be shown in the info window.
- * 
- **/
 gchar*
 gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
 				GtkSourceCompletionItem *item)

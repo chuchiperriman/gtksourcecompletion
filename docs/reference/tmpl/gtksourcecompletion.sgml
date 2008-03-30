@@ -44,7 +44,7 @@ GtkSourceCompletion
 </para>
 
 @completion: 
-@event_name: 
+@trigger_name: 
 @event_data: 
 
 

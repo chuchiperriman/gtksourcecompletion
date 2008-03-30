@@ -503,7 +503,6 @@ gsv_completion_popup_select_next(GsvCompletionPopup *self,
 	return gsv_completion_tree_select_next(_get_current_tree(self),rows);
 }
 
-/*Not free the item*/
 gboolean
 gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
 					GtkSourceCompletionItem **item)

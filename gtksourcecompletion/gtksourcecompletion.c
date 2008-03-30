@@ -69,7 +69,7 @@ typedef struct _InternalCompletionData InternalCompletionData;
 
 static GObjectClass* parent_class = NULL;
 
-/***************** GtkTextView-GtkSourceCompletion Control ************/
+/* **************** GtkTextView-GtkSourceCompletion Control *********** */
 
 /*
  * We save a map with a GtkTextView and his GtkSourceCompletion. If you 
@@ -99,7 +99,7 @@ completion_control_remove_completion(GtkTextView *view)
 {
 	g_hash_table_remove(completion_map,view);
 }
-/***********************************************************************/
+/* ********************************************************************* */
 
 static gint
 internal_data_compare (gconstpointer v1,
@@ -392,14 +392,6 @@ gtk_source_completion_get_type (void)
 	return our_type;
 }
 
-/**
- * gtk_source_completion_new:
- * @view: a #GtkSourceView.
- *
- * Creates a new #GtkSourceCompletion asociated to a GtkSourceView
- *
- * Returns: value: A new #GtkSourceCompletion
- **/
 GtkSourceCompletion*
 gtk_source_completion_new (GtkTextView *view)
 {
@@ -427,17 +419,6 @@ gtk_source_completion_new (GtkTextView *view)
 	return completion;
 }
 
-/**
- * gtk_source_completion_register_provider:
- * @completion: the #GtkSourceCompletion
- * @provider: The #GtkSourceCompletionProvider.
- *
- * This function register the provider into the completion and reference it. When 
- * an event is raised, completion call to the provider to get the data. When the user
- * select an item, it call the provider to tell it this action and the provider do
- * that it want (normally inserts some text)
- * 
- **/
 void
 gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 					GtkSourceCompletionProvider *provider)
@@ -447,14 +428,6 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 	g_object_ref(provider);
 }
 
-/**
- * gtk_source_completion_unregister_provider:
- * @completion: the #GtkSourceCompletion
- * @provider: The #GtkSourceCompletionProvider.
- *
- * This function unregister the provider.
- * 
- **/
 void
 gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
 					GtkSourceCompletionProvider *provider)
@@ -464,29 +437,12 @@ gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
 	g_object_unref(provider);
 }
 
-/**
- * gtk_source_completion_get_view:
- * @completion: the #GtkSourceCompletion
- *
- * Returns: The internal #GtkTextView of this completion.
- * 
- **/
 GtkTextView*
 gtk_source_completion_get_view(GtkSourceCompletion *completion)
 {
 	return completion->priv->text_view;
 }
 
-/**
- * gtk_source_completion_trigger_event:
- * @completion: the #GtkSourceCompletion
- * @trigger_name: The event name to raise
- * @event_data: This object will be passed to the providers to give them some special information of the event
- *
- * Calling this function, the completion call to all providers to get data and, if 
- * they return data, it shows the completion to the user. 
- * 
- **/
 void
 gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
 					const gchar *trigger_name, 
@@ -581,28 +537,12 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	
 }
 
-
-/**
- * gtk_source_completion_is_visible:
- * @completion: The #GtkSourceCompletion
- *
- * Returns TRUE if the completion popup is visible.
- *
- */
 gboolean
 gtk_source_completion_is_visible(GtkSourceCompletion *completion)
 {
 	return GTK_WIDGET_VISIBLE(completion->priv->popup);
 }
 
-/**
- * gtk_source_completion_get_from_view:
- * @view: the GtkSourceView
- *
- * Returns NULL if the GtkTextView haven't got an associated GtkSourceCompletion
- * or the GtkSourceCompletion of the GtkTextView
- * 
- **/
 GtkSourceCompletion*
 gtk_source_completion_get_from_view(
 																GtkTextView *view)
@@ -610,15 +550,6 @@ gtk_source_completion_get_from_view(
 	return completion_control_get_completion(view);
 }
 
-/**
- * gtk_source_completion_get_provider:
- * @completion: The #GtkSourceCompletion
- * @provider_name: Provider's name that you are looking for.
- *
- * Returns The provider if the completion has this provider registered or 
- * NULL if not.
- *
- */
 GtkSourceCompletionProvider*
 gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 								const gchar* provider_name)
@@ -640,15 +571,6 @@ gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 	return NULL;
 }
 
-/**
- * gtk_source_completion_register_trigger:
- * @completion: The #GtkSourceCompletion
- * @trigger: The trigger to register
- *
- * This function register a completion trigger. If the completion is actived
- * then this method activate the trigger. This function reference the trigger
- * object
- */
 void
 gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
@@ -661,15 +583,6 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 	}
 }
 
-/**
- * gtk_source_completion_unregister_trigger:
- * @completion: The #GtkSourceCompletion
- * @trigger: The trigger to unregister
- *
- * This function unregister a completion trigger. If the completion is actived
- * then this method deactivate the trigger. This function reference the trigger
- * object
- */								
 void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
@@ -683,16 +596,6 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 	g_object_unref(trigger);
 }
 
-/**
- * gtk_source_completion_get_trigger:
- * @completion: The #GtkSourceCompletion
- * @trigger_name: The trigger name to get
- *
- * This function return the trigger with this name.
- *
- * Returns The trigger or NULL if not exists
- *
- */
 GtkSourceCompletionTrigger*
 gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 								const gchar* trigger_name)
@@ -714,13 +617,6 @@ gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 	return FALSE;
 }
 
-/**
- * gtk_source_completion_activate:
- * @completion: The #GtkSourceCompletion
- *
- * This function activate the completion mechanism. The completion connects 
- * all signals and activate all registered triggers.
- */
 void
 gtk_source_completion_activate(GtkSourceCompletion *completion)
 {
@@ -756,13 +652,6 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 	completion->priv->active = TRUE;
 }
 
-/**
- * gtk_source_completion_deactivate:
- * @completion: The #GtkSourceCompletion
- *
- * This function deactivate the completion mechanism. The completion disconnect
- * all signals and deactivate all registered triggers.
- */
 void
 gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 {
@@ -793,12 +682,6 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 	completion->priv->active = FALSE;
 }
 
-/**
- * gtk_source_completion_finish_completion:
- * @completion: The #GtkSourceCompletion
- *
- * This function finish the completion if it is active (visible).
- */
 void
 gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
 {

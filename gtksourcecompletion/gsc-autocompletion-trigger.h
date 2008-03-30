@@ -47,9 +47,29 @@ struct _GscAutocompletionTriggerClass {
 	GObjectClass parent;
 };
 
+/**
+ * gsc_autocompletion_trigger_new:
+ *
+ * Returns The new #GscAutocompletionTrigger
+ *
+ */
 GscAutocompletionTrigger* 
 gsc_autocompletion_trigger_new();
 
+/**
+ * gsc_autocompletion_trigger_set_delay:
+ * @trigger: The #GscAutocompletionTrigger
+ * @delay: milliseconds to delay the autocompletion event.
+ *
+ * The delay time is the time between the last user key pressed
+ * and the instant when the trigger call to the completion. If 
+ * delay is 2000 then the user press a key and 2 seconds later
+ * this trigger call to the completion if the user don't press
+ * another key.
+ *
+ * Returns The new #GscAutocompletionTrigger
+ *
+ */
 void
 gsc_autocompletion_trigger_set_delay(GscAutocompletionTrigger* trigger, guint delay);
 

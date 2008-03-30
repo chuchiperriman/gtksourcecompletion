@@ -1,5 +1,5 @@
 /* Copyright (C) 2007 - Jesús Barbero <chuchiperriman@gmail.com>
- *  *
+ *
  *  This file is part of gtksourcecompletion.
  *
  *  gtksourcecompletion is free software: you can redistribute it and/or modify
@@ -32,6 +32,7 @@ struct _GscDocumentwordsProviderPrivate {
 	GdkPixbuf *icon;
 	gint count;
 	GscDocumentwordsProviderSortType sort_type;
+	GtkTextIter start_iter;
 };
 
 #define GSC_DOCUMENTWORDS_PROVIDER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderPrivate))
@@ -67,7 +68,7 @@ utf8_len_compare(gconstpointer a, gconstpointer b)
 }
 
 static GHashTable*
-get_all_words( GtkTextBuffer *buffer )
+get_all_words(GscDocumentwordsProvider* self, GtkTextBuffer *buffer )
 {
 	GtkTextIter start_iter;
     GtkTextIter prev_iter;
@@ -87,24 +88,32 @@ get_all_words( GtkTextBuffer *buffer )
 			NULL,
 			NULL))
 	{
+		if (gtk_text_iter_compare(&self->priv->start_iter,&prev_iter)!=0)
+		{
         word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+        
         if (strlen(word)>0)
             g_hash_table_insert(result,word,NULL);
         else
         	g_free(word);
         
-        prev_iter = start_iter;
-        gtk_text_iter_forward_char(&prev_iter);
+        
+      }
+      prev_iter = start_iter;
+      gtk_text_iter_forward_char(&prev_iter);
 	}
 
     if (!gtk_text_iter_is_end(&prev_iter))
     {
         gtk_text_buffer_get_end_iter(buffer,&start_iter);
-        word = gtk_text_iter_get_text(&prev_iter,&start_iter);
-        if (strlen(word)>0)
-            g_hash_table_insert(result,word,NULL);
-        else
-        	g_free(word);
+        if (gtk_text_iter_compare(&self->priv->start_iter,&prev_iter)!=0)
+		  {
+        		word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+		      if (strlen(word)>0)
+		      	g_hash_table_insert(result,word,NULL);
+		      else
+					g_free(word);
+		  }
 
         prev_iter = start_iter;
         gtk_text_iter_forward_char(&prev_iter);
@@ -198,8 +207,8 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	GtkTextView *view = gtk_source_completion_get_view(completion);
-	gchar* current_word = gtk_source_view_get_last_word(view);
 	
+	gchar* current_word = gtk_source_view_get_last_word_and_iter(view,&self->priv->start_iter,NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
 	/* 
@@ -219,7 +228,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	{
 		
 		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(view);
-		self->priv->current_words = get_all_words(text_buffer);
+		self->priv->current_words = get_all_words(self,text_buffer);
 	}
 	
 	self->priv->data_list = NULL;
@@ -336,12 +345,6 @@ GType gsc_documentwords_provider_get_type ()
 	return g_define_type_id;
 }
 
-/**
- * gsc_documentwords_provider_new:
- *
- * Returns The new #GscDocumentwordsProvider
- *
- */
 GscDocumentwordsProvider*
 gsc_documentwords_provider_new()
 {

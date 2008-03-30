@@ -52,13 +52,32 @@ typedef enum{
 	GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH
 } GscDocumentwordsProviderSortType;
 
+/**
+ * gsc_documentwords_provider_new:
+ *
+ * Returns The new #GscDocumentwordsProvider
+ *
+ */
 GscDocumentwordsProvider* 
 gsc_documentwords_provider_new();
 
+/**
+ * gsc_documentwords_provider_set_sort_type:
+ * @prov: The #GscDocumentwordsProvider
+ * @sort_type: The #GscDocumentwordsProviderSortType for the completion items.
+ *
+ * This method sets the sort type for the completion items list.
+ */
 void
 gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
 											 GscDocumentwordsProviderSortType sort_type);
 
+/**
+ * gsc_documentwords_provider_get_sort_type:
+ * @prov: The #GscDocumentwordsProvider
+ *
+ * Returns The current sort type.
+ */
 GscDocumentwordsProviderSortType
 gsc_documentwords_provider_get_sort_type(GscDocumentwordsProvider *prov);
 
@@ -67,3 +86,4 @@ GType gsc_documentwords_provider_get_type ();
 G_END_DECLS
 
 #endif
+
