@@ -1,3 +1,15 @@
+===========================
+ gtksourcecompletion 0.4.0
+===========================
+
+New Features and fixes
+======================
+- Created completion tree and completion popup widgets.
+- New multipage support!!!
+- Less memory usage
+- Better autocompletion
+
+
 News in 0.3.1
 -------------
 * Better completion triggers
