@@ -89,28 +89,38 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
  * gtk_source_completion_register_provider:
  * @completion: the #GtkSourceCompletion
  * @provider: The #GtkSourceCompletionProvider.
+ * @trigger_name: The trigger name what you want to register this provider
  *
  * This function register the provider into the completion and reference it. When 
  * an event is raised, completion call to the provider to get the data. When the user
  * select an item, it call the provider to tell it this action and the provider do
  * that it want (normally inserts some text)
  * 
+ * Returns TRUE if it was registered or FALSE if not (because it has been already registered,
+ * or the trigger don't exists)
+ *
  **/
-void 
+gboolean
 gtk_source_completion_register_provider(GtkSourceCompletion *completion, 
-					GtkSourceCompletionProvider *provider);
+					GtkSourceCompletionProvider *provider,
+					const gchar *trigger_name);
 
 /**
  * gtk_source_completion_unregister_provider:
  * @completion: the #GtkSourceCompletion
  * @provider: The #GtkSourceCompletionProvider.
+ * @trigger_name: The trigger name what you want to unregister this provider
  *
  * This function unregister the provider.
  * 
+ * Returns TRUE if it was unregistered or FALSE if not (because it doesn't exists,
+ * or the trigger don't exists)
+ * 
  **/
-void
+gboolean
 gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider);
+					GtkSourceCompletionProvider *provider,
+					const gchar *trigger_name);
 
 /**
  * gtk_source_completion_get_view:

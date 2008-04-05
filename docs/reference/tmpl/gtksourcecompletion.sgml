@@ -55,6 +55,8 @@ GtkSourceCompletion
 
 @completion: 
 @provider: 
+@trigger_name: 
+@Returns: 
 
 
 <!-- ##### FUNCTION gtk_source_completion_unregister_provider ##### -->
@@ -64,6 +66,8 @@ GtkSourceCompletion
 
 @completion: 
 @provider: 
+@trigger_name: 
+@Returns: 
 
 
 <!-- ##### FUNCTION gtk_source_completion_get_view ##### -->

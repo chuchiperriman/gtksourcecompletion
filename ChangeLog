@@ -1,5 +1,8 @@
 2008-04-05  perriman  <perriman@portatil>
-
+	
+	* gtksourcecompletion.c: API CHANGED. Added trigger_name to register or
+	unregister a provider. Only calls the providers registered for the
+	triggered event. 
 	* gtksourcecompletion-item: Fixed a type error
 	* gsc-customkey-trigger: Created new generic trigger. You can create this
 	trigger setting the trigger name and the keys. When the user press this

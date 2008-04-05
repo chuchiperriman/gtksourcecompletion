@@ -41,8 +41,11 @@ struct _GtkSourceCompletionPrivate
 {
 	GtkTextView *text_view;
 	GsvCompletionPopup *popup;
-	GList *providers;
 	GList *triggers;
+	/*Providers of the triggers*/
+	GHashTable *trig_prov;
+	/*TODO Remove this list and only use trig_prov*/
+	GList *providers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	
@@ -66,6 +69,12 @@ struct _InternalCompletionData
 };
 
 typedef struct _InternalCompletionData InternalCompletionData;
+
+struct _ProviderList
+{
+	GList *prov_list;
+};
+typedef struct _ProviderList ProviderList;
 
 static GObjectClass* parent_class = NULL;
 
@@ -100,6 +109,14 @@ completion_control_remove_completion(GtkTextView *view)
 	g_hash_table_remove(completion_map,view);
 }
 /* ********************************************************************* */
+
+static void
+_prov_list_free(gpointer prov_list)
+{
+	ProviderList *pl = (ProviderList*)prov_list;
+	g_list_free(pl->prov_list);
+	g_free(pl);
+}
 
 static gint
 internal_data_compare (gconstpointer v1,
@@ -326,6 +343,10 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	completion->priv->providers = NULL;
 	completion->priv->triggers = NULL;
 	completion->priv->popup = NULL;
+	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
+			g_str_equal,
+			g_free,
+			(GDestroyNotify)_prov_list_free);
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
@@ -348,6 +369,7 @@ gtk_source_completion_finalize (GObject *object)
 
 	free_provider_list(completion->priv->providers);
 	free_trigger_list(completion->priv->triggers);
+	g_hash_table_destroy(completion->priv->trig_prov);
 
 	completion_control_remove_completion(completion->priv->text_view);
 
@@ -419,22 +441,38 @@ gtk_source_completion_new (GtkTextView *view)
 	return completion;
 }
 
-void
+gboolean
 gtk_source_completion_register_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider)
+					GtkSourceCompletionProvider *provider,
+					const gchar *trigger_name)
 {
+	GtkSourceCompletionTrigger *trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	if (trigger==NULL) return FALSE;
+	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	g_assert(pl!=NULL);
+	pl->prov_list = g_list_append(pl->prov_list,provider);
 	/*TODO Check if the provider exists in the list*/
 	completion->priv->providers = g_list_append(completion->priv->providers,provider);
 	g_object_ref(provider);
+	
+	return TRUE;
 }
 
-void
+gboolean
 gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider)
+					GtkSourceCompletionProvider *provider,
+					const gchar *trigger_name)
 {
-	g_return_if_fail(g_list_find(completion->priv->providers, provider) != NULL);	
+	g_return_val_if_fail(g_list_find(completion->priv->providers, provider) != NULL,FALSE);
+	GtkSourceCompletionTrigger *trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	if (trigger==NULL) return FALSE;
+	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	g_assert(pl!=NULL);
+	pl->prov_list = g_list_remove(pl->prov_list,provider);
+	
 	completion->priv->providers = g_list_remove(completion->priv->providers, provider);
 	g_object_unref(provider);
+	return TRUE;
 }
 
 GtkTextView*
@@ -465,7 +503,10 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	
 	gsv_completion_popup_clear(completion->priv->popup);
 	
-	providers_list = completion->priv->providers;
+	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	if (pl==NULL) return;
+	/*providers_list = completion->priv->providers;*/
+	providers_list = pl->prov_list;
 	
 	if (providers_list != NULL)
 	{
@@ -577,6 +618,8 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 {
 	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
 	g_object_ref(trigger);
+	const gchar *tn = gtk_source_completion_trigger_get_name(trigger);
+	g_hash_table_insert(completion->priv->trig_prov,g_strdup(tn),g_malloc0(sizeof(ProviderList)));
 	if (completion->priv->active)
 	{
 		gtk_source_completion_trigger_activate(trigger);
@@ -587,12 +630,13 @@ void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
 {
-	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);	
+	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);
 	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
 	if (completion->priv->active)
 	{
 		gtk_source_completion_trigger_deactivate(trigger);
 	}
+	g_hash_table_remove(completion->priv->trig_prov,gtk_source_completion_trigger_get_name(trigger));
 	g_object_unref(trigger);
 }
 
