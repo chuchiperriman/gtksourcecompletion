@@ -80,7 +80,7 @@ gtk_source_completion_item_get_name(GtkSourceCompletionItem *item)
 	return item->name;
 }
 
-gchar*
+gpointer
 gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item)
 {
 	return item->user_data;

@@ -51,7 +51,7 @@ struct _Gsc##(PLUGIN_ID.camel)TriggerClass {
 };
 
 Gsc##(PLUGIN_ID.camel)Trigger* 
-gsc_##(PLUGIN_ID.lower)_trigger_new();
+gsc_##(PLUGIN_ID.lower)_trigger_new(GtkSourceCompletion *completion);
 
 GType gsc_##(PLUGIN_ID.lower)_trigger_get_type ();
 

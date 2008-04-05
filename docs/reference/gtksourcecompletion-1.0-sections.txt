@@ -288,3 +288,18 @@ gsc_autocompletion_trigger_set_delay
 gsc_autocompletion_trigger_get_type
 </SECTION>
 
+<SECTION>
+<FILE>gsc-customkey-trigger</FILE>
+TYPE_GSC_CUSTOMKEY_TRIGGER
+GSC_CUSTOMKEY_TRIGGER
+GSC_CUSTOMKEY_TRIGGER_CLASS
+IS_GSC_CUSTOMKEY_TRIGGER
+IS_GSC_CUSTOMKEY_TRIGGER_CLASS
+GSC_CUSTOMKEY_TRIGGER_GET_CLASS
+GscCustomkeyTriggerPrivate
+<TITLE>GscCustomkeyTrigger</TITLE>
+GscCustomkeyTrigger
+gsc_customkey_trigger_new
+gsc_customkey_trigger_get_type
+</SECTION>
+

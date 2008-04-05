@@ -6,3 +6,4 @@ gsv_completion_popup_get_type
 gsc_userrequest_trigger_get_type
 gtk_source_completion_trigger_get_type
 gsc_autocompletion_trigger_get_type
+gsc_customkey_trigger_get_type

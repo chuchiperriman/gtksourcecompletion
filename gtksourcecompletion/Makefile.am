@@ -22,6 +22,7 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletion.h				\
 	gtksourcecompletion-item.h			\
 	gsc-userrequest-trigger.h			\
+	gsc-customkey-trigger.h			\
 	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h		\
 	gsv-completion-tree.h				\
@@ -35,6 +36,7 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion-utils.c			\
 	gtksourcecompletion-item.c			\
 	gsc-userrequest-trigger.c			\
+	gsc-customkey-trigger.c			\
 	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
 	gsv-completion-tree.c				\

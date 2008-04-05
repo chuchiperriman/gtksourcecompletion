@@ -117,7 +117,7 @@ gtk_source_completion_item_get_icon(GtkSourceCompletionItem *item);
  *
  * Returns the user data of this item
  */
-gchar*
+gpointer
 gtk_source_completion_item_get_user_data(GtkSourceCompletionItem *item);
 
 /**

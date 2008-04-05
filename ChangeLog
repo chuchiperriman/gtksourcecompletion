@@ -1,3 +1,11 @@
+2008-04-05  perriman  <perriman@portatil>
+
+	* gtksourcecompletion-item: Fixed a type error
+	* gsc-customkey-trigger: Created new generic trigger. You can create this
+	trigger setting the trigger name and the keys. When the user press this
+	keys into the view, the trigger name will be triggered.
+	* templates: fixed some issues.
+
 === Version 0.4.0 ===
 
 2008-03-29  perriman  <perriman@portatil>
