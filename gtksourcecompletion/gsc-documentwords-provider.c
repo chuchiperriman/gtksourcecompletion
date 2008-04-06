@@ -19,7 +19,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "gtksourcecompletion-utils.h"
-#include "gsc-autocompletion-trigger.h"
 #include "gsc-documentwords-provider.h"
 
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
@@ -211,10 +210,6 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	gchar* current_word = gtk_source_view_get_last_word_and_iter(view,&self->priv->start_iter,NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
-	/* 
-	* We must stop the autocompletion event because the word is not correct
-	* (The user wrotte special characters only)
-	*/
 	if (self->priv->cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)

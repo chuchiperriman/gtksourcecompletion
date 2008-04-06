@@ -44,7 +44,6 @@ struct _GtkSourceCompletionPrivate
 	GList *triggers;
 	/*Providers of the triggers*/
 	GHashTable *trig_prov;
-	/*TODO Remove this list and only use trig_prov*/
 	GList *providers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
@@ -61,14 +60,6 @@ struct _GtkSourceCompletionItem
 };
 
 #define GTK_SOURCE_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionPrivate))
-
-struct _InternalCompletionData
-{
-	GtkSourceCompletionProvider *provider;
-	GtkSourceCompletionItem *data;
-};
-
-typedef struct _InternalCompletionData InternalCompletionData;
 
 struct _ProviderList
 {
@@ -119,13 +110,13 @@ _prov_list_free(gpointer prov_list)
 }
 
 static gint
-internal_data_compare (gconstpointer v1,
+_item_priority_compare (gconstpointer v1,
 					gconstpointer v2)
 {
-	InternalCompletionData *i1 = (InternalCompletionData*) v1;
-	InternalCompletionData *i2 = (InternalCompletionData*) v2;
+	GtkSourceCompletionItem *i1 = (GtkSourceCompletionItem*) v1;
+	GtkSourceCompletionItem *i2 = (GtkSourceCompletionItem*) v2;
 	
-	return i2->data->priority - i1->data->priority;
+	return i2->priority - i1->priority;
 	
 }
 
@@ -201,7 +192,6 @@ view_key_press_event_cb(GtkWidget *view,
 				{
 					ret = gsv_completion_popup_select_first(completion->priv->popup);
 				}
-
 				break;
 			}
 			case GDK_Page_Up:
@@ -234,10 +224,17 @@ view_key_press_event_cb(GtkWidget *view,
 			case GDK_Return:
 			case GDK_Tab:
 			{
-				ret = _popup_tree_selection(completion);
-				if (!ret)
+				if (!(event->state & GDK_MODIFIER_MASK))
 				{
-					end_completion(completion);
+					ret = _popup_tree_selection(completion);
+					if (!ret)
+					{
+						end_completion(completion);
+					}
+				}
+				else
+				{
+					ret = FALSE;
 				}
 				break;
 			}
@@ -451,7 +448,9 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
 	g_assert(pl!=NULL);
 	pl->prov_list = g_list_append(pl->prov_list,provider);
-	/*TODO Check if the provider exists in the list*/
+	GtkSourceCompletionProvider *prov = gtk_source_completion_get_provider(
+			completion,gtk_source_completion_provider_get_name(provider));
+	if (prov!=NULL) return FALSE;
 	completion->priv->providers = g_list_append(completion->priv->providers,provider);
 	g_object_ref(provider);
 	
@@ -486,17 +485,12 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 					const gchar *trigger_name, 
 					gpointer event_data)
 {
-	/*
-	TODO Eliminate InternalCompletionData because the item now have 
-	a provider reference
-	*/
 	GList* data_list;
 	GList* original_list;
 	GList* final_list = NULL;
 	GList *providers_list;
 	GtkSourceCompletionProvider *provider;
 	GtkSourceCompletionTrigger *trigger;
-	InternalCompletionData *idata = NULL;
 	
 	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
@@ -521,11 +515,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 				original_list = data_list;
 				do
 				{
-					idata = g_malloc0(sizeof(InternalCompletionData));
-					idata->provider = provider;
-					idata->data = (GtkSourceCompletionItem*)data_list->data;
-					final_list = g_list_append(final_list, idata);
-					
+					final_list = g_list_append(final_list, data_list->data);	
 				}while((data_list = g_list_next(data_list)) != NULL);
 				g_list_free(original_list);
 			}
@@ -535,16 +525,13 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 		if (final_list!=NULL)
 		{
 			/*Order the data*/
-			final_list = g_list_sort (final_list,internal_data_compare);
+			final_list = g_list_sort (final_list,_item_priority_compare);
 			data_list = final_list;
 			/* Insert the data into the model */
 			do
 			{
-				idata = (InternalCompletionData*)data_list->data;
 				gsv_completion_popup_add_data(completion->priv->popup,
-									idata->data);
-				g_free(idata);
-				
+									(GtkSourceCompletionItem*)data_list->data);
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not items, we don't show the popup */

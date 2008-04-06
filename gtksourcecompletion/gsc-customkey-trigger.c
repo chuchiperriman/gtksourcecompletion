@@ -159,20 +159,6 @@ GType gsc_customkey_trigger_get_type ()
 	return g_define_type_id;
 }
 
-/**
- * gsc_customkey_trigger_new:
- * @completion: The #GtkSourceCompletion
- * @trigger_name: The trigger name wich will be user the we trigger the event.
- * @keys: The string representation of the keys that we will
- * use to activate the event. You can get this 
- * string with #gtk_accelerator_name
- *
- * This is a generic trigger. You tell the name and the key and the trigger
- * will be triggered when the user press this key (or keys)
- *
- * Returns The new #GscCustomkeyTrigger
- *
- */
 GscCustomkeyTrigger* 
 gsc_customkey_trigger_new(GtkSourceCompletion *completion,
 									const gchar* trigger_name, const gchar* keys)

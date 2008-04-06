@@ -1,3 +1,8 @@
+2008-04-06  perriman  <perriman@portatil>
+
+	* gtksourcecompletion.c: Removed an obsolete struct. Less memory usage an
+	faster
+
 2008-04-05  perriman  <perriman@portatil>
 	
 	* gtksourcecompletion.c: API CHANGED. Added trigger_name to register or
