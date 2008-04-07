@@ -1,3 +1,8 @@
+2008-04-07  perriman  <perriman@portatil>
+
+	* gsc-autocompletion-trigger.h
+	* gsc-userrequest-trigger.h: Fixed some API problems!!
+
 2008-04-06  perriman  <perriman@portatil>
 
 	* gtksourcecompletion.c: Removed an obsolete struct. Less memory usage an

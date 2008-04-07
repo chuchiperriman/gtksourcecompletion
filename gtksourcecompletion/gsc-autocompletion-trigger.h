@@ -53,8 +53,8 @@ struct _GscAutocompletionTriggerClass {
  * Returns The new #GscAutocompletionTrigger
  *
  */
-GscAutocompletionTrigger* 
-gsc_autocompletion_trigger_new();
+GscAutocompletionTrigger*
+gsc_autocompletion_trigger_new(GtkSourceCompletion *completion);
 
 /**
  * gsc_autocompletion_trigger_set_delay:

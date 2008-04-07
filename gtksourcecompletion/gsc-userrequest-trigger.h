@@ -54,7 +54,7 @@ struct _GscUserRequestTriggerClass {
  *
  */
 GscUserRequestTrigger* 
-gsc_userrequest_trigger_new();
+gsc_userrequest_trigger_new(GtkSourceCompletion *completion);
 
 /**
  * gsc_userrequest_trigger_set_keys:
