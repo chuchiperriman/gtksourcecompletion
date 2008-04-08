@@ -224,17 +224,10 @@ view_key_press_event_cb(GtkWidget *view,
 			case GDK_Return:
 			case GDK_Tab:
 			{
-				if (!(event->state & GDK_MODIFIER_MASK))
+				ret = _popup_tree_selection(completion);
+				if (!ret)
 				{
-					ret = _popup_tree_selection(completion);
-					if (!ret)
-					{
-						end_completion(completion);
-					}
-				}
-				else
-				{
-					ret = FALSE;
+					end_completion(completion);
 				}
 				break;
 			}
