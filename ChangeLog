@@ -1,14 +1,22 @@
-2008-04-07  perriman  <perriman@portatil>
+2008-04-26  perriman  <chuchiperriman@gmail.com>
+
+	* fixed #1952166 (gtksourcecompletion.c): When the user 
+	clicks on a different location on the view, we hide the
+	completion popup
+	* gtksourcecompletion.c: Added info-keys property to set the keys to
+	show/hide the info window
+
+2008-04-07  perriman  <chuchiperriman@gmail.com>
 
 	* gsc-autocompletion-trigger.h
 	* gsc-userrequest-trigger.h: Fixed some API problems!!
 
-2008-04-06  perriman  <perriman@portatil>
+2008-04-06  perriman  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion.c: Removed an obsolete struct. Less memory usage an
 	faster
 
-2008-04-05  perriman  <perriman@portatil>
+2008-04-05  perriman  <chuchiperriman@gmail.com>
 	
 	* gtksourcecompletion.c: API CHANGED. Added trigger_name to register or
 	unregister a provider. Only calls the providers registered for the
@@ -21,31 +29,31 @@
 
 === Version 0.4.0 ===
 
-2008-03-29  perriman  <perriman@portatil>
+2008-03-29  perriman  <chuchiperriman@gmail.com>
 
 	* fixed #1925665: We don't show the current word.
 	* doc: 
 		- Updated some API documentation
 		- Moved documentation from .c to .h files
 
-2008-03-10  perriman  <perriman@portatil>
+2008-03-10  perriman  <chuchiperriman@gmail.com>
 
 	* fixed #1909917: Added a GTK_STOCK_GO_FORWARD if we have two 
 	or more pages with data.
 
-2008-03-09  perriman  <perriman@portatil>
+2008-03-09  perriman  <chuchiperriman@gmail.com>
 
 	* fixed #1909908: Break the completion if the user changes
 	the cursor position before the delay
 
-2008-03-01  perriman  <perriman@portatil>
+2008-03-01  perriman  <chuchiperriman@gmail.com>
 
 	* gsc-docwordscompletion-provider.c:
 		- Fixed an important memory lost problem!!
 		- Removed references to g_completion (we don't need it and we safe a
 		lot of memory usage)
 
-2008-01-27  perriman  <perriman@portatil>
+2008-01-27  perriman  <chuchiperriman@gmail.com>
 
 	* pixmaps: Moved pixmaps foldel to the root folder.
 	* build: Fixed some problems with distcheck

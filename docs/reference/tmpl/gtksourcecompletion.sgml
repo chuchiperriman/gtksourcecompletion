@@ -29,6 +29,11 @@ GtkSourceCompletion
 </para>
 
 
+<!-- ##### ARG GtkSourceCompletion:info-keys ##### -->
+<para>
+
+</para>
+
 <!-- ##### FUNCTION gtk_source_completion_new ##### -->
 <para>
 

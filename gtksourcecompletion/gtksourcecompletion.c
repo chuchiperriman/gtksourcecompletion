@@ -28,13 +28,22 @@
 
 static gboolean lib_initialized = FALSE;
 
+#define DEFAULT_INFO_KEYS "<Control>i"
+
 /* Internal signals */
 enum
 {
 	IS_GTK_TEXT_VIEW_KP,
 	IS_GTK_TEXT_DESTROY,
 	IS_GTK_TEXT_FOCUS_OUT,
+	IS_GTK_TEXT_BUTTON_PRESS,
 	IS_LAST_SIGNAL
+};
+
+/* Properties */
+enum {
+	PROP_0,
+	PROP_INFO_KEYS
 };
 
 struct _GtkSourceCompletionPrivate
@@ -47,6 +56,8 @@ struct _GtkSourceCompletionPrivate
 	GList *providers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
+	guint info_key;
+	GdkModifierType info_mods;
 	
 };
 
@@ -134,6 +145,17 @@ end_completion (GtkSourceCompletion *completion)
 	}while((providers = g_list_next(providers)) != NULL);
 }
 
+static void
+_set_info_keys(GtkSourceCompletion *completion, const gchar* keys)
+{
+	guint key;
+	GdkModifierType mods;
+	gtk_accelerator_parse(keys,&key,&mods);
+	g_return_if_fail(key!=0);
+	completion->priv->info_key = key;
+	completion->priv->info_mods = mods;
+}
+
 static gboolean
 _popup_tree_selection(GtkSourceCompletion *completion)
 {
@@ -158,6 +180,7 @@ view_key_press_event_cb(GtkWidget *view,
 {
 	/* Catch only keys of popup movement */
 	gboolean ret = FALSE;
+	gboolean catched = FALSE;
 	GtkSourceCompletion *completion;
 	g_assert(GTK_IS_SOURCE_COMPLETION(user_data));
 	completion = GTK_SOURCE_COMPLETION(user_data);
@@ -170,16 +193,19 @@ view_key_press_event_cb(GtkWidget *view,
 			case GDK_space:
 			{
 				end_completion (completion);
+				catched = TRUE;
 				break;
 			}
 	 		case GDK_Down:
 			{
 				ret = gsv_completion_popup_select_next(completion->priv->popup, 1);
+				catched = TRUE;
 				break;
 			}
 			case GDK_Page_Down:
 			{
 				ret = gsv_completion_popup_select_next(completion->priv->popup, 5);
+				catched = TRUE;
 				break;
 			}
 			case GDK_Up:
@@ -192,33 +218,39 @@ view_key_press_event_cb(GtkWidget *view,
 				{
 					ret = gsv_completion_popup_select_first(completion->priv->popup);
 				}
+				catched = TRUE;
 				break;
 			}
 			case GDK_Page_Up:
 			{
 				ret = gsv_completion_popup_select_previous(completion->priv->popup, 5);
+				catched = TRUE;
 				break;
 			}
 			case GDK_Home:
 			{
 				ret = gsv_completion_popup_select_first(completion->priv->popup);
+				catched = TRUE;
 				break;
 			}
 			case GDK_End:
 			{
 				ret = gsv_completion_popup_select_last(completion->priv->popup);
+				catched = TRUE;
 				break;
 			}
 			case GDK_Left:
 			{
 				gsv_completion_popup_page_previous(completion->priv->popup);
 				ret = TRUE;
+				catched = TRUE;
 				break;
 			}
 			case GDK_Right:
 			{
 				gsv_completion_popup_page_next(completion->priv->popup);
 				ret = TRUE;
+				catched = TRUE;
 				break;
 			}
 			case GDK_Return:
@@ -229,17 +261,17 @@ view_key_press_event_cb(GtkWidget *view,
 				{
 					end_completion(completion);
 				}
+				catched = TRUE;
 				break;
 			}
-			/*Special keys... */
-			case GDK_i:
+		}
+		if (!catched)
+		{
+			if ((event->state & completion->priv->info_mods) && event->keyval == completion->priv->info_key)
 			{
-				if ((event->state & GDK_CONTROL_MASK))
-				{
-					/*View information of the item */
-					gsv_completion_popup_toggle_item_info(completion->priv->popup);
-					ret = TRUE;
-				}
+				/*View information of the item */
+				gsv_completion_popup_toggle_item_info(completion->priv->popup);
+				ret = TRUE;
 			}
 		}
 
@@ -273,6 +305,19 @@ static gboolean
 view_focus_out_event_cb(GtkWidget *widget,
 				GdkEventFocus *event,
 				gpointer user_data)
+{
+	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
+	if (gtk_source_completion_is_visible(completion))
+	{
+		end_completion(completion);
+	}
+	return FALSE;
+}
+
+static gboolean
+view_button_press_event_cb(GtkWidget *widget,
+			GdkEventButton *event,
+			gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
 	if (gtk_source_completion_is_visible(completion))
@@ -317,6 +362,54 @@ free_trigger_list(gpointer list)
 }
 
 static void
+gtk_source_completion_set_property (GObject      *object,
+				    guint         prop_id,
+				    const GValue *value,
+				    GParamSpec   *pspec)
+{
+	GtkSourceCompletion *self;
+
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+
+	self = GTK_SOURCE_COMPLETION(object);
+
+	switch (prop_id)
+	{
+		case PROP_INFO_KEYS:
+			_set_info_keys(self, g_value_get_string(value));
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void
+gtk_source_completion_get_property (GObject    *object,
+				guint       prop_id,
+				GValue     *value,
+				GParamSpec *pspec)
+{
+	GtkSourceCompletion *self;
+
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+
+	self = GTK_SOURCE_COMPLETION(object);
+
+	switch (prop_id)
+	{
+		case PROP_INFO_KEYS:
+			g_value_set_string(value,gtk_accelerator_name(self->priv->info_key,
+								      self->priv->info_mods));
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void
 gtk_source_completion_init (GtkSourceCompletion *completion)
 {
 	g_debug("Init GtkSourceCompletion");
@@ -337,6 +430,7 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 			g_str_equal,
 			g_free,
 			(GDestroyNotify)_prov_list_free);
+	_set_info_keys(completion,DEFAULT_INFO_KEYS);
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
@@ -371,7 +465,22 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
 
+	object_class->get_property = gtk_source_completion_get_property;
+	object_class->set_property = gtk_source_completion_set_property;
 	object_class->finalize = gtk_source_completion_finalize;
+
+	/**
+	 * GtkSourceCompletion:info-keys:
+	 *
+	 * Keys to show/hide the info window
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_INFO_KEYS,
+					 g_param_spec_string ("info-keys",
+							      _("Keys to show/hide the info window"),
+							      _("Keys to show/hide the info window"),
+							      DEFAULT_INFO_KEYS,
+							      G_PARAM_READWRITE));
 
 	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionPrivate));				
 }
@@ -660,6 +769,12 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 							"focus-out-event",
 							G_CALLBACK(view_focus_out_event_cb),
 							(gpointer)completion);
+	completion->priv->internal_signal_ids[IS_GTK_TEXT_BUTTON_PRESS] = 
+			g_signal_connect(completion->priv->text_view,
+							"button-press-event",
+							G_CALLBACK(view_button_press_event_cb),
+							(gpointer)completion);
+
 	/* We activate the triggers*/
 	GList *plist = completion->priv->triggers;
 	GtkSourceCompletionTrigger *trigger;	

@@ -230,6 +230,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	self->priv->count = 0;
 	g_hash_table_foreach(self->priv->current_words,gh_add_key_to_list,self);
 	g_free(self->priv->cleaned_word);
+	self->priv->cleaned_word = NULL;
 	
 	if (self->priv->data_list!=NULL)
 	{
@@ -286,6 +287,7 @@ static void gsc_documentwords_provider_finalize(GObject *object)
 	self = GSC_DOCUMENTWORDS_PROVIDER(object);
 	clean_current_words(self);
 	g_free(self->priv->cleaned_word);
+	self->priv->cleaned_word = NULL;
 	self->priv->data_list = NULL;
 	self->priv->count= 0;
 	gdk_pixbuf_unref (self->priv->icon);
@@ -324,6 +326,7 @@ static void gsc_documentwords_provider_init (GscDocumentwordsProvider * self)
 	//self->priv->temp_list = NULL;
 	self->priv->is_completing = FALSE;
 	self->priv->count=0;
+	self->priv->cleaned_word=NULL;
 	self->priv->icon = gdk_pixbuf_new_from_file(ICON_FILE,NULL);
 	self->priv->sort_type = GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH;
 }
