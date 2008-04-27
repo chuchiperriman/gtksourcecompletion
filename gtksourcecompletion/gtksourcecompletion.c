@@ -29,6 +29,8 @@
 static gboolean lib_initialized = FALSE;
 
 #define DEFAULT_INFO_KEYS "<Control>i"
+#define DEFAULT_PAGE_NEXT_KEYS "Right"
+#define DEFAULT_PAGE_PREV_KEYS "Left"
 
 /* Internal signals */
 enum
@@ -43,8 +45,23 @@ enum
 /* Properties */
 enum {
 	PROP_0,
-	PROP_INFO_KEYS
+	PROP_INFO_KEYS,
+	PROP_NEXT_PAGE_KEYS,
+	PROP_PREV_PAGE_KEYS
 };
+
+typedef enum {
+	KEYS_INFO,
+	KEYS_PAGE_NEXT,
+	KEYS_PAGE_PREV,
+	KEYS_LAST
+} KeysType;
+
+typedef struct 
+{
+	guint key;
+	GdkModifierType mods;
+} CompletionKeys;
 
 struct _GtkSourceCompletionPrivate
 {
@@ -56,9 +73,7 @@ struct _GtkSourceCompletionPrivate
 	GList *providers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
-	guint info_key;
-	GdkModifierType info_mods;
-	
+	CompletionKeys keys[KEYS_LAST];
 };
 
 struct _GtkSourceCompletionItem
@@ -146,14 +161,34 @@ end_completion (GtkSourceCompletion *completion)
 }
 
 static void
-_set_info_keys(GtkSourceCompletion *completion, const gchar* keys)
+_set_keys(GtkSourceCompletion *completion, KeysType type, const gchar* keys)
 {
 	guint key;
 	GdkModifierType mods;
 	gtk_accelerator_parse(keys,&key,&mods);
 	g_return_if_fail(key!=0);
-	completion->priv->info_key = key;
-	completion->priv->info_mods = mods;
+	completion->priv->keys[type].key = key;
+	completion->priv->keys[type].mods = mods;
+}
+
+static gboolean
+_compare_keys(GtkSourceCompletion *completion, KeysType type, GdkEventKey *event)
+{
+	guint modifiers = gtk_accelerator_get_default_mod_mask ();
+	if (completion->priv->keys[type].mods == 0 &&
+	    (event->state & modifiers)==0)
+	{
+		if (event->keyval == completion->priv->keys[type].key)
+		{
+			return TRUE;
+		}
+	}else if ((event->state & completion->priv->keys[type].mods) && 
+	    event->keyval == completion->priv->keys[type].key)
+	{
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 static gboolean
@@ -187,91 +222,93 @@ view_key_press_event_cb(GtkWidget *view,
 	
 	if (gtk_source_completion_is_visible(completion))
 	{
-		switch (event->keyval)
-	 	{
-			case GDK_Escape:
-			case GDK_space:
-			{
-				end_completion (completion);
-				catched = TRUE;
-				break;
-			}
-	 		case GDK_Down:
-			{
-				ret = gsv_completion_popup_select_next(completion->priv->popup, 1);
-				catched = TRUE;
-				break;
-			}
-			case GDK_Page_Down:
-			{
-				ret = gsv_completion_popup_select_next(completion->priv->popup, 5);
-				catched = TRUE;
-				break;
-			}
-			case GDK_Up:
-			{
-				if (gsv_completion_popup_select_previous(completion->priv->popup, 1))
+		guint modifiers = gtk_accelerator_get_default_mod_mask ();
+		if ((event->state & modifiers)==0)
+		{
+			switch (event->keyval)
+		 	{
+				case GDK_Escape:
+				case GDK_space:
 				{
-					ret = TRUE;
+					end_completion (completion);
+					catched = TRUE;
+					break;
 				}
-				else
+		 		case GDK_Down:
+				{
+					ret = gsv_completion_popup_select_next(completion->priv->popup, 1);
+					catched = TRUE;
+					break;
+				}
+				case GDK_Page_Down:
+				{
+					ret = gsv_completion_popup_select_next(completion->priv->popup, 5);
+					catched = TRUE;
+					break;
+				}
+				case GDK_Up:
+				{
+					if (gsv_completion_popup_select_previous(completion->priv->popup, 1))
+					{
+						ret = TRUE;
+					}
+					else
+					{
+						ret = gsv_completion_popup_select_first(completion->priv->popup);
+					}
+					catched = TRUE;
+					break;
+				}
+				case GDK_Page_Up:
+				{
+					ret = gsv_completion_popup_select_previous(completion->priv->popup, 5);
+					catched = TRUE;
+					break;
+				}
+				case GDK_Home:
 				{
 					ret = gsv_completion_popup_select_first(completion->priv->popup);
+					catched = TRUE;
+					break;
 				}
-				catched = TRUE;
-				break;
-			}
-			case GDK_Page_Up:
-			{
-				ret = gsv_completion_popup_select_previous(completion->priv->popup, 5);
-				catched = TRUE;
-				break;
-			}
-			case GDK_Home:
-			{
-				ret = gsv_completion_popup_select_first(completion->priv->popup);
-				catched = TRUE;
-				break;
-			}
-			case GDK_End:
-			{
-				ret = gsv_completion_popup_select_last(completion->priv->popup);
-				catched = TRUE;
-				break;
-			}
-			case GDK_Left:
-			{
-				gsv_completion_popup_page_previous(completion->priv->popup);
-				ret = TRUE;
-				catched = TRUE;
-				break;
-			}
-			case GDK_Right:
-			{
-				gsv_completion_popup_page_next(completion->priv->popup);
-				ret = TRUE;
-				catched = TRUE;
-				break;
-			}
-			case GDK_Return:
-			case GDK_Tab:
-			{
-				ret = _popup_tree_selection(completion);
-				if (!ret)
+				case GDK_End:
 				{
-					end_completion(completion);
+					ret = gsv_completion_popup_select_last(completion->priv->popup);
+					catched = TRUE;
+					break;
 				}
-				catched = TRUE;
-				break;
+				case GDK_Return:
+				case GDK_Tab:
+				{
+					ret = _popup_tree_selection(completion);
+					if (!ret)
+					{
+						end_completion(completion);
+					}
+					catched = TRUE;
+					break;
+				}
 			}
 		}
 		if (!catched)
 		{
-			if ((event->state & completion->priv->info_mods) && event->keyval == completion->priv->info_key)
+			if (_compare_keys(completion,KEYS_INFO,event))
 			{
 				/*View information of the item */
 				gsv_completion_popup_toggle_item_info(completion->priv->popup);
 				ret = TRUE;
+			}else if (_compare_keys(completion,KEYS_PAGE_NEXT,event))
+			{
+				g_debug("next");
+				gsv_completion_popup_page_next(completion->priv->popup);
+				ret = TRUE;
+				
+			}else if (_compare_keys(completion,KEYS_PAGE_PREV,event))
+			{
+				g_debug("prev");
+				gsv_completion_popup_page_previous(completion->priv->popup);
+				ret = TRUE;
+				
 			}
 		}
 
@@ -376,7 +413,13 @@ gtk_source_completion_set_property (GObject      *object,
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
-			_set_info_keys(self, g_value_get_string(value));
+			_set_keys(self, KEYS_INFO, g_value_get_string(value));
+			break;
+		case PROP_NEXT_PAGE_KEYS:
+			_set_keys(self,KEYS_PAGE_NEXT,g_value_get_string(value));
+			break;
+		case PROP_PREV_PAGE_KEYS:
+			_set_keys(self,KEYS_PAGE_PREV,g_value_get_string(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -399,8 +442,16 @@ gtk_source_completion_get_property (GObject    *object,
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
-			g_value_set_string(value,gtk_accelerator_name(self->priv->info_key,
-								      self->priv->info_mods));
+			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_INFO].key,
+								      self->priv->keys[KEYS_INFO].mods));
+			break;
+		case PROP_NEXT_PAGE_KEYS:
+			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_PAGE_NEXT].key,
+								      self->priv->keys[KEYS_PAGE_NEXT].mods));
+			break;
+		case PROP_PREV_PAGE_KEYS:
+			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_PAGE_PREV].key,
+								      self->priv->keys[KEYS_PAGE_PREV].mods));
 			break;
 
 		default:
@@ -430,7 +481,10 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 			g_str_equal,
 			g_free,
 			(GDestroyNotify)_prov_list_free);
-	_set_info_keys(completion,DEFAULT_INFO_KEYS);
+	
+	_set_keys(completion, KEYS_INFO, DEFAULT_INFO_KEYS);
+	_set_keys(completion, KEYS_PAGE_NEXT, DEFAULT_PAGE_NEXT_KEYS);
+	_set_keys(completion, KEYS_PAGE_PREV, DEFAULT_PAGE_PREV_KEYS);
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
@@ -480,6 +534,31 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 							      _("Keys to show/hide the info window"),
 							      _("Keys to show/hide the info window"),
 							      DEFAULT_INFO_KEYS,
+							      G_PARAM_READWRITE));
+	/**
+	 * GtkSourceCompletion:next-page-keys:
+	 *
+	 * Keys to show the next completion page
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_NEXT_PAGE_KEYS,
+					 g_param_spec_string ("next-page-keys",
+							      _("Keys to show the next completion page"),
+							      _("Keys to show the next completion page"),
+							      DEFAULT_PAGE_NEXT_KEYS,
+							      G_PARAM_READWRITE));
+							      
+	/**
+	 * GtkSourceCompletion:previous-page-keys:
+	 *
+	 * Keys to show the previous completion page
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_PREV_PAGE_KEYS,
+					 g_param_spec_string ("previous-page-keys",
+							      _("Keys to show the previous completion page"),
+							      _("Keys to show the previous completion page"),
+							      DEFAULT_PAGE_PREV_KEYS,
 							      G_PARAM_READWRITE));
 
 	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionPrivate));				
@@ -829,4 +908,4 @@ gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
 		end_completion(completion);
 	}
 }
-
+	

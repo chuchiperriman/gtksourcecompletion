@@ -34,6 +34,16 @@ GtkSourceCompletion
 
 </para>
 
+<!-- ##### ARG GtkSourceCompletion:next-page-keys ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG GtkSourceCompletion:previous-page-keys ##### -->
+<para>
+
+</para>
+
 <!-- ##### FUNCTION gtk_source_completion_new ##### -->
 <para>
 
