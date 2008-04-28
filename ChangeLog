@@ -1,3 +1,8 @@
+2008-04-28  chuchi  <chuchi@ubunchi>
+
+	* gtksourcecompletion.c: Fixed a bug that overwrite a trigger if it had
+	been registered twice.
+
 2008-04-26  perriman  <chuchiperriman@gmail.com>
 
 	* fixed #1952166 (gtksourcecompletion.c): When the user 

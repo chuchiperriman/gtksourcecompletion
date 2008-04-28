@@ -624,6 +624,7 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 					GtkSourceCompletionProvider *provider,
 					const gchar *trigger_name)
 {
+    
 	GtkSourceCompletionTrigger *trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	if (trigger==NULL) return FALSE;
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
@@ -634,7 +635,7 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 	if (prov!=NULL) return FALSE;
 	completion->priv->providers = g_list_append(completion->priv->providers,provider);
 	g_object_ref(provider);
-	
+    
 	return TRUE;
 }
 
@@ -672,7 +673,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	GList *providers_list;
 	GtkSourceCompletionProvider *provider;
 	GtkSourceCompletionTrigger *trigger;
-	
+
 	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
 	
@@ -784,14 +785,23 @@ void
 gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 								GtkSourceCompletionTrigger *trigger)
 {
-	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
-	g_object_ref(trigger);
-	const gchar *tn = gtk_source_completion_trigger_get_name(trigger);
-	g_hash_table_insert(completion->priv->trig_prov,g_strdup(tn),g_malloc0(sizeof(ProviderList)));
-	if (completion->priv->active)
-	{
-		gtk_source_completion_trigger_activate(trigger);
-	}
+    const gchar* trigger_name = gtk_source_completion_trigger_get_name(trigger);
+	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+    /*Only register the trigger if it has not been registered yet*/
+    if (pl==NULL)
+    {
+
+    	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
+    	g_object_ref(trigger);
+    	const gchar *tn = gtk_source_completion_trigger_get_name(trigger);
+        ProviderList *pl = g_malloc0(sizeof(ProviderList));
+        pl->prov_list = NULL;
+    	g_hash_table_insert(completion->priv->trig_prov,g_strdup(tn),pl);
+    	if (completion->priv->active)
+    	{
+    		gtk_source_completion_trigger_activate(trigger);
+    	}
+    }
 }
 
 void
