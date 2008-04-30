@@ -1,4 +1,14 @@
-2008-04-28  chuchi  <chuchi@ubunchi>
+2008-04-30  perriman  <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion.h: Added gtk_source_completion_get_active_trigger_name
+	 function. 
+	* gtksourcecompletion.c: Check if the view has focus. If the view has not
+	the focus then it does not show the completion.
+	* gsc-autocompletion-trigger.c: Check if the user delete some text and
+	finish the completion.
+	
+
+2008-04-28  perriman  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion.c: Fixed a bug that overwrite a trigger if it had
 	been registered twice.

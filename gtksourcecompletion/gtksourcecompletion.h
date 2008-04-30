@@ -165,7 +165,7 @@ gtk_source_completion_get_from_view(
  */
 GtkSourceCompletionProvider*
 gtk_source_completion_get_provider(GtkSourceCompletion *completion,
-								const gchar* provider_name);
+				   const gchar* provider_name);
 
 /**
  * gtk_source_completion_register_trigger:
@@ -178,7 +178,7 @@ gtk_source_completion_get_provider(GtkSourceCompletion *completion,
  */
 void
 gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
-								GtkSourceCompletionTrigger *trigger);
+				       GtkSourceCompletionTrigger *trigger);
 
 /**
  * gtk_source_completion_unregister_trigger:
@@ -191,7 +191,7 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
  */																
 void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
-								GtkSourceCompletionTrigger *trigger);
+					 GtkSourceCompletionTrigger *trigger);
 
 /**
  * gtk_source_completion_get_trigger:
@@ -202,10 +202,24 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
  *
  * Returns The trigger or NULL if not exists
  *
- */			
+ */
 GtkSourceCompletionTrigger*
 gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
-								const gchar* trigger_name);
+				  const gchar* trigger_name);
+
+/**
+ * gtk_source_completion_get_active_trigger_name:
+ * @completion: The #GtkSourceCompletion
+ *
+ * This function return the active trigger name. The active trigger is the last
+ * trigger raised if the completion is active. If the completion is not visible then
+ * there is no an active trigger.
+ *
+ * Returns The trigger name or NULL if completion is not active
+ *
+ */
+const gchar*
+gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion);
 
 /**
  * gtk_source_completion_activate:

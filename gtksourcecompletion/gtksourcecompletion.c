@@ -74,6 +74,7 @@ struct _GtkSourceCompletionPrivate
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	CompletionKeys keys[KEYS_LAST];
+	const gchar *active_trigger;
 };
 
 struct _GtkSourceCompletionItem
@@ -158,6 +159,8 @@ end_completion (GtkSourceCompletion *completion)
 		gtk_source_completion_provider_end_completion(provider,completion);
 			
 	}while((providers = g_list_next(providers)) != NULL);
+	
+	completion->priv->active_trigger = NULL;
 }
 
 static void
@@ -477,6 +480,7 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	completion->priv->providers = NULL;
 	completion->priv->triggers = NULL;
 	completion->priv->popup = NULL;
+	completion->priv->active_trigger = NULL;
 	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
 			g_str_equal,
 			g_free,
@@ -677,6 +681,9 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
 	
+	if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+		return;
+	
 	gsv_completion_popup_clear(completion->priv->popup);
 	
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
@@ -719,7 +726,10 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			/* If there are not items, we don't show the popup */
 			if (gsv_completion_popup_has_items(completion->priv->popup))
 			{
+				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+					return;
 				gsv_completion_popup_refresh(completion->priv->popup);
+				completion->priv->active_trigger = trigger_name;
 			}
 			else
 			{
@@ -918,4 +928,11 @@ gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
 		end_completion(completion);
 	}
 }
+
+const gchar*
+gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion)
+{
+	return completion->priv->active_trigger;
+}
+
 	

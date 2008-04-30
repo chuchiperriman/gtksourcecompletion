@@ -58,8 +58,7 @@ static gpointer gsc_autocompletion_trigger_parent_class = NULL;
 static GtkSourceCompletionTriggerIface* gsc_autocompletion_trigger_parent_iface = NULL;
 
 static gboolean
-autocompletion_raise_event(
-								gpointer event);
+autocompletion_raise_event(gpointer event);
 
 static gint
 _get_text_offset(GscAutocompletionTrigger *self)
@@ -128,10 +127,10 @@ autocompletion_insert_text_cb(GtkTextBuffer *buffer,
 }
 
 static gboolean
-autocompletion_raise_event(
-								gpointer event)
+autocompletion_raise_event(gpointer event)
 {
 	gchar* word;
+	const gchar *active_trigger = NULL;
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(event);
 	/*Check if the user has changed the cursor position.If yes, we don't complete*/
 	gint offset = _get_text_offset(self);
@@ -148,6 +147,14 @@ autocompletion_raise_event(
 		gtk_source_completion_trigger_event(completion,
 							GSC_AUTOCOMPLETION_TRIGGER_NAME,
 							self);
+	}
+	else
+	{
+		active_trigger = gtk_source_completion_get_active_trigger_name(self->priv->completion);
+		if (active_trigger!=NULL && strcmp(active_trigger,GSC_AUTOCOMPLETION_TRIGGER_NAME)==0)
+		{
+			gtk_source_completion_finish_completion(completion);
+		}
 	}
 	return FALSE;
 }
