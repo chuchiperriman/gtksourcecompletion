@@ -34,22 +34,24 @@ gtk_source_completion_trigger_get_type ()
 {
 	static GType gtk_source_completion_trigger_type_id = 0;
 	if (!gtk_source_completion_trigger_type_id) {
-		static const GTypeInfo g_define_type_info = { 
-							sizeof (GtkSourceCompletionTriggerIface), 
-							(GBaseInitFunc) gtk_source_completion_trigger_base_init, 
-							(GBaseFinalizeFunc) NULL, 
-							(GClassInitFunc) NULL, 
-							(GClassFinalizeFunc) NULL, 
-							NULL, 
-							0, 
-							0, 
-							(GInstanceInitFunc) NULL };
+		static const GTypeInfo g_define_type_info = 
+		{ 
+			sizeof (GtkSourceCompletionTriggerIface), 
+			(GBaseInitFunc) gtk_source_completion_trigger_base_init, 
+			(GBaseFinalizeFunc) NULL, 
+			(GClassInitFunc) NULL, 
+			(GClassFinalizeFunc) NULL, 
+			NULL, 
+			0, 
+			0, 
+			(GInstanceInitFunc) NULL 
+		};
 							
 		gtk_source_completion_trigger_type_id = 
-				g_type_register_static (G_TYPE_INTERFACE, 
-							"GtkSourceCompletionTrigger", 
-							&g_define_type_info, 
-							0);
+			g_type_register_static (G_TYPE_INTERFACE, 
+						"GtkSourceCompletionTrigger", 
+						&g_define_type_info, 
+						0);
 	}
 	return gtk_source_completion_trigger_type_id;
 }

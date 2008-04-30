@@ -41,9 +41,12 @@ enum  {
 	GSC_USERREQUEST_TRIGGER_DUMMY_PROPERTY,
 };
 
-static const gchar* gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTrigger* base);
-static gboolean gsc_userrequest_trigger_real_activate (GtkSourceCompletionTrigger* base);
-static gboolean gsc_userrequest_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
+static const gchar* 
+gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_userrequest_trigger_real_activate (GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_userrequest_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
 
 static gpointer gsc_userrequest_trigger_parent_class = NULL;
 static GtkSourceCompletionTriggerIface* gsc_userrequest_trigger_parent_iface = NULL;
@@ -51,28 +54,29 @@ static GtkSourceCompletionTriggerIface* gsc_userrequest_trigger_parent_iface = N
 
 static gboolean
 user_request_view_key_press_event_cb(GtkWidget *view,
-					GdkEventKey *event, 
-					gpointer user_data)
+				     GdkEventKey *event, 
+				     gpointer user_data)
 {
 	GscUserRequestTrigger *self = GSC_USERREQUEST_TRIGGER(user_data);
 	GtkSourceCompletion* completion = self->priv->completion;
 		
 	if (completion != NULL)
 	{
-		
 		if ((event->state & self->priv->mod) && event->keyval == self->priv->key)
 		{
-			gtk_source_completion_trigger_event(completion,GSC_USERREQUEST_TRIGGER_NAME,NULL);
+			gtk_source_completion_trigger_event(completion,
+							    GSC_USERREQUEST_TRIGGER_NAME,
+							    NULL);
 			return TRUE;
 		}
-		
 	}
 	
 	return FALSE;
 	
 } 
 
-static const gchar* gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTrigger *self)
+static const gchar* 
+gsc_userrequest_trigger_real_get_name(GtkSourceCompletionTrigger *self)
 {
 	return GSC_USERREQUEST_TRIGGER_NAME;
 }
@@ -106,23 +110,33 @@ gsc_userrequest_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
 	return TRUE;
 }
 
-static void gsc_userrequest_trigger_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
+static void 
+gsc_userrequest_trigger_get_property (GObject * object, 
+				      guint property_id, 
+				      GValue * value, 
+				      GParamSpec * pspec)
 {
 }
 
 
-static void gsc_userrequest_trigger_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
+static void 
+gsc_userrequest_trigger_set_property (GObject * object, 
+				      guint property_id, 
+				      const GValue * value, 
+				      GParamSpec * pspec)
 {
 }
 
-static void gsc_userrequest_trigger_init (GscUserRequestTrigger * self)
+static void 
+gsc_userrequest_trigger_init (GscUserRequestTrigger * self)
 {
 	self->priv = g_new0(GscUserRequestTriggerPrivate, 1);
 	gtk_accelerator_parse("<Control>Return",&self->priv->key,&self->priv->mod);
 	g_debug("Init UR trigger");
 }
 
-static void gsc_userrequest_trigger_finalize(GObject *object)
+static void 
+gsc_userrequest_trigger_finalize(GObject *object)
 {
 	g_debug("Finish UR trigger");
 	GscUserRequestTrigger *self;
@@ -130,7 +144,8 @@ static void gsc_userrequest_trigger_finalize(GObject *object)
 	G_OBJECT_CLASS(gsc_userrequest_trigger_parent_class)->finalize(object);
 }
 
-static void gsc_userrequest_trigger_class_init (GscUserRequestTriggerClass * klass)
+static void 
+gsc_userrequest_trigger_class_init (GscUserRequestTriggerClass * klass)
 {
 	gsc_userrequest_trigger_parent_class = g_type_class_peek_parent (klass);
 	G_OBJECT_CLASS (klass)->get_property = gsc_userrequest_trigger_get_property;
@@ -138,7 +153,8 @@ static void gsc_userrequest_trigger_class_init (GscUserRequestTriggerClass * kla
 	G_OBJECT_CLASS (klass)->finalize = gsc_userrequest_trigger_finalize;
 }
 
-static void gsc_userrequest_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
+static void 
+gsc_userrequest_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
 {
 	gsc_userrequest_trigger_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_userrequest_trigger_real_get_name;
@@ -146,14 +162,31 @@ static void gsc_userrequest_trigger_interface_init (GtkSourceCompletionTriggerIf
 	iface->deactivate = gsc_userrequest_trigger_real_deactivate;
 }
 
-GType gsc_userrequest_trigger_get_type ()
+GType 
+gsc_userrequest_trigger_get_type ()
 {
 	static GType g_define_type_id = 0;
 	if (G_UNLIKELY (g_define_type_id == 0)) {
-		static const GTypeInfo g_define_type_info = { sizeof (GscUserRequestTriggerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_userrequest_trigger_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GscUserRequestTrigger), 0, (GInstanceInitFunc) gsc_userrequest_trigger_init };
-		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscUserRequestTrigger", &g_define_type_info, 0);
-		static const GInterfaceInfo gsc_userrequest_trigger_info = { (GInterfaceInitFunc) gsc_userrequest_trigger_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GTK_SOURCE_COMPLETION_TYPE_TRIGGER, &gsc_userrequest_trigger_info);
+		static const GTypeInfo g_define_type_info = { sizeof (GscUserRequestTriggerClass), 
+							     (GBaseInitFunc) NULL, 
+							     (GBaseFinalizeFunc) NULL, 
+							     (GClassInitFunc) gsc_userrequest_trigger_class_init, 
+							     (GClassFinalizeFunc) NULL, 
+							     NULL, 
+							     sizeof (GscUserRequestTrigger), 
+							     0, 
+							     (GInstanceInitFunc) gsc_userrequest_trigger_init
+							     };
+		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, 
+							   "GscUserRequestTrigger", 
+							   &g_define_type_info, 
+							   0);
+		static const GInterfaceInfo gsc_userrequest_trigger_info = {(GInterfaceInitFunc) gsc_userrequest_trigger_interface_init, 
+									    (GInterfaceFinalizeFunc) NULL, 
+									    NULL};
+		g_type_add_interface_static (g_define_type_id, 
+					     GTK_SOURCE_COMPLETION_TYPE_TRIGGER, 
+					     &gsc_userrequest_trigger_info);
 	}
 	return g_define_type_id;
 }

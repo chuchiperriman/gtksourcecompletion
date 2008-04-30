@@ -40,17 +40,20 @@ struct _GscCustomkeyTriggerPrivate {
 
 #define GSC_CUSTOMKEY_TRIGGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_CUSTOMKEY_TRIGGER, GscCustomkeyTriggerPrivate))
 
-static const gchar* gsc_customkey_trigger_real_get_name(GtkSourceCompletionTrigger* base);
-static gboolean gsc_customkey_trigger_real_activate (GtkSourceCompletionTrigger* base);
-static gboolean gsc_customkey_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
+static const gchar* 
+gsc_customkey_trigger_real_get_name(GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_customkey_trigger_real_activate (GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_customkey_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
 
 static gpointer gsc_customkey_trigger_parent_class = NULL;
 static GtkSourceCompletionTriggerIface* gsc_customkey_trigger_parent_iface = NULL;
 
 static gboolean
 _view_key_press_event_cb(GtkWidget *view,
-					GdkEventKey *event, 
-					gpointer user_data)
+			 GdkEventKey *event, 
+			 gpointer user_data)
 {
 	GscCustomkeyTrigger *self = GSC_CUSTOMKEY_TRIGGER(user_data);
 	GtkSourceCompletion* completion = self->priv->completion;
@@ -65,13 +68,12 @@ _view_key_press_event_cb(GtkWidget *view,
 		}
 		
 	}
-	
 	return FALSE;
-	
 } 
 
 
-static const gchar* gsc_customkey_trigger_real_get_name(GtkSourceCompletionTrigger *base)
+static const gchar* 
+gsc_customkey_trigger_real_get_name(GtkSourceCompletionTrigger *base)
 {
 	GscCustomkeyTrigger *self = GSC_CUSTOMKEY_TRIGGER(base);
 	return self->priv->trigger_name;
@@ -88,11 +90,11 @@ gsc_customkey_trigger_real_activate (GtkSourceCompletionTrigger* base)
 	g_assert(GTK_IS_TEXT_VIEW(view));
 	self->priv->signals[CKP_GTK_TEXT_VIEW_KP] =  
 			g_signal_connect_data(view,
-						"key-press-event",
-						G_CALLBACK(_view_key_press_event_cb),
-						(gpointer) self,
-						(GClosureNotify)NULL,
-						0);
+					      "key-press-event",
+					      G_CALLBACK(_view_key_press_event_cb),
+					      (gpointer) self,
+					      (GClosureNotify)NULL,
+					      0);
 	return TRUE;
 }
 
@@ -106,23 +108,30 @@ gsc_customkey_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
 	return FALSE;
 }
 
-static void gsc_customkey_trigger_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
+static void 
+gsc_customkey_trigger_get_property (GObject * object, 
+						guint property_id, 
+						GValue * value, 
+						GParamSpec * pspec)
 {
 }
 
 
-static void gsc_customkey_trigger_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
+static void 
+gsc_customkey_trigger_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
 {
 }
 
-static void gsc_customkey_trigger_init (GscCustomkeyTrigger * self)
+static void 
+gsc_customkey_trigger_init (GscCustomkeyTrigger * self)
 {
 	self->priv = g_new0(GscCustomkeyTriggerPrivate, 1);
 	self->priv->trigger_name = NULL;
 	g_debug("Init Customkey trigger");
 }
 
-static void gsc_customkey_trigger_finalize(GObject *object)
+static void 
+gsc_customkey_trigger_finalize(GObject *object)
 {
 	g_debug("Finish Customkey trigger");
 	GscCustomkeyTrigger *self;
@@ -131,7 +140,8 @@ static void gsc_customkey_trigger_finalize(GObject *object)
 	G_OBJECT_CLASS(gsc_customkey_trigger_parent_class)->finalize(object);
 }
 
-static void gsc_customkey_trigger_class_init (GscCustomkeyTriggerClass * klass)
+static void 
+gsc_customkey_trigger_class_init (GscCustomkeyTriggerClass * klass)
 {
 	gsc_customkey_trigger_parent_class = g_type_class_peek_parent (klass);
 	G_OBJECT_CLASS (klass)->get_property = gsc_customkey_trigger_get_property;
@@ -139,7 +149,8 @@ static void gsc_customkey_trigger_class_init (GscCustomkeyTriggerClass * klass)
 	G_OBJECT_CLASS (klass)->finalize = gsc_customkey_trigger_finalize;
 }
 
-static void gsc_customkey_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
+static void 
+gsc_customkey_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
 {
 	gsc_customkey_trigger_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_customkey_trigger_real_get_name;
@@ -147,21 +158,38 @@ static void gsc_customkey_trigger_interface_init (GtkSourceCompletionTriggerIfac
 	iface->deactivate = gsc_customkey_trigger_real_deactivate;
 }
 
-GType gsc_customkey_trigger_get_type ()
+GType 
+gsc_customkey_trigger_get_type ()
 {
 	static GType g_define_type_id = 0;
 	if (G_UNLIKELY (g_define_type_id == 0)) {
-		static const GTypeInfo g_define_type_info = { sizeof (GscCustomkeyTriggerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_customkey_trigger_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GscCustomkeyTrigger), 0, (GInstanceInitFunc) gsc_customkey_trigger_init };
-		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscCustomkeyTrigger", &g_define_type_info, 0);
-		static const GInterfaceInfo gsc_customkey_trigger_info = { (GInterfaceInitFunc) gsc_customkey_trigger_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GTK_SOURCE_COMPLETION_TYPE_TRIGGER, &gsc_customkey_trigger_info);
+		static const GTypeInfo g_define_type_info = {sizeof (GscCustomkeyTriggerClass),
+							     (GBaseInitFunc) NULL,
+							     (GBaseFinalizeFunc) NULL, 
+							     (GClassInitFunc) gsc_customkey_trigger_class_init, 
+							     (GClassFinalizeFunc) NULL, 
+							     NULL, 
+							     sizeof (GscCustomkeyTrigger), 
+							     0, 
+							     (GInstanceInitFunc) gsc_customkey_trigger_init 
+							     };
+		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscCustomkeyTrigger", 
+							   &g_define_type_info, 
+							   0);
+		static const GInterfaceInfo gsc_customkey_trigger_info = {(GInterfaceInitFunc) gsc_customkey_trigger_interface_init, 
+									  (GInterfaceFinalizeFunc) NULL,
+									  NULL};
+		g_type_add_interface_static (g_define_type_id,
+					     GTK_SOURCE_COMPLETION_TYPE_TRIGGER, 
+					     &gsc_customkey_trigger_info);
 	}
 	return g_define_type_id;
 }
 
 GscCustomkeyTrigger* 
 gsc_customkey_trigger_new(GtkSourceCompletion *completion,
-									const gchar* trigger_name, const gchar* keys)
+			  const gchar* trigger_name, 
+			  const gchar* keys)
 {
 	GscCustomkeyTrigger *self = GSC_CUSTOMKEY_TRIGGER (g_object_new (TYPE_GSC_CUSTOMKEY_TRIGGER, NULL));
 	self->priv->completion = completion;

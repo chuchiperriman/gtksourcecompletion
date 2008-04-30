@@ -55,8 +55,8 @@ gtk_source_view_get_last_word(GtkTextView *text_view);
  */
 void
 gtk_source_view_get_cursor_pos(GtkTextView *text_view, 
-					gint *x, 
-					gint *y);
+				gint *x, 
+				gint *y);
 
 /**
  * gtc_gsv_get_text: 
@@ -77,7 +77,7 @@ gtc_gsv_get_text(GtkTextView *text_view);
  */
 void
 gtk_source_view_replace_actual_word(GtkTextView *text_view, 
-					const gchar* text);
+				    const gchar* text);
 
 /**
  * gsc_char_is_separator:

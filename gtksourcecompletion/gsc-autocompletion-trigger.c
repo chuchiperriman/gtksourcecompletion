@@ -50,15 +50,17 @@ enum  {
 	GSC_AUTOCOMPLETION_TRIGGER_DUMMY_PROPERTY,
 };
 
-static const gchar* gsc_autocompletion_trigger_real_get_name(GtkSourceCompletionTrigger* base);
-static gboolean gsc_autocompletion_trigger_real_activate (GtkSourceCompletionTrigger* base);
-static gboolean gsc_autocompletion_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
+static const gchar* 
+gsc_autocompletion_trigger_real_get_name(GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_autocompletion_trigger_real_activate (GtkSourceCompletionTrigger* base);
+static gboolean 
+gsc_autocompletion_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
+static gboolean
+autocompletion_raise_event(gpointer event);
 
 static gpointer gsc_autocompletion_trigger_parent_class = NULL;
 static GtkSourceCompletionTriggerIface* gsc_autocompletion_trigger_parent_iface = NULL;
-
-static gboolean
-autocompletion_raise_event(gpointer event);
 
 static gint
 _get_text_offset(GscAutocompletionTrigger *self)
@@ -72,8 +74,8 @@ _get_text_offset(GscAutocompletionTrigger *self)
 
 static gboolean
 autocompletion_key_release_cb (GtkWidget *view,
-					GdkEventKey *event, 
-					gpointer user_data)
+			       GdkEventKey *event, 
+			       gpointer user_data)
 {
 	guint keyval = event->keyval;
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
@@ -94,7 +96,9 @@ autocompletion_key_release_cb (GtkWidget *view,
 	
 				self->priv->text_offset = _get_text_offset(self);
 				/*raise event in 0,5 seconds*/
-				self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);	
+				self->priv->source_id = g_timeout_add(self->priv->delay,
+								      autocompletion_raise_event,
+								      self);	
 			}
 		}
 	}
@@ -104,10 +108,10 @@ autocompletion_key_release_cb (GtkWidget *view,
 
 static void
 autocompletion_insert_text_cb(GtkTextBuffer *buffer,
-											GtkTextIter* location,
-											gchar *text,
-											gint len,
-											gpointer user_data)
+			      GtkTextIter* location,
+			      gchar *text,
+			      gint len,
+			      gpointer user_data)
 {
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(user_data);
 	/*TODO see the maximun length of a single UTF-8 character*/
@@ -122,7 +126,9 @@ autocompletion_insert_text_cb(GtkTextBuffer *buffer,
 
 		self->priv->text_offset = _get_text_offset(self);
 		/*raise event in 0,5 seconds*/
-		self->priv->source_id = g_timeout_add(self->priv->delay,autocompletion_raise_event,self);
+		self->priv->source_id = g_timeout_add(self->priv->delay,
+						      autocompletion_raise_event,
+						      self);
 	}
 }
 
@@ -201,22 +207,32 @@ gsc_autocompletion_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
 	return FALSE;
 }
 
-static void gsc_autocompletion_trigger_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
+static void 
+gsc_autocompletion_trigger_get_property (GObject * object, 
+					 guint property_id, 
+					 GValue * value, 
+					 GParamSpec * pspec)
 {
 }
 
 
-static void gsc_autocompletion_trigger_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
+static void 
+gsc_autocompletion_trigger_set_property (GObject * object, 
+					 guint property_id, 
+					 const GValue * value, 
+					 GParamSpec * pspec)
 {
 }
 
-static void gsc_autocompletion_trigger_init (GscAutocompletionTrigger * self)
+static void 
+gsc_autocompletion_trigger_init (GscAutocompletionTrigger * self)
 {
 	self->priv = g_new0(GscAutocompletionTriggerPrivate, 1);
 	g_debug("Init Autocompletion trigger");
 }
 
-static void gsc_autocompletion_trigger_finalize(GObject *object)
+static void 
+gsc_autocompletion_trigger_finalize(GObject *object)
 {
 	g_debug("Finish Autocompletion trigger");
 	GscAutocompletionTrigger *self;
@@ -225,7 +241,8 @@ static void gsc_autocompletion_trigger_finalize(GObject *object)
 	G_OBJECT_CLASS(gsc_autocompletion_trigger_parent_class)->finalize(object);
 }
 
-static void gsc_autocompletion_trigger_class_init (GscAutocompletionTriggerClass * klass)
+static void 
+gsc_autocompletion_trigger_class_init (GscAutocompletionTriggerClass * klass)
 {
 	gsc_autocompletion_trigger_parent_class = g_type_class_peek_parent (klass);
 	G_OBJECT_CLASS (klass)->get_property = gsc_autocompletion_trigger_get_property;
@@ -233,7 +250,8 @@ static void gsc_autocompletion_trigger_class_init (GscAutocompletionTriggerClass
 	G_OBJECT_CLASS (klass)->finalize = gsc_autocompletion_trigger_finalize;
 }
 
-static void gsc_autocompletion_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
+static void 
+gsc_autocompletion_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
 {
 	gsc_autocompletion_trigger_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_autocompletion_trigger_real_get_name;
@@ -241,7 +259,8 @@ static void gsc_autocompletion_trigger_interface_init (GtkSourceCompletionTrigge
 	iface->deactivate = gsc_autocompletion_trigger_real_deactivate;
 }
 
-GType gsc_autocompletion_trigger_get_type ()
+GType 
+gsc_autocompletion_trigger_get_type ()
 {
 	static GType g_define_type_id = 0;
 	if (G_UNLIKELY (g_define_type_id == 0)) {
@@ -268,7 +287,8 @@ gsc_autocompletion_trigger_new(GtkSourceCompletion *completion)
 }
 
 void
-gsc_autocompletion_trigger_set_delay(GscAutocompletionTrigger* trigger, guint delay)
+gsc_autocompletion_trigger_set_delay(GscAutocompletionTrigger* trigger, 
+				     guint delay)
 {
 	trigger->priv->delay = delay;
 }

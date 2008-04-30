@@ -71,7 +71,8 @@ gsc_autocompletion_trigger_new(GtkSourceCompletion *completion);
  *
  */
 void
-gsc_autocompletion_trigger_set_delay(GscAutocompletionTrigger* trigger, guint delay);
+gsc_autocompletion_trigger_set_delay(GscAutocompletionTrigger* trigger,
+				     guint delay);
 
 GType gsc_autocompletion_trigger_get_type ();
 

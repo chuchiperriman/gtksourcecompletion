@@ -45,7 +45,6 @@ typedef struct _GtkSourceCompletion GtkSourceCompletion;
 struct _GtkSourceCompletionClass
 {
 	GObjectClass parent_class;
-
 	/* Signals */
 	void(* populate_completion) (GtkSourceCompletion* completion);
 };
@@ -82,8 +81,8 @@ gtk_source_completion_new (GtkTextView *view);
  **/
 void 
 gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
-					const gchar *trigger_name, 
-					gpointer event_data);
+				    const gchar *trigger_name, 
+				    gpointer event_data);
 
 /**
  * gtk_source_completion_register_provider:
@@ -119,8 +118,8 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
  **/
 gboolean
 gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider,
-					const gchar *trigger_name);
+					  GtkSourceCompletionProvider *provider,
+					  const gchar *trigger_name);
 
 /**
  * gtk_source_completion_get_view:
@@ -151,8 +150,7 @@ gtk_source_completion_is_visible(GtkSourceCompletion *completion);
  * 
  **/
 GtkSourceCompletion*
-gtk_source_completion_get_from_view(
-								GtkTextView *view);
+gtk_source_completion_get_from_view(GtkTextView *view);
 
 /**
  * gtk_source_completion_get_provider:

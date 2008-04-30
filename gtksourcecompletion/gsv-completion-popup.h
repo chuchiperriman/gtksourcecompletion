@@ -46,8 +46,7 @@ struct _GsvCompletionPopupClass
   GtkWindowClass parent_class;
   
   void	 (* item_selected)(GsvCompletionPopup *popup,
-				     	 GtkSourceCompletionItem *item);
-
+			   GtkSourceCompletionItem *item);
 };
 
 struct _GsvCompletionPopup
@@ -92,7 +91,7 @@ gsv_completion_popup_select_last(GsvCompletionPopup *self);
  */
 gboolean
 gsv_completion_popup_select_previous(GsvCompletionPopup *self, 
-					gint rows);
+				     gint rows);
 
 /**
  * gsv_completion_popup_select_next:
@@ -104,7 +103,7 @@ gsv_completion_popup_select_previous(GsvCompletionPopup *self,
  */
 gboolean
 gsv_completion_popup_select_next(GsvCompletionPopup *self, 
-					gint rows);
+				 gint rows);
 
 /**
  * gsv_completion_popup_get_selected_item:
@@ -147,7 +146,7 @@ gsv_completion_popup_clear(GsvCompletionPopup *self);
  */
 void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
-					GtkSourceCompletionItem* data);
+			      GtkSourceCompletionItem* data);
 
 /**
  * gsv_completion_popup_has_items:

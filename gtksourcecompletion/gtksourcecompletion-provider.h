@@ -43,21 +43,17 @@ typedef struct _GtkSourceCompletionProviderIface GtkSourceCompletionProviderIfac
 struct _GtkSourceCompletionProviderIface {
 	
 	GTypeInterface parent;
-
 	const gchar* (*get_name) (GtkSourceCompletionProvider *self);
-
 	GList* (*get_data) (GtkSourceCompletionProvider* self,
-	 										GtkSourceCompletion* completion, 
-	 										GtkSourceCompletionTrigger *trigger);
+	 		    GtkSourceCompletion* completion, 
+	 		    GtkSourceCompletionTrigger *trigger);
 	void (*data_selected) (GtkSourceCompletionProvider* self,
-											GtkSourceCompletion* completion, 
-											GtkSourceCompletionItem* data);
-											
+			       GtkSourceCompletion* completion, 
+			       GtkSourceCompletionItem* data);							
 	void (*end_completion) (GtkSourceCompletionProvider* self,
-	 										GtkSourceCompletion* completion);
-	 										
+	 			GtkSourceCompletion* completion);							
 	gchar* (*get_item_info_markup) (GtkSourceCompletionProvider *self, 
-							GtkSourceCompletionItem *item);
+					GtkSourceCompletionItem *item);
 
 };
 
@@ -88,8 +84,8 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider* self);
  **/
 GList* 
 gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self, 
-					GtkSourceCompletion* completion, 
-					GtkSourceCompletionTrigger *trigger);
+					 GtkSourceCompletion* completion, 
+					 GtkSourceCompletionTrigger *trigger);
 
 /**
  * gtk_source_completion_provider_data_selected:
@@ -104,8 +100,8 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
  **/				
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					GtkSourceCompletion *completion, 
-					GtkSourceCompletionItem* item);
+					      GtkSourceCompletion *completion, 
+					      GtkSourceCompletionItem* item);
 
 /**
  * gtk_source_completion_provider_end_completion:
@@ -117,7 +113,7 @@ gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self,
  **/					
 void 
 gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					GtkSourceCompletion* completion);
+					       GtkSourceCompletion* completion);
 
 /**
  * gtk_source_completion_provider_get_item_info_markup:
@@ -132,7 +128,7 @@ gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self
  **/
 gchar*
 gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
-				GtkSourceCompletionItem *item);
+						    GtkSourceCompletionItem *item);
 
 GType 
 gtk_source_completion_provider_get_type ();

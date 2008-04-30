@@ -150,6 +150,15 @@ GtkSourceCompletion
 @Returns: 
 
 
+<!-- ##### FUNCTION gtk_source_completion_get_active_trigger_name ##### -->
+<para>
+
+</para>
+
+@completion: 
+@Returns: 
+
+
 <!-- ##### FUNCTION gtk_source_completion_activate ##### -->
 <para>
 

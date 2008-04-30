@@ -70,7 +70,7 @@ gsc_documentwords_provider_new();
  */
 void
 gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
-											 GscDocumentwordsProviderSortType sort_type);
+					 GscDocumentwordsProviderSortType sort_type);
 
 /**
  * gsc_documentwords_provider_get_sort_type:
@@ -81,7 +81,8 @@ gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
 GscDocumentwordsProviderSortType
 gsc_documentwords_provider_get_sort_type(GscDocumentwordsProvider *prov);
 
-GType gsc_documentwords_provider_get_type ();
+GType 
+gsc_documentwords_provider_get_type ();
 
 G_END_DECLS
 

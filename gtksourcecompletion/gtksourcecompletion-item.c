@@ -40,11 +40,11 @@ gtk_source_completion_item_free(GtkSourceCompletionItem *item)
 
 GtkSourceCompletionItem*
 gtk_source_completion_item_new(int id,
-							const gchar *name,
-							const GdkPixbuf *icon,
-							int priority,
-							GtkSourceCompletionProvider *provider,
-							gpointer user_data)
+				const gchar *name,
+				const GdkPixbuf *icon,
+				int priority,
+				GtkSourceCompletionProvider *provider,
+				gpointer user_data)
 {
 	g_debug("Created GtkSourceCompletionItem");
 	GtkSourceCompletionItem* item = g_malloc0(sizeof(GtkSourceCompletionItem));
@@ -60,12 +60,12 @@ gtk_source_completion_item_new(int id,
 
 GtkSourceCompletionItem*
 gtk_source_completion_item_new_full(int id,
-							const gchar *name,
-							const GdkPixbuf *icon,
-							int priority,
-							GtkSourceCompletionProvider *provider,
-							const gchar *page_name,
-							gpointer user_data)
+				    const gchar *name,
+				    const GdkPixbuf *icon,
+				    int priority,
+				    GtkSourceCompletionProvider *provider,
+				    const gchar *page_name,
+				    gpointer user_data)
 {
 	GtkSourceCompletionItem *item; 
 	item = gtk_source_completion_item_new(id,name,icon,priority,provider,user_data);

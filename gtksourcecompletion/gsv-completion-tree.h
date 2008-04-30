@@ -42,24 +42,21 @@ typedef struct _GsvCompletionTreeClass GsvCompletionTreeClass;
 
 struct _GsvCompletionTreeClass
 {
-  GtkScrolledWindowClass parent_class;
-  
-  void	 (* item_selected)(GsvCompletionTree *tree,
-				     	 GtkSourceCompletionItem *item);
-	void	 (* selection_changed)(GsvCompletionTree *tree,
-				     	 GtkSourceCompletionItem *item);
-
+	GtkScrolledWindowClass parent_class;
+	void (* item_selected)(GsvCompletionTree *tree,
+			       GtkSourceCompletionItem *item);
+	void (* selection_changed)(GsvCompletionTree *tree,
+				   GtkSourceCompletionItem *item);
 };
 
 struct _GsvCompletionTree
 {
-  GtkScrolledWindow parent;
-  
-  GsvCompletionTreePriv *priv;
-
+	GtkScrolledWindow parent;
+	GsvCompletionTreePriv *priv;
 };
 
-GType gsv_completion_tree_get_type (void) G_GNUC_CONST;
+GType 
+gsv_completion_tree_get_type (void) G_GNUC_CONST;
 
 /**
  * gsv_completion_tree_new:
@@ -82,7 +79,7 @@ gsv_completion_tree_new();
  */
 gboolean
 gsv_completion_tree_get_selected_item(GsvCompletionTree *self,
-													GtkSourceCompletionItem **item);
+				      GtkSourceCompletionItem **item);
 /**
  * gsv_completion_tree_select_first:
  * @self: The #GsvCompletionTree
@@ -117,7 +114,7 @@ gsv_completion_tree_select_last(GsvCompletionTree *self);
  */
 gboolean
 gsv_completion_tree_select_previous(GsvCompletionTree *self, 
-					gint rows);
+				    gint rows);
 
 /**
  * gsv_completion_tree_select_next:
@@ -131,7 +128,7 @@ gsv_completion_tree_select_previous(GsvCompletionTree *self,
  */
 gboolean
 gsv_completion_tree_select_next(GsvCompletionTree *self, 
-					gint rows);
+				gint rows);
 
 /**
  * gsv_completion_tree_get_selected_item:
@@ -165,7 +162,7 @@ gsv_completion_tree_clear(GsvCompletionTree *self);
  */
 void
 gsv_completion_tree_add_data(GsvCompletionTree *self,
-					GtkSourceCompletionItem* data);
+			     GtkSourceCompletionItem* data);
 
 /**
  * gsv_completion_tree_has_items:

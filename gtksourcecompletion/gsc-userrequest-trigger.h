@@ -66,9 +66,11 @@ gsc_userrequest_trigger_new(GtkSourceCompletion *completion);
  * Assign the keys that we will use to activate the user request event
  */
 void
-gsc_userrequest_trigger_set_keys(GscUserRequestTrigger * self, const gchar* keys);
+gsc_userrequest_trigger_set_keys(GscUserRequestTrigger * self, 
+				 const gchar* keys);
 
-GType gsc_userrequest_trigger_get_type ();
+GType 
+gsc_userrequest_trigger_get_type ();
 
 G_END_DECLS
 

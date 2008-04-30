@@ -138,7 +138,7 @@ _prov_list_free(gpointer prov_list)
 
 static gint
 _item_priority_compare (gconstpointer v1,
-					gconstpointer v2)
+			gconstpointer v2)
 {
 	GtkSourceCompletionItem *i1 = (GtkSourceCompletionItem*) v1;
 	GtkSourceCompletionItem *i2 = (GtkSourceCompletionItem*) v2;
@@ -208,13 +208,12 @@ _popup_tree_selection(GtkSourceCompletion *completion)
 	}
 	
 	return FALSE;
-
 }
 
 static gboolean
 view_key_press_event_cb(GtkWidget *view,
-					GdkEventKey *event, 
-					gpointer user_data)
+			GdkEventKey *event, 
+			gpointer user_data)
 {
 	/* Catch only keys of popup movement */
 	gboolean ret = FALSE;
@@ -316,15 +315,13 @@ view_key_press_event_cb(GtkWidget *view,
 		}
 
 	}
-	
 	return ret;
-
 }
 
 static void
 _popup_item_select_cb(GtkWidget *popup,
-							GtkSourceCompletionItem *item,
-							gpointer user_data)
+		      GtkSourceCompletionItem *item,
+		      gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
 	GtkSourceCompletionProvider *prov;
@@ -335,7 +332,7 @@ _popup_item_select_cb(GtkWidget *popup,
 
 static void
 view_destroy_event_cb(GtkWidget *widget,
-				gpointer user_data)
+		      gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
 	g_object_unref(completion);
@@ -343,8 +340,8 @@ view_destroy_event_cb(GtkWidget *widget,
 
 static gboolean
 view_focus_out_event_cb(GtkWidget *widget,
-				GdkEventFocus *event,
-				gpointer user_data)
+			GdkEventFocus *event,
+			gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
 	if (gtk_source_completion_is_visible(completion))
@@ -356,8 +353,8 @@ view_focus_out_event_cb(GtkWidget *widget,
 
 static gboolean
 view_button_press_event_cb(GtkWidget *widget,
-			GdkEventButton *event,
-			gpointer user_data)
+			   GdkEventButton *event,
+			   gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
 	if (gtk_source_completion_is_visible(completion))
@@ -432,9 +429,9 @@ gtk_source_completion_set_property (GObject      *object,
 
 static void
 gtk_source_completion_get_property (GObject    *object,
-				guint       prop_id,
-				GValue     *value,
-				GParamSpec *pspec)
+				    guint       prop_id,
+				    GValue     *value,
+				    GParamSpec *pspec)
 {
 	GtkSourceCompletion *self;
 
@@ -445,16 +442,19 @@ gtk_source_completion_get_property (GObject    *object,
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
-			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_INFO].key,
-								      self->priv->keys[KEYS_INFO].mods));
+			g_value_set_string(value,
+					   gtk_accelerator_name(self->priv->keys[KEYS_INFO].key,
+								self->priv->keys[KEYS_INFO].mods));
 			break;
 		case PROP_NEXT_PAGE_KEYS:
-			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_PAGE_NEXT].key,
-								      self->priv->keys[KEYS_PAGE_NEXT].mods));
+			g_value_set_string(value,
+					   gtk_accelerator_name(self->priv->keys[KEYS_PAGE_NEXT].key,
+								self->priv->keys[KEYS_PAGE_NEXT].mods));
 			break;
 		case PROP_PREV_PAGE_KEYS:
-			g_value_set_string(value,gtk_accelerator_name(self->priv->keys[KEYS_PAGE_PREV].key,
-								      self->priv->keys[KEYS_PAGE_PREV].mods));
+			g_value_set_string(value,
+					   gtk_accelerator_name(self->priv->keys[KEYS_PAGE_PREV].key,
+								self->priv->keys[KEYS_PAGE_PREV].mods));
 			break;
 
 		default:
@@ -482,9 +482,9 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	completion->priv->popup = NULL;
 	completion->priv->active_trigger = NULL;
 	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
-			g_str_equal,
-			g_free,
-			(GDestroyNotify)_prov_list_free);
+							    g_str_equal,
+							    g_free,
+							    (GDestroyNotify)_prov_list_free);
 	
 	_set_keys(completion, KEYS_INFO, DEFAULT_INFO_KEYS);
 	_set_keys(completion, KEYS_PAGE_NEXT, DEFAULT_PAGE_NEXT_KEYS);
@@ -614,9 +614,9 @@ gtk_source_completion_new (GtkTextView *view)
 	completion->priv->popup = GSV_COMPLETION_POPUP(gsv_completion_popup_new(view));
 	
 	g_signal_connect(completion->priv->popup, 
-						"item-selected",
-						G_CALLBACK(_popup_item_select_cb),
-						(gpointer) completion);
+			 "item-selected",
+			 G_CALLBACK(_popup_item_select_cb),
+			 (gpointer) completion);
 
 	completion_control_add_completion(view,completion);
 	
@@ -668,8 +668,8 @@ gtk_source_completion_get_view(GtkSourceCompletion *completion)
 
 void
 gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
-					const gchar *trigger_name, 
-					gpointer event_data)
+				    const gchar *trigger_name, 
+				    gpointer event_data)
 {
 	GList* data_list;
 	GList* original_list;
@@ -720,7 +720,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			do
 			{
 				gsv_completion_popup_add_data(completion->priv->popup,
-									(GtkSourceCompletionItem*)data_list->data);
+							      (GtkSourceCompletionItem*)data_list->data);
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not items, we don't show the popup */
@@ -764,15 +764,14 @@ gtk_source_completion_is_visible(GtkSourceCompletion *completion)
 }
 
 GtkSourceCompletion*
-gtk_source_completion_get_from_view(
-																GtkTextView *view)
+gtk_source_completion_get_from_view(GtkTextView *view)
 {
 	return completion_control_get_completion(view);
 }
 
 GtkSourceCompletionProvider*
 gtk_source_completion_get_provider(GtkSourceCompletion *completion,
-								const gchar* provider_name)
+				   const gchar* provider_name)
 {
 	GList *plist = completion->priv->providers;
 	GtkSourceCompletionProvider *provider;	
@@ -793,7 +792,7 @@ gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 
 void
 gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
-								GtkSourceCompletionTrigger *trigger)
+					GtkSourceCompletionTrigger *trigger)
 {
     const gchar* trigger_name = gtk_source_completion_trigger_get_name(trigger);
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
@@ -816,7 +815,7 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 
 void
 gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
-								GtkSourceCompletionTrigger *trigger)
+					 GtkSourceCompletionTrigger *trigger)
 {
 	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);
 	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
@@ -824,13 +823,14 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
 	{
 		gtk_source_completion_trigger_deactivate(trigger);
 	}
-	g_hash_table_remove(completion->priv->trig_prov,gtk_source_completion_trigger_get_name(trigger));
+	g_hash_table_remove(completion->priv->trig_prov,
+			    gtk_source_completion_trigger_get_name(trigger));
 	g_object_unref(trigger);
 }
 
 GtkSourceCompletionTrigger*
 gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
-								const gchar* trigger_name)
+				  const gchar* trigger_name)
 {
 	GList *plist = completion->priv->triggers;
 	GtkSourceCompletionTrigger *trigger;	
@@ -855,24 +855,24 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 	g_debug("Activating GtkSourceCompletion");
 	completion->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
 			g_signal_connect(completion->priv->text_view,
-						"key-press-event",
-						G_CALLBACK(view_key_press_event_cb),
-						(gpointer) completion);
+					 "key-press-event",
+					 G_CALLBACK(view_key_press_event_cb),
+					 (gpointer) completion);
 	completion->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
 			g_signal_connect(completion->priv->text_view,
-							"destroy",
-							G_CALLBACK(view_destroy_event_cb),
-							(gpointer)completion);
+					 "destroy",
+					 G_CALLBACK(view_destroy_event_cb),
+					 (gpointer)completion);
 	completion->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
 			g_signal_connect(completion->priv->text_view,
-							"focus-out-event",
-							G_CALLBACK(view_focus_out_event_cb),
-							(gpointer)completion);
+					 "focus-out-event",
+					 G_CALLBACK(view_focus_out_event_cb),
+					 (gpointer)completion);
 	completion->priv->internal_signal_ids[IS_GTK_TEXT_BUTTON_PRESS] = 
 			g_signal_connect(completion->priv->text_view,
-							"button-press-event",
-							G_CALLBACK(view_button_press_event_cb),
-							(gpointer)completion);
+					 "button-press-event",
+					 G_CALLBACK(view_button_press_event_cb),
+					 (gpointer)completion);
 
 	/* We activate the triggers*/
 	GList *plist = completion->priv->triggers;
@@ -897,7 +897,8 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 	gint i;
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
-		if (g_signal_handler_is_connected(completion->priv->text_view, completion->priv->internal_signal_ids[i]))
+		if (g_signal_handler_is_connected(completion->priv->text_view, 
+						  completion->priv->internal_signal_ids[i]))
 		{
 			g_signal_handler_disconnect (completion->priv->text_view,
 				completion->priv->internal_signal_ids[i]);
@@ -935,4 +936,3 @@ gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion)
 	return completion->priv->active_trigger;
 }
 
-	

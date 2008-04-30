@@ -20,7 +20,6 @@
  
 #include "gtksourcecompletion-utils.h"
 
-
 gboolean
 gsc_char_is_separator(const gunichar ch)
 {
@@ -107,8 +106,8 @@ gtk_source_view_get_last_word(GtkTextView *text_view)
 
 void
 gtk_source_view_get_cursor_pos(GtkTextView *text_view, 
-					gint *x, 
-					gint *y)
+				gint *x, 
+				gint *y)
 {
 	GdkWindow *win;
 	GtkTextMark* insert_mark;
@@ -125,12 +124,14 @@ gtk_source_view_get_cursor_pos(GtkTextView *text_view,
 														&start,
 														&location );
 	gtk_text_view_buffer_to_window_coords (text_view,
-                                        GTK_TEXT_WINDOW_WIDGET,
-                                        location.x, location.y,
-                                        &win_x, &win_y);
+						GTK_TEXT_WINDOW_WIDGET,
+						location.x, 
+						location.y,
+						&win_x, 
+						&win_y);
 
 	win = gtk_text_view_get_window (text_view, 
-                                GTK_TEXT_WINDOW_WIDGET);
+	                                GTK_TEXT_WINDOW_WIDGET);
 	gdk_window_get_origin (win, &xx, &yy);
 	
 	*x = win_x + xx;
@@ -152,7 +153,7 @@ gtc_gsv_get_text(GtkTextView *text_view)
 
 void
 gtk_source_view_replace_actual_word(GtkTextView *text_view, 
-					const gchar* text)
+				    const gchar* text)
 {
 	GtkTextBuffer *buffer;
 	GtkTextIter word_start, word_end;

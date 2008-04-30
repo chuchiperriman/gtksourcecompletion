@@ -36,22 +36,22 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 
 void 
 gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					GtkSourceCompletion* completion, 
-					GtkSourceCompletionItem* item)
+					      GtkSourceCompletion* completion, 
+					      GtkSourceCompletionItem* item)
 {
 	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, completion, item);
 }
 
 void 
 gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					GtkSourceCompletion* completion)
+					       GtkSourceCompletion* completion)
 {
 	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->end_completion(self, completion);
 }
 
 gchar*
 gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
-				GtkSourceCompletionItem *item)
+						    GtkSourceCompletionItem *item)
 {
 	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_item_info_markup (self, item);
 }
@@ -71,17 +71,19 @@ gtk_source_completion_provider_get_type ()
 {
 	static GType gtk_source_completion_provider_type_id = 0;
 	if (!gtk_source_completion_provider_type_id) {
-		static const GTypeInfo g_define_type_info = { 
-							sizeof (GtkSourceCompletionProviderIface), 
-							(GBaseInitFunc) gtk_source_completion_provider_base_init, 
-							(GBaseFinalizeFunc) NULL, 
-							(GClassInitFunc) NULL, 
-							(GClassFinalizeFunc) NULL, 
-							NULL, 
-							0, 
-							0, 
-							(GInstanceInitFunc) NULL };
-							
+		static const GTypeInfo g_define_type_info = 
+		{ 
+			sizeof (GtkSourceCompletionProviderIface), 
+			(GBaseInitFunc) gtk_source_completion_provider_base_init, 
+			(GBaseFinalizeFunc) NULL, 
+			(GClassInitFunc) NULL, 
+			(GClassFinalizeFunc) NULL, 
+			NULL, 
+			0, 
+			0, 
+			(GInstanceInitFunc) NULL 
+		};
+						
 		gtk_source_completion_provider_type_id = 
 				g_type_register_static (G_TYPE_INTERFACE, 
 							"GtkSourceCompletionProvider", 
@@ -90,7 +92,5 @@ gtk_source_completion_provider_get_type ()
 	}
 	return gtk_source_completion_provider_type_id;
 }
-
-
 
 

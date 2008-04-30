@@ -39,15 +39,10 @@ typedef struct _GtkSourceCompletionTriggerIface GtkSourceCompletionTriggerIface;
 #include "gtksourcecompletion.h"
 
 struct _GtkSourceCompletionTriggerIface {
-	
 	GTypeInterface parent;
-
 	const gchar* (*get_name) (GtkSourceCompletionTrigger *self);
-
 	gboolean (*activate) (GtkSourceCompletionTrigger* self);
-	
 	gboolean (*deactivate) (GtkSourceCompletionTrigger* self);
-	
 };
 
 /**

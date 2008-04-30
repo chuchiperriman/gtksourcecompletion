@@ -64,9 +64,11 @@ struct _GscCustomkeyTriggerClass {
  */
 GscCustomkeyTrigger* 
 gsc_customkey_trigger_new(GtkSourceCompletion *completion,
-									const gchar* trigger_name, const gchar* keys);
+			  const gchar* trigger_name, 
+			  const gchar* keys);
 
-GType gsc_customkey_trigger_get_type ();
+GType 
+gsc_customkey_trigger_get_type ();
 
 G_END_DECLS
 

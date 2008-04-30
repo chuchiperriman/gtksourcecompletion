@@ -38,13 +38,24 @@ struct _GscDocumentwordsProviderPrivate {
 enum  {
 	GSC_DOCUMENTWORDS_PROVIDER_DUMMY_PROPERTY,
 };
-static const gchar* gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self);
-static GList* gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger* trigger);
-static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion);
-static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data);
-static gchar* gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCompletionProvider *self, GtkSourceCompletionItem *item);
+static const gchar* 
+gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self);
+static GList* 
+gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, 
+					  GtkSourceCompletion* completion, 
+					  GtkSourceCompletionTrigger* trigger);
+static void 
+gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, 
+						GtkSourceCompletion* completion);
+static void 
+gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, 
+					       GtkSourceCompletion* completion, GtkSourceCompletionItem* data);
+static gchar* 
+gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCompletionProvider *self, 
+						      GtkSourceCompletionItem *item);
+
+static GtkSourceCompletionProviderIface* gsc_documentwords_provider_parent_iface = NULL;
 static gpointer gsc_documentwords_provider_parent_class = NULL;
-static GtkSourceCompletionProviderIface* gsc_documentwords_provider_gtk_source_completion_provider_parent_iface = NULL;
 
 static gboolean
 pred_is_separator(gunichar ch, gpointer user_data)
@@ -70,17 +81,16 @@ static GHashTable*
 get_all_words(GscDocumentwordsProvider* self, GtkTextBuffer *buffer )
 {
 	GtkTextIter start_iter;
-    GtkTextIter prev_iter;
-    gchar *word;
-	GHashTable *result = g_hash_table_new_full(
-						g_str_hash,
-						g_str_equal,
-						g_free,
-						NULL);
+	GtkTextIter prev_iter;
+	gchar *word;
+	GHashTable *result = g_hash_table_new_full(g_str_hash,
+						   g_str_equal,
+						   g_free,
+						   NULL);
 	
 	
 	gtk_text_buffer_get_start_iter(buffer,&start_iter);
-   prev_iter = start_iter;
+	prev_iter = start_iter;
 	while (gtk_text_iter_forward_find_char(
 			&start_iter,
 			(GtkTextCharPredicate)pred_is_separator,
@@ -89,36 +99,31 @@ get_all_words(GscDocumentwordsProvider* self, GtkTextBuffer *buffer )
 	{
 		if (gtk_text_iter_compare(&self->priv->start_iter,&prev_iter)!=0)
 		{
-        word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+			word = gtk_text_iter_get_text(&prev_iter,&start_iter);
         
-        if (strlen(word)>0)
-            g_hash_table_insert(result,word,NULL);
-        else
-        	g_free(word);
-        
-        
-      }
-      prev_iter = start_iter;
-      gtk_text_iter_forward_char(&prev_iter);
+			if (strlen(word)>0)
+				g_hash_table_insert(result,word,NULL);
+			else
+				g_free(word);
+		}
+		prev_iter = start_iter;
+		gtk_text_iter_forward_char(&prev_iter);
 	}
 
-    if (!gtk_text_iter_is_end(&prev_iter))
-    {
-        gtk_text_buffer_get_end_iter(buffer,&start_iter);
-        if (gtk_text_iter_compare(&self->priv->start_iter,&prev_iter)!=0)
-		  {
-        		word = gtk_text_iter_get_text(&prev_iter,&start_iter);
-		      if (strlen(word)>0)
-		      	g_hash_table_insert(result,word,NULL);
-		      else
-					g_free(word);
-		  }
-
-        prev_iter = start_iter;
-        gtk_text_iter_forward_char(&prev_iter);
-        
-    }
-			
+	if (!gtk_text_iter_is_end(&prev_iter))
+	{
+		gtk_text_buffer_get_end_iter(buffer,&start_iter);
+		if (gtk_text_iter_compare(&self->priv->start_iter,&prev_iter)!=0)
+		{
+			word = gtk_text_iter_get_text(&prev_iter,&start_iter);
+			if (strlen(word)>0)
+				g_hash_table_insert(result,word,NULL);
+			else
+				g_free(word);
+		}
+		prev_iter = start_iter;
+	        gtk_text_iter_forward_char(&prev_iter);
+	}
 	return result;
 }
 
@@ -134,9 +139,7 @@ is_valid_word(gchar *current_word, gchar *completion_word)
 	{
 		return TRUE;
 	}
-	
 	return FALSE;
-	
 }
 
 static void
@@ -155,8 +158,8 @@ clean_current_words(GscDocumentwordsProvider* self)
  */
 static void
 gh_add_key_to_list(gpointer key,
-					gpointer value,
-					gpointer user_data)
+		   gpointer value,
+		   gpointer user_data)
 {
 
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(user_data);
@@ -169,11 +172,11 @@ gh_add_key_to_list(gpointer key,
 	{
 		self->priv->count++;
 		data = gtk_source_completion_item_new(0,
-							(gchar*)key,
-							self->priv->icon,
-							15,
-							GTK_SOURCE_COMPLETION_PROVIDER(self),
-							NULL);
+						      (gchar*)key,
+						       self->priv->icon,
+						       15,
+						       GTK_SOURCE_COMPLETION_PROVIDER(self),
+						       NULL);
 		self->priv->data_list = g_list_append(self->priv->data_list,data);
 	}
 }
@@ -185,7 +188,8 @@ _sort_completion_list(GscDocumentwordsProvider *self, GList *data_list)
 	{
 		case GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH:
 		{
-			data_list = g_list_sort(data_list, (GCompareFunc)utf8_len_compare );
+			data_list = g_list_sort(data_list,
+						(GCompareFunc)utf8_len_compare );
 			break;
 		}
 		default: 
@@ -196,25 +200,31 @@ _sort_completion_list(GscDocumentwordsProvider *self, GList *data_list)
 }
 
 
-static const gchar* gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self)
+static const gchar* 
+gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self)
 {
 	return GSC_DOCUMENTWORDS_PROVIDER_NAME;
 }
 
 static GList* 
-gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionTrigger *trigger)
+gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, 
+					  GtkSourceCompletion* completion, 
+					  GtkSourceCompletionTrigger *trigger)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	
-	gchar* current_word = gtk_source_view_get_last_word_and_iter(view,&self->priv->start_iter,NULL);
+	gchar* current_word = gtk_source_view_get_last_word_and_iter(view,
+								     &self->priv->start_iter,
+								     NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
 	if (self->priv->cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)
 		{
-			gsc_documentwords_provider_real_end_completion(base,completion);
+			gsc_documentwords_provider_real_end_completion(base,
+								       completion);
 		}
 		return NULL;
 	}
@@ -235,7 +245,8 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	if (self->priv->data_list!=NULL)
 	{
 		self->priv->is_completing = TRUE;
-		self->priv->data_list = _sort_completion_list(self,self->priv->data_list);
+		self->priv->data_list = _sort_completion_list(self,
+							      self->priv->data_list);
 	}
 	else
 	{
@@ -247,7 +258,9 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, Gtk
 	return self->priv->data_list;
 }
 
-static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion)
+static void 
+gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, 
+						GtkSourceCompletion* completion)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	/*Clean current word list*/
@@ -257,7 +270,10 @@ static void gsc_documentwords_provider_real_end_completion (GtkSourceCompletionP
 	
 }
 
-static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, GtkSourceCompletion* completion, GtkSourceCompletionItem* data)
+static void 
+gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, 
+					       GtkSourceCompletion* completion, 
+					       GtkSourceCompletionItem* data)
 {
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gtk_source_view_replace_actual_word(view,
@@ -266,21 +282,30 @@ static void gsc_documentwords_provider_real_data_selected (GtkSourceCompletionPr
 
 static gchar*
 gsc_documentwords_provider_real_get_item_info_markup(GtkSourceCompletionProvider *self,
-				GtkSourceCompletionItem *item)
+						     GtkSourceCompletionItem *item)
 {
 	return NULL;
 }
 
-static void gsc_documentwords_provider_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
+static void 
+gsc_documentwords_provider_get_property (GObject * object, 
+					 guint property_id, 
+					 GValue * value, 
+					 GParamSpec * pspec)
 {
 }
 
 
-static void gsc_documentwords_provider_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
+static void 
+gsc_documentwords_provider_set_property (GObject * object, 
+					 guint property_id, 
+					 const GValue * value, 
+					 GParamSpec * pspec)
 {
 }
 
-static void gsc_documentwords_provider_finalize(GObject *object)
+static void 
+gsc_documentwords_provider_finalize(GObject *object)
 {
 	g_debug("Finish GscDocumentwordsProvider");
 	GscDocumentwordsProvider *self;
@@ -297,7 +322,8 @@ static void gsc_documentwords_provider_finalize(GObject *object)
 }
 
 
-static void gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass * klass)
+static void 
+gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass * klass)
 {
 	g_debug("Init GscDocumentwordsProvider");
 	gsc_documentwords_provider_parent_class = g_type_class_peek_parent (klass);
@@ -307,9 +333,10 @@ static void gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass
 }
 
 
-static void gsc_documentwords_provider_gtk_source_completion_provider_interface_init (GtkSourceCompletionProviderIface * iface)
+static void 
+gsc_documentwords_provider_interface_init (GtkSourceCompletionProviderIface * iface)
 {
-	gsc_documentwords_provider_gtk_source_completion_provider_parent_iface = g_type_interface_peek_parent (iface);
+	gsc_documentwords_provider_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_documentwords_provider_real_get_name;
 	iface->get_data = gsc_documentwords_provider_real_get_data;
 	iface->end_completion = gsc_documentwords_provider_real_end_completion;
@@ -335,10 +362,26 @@ GType gsc_documentwords_provider_get_type ()
 {
 	static GType g_define_type_id = 0;
 	if (G_UNLIKELY (g_define_type_id == 0)) {
-		static const GTypeInfo g_define_type_info = { sizeof (GscDocumentwordsProviderClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_documentwords_provider_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GscDocumentwordsProvider), 0, (GInstanceInitFunc) gsc_documentwords_provider_init };
-		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscDocumentwordsProvider", &g_define_type_info, 0);
-		static const GInterfaceInfo gtk_source_completion_provider_info = { (GInterfaceInitFunc) gsc_documentwords_provider_gtk_source_completion_provider_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GTK_SOURCE_COMPLETION_TYPE_PROVIDER, &gtk_source_completion_provider_info);
+		static const GTypeInfo g_define_type_info = {sizeof (GscDocumentwordsProviderClass), 
+							     (GBaseInitFunc) NULL,
+							     (GBaseFinalizeFunc) NULL, 
+							     (GClassInitFunc) gsc_documentwords_provider_class_init, 
+							     (GClassFinalizeFunc) NULL, 
+							     NULL, 
+							     sizeof (GscDocumentwordsProvider), 
+							     0, 
+							     (GInstanceInitFunc) gsc_documentwords_provider_init 
+							     };
+		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, 
+							   "GscDocumentwordsProvider", 
+							   &g_define_type_info,
+							   0);
+		static const GInterfaceInfo gtk_source_completion_provider_info = {(GInterfaceInitFunc) gsc_documentwords_provider_interface_init,
+										   (GInterfaceFinalizeFunc) NULL, 
+										   NULL};
+		g_type_add_interface_static (g_define_type_id, 
+					     GTK_SOURCE_COMPLETION_TYPE_PROVIDER, 
+					     &gtk_source_completion_provider_info);
 	}
 	return g_define_type_id;
 }
@@ -351,7 +394,7 @@ gsc_documentwords_provider_new()
 
 void
 gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,
-											 GscDocumentwordsProviderSortType sort_type)
+					 GscDocumentwordsProviderSortType sort_type)
 {
 	prov->priv->sort_type = sort_type;
 }
