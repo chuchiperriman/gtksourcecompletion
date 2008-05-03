@@ -1,3 +1,7 @@
+2008-05-03  Chuchi  <perriman@homer>
+
+	* version: Updated to 0.5.0 version because we will break the API
+
 === Version 0.4.1 ===
 
 2008-04-30  perriman  <chuchiperriman@gmail.com>
