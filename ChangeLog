@@ -1,3 +1,5 @@
+=== Version 0.4.1 ===
+
 2008-04-30  perriman  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion.h: Added gtk_source_completion_get_active_trigger_name
