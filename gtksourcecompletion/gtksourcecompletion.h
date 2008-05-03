@@ -45,8 +45,6 @@ typedef struct _GtkSourceCompletion GtkSourceCompletion;
 struct _GtkSourceCompletionClass
 {
 	GObjectClass parent_class;
-	/* Signals */
-	void(* populate_completion) (GtkSourceCompletion* completion);
 };
 
 struct _GtkSourceCompletion
