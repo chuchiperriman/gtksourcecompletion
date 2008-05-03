@@ -1,4 +1,17 @@
 ===========================
+ gtksourcecompletion 0.4.1
+===========================
+
+New Features and fixes
+======================
+- Created a custom key trigger. You can create this trigger and set the 
+	keys. When the user press these keys then the trigger will be raised.
+- A lot of focus improvements and usability
+- Fixed some bugs
+- Document wods completion use less memory and it goes faster
+
+
+===========================
  gtksourcecompletion 0.4.0
 ===========================
 
@@ -10,7 +23,7 @@ New Features and fixes
 - Better autocompletion
 
 
-News in 0.3.1
+News in 0.4.0
 -------------
 * Better completion triggers
 * Sort the completion items by length
