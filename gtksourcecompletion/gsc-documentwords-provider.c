@@ -18,8 +18,8 @@
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
-#include "gtksourcecompletion-utils.h"
 #include "gsc-documentwords-provider.h"
+#include "gtksourcecompletion-utils.h"
 
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
 
@@ -45,14 +45,8 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base,
 					  GtkSourceCompletion* completion, 
 					  GtkSourceCompletionTrigger* trigger);
 static void 
-gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, 
+gsc_documentwords_provider_real_finish (GtkSourceCompletionProvider* base, 
 						GtkSourceCompletion* completion);
-static void 
-gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, 
-					       GtkSourceCompletion* completion, GtkSourceCompletionItem* data);
-static gchar* 
-gsc_documentwords_provider_real_get_item_info_markup (GtkSourceCompletionProvider *self, 
-						      GtkSourceCompletionItem *item);
 
 static GtkSourceCompletionProviderIface* gsc_documentwords_provider_parent_iface = NULL;
 static gpointer gsc_documentwords_provider_parent_class = NULL;
@@ -67,8 +61,8 @@ static gint
 utf8_len_compare(gconstpointer a, gconstpointer b)
 {
     glong lena,lenb;
-    lena = g_utf8_strlen(gtk_source_completion_item_get_name((GtkSourceCompletionItem*)a),-1);
-    lenb = g_utf8_strlen(gtk_source_completion_item_get_name((GtkSourceCompletionItem*)b),-1);
+    lena = g_utf8_strlen(gtk_source_completion_proposal_get_name((GtkSourceCompletionProposal*)a),-1);
+    lenb = g_utf8_strlen(gtk_source_completion_proposal_get_name((GtkSourceCompletionProposal*)b),-1);
     if (lena==lenb)
         return 0;
     else if (lena<lenb)
@@ -154,7 +148,7 @@ clean_current_words(GscDocumentwordsProvider* self)
 }
 
 /*
- * Check the hash item and inserts the completion item into the final list
+ * Check the proposals hash and inserts the completion proposal into the final list
  */
 static void
 gh_add_key_to_list(gpointer key,
@@ -167,15 +161,14 @@ gh_add_key_to_list(gpointer key,
 	{
 		return;
 	}
-	GtkSourceCompletionItem *data;
+	GtkSourceCompletionProposal *data;
 	if (is_valid_word(self->priv->cleaned_word,(gchar*)key))
 	{
 		self->priv->count++;
-		data = gtk_source_completion_item_new(0,
+		data = gtk_source_completion_proposal_new(0,
 						      (gchar*)key,
 						       self->priv->icon,
 						       15,
-						       GTK_SOURCE_COMPLETION_PROVIDER(self),
 						       NULL);
 		self->priv->data_list = g_list_append(self->priv->data_list,data);
 	}
@@ -223,8 +216,8 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base,
 	{
 		if (self->priv->is_completing)
 		{
-			gsc_documentwords_provider_real_end_completion(base,
-								       completion);
+			gsc_documentwords_provider_real_finish(base,
+							       completion);
 		}
 		return NULL;
 	}
@@ -259,7 +252,7 @@ gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base,
 }
 
 static void 
-gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* base, 
+gsc_documentwords_provider_real_finish (GtkSourceCompletionProvider* base, 
 						GtkSourceCompletion* completion)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
@@ -268,23 +261,6 @@ gsc_documentwords_provider_real_end_completion (GtkSourceCompletionProvider* bas
 	
 	self->priv->is_completing = FALSE;
 	
-}
-
-static void 
-gsc_documentwords_provider_real_data_selected (GtkSourceCompletionProvider* base, 
-					       GtkSourceCompletion* completion, 
-					       GtkSourceCompletionItem* data)
-{
-	GtkTextView *view = gtk_source_completion_get_view(completion);
-	gtk_source_view_replace_actual_word(view,
-					gtk_source_completion_item_get_name(data));
-}
-
-static gchar*
-gsc_documentwords_provider_real_get_item_info_markup(GtkSourceCompletionProvider *self,
-						     GtkSourceCompletionItem *item)
-{
-	return NULL;
 }
 
 static void 
@@ -339,9 +315,7 @@ gsc_documentwords_provider_interface_init (GtkSourceCompletionProviderIface * if
 	gsc_documentwords_provider_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_documentwords_provider_real_get_name;
 	iface->get_data = gsc_documentwords_provider_real_get_data;
-	iface->end_completion = gsc_documentwords_provider_real_end_completion;
-	iface->data_selected = gsc_documentwords_provider_real_data_selected;
-	iface->get_item_info_markup = gsc_documentwords_provider_real_get_item_info_markup;
+	iface->finish = gsc_documentwords_provider_real_finish;
 }
 
 

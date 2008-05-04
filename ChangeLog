@@ -1,3 +1,18 @@
+2008-05-05  Chuchi  <perriman@homer>
+
+	* gtksourcecompletion-proposal: 
+		- Created a new GObject to store a completion proposal information.
+		- This object has two new functions: apply and get_info. We
+		do not call to the provider to get the info or when the
+		proposal is selected, this object has these functions.
+	* gtksourcecompletion-provider: 
+		- Uses the new GtkSourceCompletionProposal object.
+		- Removed data_selected function
+		- Removed get_info_markup function
+	* gtksourcecompletion.c:
+		- Uses the new GtkSourceCompletionProposal object.
+	* gtksourcecompletion-item: Removed the old item files
+
 2008-05-03  Chuchi  <perriman@homer>
 
 	* version: Updated to 0.5.0 version because we will break the API

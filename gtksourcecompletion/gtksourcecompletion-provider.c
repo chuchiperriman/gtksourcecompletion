@@ -35,25 +35,10 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 }
 
 void 
-gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					      GtkSourceCompletion* completion, 
-					      GtkSourceCompletionItem* item)
+gtk_source_completion_provider_finish (GtkSourceCompletionProvider* self, 
+				       GtkSourceCompletion* completion)
 {
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->data_selected (self, completion, item);
-}
-
-void 
-gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					       GtkSourceCompletion* completion)
-{
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->end_completion(self, completion);
-}
-
-gchar*
-gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
-						    GtkSourceCompletionItem *item)
-{
-	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_item_info_markup (self, item);
+	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->finish(self, completion);
 }
 
 static void 

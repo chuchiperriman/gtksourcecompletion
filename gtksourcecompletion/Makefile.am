@@ -20,7 +20,7 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
-	gtksourcecompletion-item.h			\
+	gtksourcecompletion-proposal.h			\
 	gsc-userrequest-trigger.h			\
 	gsc-customkey-trigger.h			\
 	gsc-autocompletion-trigger.h		\
@@ -34,7 +34,7 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
 	gtksourcecompletion-utils.c			\
-	gtksourcecompletion-item.c			\
+	gtksourcecompletion-proposal.c			\
 	gsc-userrequest-trigger.c			\
 	gsc-customkey-trigger.c			\
 	gsc-autocompletion-trigger.c		\

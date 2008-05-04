@@ -22,7 +22,7 @@
 #include <string.h>
 #include "gtksourcecompletion.h"
 #include "gtksourcecompletion-i18n.h"
-#include "gtksourcecompletion-item.h"
+#include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
 #include "gsv-completion-popup.h"
 
@@ -77,15 +77,6 @@ struct _GtkSourceCompletionPrivate
 	const gchar *active_trigger;
 };
 
-struct _GtkSourceCompletionItem
-{
-	int id;
-	gchar *name;
-	const GdkPixbuf *icon;
-	int priority;
-	gpointer user_data;
-};
-
 #define GTK_SOURCE_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionPrivate))
 
 struct _ProviderList
@@ -100,7 +91,7 @@ static GObjectClass* parent_class = NULL;
 
 /*
  * We save a map with a GtkTextView and his GtkSourceCompletion. If you 
- * call twice to gtk_source_completion_item_new, the second time it returns
+ * call twice to gtk_source_completion_proposal_new, the second time it returns
  * the previous created GtkSourceCompletion, not creates a new one
  */
 
@@ -137,13 +128,13 @@ _prov_list_free(gpointer prov_list)
 }
 
 static gint
-_item_priority_compare (gconstpointer v1,
+_proposal_priority_compare (gconstpointer v1,
 			gconstpointer v2)
 {
-	GtkSourceCompletionItem *i1 = (GtkSourceCompletionItem*) v1;
-	GtkSourceCompletionItem *i2 = (GtkSourceCompletionItem*) v2;
+	GtkSourceCompletionProposal *i1 = (GtkSourceCompletionProposal*) v1;
+	GtkSourceCompletionProposal *i2 = (GtkSourceCompletionProposal*) v2;
 	
-	return i2->priority - i1->priority;
+	return gtk_source_completion_proposal_get_priority(i2) - gtk_source_completion_proposal_get_priority(i1);
 	
 }
 
@@ -156,7 +147,7 @@ end_completion (GtkSourceCompletion *completion)
 	do
 	{
 		GtkSourceCompletionProvider *provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers->data);
-		gtk_source_completion_provider_end_completion(provider,completion);
+		gtk_source_completion_provider_finish(provider,completion);
 			
 	}while((providers = g_list_next(providers)) != NULL);
 	
@@ -197,12 +188,10 @@ _compare_keys(GtkSourceCompletion *completion, KeysType type, GdkEventKey *event
 static gboolean
 _popup_tree_selection(GtkSourceCompletion *completion)
 {
-	GtkSourceCompletionItem *item;
-	GtkSourceCompletionProvider *prov;
-	if (gsv_completion_popup_get_selected_item(completion->priv->popup,&item))
+	GtkSourceCompletionProposal *proposal;
+	if (gsv_completion_popup_get_selected_proposal(completion->priv->popup,&proposal))
 	{
-		prov = gtk_source_completion_item_get_provider(item);
-		gtk_source_completion_provider_data_selected(prov,completion, item);
+		gtk_source_completion_proposal_selected(proposal,completion);
 		end_completion (completion);
 		return TRUE;
 	}
@@ -296,8 +285,8 @@ view_key_press_event_cb(GtkWidget *view,
 		{
 			if (_compare_keys(completion,KEYS_INFO,event))
 			{
-				/*View information of the item */
-				gsv_completion_popup_toggle_item_info(completion->priv->popup);
+				/*View information of the proposal */
+				gsv_completion_popup_toggle_proposal_info(completion->priv->popup);
 				ret = TRUE;
 			}else if (_compare_keys(completion,KEYS_PAGE_NEXT,event))
 			{
@@ -319,14 +308,12 @@ view_key_press_event_cb(GtkWidget *view,
 }
 
 static void
-_popup_item_select_cb(GtkWidget *popup,
-		      GtkSourceCompletionItem *item,
+_popup_proposal_select_cb(GtkWidget *popup,
+		      GtkSourceCompletionProposal *proposal,
 		      gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
-	GtkSourceCompletionProvider *prov;
-	prov = gtk_source_completion_item_get_provider(item);
-	gtk_source_completion_provider_data_selected(prov,completion, item);
+	gtk_source_completion_proposal_selected(proposal,completion);
 	end_completion (completion);
 }
 
@@ -614,8 +601,8 @@ gtk_source_completion_new (GtkTextView *view)
 	completion->priv->popup = GSV_COMPLETION_POPUP(gsv_completion_popup_new(view));
 	
 	g_signal_connect(completion->priv->popup, 
-			 "item-selected",
-			 G_CALLBACK(_popup_item_select_cb),
+			 "proposal-selected",
+			 G_CALLBACK(_popup_proposal_select_cb),
 			 (gpointer) completion);
 
 	completion_control_add_completion(view,completion);
@@ -714,17 +701,17 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 		if (final_list!=NULL)
 		{
 			/*Order the data*/
-			final_list = g_list_sort (final_list,_item_priority_compare);
+			final_list = g_list_sort (final_list,_proposal_priority_compare);
 			data_list = final_list;
 			/* Insert the data into the model */
 			do
 			{
 				gsv_completion_popup_add_data(completion->priv->popup,
-							      (GtkSourceCompletionItem*)data_list->data);
+							      (GtkSourceCompletionProposal*)data_list->data);
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
-			/* If there are not items, we don't show the popup */
-			if (gsv_completion_popup_has_items(completion->priv->popup))
+			/* If there are not proposals, we don't show the popup */
+			if (gsv_completion_popup_has_proposals(completion->priv->popup))
 			{
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;

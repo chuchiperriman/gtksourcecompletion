@@ -21,7 +21,7 @@
 #define GTK_SOURCE_COMPLETION_TREE_H
 
 #include <gtk/gtk.h>
-#include "gtksourcecompletion-item.h"
+#include "gtksourcecompletion-proposal.h"
 
 G_BEGIN_DECLS
 
@@ -43,10 +43,10 @@ typedef struct _GsvCompletionTreeClass GsvCompletionTreeClass;
 struct _GsvCompletionTreeClass
 {
 	GtkScrolledWindowClass parent_class;
-	void (* item_selected)(GsvCompletionTree *tree,
-			       GtkSourceCompletionItem *item);
+	void (* proposal_selected)(GsvCompletionTree *tree,
+			       GtkSourceCompletionProposal *proposal);
 	void (* selection_changed)(GsvCompletionTree *tree,
-				   GtkSourceCompletionItem *item);
+				   GtkSourceCompletionProposal *proposal);
 };
 
 struct _GsvCompletionTree
@@ -70,23 +70,23 @@ GtkWidget*
 gsv_completion_tree_new();
 
 /**
- * gsv_completion_tree_get_selected_item:
+ * gsv_completion_tree_get_selected_proposal:
  * @self: The #GsvCompletionTree
- * @item: A reference of an item. This function sets the pointer to the selected item.
+ * @proposal: A reference of a proposal. This function sets the pointer to the selected proposal.
  *
- * @Returns TRUE if there is an item selected
+ * @Returns TRUE if there is an proposal selected
  *
  */
 gboolean
-gsv_completion_tree_get_selected_item(GsvCompletionTree *self,
-				      GtkSourceCompletionItem **item);
+gsv_completion_tree_get_selected_proposal(GsvCompletionTree *self,
+				      GtkSourceCompletionProposal **proposal);
 /**
  * gsv_completion_tree_select_first:
  * @self: The #GsvCompletionTree
  *
- * This functions selects the first item on the tree
+ * This functions selects the first proposal on the tree
  *
- * Returns TRUE if there is an item and it has been selected
+ * Returns TRUE if there is an proposal and it has been selected
  */
 gboolean
 gsv_completion_tree_select_first(GsvCompletionTree *self);
@@ -95,9 +95,9 @@ gsv_completion_tree_select_first(GsvCompletionTree *self);
  * gsv_completion_tree_select_last:
  * @self: The #GsvCompletionTree
  *
- * This functions selects the last item on the tree
+ * This functions selects the last proposal on the tree
  *
- * Returns TRUE if there is an item and it has been selected
+ * Returns TRUE if there is an proposal and it has been selected
  */
 gboolean 
 gsv_completion_tree_select_last(GsvCompletionTree *self);
@@ -105,12 +105,12 @@ gsv_completion_tree_select_last(GsvCompletionTree *self);
 /**
  * gsv_completion_tree_select_previous:
  * @self: The #GsvCompletionTree
- * @rows: the number of the previous items to select
+ * @rows: the number of the previous proposals to select
  *
- * This functions selects the rows number of items before the current.
+ * This functions selects the rows number of proposals before the current.
  *
- * Returns TRUE if there is an item and it has been selected. If rows=5 but the tree
- * only have 3 items, it returns true too.
+ * Returns TRUE if there is an proposal and it has been selected. If rows=5 but the tree
+ * only have 3 proposals, it returns true too.
  */
 gboolean
 gsv_completion_tree_select_previous(GsvCompletionTree *self, 
@@ -119,35 +119,35 @@ gsv_completion_tree_select_previous(GsvCompletionTree *self,
 /**
  * gsv_completion_tree_select_next:
  * @self: The #GsvCompletionTree
- * @rows: the number of the next items to select
+ * @rows: the number of the next proposals to select
  *
- * This functions selects the rows number of items after the current.
+ * This functions selects the rows number of proposals after the current.
  *
- * Returns TRUE if there is an item and it has been selected. If rows=5 but the tree
- * only have 3 items, it returns true too.
+ * Returns TRUE if there is an proposal and it has been selected. If rows=5 but the tree
+ * only have 3 proposals, it returns true too.
  */
 gboolean
 gsv_completion_tree_select_next(GsvCompletionTree *self, 
 				gint rows);
 
 /**
- * gsv_completion_tree_get_selected_item:
+ * gsv_completion_tree_get_selected_proposal:
  * @self: the #GsvCompletionTree
- * @item: Sets the ponter to the selected item.
+ * @proposal: Sets the ponter to the selected proposal.
  *
- * Sets the param item to the selected item if there is an item selected.
+ * Sets the param proposal to the selected proposal if there is an proposal selected.
  *
- * Returns TRUE if there is an item selected
+ * Returns TRUE if there is an proposal selected
  */
 gboolean
-gsv_completion_tree_get_selected_item(GsvCompletionTree *self,
-				      GtkSourceCompletionItem **item);
+gsv_completion_tree_get_selected_proposal(GsvCompletionTree *self,
+				      GtkSourceCompletionProposal **proposal);
 				      
 /**
  * gsv_completion_tree_clear:
  * @self: the #GsvCompletionTree
  *
- * Clear the tree model and free the items 
+ * Clear the tree model and free the proposals 
  */
 void
 gsv_completion_tree_clear(GsvCompletionTree *self);
@@ -155,23 +155,23 @@ gsv_completion_tree_clear(GsvCompletionTree *self);
 /**
  * gsv_completion_tree_add_data:
  * @self: The #GsvCompletionTree
- * @data: the item to add to the tree
+ * @data: the proposal to add to the tree
  *
- * Adds a new item into the tree
+ * Adds a new proposal into the tree
  *
  */
 void
 gsv_completion_tree_add_data(GsvCompletionTree *self,
-			     GtkSourceCompletionItem* data);
+			     GtkSourceCompletionProposal* data);
 
 /**
- * gsv_completion_tree_has_items:
+ * gsv_completion_tree_has_proposals:
  * @self: The #GsvCompletionTree
  *
- * Returns TRUE if the tree has one or more items.
+ * Returns TRUE if the tree has one or more proposals.
  */
 gboolean
-gsv_completion_tree_has_items(GsvCompletionTree *self);
+gsv_completion_tree_has_proposals(GsvCompletionTree *self);
 
 G_END_DECLS
 #endif

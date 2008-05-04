@@ -64,9 +64,9 @@ gsc_documentwords_provider_new();
 /**
  * gsc_documentwords_provider_set_sort_type:
  * @prov: The #GscDocumentwordsProvider
- * @sort_type: The #GscDocumentwordsProviderSortType for the completion items.
+ * @sort_type: The #GscDocumentwordsProviderSortType for the completion proposal.
  *
- * This method sets the sort type for the completion items list.
+ * This method sets the sort type for the completion proposals list.
  */
 void
 gsc_documentwords_provider_set_sort_type(GscDocumentwordsProvider *prov,

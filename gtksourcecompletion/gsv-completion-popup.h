@@ -21,7 +21,7 @@
 #define GSV_COMPLETION_POPUP_H
 
 #include <gtk/gtk.h>
-#include "gtksourcecompletion-item.h"
+#include "gtksourcecompletion-proposal.h"
 
 G_BEGIN_DECLS
 
@@ -45,8 +45,8 @@ struct _GsvCompletionPopupClass
 {
   GtkWindowClass parent_class;
   
-  void	 (* item_selected)(GsvCompletionPopup *popup,
-			   GtkSourceCompletionItem *item);
+  void	 (* proposal_selected)(GsvCompletionPopup *popup,
+			   GtkSourceCompletionProposal *proposal);
 };
 
 struct _GsvCompletionPopup
@@ -106,16 +106,16 @@ gsv_completion_popup_select_next(GsvCompletionPopup *self,
 				 gint rows);
 
 /**
- * gsv_completion_popup_get_selected_item:
+ * gsv_completion_popup_get_selected_proposal:
  * @self: The #GsvCompletionPopup
  *
- * See #gsv_completion_tree_select_item. Not free the item!
+ * See #gsv_completion_tree_select_proposal. Not free the proposal!
  *
  * Returns
  */
 gboolean
-gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
-					GtkSourceCompletionItem **item);
+gsv_completion_popup_get_selected_proposal(GsvCompletionPopup *self,
+					GtkSourceCompletionProposal **proposal);
 
 /**
  * gsv_completion_popup_new:
@@ -130,7 +130,7 @@ gsv_completion_popup_new (GtkTextView *view);
  * gsv_completion_popup_clear:
  * @self: The #GsvCompletionPopup
  *
- * Clear all items in all pages. It frees all completion items.
+ * Clear all proposals in all pages. It frees all completion proposals.
  *
  */
 void
@@ -139,26 +139,26 @@ gsv_completion_popup_clear(GsvCompletionPopup *self);
 /**
  * gsv_completion_popup_add_data:
  * @self: The #GsvCompletionPopup
- * @data: The #GtkSourceCompletionItem to add.
+ * @data: The #GtkSourceCompletionProposal to add.
  *
- * The popup frees the item when it will be cleaned.
+ * The popup frees the proposal when it will be cleaned.
  *
  */
 void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
-			      GtkSourceCompletionItem* data);
+			      GtkSourceCompletionProposal* data);
 
 /**
- * gsv_completion_popup_has_items:
+ * gsv_completion_popup_has_proposals:
  * @self: The #GsvCompletionPopup
  *
  * Returns TRUE if the popup has almost one element.
  */
 gboolean
-gsv_completion_popup_has_items(GsvCompletionPopup *self);
+gsv_completion_popup_has_proposals(GsvCompletionPopup *self);
 
 /**
- * gsv_completion_popup_toggle_item_info:
+ * gsv_completion_popup_toggle_proposal_info:
  * @self: The #GsvCompletionPopup
  *
  * This toggle the state of the info dialog. If the info is visible
@@ -167,7 +167,7 @@ gsv_completion_popup_has_items(GsvCompletionPopup *self);
  *
  */
 void
-gsv_completion_popup_toggle_item_info(GsvCompletionPopup *self);
+gsv_completion_popup_toggle_proposal_info(GsvCompletionPopup *self);
 
 /**
  * gsv_completion_popup_refresh:

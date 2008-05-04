@@ -22,7 +22,7 @@
 #include "gsv-completion-tree.h"
 #include "gtksourcecompletion-i18n.h"
 #include "gtksourcecompletion-utils.h"
-#include "gtksourcecompletion-item.h"
+#include "gtksourcecompletion-proposal.h"
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
@@ -58,13 +58,13 @@ G_DEFINE_TYPE(GsvCompletionPopup, gsv_completion_popup, GTK_TYPE_WINDOW);
 
 
 static void
-_item_selected_cb (GsvCompletionTree *tree, 
-		   GtkSourceCompletionItem *item,
+_proposal_selected_cb (GsvCompletionTree *tree, 
+		   GtkSourceCompletionProposal *proposal,
 		   gpointer user_data);
 
 static void 
 _selection_changed_cd(GsvCompletionTree *tree, 
-		      GtkSourceCompletionItem *item,
+		      GtkSourceCompletionProposal *proposal,
 		      gpointer user_data);
 
 
@@ -95,8 +95,8 @@ _get_tree_by_name(GsvCompletionPopup *self, const gchar* tree_name)
 		tree = GSV_COMPLETION_TREE(completion_tree);
 		gtk_widget_show_all(completion_tree);
 		g_signal_connect(completion_tree, 
-				"item-selected",
-				G_CALLBACK(_item_selected_cb),
+				"proposal-selected",
+				G_CALLBACK(_proposal_selected_cb),
 				(gpointer) self);
 						
 		g_signal_connect(completion_tree, 
@@ -140,11 +140,10 @@ static void
 _set_current_completion_info(GsvCompletionPopup *self)
 {
 	gchar* markup = NULL;
-	GtkSourceCompletionItem *item;
-	if (gsv_completion_popup_get_selected_item(self,&item))
+	GtkSourceCompletionProposal *proposal;
+	if (gsv_completion_popup_get_selected_proposal(self,&proposal))
 	{
-		markup = gtk_source_completion_provider_get_item_info_markup(
-						gtk_source_completion_item_get_provider(item),item);
+		markup = gtk_source_completion_proposal_get_info_markup(proposal);
 		if (markup != NULL)
 		{
 			gtk_label_set_markup(GTK_LABEL(self->priv->info_label),markup);
@@ -153,7 +152,7 @@ _set_current_completion_info(GsvCompletionPopup *self)
 		else
 		{
 			gtk_label_set_markup(GTK_LABEL(self->priv->info_label), 
-					     _("There is no info for the current item"));
+					     _("There is no info for the current proposal"));
 		}
 	}
 }
@@ -192,16 +191,16 @@ _info_toggled_cb(GtkToggleButton *widget,
 }
 
 static void
-_item_selected_cb (GsvCompletionTree *tree, 
-		   GtkSourceCompletionItem *item,
+_proposal_selected_cb (GsvCompletionTree *tree, 
+		   GtkSourceCompletionProposal *proposal,
 		   gpointer user_data)
 {
-	g_signal_emit (G_OBJECT (user_data), popup_signals[ITEM_SELECTED], 0, item);
+	g_signal_emit (G_OBJECT (user_data), popup_signals[ITEM_SELECTED], 0, proposal);
 }
 
 static void 
 _selection_changed_cd(GsvCompletionTree *tree, 
-		      GtkSourceCompletionItem *item,
+		      GtkSourceCompletionProposal *proposal,
 		      gpointer user_data)
 {
 	GsvCompletionPopup *self = GSV_COMPLETION_POPUP(user_data);
@@ -237,7 +236,7 @@ _update_pages_visibility(GsvCompletionPopup *self)
 	for(i=0;i<pages;i++)
 	{
 		tree= GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gsv_completion_tree_has_items(tree))
+		if (gsv_completion_tree_has_proposals(tree))
 		{
 			if (!first_set)
 			{
@@ -338,10 +337,10 @@ gsv_completion_popup_class_init (GsvCompletionPopupClass *klass)
 	widget_class->realize = gsv_completion_popup_realize;
 	
 	popup_signals[ITEM_SELECTED] =
-		g_signal_new ("item-selected",
+		g_signal_new ("proposal-selected",
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      G_STRUCT_OFFSET (GsvCompletionPopupClass, item_selected),
+			      G_STRUCT_OFFSET (GsvCompletionPopupClass, proposal_selected),
 			      NULL, 
 			      NULL,
 			      g_cclosure_marshal_VOID__POINTER, 
@@ -372,7 +371,7 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	/*Icon list*/
 	GtkWidget *info_icon = 
 		gtk_image_new_from_stock(GTK_STOCK_INFO,GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_set_tooltip_text(info_icon, _("Show Item Info"));
+	gtk_widget_set_tooltip_text(info_icon, _("Show Proposal Info"));
 	GtkWidget *info_button = gtk_toggle_button_new();
 	self->priv->info_button = info_button;
 	gtk_container_add(GTK_CONTAINER(info_button),info_icon);
@@ -438,8 +437,8 @@ gsv_completion_popup_init (GsvCompletionPopup *self)
 	/* Connect signals */
 	
 	g_signal_connect(completion_tree, 
-			"item-selected",
-			G_CALLBACK(_item_selected_cb),
+			"proposal-selected",
+			G_CALLBACK(_proposal_selected_cb),
 			(gpointer) self);
 						
 	g_signal_connect(completion_tree, 
@@ -464,10 +463,10 @@ gsv_completion_popup_new (GtkTextView *view)
 
 void
 gsv_completion_popup_add_data(GsvCompletionPopup *self,
-			      GtkSourceCompletionItem* data)
+			      GtkSourceCompletionProposal* data)
 {
 	GsvCompletionTree *tree = _get_tree_by_name(self,
-						    gtk_source_completion_item_get_page_name(data));
+						    gtk_source_completion_proposal_get_page_name(data));
 	
 	gsv_completion_tree_add_data(tree,data);
 }
@@ -512,14 +511,14 @@ gsv_completion_popup_select_next(GsvCompletionPopup *self,
 }
 
 gboolean
-gsv_completion_popup_get_selected_item(GsvCompletionPopup *self,
-					GtkSourceCompletionItem **item)
+gsv_completion_popup_get_selected_proposal(GsvCompletionPopup *self,
+					GtkSourceCompletionProposal **proposal)
 {
-	return gsv_completion_tree_get_selected_item(_get_current_tree(self),item);
+	return gsv_completion_tree_get_selected_proposal(_get_current_tree(self),proposal);
 }
 
 gboolean
-gsv_completion_popup_has_items(GsvCompletionPopup *self)
+gsv_completion_popup_has_proposals(GsvCompletionPopup *self)
 {
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	guint i;
@@ -527,14 +526,14 @@ gsv_completion_popup_has_items(GsvCompletionPopup *self)
 	for(i=0;i<pages;i++)
 	{
 		tree= GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gsv_completion_tree_has_items(tree))
+		if (gsv_completion_tree_has_proposals(tree))
 			return TRUE;
 	}
 	return FALSE;
 }
 
 void
-gsv_completion_popup_toggle_item_info(GsvCompletionPopup *self)
+gsv_completion_popup_toggle_proposal_info(GsvCompletionPopup *self)
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),
 				     !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->priv->info_button)));
@@ -561,7 +560,7 @@ gsv_completion_popup_page_next(GsvCompletionPopup *self)
 			page = 0;
 		
 		tree = GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
-		if (gsv_completion_tree_has_items(tree))
+		if (gsv_completion_tree_has_proposals(tree))
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
 			gsv_completion_tree_select_first(tree);
@@ -594,7 +593,7 @@ gsv_completion_popup_page_previous(GsvCompletionPopup *self)
 			page = pages -1;
 	
 		tree = GSV_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));	
-		if (gsv_completion_tree_has_items(tree))
+		if (gsv_completion_tree_has_proposals(tree))
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
 			gsv_completion_tree_select_first(tree);

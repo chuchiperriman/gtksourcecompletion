@@ -90,7 +90,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
  *
  * This function register the provider into the completion and reference it. When 
  * an event is raised, completion call to the provider to get the data. When the user
- * select an item, it call the provider to tell it this action and the provider do
+ * select a proposal, it call the provider to tell it this action and the provider do
  * that it want (normally inserts some text)
  * 
  * Returns TRUE if it was registered or FALSE if not (because it has been already registered,

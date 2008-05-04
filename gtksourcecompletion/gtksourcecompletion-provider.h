@@ -38,7 +38,7 @@ typedef struct _GtkSourceCompletionProviderIface GtkSourceCompletionProviderIfac
 
 #include "gtksourcecompletion.h"
 #include "gtksourcecompletion-trigger.h"
-#include "gtksourcecompletion-item.h"
+#include "gtksourcecompletion-proposal.h"
 
 struct _GtkSourceCompletionProviderIface {
 	
@@ -47,15 +47,12 @@ struct _GtkSourceCompletionProviderIface {
 	GList* (*get_data) (GtkSourceCompletionProvider* self,
 	 		    GtkSourceCompletion* completion, 
 	 		    GtkSourceCompletionTrigger *trigger);
-	void (*data_selected) (GtkSourceCompletionProvider* self,
-			       GtkSourceCompletion* completion, 
-			       GtkSourceCompletionItem* data);							
-	void (*end_completion) (GtkSourceCompletionProvider* self,
+	void (*finish) (GtkSourceCompletionProvider* self,
 	 			GtkSourceCompletion* completion);							
-	gchar* (*get_item_info_markup) (GtkSourceCompletionProvider *self, 
-					GtkSourceCompletionItem *item);
-
 };
+
+GType 
+gtk_source_completion_provider_get_type ();
 
 /**
  * gtk_source_completion_provider_get_name:
@@ -76,10 +73,10 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider* self);
  * @trigger: The #GtkSourceCompletionTrigger that raise the event
  *
  * The completion call this function when an event is raised.
- * This function may return a list of #GtkSourceCompletionItem to be shown
+ * This function may return a list of #GtkSourceCompletionProposal to be shown
  * in the popup to the user.
  *
- * Returns: a list of #GtkSourceCompletionData or NULL if there are no items
+ * Returns: a list of #GtkSourceCompletionData or NULL if there are no proposals
  * 
  **/
 GList* 
@@ -88,23 +85,7 @@ gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
 					 GtkSourceCompletionTrigger *trigger);
 
 /**
- * gtk_source_completion_provider_data_selected:
- * @self: the #GtkSourceCompletionProvider
- * @view: The #GtkSourceCompletion.
- * @item: The data selected by the user.
- *
- * The completion call this function when the user select an item of this provider.
- * The provider may insert the text in the view of do something.
- *
- * 
- **/				
-void 
-gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self, 
-					      GtkSourceCompletion *completion, 
-					      GtkSourceCompletionItem* item);
-
-/**
- * gtk_source_completion_provider_end_completion:
+ * gtk_source_completion_provider_finish:
  * @self: the #GtkSourceCompletionProvider
  * @view: The #GtkSourceCompletion.
  *
@@ -112,26 +93,8 @@ gtk_source_completion_provider_data_selected (GtkSourceCompletionProvider* self,
  * 
  **/					
 void 
-gtk_source_completion_provider_end_completion (GtkSourceCompletionProvider* self, 
-					       GtkSourceCompletion* completion);
-
-/**
- * gtk_source_completion_provider_get_item_info_markup:
- * @self: the #GtkSourceCompletionProvider
- * @item: The selected item.
- *
- * The completion call this function when the user wants to view the 
- * aditional info of the current item.
- *
- * Returns: The pango markup to be shown in the info window.
- * 
- **/
-gchar*
-gtk_source_completion_provider_get_item_info_markup(GtkSourceCompletionProvider *self,
-						    GtkSourceCompletionItem *item);
-
-GType 
-gtk_source_completion_provider_get_type ();
+gtk_source_completion_provider_finish (GtkSourceCompletionProvider* self, 
+				       GtkSourceCompletion* completion);
 
 G_END_DECLS
 
