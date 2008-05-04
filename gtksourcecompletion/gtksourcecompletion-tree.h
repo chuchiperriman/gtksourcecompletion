@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsv-completion-tree.h
+ *  gtksourcecompletion-tree.h
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -28,83 +28,83 @@ G_BEGIN_DECLS
 /*
  * Type checking and casting macros
  */
-#define GSV_TYPE_COMPLETION_TREE              (gsv_completion_tree_get_type())
-#define GSV_COMPLETION_TREE(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GSV_TYPE_COMPLETION_TREE, GsvCompletionTree))
-#define GSV_COMPLETION_TREE_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GSV_TYPE_COMPLETION_TREE, GsvCompletionTreeClass))
-#define GSV_IS_COMPLETION_TREE(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GSV_TYPE_COMPLETION_TREE))
-#define GSV_IS_COMPLETION_TREE_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSV_TYPE_COMPLETION_TREE))
-#define GSV_COMPLETION_TREE_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSV_TYPE_COMPLETION_TREE, GsvCompletionTreeClass))
+#define GTK_TYPE_SOURCE_COMPLETION_TREE              (gtk_source_completion_tree_get_type())
+#define GTK_SOURCE_COMPLETION_TREE(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_SOURCE_COMPLETION_TREE, GtkSourceCompletionTree))
+#define GTK_SOURCE_COMPLETION_TREE_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_SOURCE_COMPLETION_TREE, GtkSourceCompletionTreeClass))
+#define GTK_IS_SOURCE_COMPLETION_TREE(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_SOURCE_COMPLETION_TREE))
+#define GTK_IS_SOURCE_COMPLETION_TREE_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION_TREE))
+#define GTK_SOURCE_COMPLETION_TREE_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_SOURCE_COMPLETION_TREE, GtkSourceCompletionTreeClass))
 
-typedef struct _GsvCompletionTreePriv GsvCompletionTreePriv;
-typedef struct _GsvCompletionTree GsvCompletionTree;
-typedef struct _GsvCompletionTreeClass GsvCompletionTreeClass;
+typedef struct _GtkSourceCompletionTreePriv GtkSourceCompletionTreePriv;
+typedef struct _GtkSourceCompletionTree GtkSourceCompletionTree;
+typedef struct _GtkSourceCompletionTreeClass GtkSourceCompletionTreeClass;
 
 
-struct _GsvCompletionTreeClass
+struct _GtkSourceCompletionTreeClass
 {
 	GtkScrolledWindowClass parent_class;
-	void (* proposal_selected)(GsvCompletionTree *tree,
+	void (* proposal_selected)(GtkSourceCompletionTree *tree,
 			       GtkSourceCompletionProposal *proposal);
-	void (* selection_changed)(GsvCompletionTree *tree,
+	void (* selection_changed)(GtkSourceCompletionTree *tree,
 				   GtkSourceCompletionProposal *proposal);
 };
 
-struct _GsvCompletionTree
+struct _GtkSourceCompletionTree
 {
 	GtkScrolledWindow parent;
-	GsvCompletionTreePriv *priv;
+	GtkSourceCompletionTreePriv *priv;
 };
 
 GType 
-gsv_completion_tree_get_type (void) G_GNUC_CONST;
+gtk_source_completion_tree_get_type (void) G_GNUC_CONST;
 
 /**
- * gsv_completion_tree_new:
+ * gtk_source_completion_tree_new:
  *
- * Create a new GsvCompletionTree
+ * Create a new GtkSourceCompletionTree
  *
- * Returns the new #GsvCompletionTree
+ * Returns the new #GtkSourceCompletionTree
  *
  */
 GtkWidget*
-gsv_completion_tree_new();
+gtk_source_completion_tree_new();
 
 /**
- * gsv_completion_tree_get_selected_proposal:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_get_selected_proposal:
+ * @self: The #GtkSourceCompletionTree
  * @proposal: A reference of a proposal. This function sets the pointer to the selected proposal.
  *
  * @Returns TRUE if there is an proposal selected
  *
  */
 gboolean
-gsv_completion_tree_get_selected_proposal(GsvCompletionTree *self,
+gtk_source_completion_tree_get_selected_proposal(GtkSourceCompletionTree *self,
 				      GtkSourceCompletionProposal **proposal);
 /**
- * gsv_completion_tree_select_first:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_select_first:
+ * @self: The #GtkSourceCompletionTree
  *
  * This functions selects the first proposal on the tree
  *
  * Returns TRUE if there is an proposal and it has been selected
  */
 gboolean
-gsv_completion_tree_select_first(GsvCompletionTree *self);
+gtk_source_completion_tree_select_first(GtkSourceCompletionTree *self);
 
 /**
- * gsv_completion_tree_select_last:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_select_last:
+ * @self: The #GtkSourceCompletionTree
  *
  * This functions selects the last proposal on the tree
  *
  * Returns TRUE if there is an proposal and it has been selected
  */
 gboolean 
-gsv_completion_tree_select_last(GsvCompletionTree *self);
+gtk_source_completion_tree_select_last(GtkSourceCompletionTree *self);
 
 /**
- * gsv_completion_tree_select_previous:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_select_previous:
+ * @self: The #GtkSourceCompletionTree
  * @rows: the number of the previous proposals to select
  *
  * This functions selects the rows number of proposals before the current.
@@ -113,12 +113,12 @@ gsv_completion_tree_select_last(GsvCompletionTree *self);
  * only have 3 proposals, it returns true too.
  */
 gboolean
-gsv_completion_tree_select_previous(GsvCompletionTree *self, 
+gtk_source_completion_tree_select_previous(GtkSourceCompletionTree *self, 
 				    gint rows);
 
 /**
- * gsv_completion_tree_select_next:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_select_next:
+ * @self: The #GtkSourceCompletionTree
  * @rows: the number of the next proposals to select
  *
  * This functions selects the rows number of proposals after the current.
@@ -127,12 +127,12 @@ gsv_completion_tree_select_previous(GsvCompletionTree *self,
  * only have 3 proposals, it returns true too.
  */
 gboolean
-gsv_completion_tree_select_next(GsvCompletionTree *self, 
+gtk_source_completion_tree_select_next(GtkSourceCompletionTree *self, 
 				gint rows);
 
 /**
- * gsv_completion_tree_get_selected_proposal:
- * @self: the #GsvCompletionTree
+ * gtk_source_completion_tree_get_selected_proposal:
+ * @self: the #GtkSourceCompletionTree
  * @proposal: Sets the ponter to the selected proposal.
  *
  * Sets the param proposal to the selected proposal if there is an proposal selected.
@@ -140,38 +140,38 @@ gsv_completion_tree_select_next(GsvCompletionTree *self,
  * Returns TRUE if there is an proposal selected
  */
 gboolean
-gsv_completion_tree_get_selected_proposal(GsvCompletionTree *self,
+gtk_source_completion_tree_get_selected_proposal(GtkSourceCompletionTree *self,
 				      GtkSourceCompletionProposal **proposal);
 				      
 /**
- * gsv_completion_tree_clear:
- * @self: the #GsvCompletionTree
+ * gtk_source_completion_tree_clear:
+ * @self: the #GtkSourceCompletionTree
  *
  * Clear the tree model and free the proposals 
  */
 void
-gsv_completion_tree_clear(GsvCompletionTree *self);
+gtk_source_completion_tree_clear(GtkSourceCompletionTree *self);
 
 /**
- * gsv_completion_tree_add_data:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_add_data:
+ * @self: The #GtkSourceCompletionTree
  * @data: the proposal to add to the tree
  *
  * Adds a new proposal into the tree
  *
  */
 void
-gsv_completion_tree_add_data(GsvCompletionTree *self,
+gtk_source_completion_tree_add_data(GtkSourceCompletionTree *self,
 			     GtkSourceCompletionProposal* data);
 
 /**
- * gsv_completion_tree_has_proposals:
- * @self: The #GsvCompletionTree
+ * gtk_source_completion_tree_has_proposals:
+ * @self: The #GtkSourceCompletionTree
  *
  * Returns TRUE if the tree has one or more proposals.
  */
 gboolean
-gsv_completion_tree_has_proposals(GsvCompletionTree *self);
+gtk_source_completion_tree_has_proposals(GtkSourceCompletionTree *self);
 
 G_END_DECLS
 #endif

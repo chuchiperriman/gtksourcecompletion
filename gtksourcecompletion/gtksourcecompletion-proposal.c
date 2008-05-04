@@ -36,27 +36,27 @@ struct _GtkSourceCompletionProposalPrivate
 
 static GObjectClass* parent_class = NULL;
 
-#define GTKSOURCECOMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTKSOURCECOMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalPrivate))
+#define GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalPrivate))
 
 
 static void
-gtksourcecompletion_proposal_init (GtkSourceCompletionProposal *self)
+gtk_source_completion_proposal_init (GtkSourceCompletionProposal *self)
 {
-	self->priv = GTKSOURCECOMPLETION_PROPOSAL_GET_PRIVATE(self);
+	self->priv = GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(self);
 	
 	g_debug("Created GtkSourceCompletionProposal");
 	self->priv->id = -1;
 	self->priv->name = NULL;
 	self->priv->icon = NULL;
-	self->priv->priority = GTKSOURCECOMPLETION_PROPOSAL_DEFAULT_PRIORITY;
+	self->priv->priority = GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PRIORITY;
 	self->priv->user_data = NULL;
-	self->priv->page_name = GTKSOURCECOMPLETION_PROPOSAL_DEFAULT_PAGE;
+	self->priv->page_name = GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE;
 }
 
 static void
-gtksourcecompletion_proposal_finalize (GObject *object)
+gtk_source_completion_proposal_finalize (GObject *object)
 {
-	GtkSourceCompletionProposal *self = GTKSOURCECOMPLETION_PROPOSAL(object);
+	GtkSourceCompletionProposal *self = GTK_SOURCE_COMPLETION_PROPOSAL(object);
 	g_debug("Free GtkSourceCompletionProposal");
 	g_free(self->priv->name);
 	
@@ -64,18 +64,18 @@ gtksourcecompletion_proposal_finalize (GObject *object)
 }
 
 static void
-gtksourcecompletion_proposal_class_init (GtkSourceCompletionProposalClass *klass)
+gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
 
-	object_class->finalize = gtksourcecompletion_proposal_finalize;
+	object_class->finalize = gtk_source_completion_proposal_finalize;
 
 	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionProposalPrivate));
 }
 
 GType
-gtksourcecompletion_proposal_get_type (void)
+gtk_source_completion_proposal_get_type (void)
 {
 	static GType our_type = 0;
 
@@ -86,12 +86,12 @@ gtksourcecompletion_proposal_get_type (void)
 			sizeof (GtkSourceCompletionProposalClass), /* class_size */
 			(GBaseInitFunc) NULL, /* base_init */
 			(GBaseFinalizeFunc) NULL, /* base_finalize */
-			(GClassInitFunc) gtksourcecompletion_proposal_class_init, /* class_init */
+			(GClassInitFunc) gtk_source_completion_proposal_class_init, /* class_init */
 			(GClassFinalizeFunc) NULL, /* class_finalize */
 			NULL /* class_data */,
 			sizeof (GtkSourceCompletionProposal), /* instance_size */
 			0, /* n_preallocs */
-			(GInstanceInitFunc) gtksourcecompletion_proposal_init, /* instance_init */
+			(GInstanceInitFunc) gtk_source_completion_proposal_init, /* instance_init */
 			NULL /* value_table */  
 		};
 		our_type = g_type_register_static (G_TYPE_OBJECT, "GtkSourceCompletionProposal",
@@ -112,13 +112,13 @@ gtk_source_completion_proposal_new_full(int id,
 				    gpointer user_data)
 {
 	GtkSourceCompletionProposal *self = 
-		GTKSOURCECOMPLETION_PROPOSAL(g_object_new (GTKSOURCECOMPLETION_TYPE_PROPOSAL, NULL));
+		GTK_SOURCE_COMPLETION_PROPOSAL(g_object_new (GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, NULL));
 	self->priv->id = id;
 	self->priv->name = g_strdup(name);
 	self->priv->icon = icon;
 	self->priv->priority = priority;
 	self->priv->user_data = user_data;
-	self->priv->page_name = page_name!=NULL ? page_name : GTKSOURCECOMPLETION_PROPOSAL_DEFAULT_PAGE;
+	self->priv->page_name = page_name!=NULL ? page_name : GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE;
 	self->priv->apply_func = apply_func!=NULL ? apply_func : gtk_source_completion_proposal_apply_default;
 	self->priv->get_info_func = info_func!=NULL ? info_func : gtk_source_completion_proposal_get_info_default;
 		

@@ -1,6 +1,6 @@
 INCLUDES = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	-DGTKSOURCECOMPLETIONLOCALEDIR=\""$(gtksourcecompletionlocaledir)"\" \
+	-DGTK_SOURCE_COMPLETIONLOCALEDIR=\""$(gtksourcecompletionlocaledir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DICON_DIR=\""$(datadir)/gtksourcecompletion/pixmaps"\"	\
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
@@ -15,7 +15,7 @@ AM_CFLAGS =\
 lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
-libgtksourcecompletion_headers = 	\
+libgtk_source_completion_headers = 	\
 	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
@@ -25,11 +25,11 @@ libgtksourcecompletion_headers = 	\
 	gsc-customkey-trigger.h			\
 	gsc-autocompletion-trigger.h		\
 	gsc-documentwords-provider.h		\
-	gsv-completion-tree.h				\
+	gtksourcecompletion-tree.h				\
 	gtksourcecompletion-i18n.h			\
-	gsv-completion-popup.h
+	gtksourcecompletion-popup.h
 
-libgtksourcecompletion_1_0_la_SOURCES = \
+libgtk_source_completion_1_0_la_SOURCES = \
 	gtksourcecompletion.c			\
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
@@ -39,15 +39,15 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gsc-customkey-trigger.c			\
 	gsc-autocompletion-trigger.c		\
 	gsc-documentwords-provider.c		\
-	gsv-completion-tree.c				\
-	gsv-completion-popup.c				\
-	$(libgtksourcecompletion_headers)
+	gtksourcecompletion-tree.c				\
+	gtksourcecompletion-popup.c				\
+	$(libgtk_source_completion_headers)
 	
 
-libgtksourcecompletion_1_0_la_LIBADD = \
+libgtk_source_completion_1_0_la_LIBADD = \
 	$(PACKAGE_LIBS) 
 	
-libgtksourcecompletion_1_0_la_LDFLAGS = \
+libgtk_source_completion_1_0_la_LDFLAGS = \
 	-version-info 1:0:0 -module	\
 	`pkg-config --libs gtksourceview-2.0`
 
@@ -56,18 +56,18 @@ INST_H_FILES = \
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
-	gtksourcecompletion-item.h			\
+	gtksourcecompletion-proposal.h			\
 	gsc-userrequest-trigger.h			\
 	gsc-autocompletion-trigger.h		\
 	gtksourcecompletion-providers.h		\
-	gsv-completion-tree.h				\
+	gtksourcecompletion-tree.h				\
 	gtksourcecompletion-i18n.h			\
-	gsv-completion-popup.h
+	gtksourcecompletion-popup.h
 	
-libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
+libgtk_source_completion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
 
-libgtksourcecompletion_1_0_include_HEADERS =          \
-	$(libgtksourcecompletion_headers)             
+libgtk_source_completion_1_0_include_HEADERS =          \
+	$(libgtk_source_completion_headers)             
 
 #headerdir = $(prefix)/include/gtksourcecompletion
 

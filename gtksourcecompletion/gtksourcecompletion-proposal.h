@@ -18,8 +18,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GTKSOURCECOMPLETION_PROPOSAL_H
-#define _GTKSOURCECOMPLETION_PROPOSAL_H
+#ifndef _GTK_SOURCE_COMPLETION_PROPOSAL_H
+#define _GTK_SOURCE_COMPLETION_PROPOSAL_H
 
 #include <glib-object.h>
 #include <glib.h>
@@ -28,15 +28,15 @@
 
 G_BEGIN_DECLS
 
-#define GTKSOURCECOMPLETION_TYPE_PROPOSAL             (gtksourcecompletion_proposal_get_type ())
-#define GTKSOURCECOMPLETION_PROPOSAL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTKSOURCECOMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposal))
-#define GTKSOURCECOMPLETION_PROPOSAL_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTKSOURCECOMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalClass)
-#define GTKSOURCECOMPLETION_IS_PROPOSAL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTKSOURCECOMPLETION_TYPE_PROPOSAL))
-#define GTKSOURCECOMPLETION_IS_PROPOSAL_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTKSOURCECOMPLETION_TYPE_PROPOSAL))
-#define GTKSOURCECOMPLETION_PROPOSAL_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTKSOURCECOMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalClass))
+#define GTK_SOURCE_COMPLETION_TYPE_PROPOSAL             (gtk_source_completion_proposal_get_type ())
+#define GTK_SOURCE_COMPLETION_PROPOSAL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposal))
+#define GTK_SOURCE_COMPLETION_PROPOSAL_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalClass)
+#define GTK_SOURCE_COMPLETION_IS_PROPOSAL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL))
+#define GTK_SOURCE_COMPLETION_IS_PROPOSAL_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL))
+#define GTK_SOURCE_COMPLETION_PROPOSAL_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalClass))
 
-#define GTKSOURCECOMPLETION_PROPOSAL_DEFAULT_PAGE "Default"
-#define GTKSOURCECOMPLETION_PROPOSAL_DEFAULT_PRIORITY 10
+#define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE "Default"
+#define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PRIORITY 10
 
 typedef struct _GtkSourceCompletionProposalPrivate GtkSourceCompletionProposalPrivate;
 typedef struct _GtkSourceCompletionProposalClass GtkSourceCompletionProposalClass;
@@ -58,7 +58,7 @@ struct _GtkSourceCompletionProposal
 };
 
 GType 
-gtksourcecompletion_proposal_get_type (void) G_GNUC_CONST;
+gtk_source_completion_proposal_get_type (void) G_GNUC_CONST;
 
 /* Default functions */
 void 

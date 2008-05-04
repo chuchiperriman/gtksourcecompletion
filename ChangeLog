@@ -1,4 +1,8 @@
 2008-05-05  Chuchi  <perriman@homer>
+	
+	* gtksourcecompletion-tree:
+	* gtksourcecompletion-popup:
+		- Refactor old gsv prefix to the standar gtksourcecompletion
 
 	* gtksourcecompletion-proposal: 
 		- Created a new GObject to store a completion proposal information.

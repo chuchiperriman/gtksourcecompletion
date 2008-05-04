@@ -24,7 +24,7 @@
 #include "gtksourcecompletion-i18n.h"
 #include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
-#include "gsv-completion-popup.h"
+#include "gtksourcecompletion-popup.h"
 
 static gboolean lib_initialized = FALSE;
 
@@ -66,7 +66,7 @@ typedef struct
 struct _GtkSourceCompletionPrivate
 {
 	GtkTextView *text_view;
-	GsvCompletionPopup *popup;
+	GtkSourceCompletionPopup *popup;
 	GList *triggers;
 	/*Providers of the triggers*/
 	GHashTable *trig_prov;
@@ -189,7 +189,7 @@ static gboolean
 _popup_tree_selection(GtkSourceCompletion *completion)
 {
 	GtkSourceCompletionProposal *proposal;
-	if (gsv_completion_popup_get_selected_proposal(completion->priv->popup,&proposal))
+	if (gtk_source_completion_popup_get_selected_proposal(completion->priv->popup,&proposal))
 	{
 		gtk_source_completion_proposal_selected(proposal,completion);
 		end_completion (completion);
@@ -227,44 +227,44 @@ view_key_press_event_cb(GtkWidget *view,
 				}
 		 		case GDK_Down:
 				{
-					ret = gsv_completion_popup_select_next(completion->priv->popup, 1);
+					ret = gtk_source_completion_popup_select_next(completion->priv->popup, 1);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Page_Down:
 				{
-					ret = gsv_completion_popup_select_next(completion->priv->popup, 5);
+					ret = gtk_source_completion_popup_select_next(completion->priv->popup, 5);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Up:
 				{
-					if (gsv_completion_popup_select_previous(completion->priv->popup, 1))
+					if (gtk_source_completion_popup_select_previous(completion->priv->popup, 1))
 					{
 						ret = TRUE;
 					}
 					else
 					{
-						ret = gsv_completion_popup_select_first(completion->priv->popup);
+						ret = gtk_source_completion_popup_select_first(completion->priv->popup);
 					}
 					catched = TRUE;
 					break;
 				}
 				case GDK_Page_Up:
 				{
-					ret = gsv_completion_popup_select_previous(completion->priv->popup, 5);
+					ret = gtk_source_completion_popup_select_previous(completion->priv->popup, 5);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Home:
 				{
-					ret = gsv_completion_popup_select_first(completion->priv->popup);
+					ret = gtk_source_completion_popup_select_first(completion->priv->popup);
 					catched = TRUE;
 					break;
 				}
 				case GDK_End:
 				{
-					ret = gsv_completion_popup_select_last(completion->priv->popup);
+					ret = gtk_source_completion_popup_select_last(completion->priv->popup);
 					catched = TRUE;
 					break;
 				}
@@ -286,18 +286,18 @@ view_key_press_event_cb(GtkWidget *view,
 			if (_compare_keys(completion,KEYS_INFO,event))
 			{
 				/*View information of the proposal */
-				gsv_completion_popup_toggle_proposal_info(completion->priv->popup);
+				gtk_source_completion_popup_toggle_proposal_info(completion->priv->popup);
 				ret = TRUE;
 			}else if (_compare_keys(completion,KEYS_PAGE_NEXT,event))
 			{
 				g_debug("next");
-				gsv_completion_popup_page_next(completion->priv->popup);
+				gtk_source_completion_popup_page_next(completion->priv->popup);
 				ret = TRUE;
 				
 			}else if (_compare_keys(completion,KEYS_PAGE_PREV,event))
 			{
 				g_debug("prev");
-				gsv_completion_popup_page_previous(completion->priv->popup);
+				gtk_source_completion_popup_page_previous(completion->priv->popup);
 				ret = TRUE;
 				
 			}
@@ -598,7 +598,7 @@ gtk_source_completion_new (GtkTextView *view)
 	completion = GTK_SOURCE_COMPLETION (g_object_new (GTK_TYPE_SOURCE_COMPLETION, NULL));
 	completion->priv->text_view = view;
 	
-	completion->priv->popup = GSV_COMPLETION_POPUP(gsv_completion_popup_new(view));
+	completion->priv->popup = GTK_SOURCE_COMPLETION_POPUP(gtk_source_completion_popup_new(view));
 	
 	g_signal_connect(completion->priv->popup, 
 			 "proposal-selected",
@@ -671,7 +671,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 		return;
 	
-	gsv_completion_popup_clear(completion->priv->popup);
+	gtk_source_completion_popup_clear(completion->priv->popup);
 	
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
 	if (pl==NULL) return;
@@ -706,16 +706,16 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			/* Insert the data into the model */
 			do
 			{
-				gsv_completion_popup_add_data(completion->priv->popup,
+				gtk_source_completion_popup_add_data(completion->priv->popup,
 							      (GtkSourceCompletionProposal*)data_list->data);
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not proposals, we don't show the popup */
-			if (gsv_completion_popup_has_proposals(completion->priv->popup))
+			if (gtk_source_completion_popup_has_proposals(completion->priv->popup))
 			{
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
-				gsv_completion_popup_refresh(completion->priv->popup);
+				gtk_source_completion_popup_refresh(completion->priv->popup);
 				completion->priv->active_trigger = trigger_name;
 			}
 			else

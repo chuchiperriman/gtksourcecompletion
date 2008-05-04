@@ -1,5 +1,5 @@
-#ifndef __GTKSOURCECOMPLETION_INTL_H__
-#define __GTKSOURCECOMPLETION_INTL_H__
+#ifndef __GTK_SOURCE_COMPLETION_INTL_H__
+#define __GTK_SOURCE_COMPLETION_INTL_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,4 +24,4 @@
 #define bind_textdomain_codeset(Domain,Codeset) (Codeset) 
 #endif /* ENABLE_NLS */
 
-#endif /* __GTKSOURCECOMPLETION_INTL_H__ */
+#endif /* __GTK_SOURCE_COMPLETION_INTL_H__ */
