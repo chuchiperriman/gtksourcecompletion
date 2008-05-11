@@ -1,3 +1,15 @@
+2008-05-11  Chuchi  <perriman@homer>
+
+	* gtksourcecompletion-proposal: Changed the apply and display-info
+	mechanism. Now the proposal emits two signals: appy and display-info.
+	The default handler insert the label into the view and te display-info
+	show the proposal info asigned in the constructor
+	* gtksourcecompletion-popup: Now emits a display-info signal when the
+	popup requires this information instead of call the proposal directly.
+	* gtksourcecompletion: 
+		-Adapted to the new changes on proposal and popup
+		-Remove the priority mechanism
+
 2008-05-05  Chuchi  <perriman@homer>
 	
 	* gtksourcecompletion-tree:

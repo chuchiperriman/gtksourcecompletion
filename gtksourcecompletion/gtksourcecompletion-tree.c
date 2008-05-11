@@ -221,7 +221,7 @@ gtk_source_completion_tree_add_data(GtkSourceCompletionTree *self,
 	gtk_list_store_set (store, 
 			    &iter,
 			    COL_PIXBUF, gtk_source_completion_proposal_get_icon(data),
-			    COL_NAME, gtk_source_completion_proposal_get_name(data),
+			    COL_NAME, gtk_source_completion_proposal_get_label(data),
 			    COL_DATA, data,
 			    -1);
 }

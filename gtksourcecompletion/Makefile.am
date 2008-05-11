@@ -15,7 +15,7 @@ AM_CFLAGS =\
 lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
-libgtk_source_completion_headers = 	\
+libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
 	gtksourcecompletion-utils.h		\
@@ -29,7 +29,7 @@ libgtk_source_completion_headers = 	\
 	gtksourcecompletion-i18n.h			\
 	gtksourcecompletion-popup.h
 
-libgtk_source_completion_1_0_la_SOURCES = \
+libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion.c			\
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
@@ -44,10 +44,10 @@ libgtk_source_completion_1_0_la_SOURCES = \
 	$(libgtk_source_completion_headers)
 	
 
-libgtk_source_completion_1_0_la_LIBADD = \
+libgtksourcecompletion_1_0_la_LIBADD = \
 	$(PACKAGE_LIBS) 
 	
-libgtk_source_completion_1_0_la_LDFLAGS = \
+libgtksourcecompletion_1_0_la_LDFLAGS = \
 	-version-info 1:0:0 -module	\
 	`pkg-config --libs gtksourceview-2.0`
 
@@ -64,9 +64,9 @@ INST_H_FILES = \
 	gtksourcecompletion-i18n.h			\
 	gtksourcecompletion-popup.h
 	
-libgtk_source_completion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
+libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
 
-libgtk_source_completion_1_0_include_HEADERS =          \
+libgtksourcecompletion_1_0_include_HEADERS =          \
 	$(libgtk_source_completion_headers)             
 
 #headerdir = $(prefix)/include/gtksourcecompletion

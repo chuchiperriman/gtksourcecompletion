@@ -127,17 +127,6 @@ _prov_list_free(gpointer prov_list)
 	g_free(pl);
 }
 
-static gint
-_proposal_priority_compare (gconstpointer v1,
-			gconstpointer v2)
-{
-	GtkSourceCompletionProposal *i1 = (GtkSourceCompletionProposal*) v1;
-	GtkSourceCompletionProposal *i2 = (GtkSourceCompletionProposal*) v2;
-	
-	return gtk_source_completion_proposal_get_priority(i2) - gtk_source_completion_proposal_get_priority(i1);
-	
-}
-
 static void
 end_completion (GtkSourceCompletion *completion)
 {
@@ -191,7 +180,7 @@ _popup_tree_selection(GtkSourceCompletion *completion)
 	GtkSourceCompletionProposal *proposal;
 	if (gtk_source_completion_popup_get_selected_proposal(completion->priv->popup,&proposal))
 	{
-		gtk_source_completion_proposal_selected(proposal,completion);
+		gtk_source_completion_proposal_apply(proposal,completion);
 		end_completion (completion);
 		return TRUE;
 	}
@@ -313,8 +302,16 @@ _popup_proposal_select_cb(GtkWidget *popup,
 		      gpointer user_data)
 {
 	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
-	gtk_source_completion_proposal_selected(proposal,completion);
+	gtk_source_completion_proposal_apply(proposal,completion);
 	end_completion (completion);
+}
+
+static void
+_popup_display_info_cb(GtkWidget *popup,
+		      GtkSourceCompletionProposal *proposal,
+		      gpointer user_data)
+{
+	gtk_source_completion_proposal_display_info(proposal,GTK_SOURCE_COMPLETION(user_data));
 }
 
 static void
@@ -604,6 +601,11 @@ gtk_source_completion_new (GtkTextView *view)
 			 "proposal-selected",
 			 G_CALLBACK(_popup_proposal_select_cb),
 			 (gpointer) completion);
+			 
+	g_signal_connect(completion->priv->popup, 
+			 "display-info",
+			 G_CALLBACK(_popup_display_info_cb),
+			 (gpointer) completion);
 
 	completion_control_add_completion(view,completion);
 	
@@ -700,8 +702,6 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 		
 		if (final_list!=NULL)
 		{
-			/*Order the data*/
-			final_list = g_list_sort (final_list,_proposal_priority_compare);
 			data_list = final_list;
 			/* Insert the data into the model */
 			do

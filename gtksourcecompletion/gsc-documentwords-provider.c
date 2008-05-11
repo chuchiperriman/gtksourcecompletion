@@ -61,8 +61,8 @@ static gint
 utf8_len_compare(gconstpointer a, gconstpointer b)
 {
     glong lena,lenb;
-    lena = g_utf8_strlen(gtk_source_completion_proposal_get_name((GtkSourceCompletionProposal*)a),-1);
-    lenb = g_utf8_strlen(gtk_source_completion_proposal_get_name((GtkSourceCompletionProposal*)b),-1);
+    lena = g_utf8_strlen(gtk_source_completion_proposal_get_label((GtkSourceCompletionProposal*)a),-1);
+    lenb = g_utf8_strlen(gtk_source_completion_proposal_get_label((GtkSourceCompletionProposal*)b),-1);
     if (lena==lenb)
         return 0;
     else if (lena<lenb)
@@ -165,11 +165,9 @@ gh_add_key_to_list(gpointer key,
 	if (is_valid_word(self->priv->cleaned_word,(gchar*)key))
 	{
 		self->priv->count++;
-		data = gtk_source_completion_proposal_new(0,
-						      (gchar*)key,
-						       self->priv->icon,
-						       15,
-						       NULL);
+		data = gtk_source_completion_proposal_new((gchar*)key,
+							  NULL,
+							  self->priv->icon);
 		self->priv->data_list = g_list_append(self->priv->data_list,data);
 	}
 }

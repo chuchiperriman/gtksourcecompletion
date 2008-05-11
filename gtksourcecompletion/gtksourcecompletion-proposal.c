@@ -22,22 +22,46 @@
 #include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
 
+/* Signals */
+enum {
+	APPLY,
+	DISPLAY_INFO,
+	LAST_SIGNAL
+};
+
 struct _GtkSourceCompletionProposalPrivate
 {
-	int id;
-	gchar *name;
+	gchar *label;
+	gchar *info;
 	const GdkPixbuf *icon;
-	int priority;
-	gpointer user_data;
 	const gchar *page_name;
-	GtkSourceCompletionProposalApply apply_func;
-	GtkSourceCompletionProposalGenInfo get_info_func;
 };
 
 static GObjectClass* parent_class = NULL;
 
 #define GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalPrivate))
 
+static guint signals[LAST_SIGNAL] = { 0 };
+
+static gboolean
+gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
+					     GtkSourceCompletion *completion)
+{
+	GtkTextView *view = gtk_source_completion_get_view(completion);
+	gtk_source_view_replace_actual_word(view,
+					    self->priv->label);
+	return TRUE;
+}
+
+static gboolean
+gtk_source_completion_proposal_display_info_default(GtkSourceCompletionProposal *self,
+					     GtkSourceCompletion *completion)
+{
+	GtkTextView *view = gtk_source_completion_get_view(completion);
+	gtk_source_view_replace_actual_word(view,
+					    self->priv->label);
+	return TRUE;
+}
 
 static void
 gtk_source_completion_proposal_init (GtkSourceCompletionProposal *self)
@@ -45,11 +69,9 @@ gtk_source_completion_proposal_init (GtkSourceCompletionProposal *self)
 	self->priv = GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(self);
 	
 	g_debug("Created GtkSourceCompletionProposal");
-	self->priv->id = -1;
-	self->priv->name = NULL;
+	self->priv->label = NULL;
+	self->priv->info = NULL;
 	self->priv->icon = NULL;
-	self->priv->priority = GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PRIORITY;
-	self->priv->user_data = NULL;
 	self->priv->page_name = GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE;
 }
 
@@ -58,7 +80,8 @@ gtk_source_completion_proposal_finalize (GObject *object)
 {
 	GtkSourceCompletionProposal *self = GTK_SOURCE_COMPLETION_PROPOSAL(object);
 	g_debug("Free GtkSourceCompletionProposal");
-	g_free(self->priv->name);
+	g_free(self->priv->label);
+	g_free(self->priv->info);
 	
 	G_OBJECT_CLASS (parent_class)->finalize (object);
 }
@@ -72,6 +95,32 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 	object_class->finalize = gtk_source_completion_proposal_finalize;
 
 	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionProposalPrivate));
+	
+	klass->apply = gtk_source_completion_proposal_apply_default;
+	klass->display_info = gtk_source_completion_proposal_display_info_default;
+	
+	signals [APPLY] =
+		g_signal_new ("apply",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+			      G_STRUCT_OFFSET (GtkSourceCompletionProposalClass, apply),
+			      NULL,
+			      NULL,
+			      g_cclosure_marshal_VOID__POINTER,
+			      G_TYPE_NONE,
+			      1,
+			      G_TYPE_POINTER);
+	signals [DISPLAY_INFO] =
+		g_signal_new ("display-info",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+			      G_STRUCT_OFFSET (GtkSourceCompletionProposalClass, display_info),
+			      NULL,
+			      NULL,
+			      g_cclosure_marshal_VOID__POINTER,
+			      G_TYPE_NONE,
+			      1,
+			      G_TYPE_POINTER);
 }
 
 GType
@@ -102,56 +151,23 @@ gtk_source_completion_proposal_get_type (void)
 }
 
 GtkSourceCompletionProposal*
-gtk_source_completion_proposal_new_full(int id,
-				    const gchar *name,
-				    const GdkPixbuf *icon,
-				    int priority,
-				    const gchar *page_name,
-				    GtkSourceCompletionProposalApply apply_func,
-				    GtkSourceCompletionProposalGenInfo info_func,
-				    gpointer user_data)
+gtk_source_completion_proposal_new(const gchar *label,
+				   const gchar *info,
+				   const GdkPixbuf *icon)
 {
 	GtkSourceCompletionProposal *self = 
 		GTK_SOURCE_COMPLETION_PROPOSAL(g_object_new (GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, NULL));
-	self->priv->id = id;
-	self->priv->name = g_strdup(name);
+	self->priv->label = g_strdup(label);
+	self->priv->info = g_strdup(info);
 	self->priv->icon = icon;
-	self->priv->priority = priority;
-	self->priv->user_data = user_data;
-	self->priv->page_name = page_name!=NULL ? page_name : GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE;
-	self->priv->apply_func = apply_func!=NULL ? apply_func : gtk_source_completion_proposal_apply_default;
-	self->priv->get_info_func = info_func!=NULL ? info_func : gtk_source_completion_proposal_get_info_default;
 		
 	return self;
 }
 
-GtkSourceCompletionProposal*
-gtk_source_completion_proposal_new(int id,
-				   const gchar *name,
-				   const GdkPixbuf *icon,
-				   int priority,
-				   gpointer user_data)
-{
-	return gtk_source_completion_proposal_new_full(id,
-						       name,
-						       icon,
-						       priority,
-						       NULL,
-						       NULL,
-						       NULL,
-						       user_data);
-}
-
-int
-gtk_source_completion_proposal_get_id(GtkSourceCompletionProposal *self)
-{
-	return self->priv->id;
-}
-
 const gchar*
-gtk_source_completion_proposal_get_name(GtkSourceCompletionProposal *self)
+gtk_source_completion_proposal_get_label(GtkSourceCompletionProposal *self)
 {
-	return self->priv->name;
+	return self->priv->label;
 }
 
 const GdkPixbuf*
@@ -160,50 +176,29 @@ gtk_source_completion_proposal_get_icon(GtkSourceCompletionProposal *self)
 	return self->priv->icon;
 }
 
-gpointer
-gtk_source_completion_proposal_get_user_data(GtkSourceCompletionProposal *self)
-{
-	return self->priv->user_data;
-}
-
 const gchar*
 gtk_source_completion_proposal_get_page_name(GtkSourceCompletionProposal *self)
 {
 	return self->priv->page_name;
 }
 
+const gchar* 
+gtk_source_completion_proposal_get_info(GtkSourceCompletionProposal *self)
+{
+	return self->priv->info;
+}
+
 void
-gtk_source_completion_proposal_selected(GtkSourceCompletionProposal *self,
+gtk_source_completion_proposal_apply(GtkSourceCompletionProposal *self,
 					GtkSourceCompletion *completion)
 {
-	self->priv->apply_func(self,completion);
+	g_signal_emit_by_name (self, "apply",completion);
 }
 
-gchar* 
-gtk_source_completion_proposal_get_info_markup(GtkSourceCompletionProposal *self)
+void
+gtk_source_completion_proposal_display_info(GtkSourceCompletionProposal *self,
+					    GtkSourceCompletion *completion)
 {
-	return self->priv->get_info_func(self);
-}
-
-gint
-gtk_source_completion_proposal_get_priority(GtkSourceCompletionProposal *self)
-{
-	return self->priv->priority;
-}
-
-/*Default functions*/
-void 
-gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
-					     GtkSourceCompletion *completion)
-{
-	GtkTextView *view = gtk_source_completion_get_view(completion);
-	gtk_source_view_replace_actual_word(view,
-					    gtk_source_completion_proposal_get_name(self));
-}
-
-gchar*
-gtk_source_completion_proposal_get_info_default(GtkSourceCompletionProposal *proposal)
-{
-	return NULL;
+	g_signal_emit_by_name (self, "display-info",completion);
 }
 

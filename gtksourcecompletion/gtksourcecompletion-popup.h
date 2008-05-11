@@ -201,6 +201,10 @@ gtk_source_completion_popup_page_next(GtkSourceCompletionPopup *self);
 void
 gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self);
 
+void
+gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
+					     gchar *info);
+
 G_END_DECLS
 
 #endif 

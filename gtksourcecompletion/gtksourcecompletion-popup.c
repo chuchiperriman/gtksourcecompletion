@@ -36,6 +36,7 @@
 enum
 {
 	ITEM_SELECTED,
+	DISPLAY_INFO,
 	LAST_SIGNAL
 };
 
@@ -137,30 +138,14 @@ _get_popup_position(GtkSourceCompletionPopup *self, gint *x, gint *y)
 }
 
 static void
-_set_current_completion_info(GtkSourceCompletionPopup *self)
-{
-	gchar* markup = NULL;
-	GtkSourceCompletionProposal *proposal;
-	if (gtk_source_completion_popup_get_selected_proposal(self,&proposal))
-	{
-		markup = gtk_source_completion_proposal_get_info_markup(proposal);
-		if (markup != NULL)
-		{
-			gtk_label_set_markup(GTK_LABEL(self->priv->info_label),markup);
-			g_free(markup);
-		}
-		else
-		{
-			gtk_label_set_markup(GTK_LABEL(self->priv->info_label), 
-					     _("There is no info for the current proposal"));
-		}
-	}
-}
-
-static void
 _show_completion_info(GtkSourceCompletionPopup *self)
 {
-	_set_current_completion_info(self);
+	GtkSourceCompletionProposal *proposal;
+	gtk_source_completion_popup_get_selected_proposal(self,&proposal);
+	if (proposal!=NULL)
+	{
+		g_signal_emit_by_name (self, "display-info",proposal);
+	}
 	gint y, x, sw, sh;
 	_get_popup_position(self,&x,&y);
 	sw = gdk_screen_width();
@@ -341,6 +326,18 @@ gtk_source_completion_popup_class_init (GtkSourceCompletionPopupClass *klass)
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 			      G_STRUCT_OFFSET (GtkSourceCompletionPopupClass, proposal_selected),
+			      NULL, 
+			      NULL,
+			      g_cclosure_marshal_VOID__POINTER, 
+			      G_TYPE_NONE,
+			      1,
+			      GTK_TYPE_POINTER);
+			      
+	popup_signals[DISPLAY_INFO] =
+		g_signal_new ("display-info",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+			      0,
 			      NULL, 
 			      NULL,
 			      g_cclosure_marshal_VOID__POINTER, 
@@ -607,6 +604,21 @@ gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self)
 		{
 			_show_completion_info(self);
 		}
+	}
+}
+
+void
+gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
+					     gchar *info)
+{
+	if (info!=NULL)
+	{
+		gtk_label_set_markup(GTK_LABEL(self->priv->info_label),info);
+	}
+	else
+	{
+		gtk_label_set_markup(GTK_LABEL(self->priv->info_label), 
+				     _("There is no info for the current proposal"));
 	}
 }
 

@@ -49,6 +49,11 @@ typedef gchar* (*GtkSourceCompletionProposalGenInfo)  (GtkSourceCompletionPropos
 struct _GtkSourceCompletionProposalClass
 {
 	GObjectClass parent_class;
+	
+	gboolean (*apply) (GtkSourceCompletionProposal *proposal,
+			   GtkSourceCompletion *completion);
+	gboolean (*display_info) (GtkSourceCompletionProposal *proposal,
+				  GtkSourceCompletion *completion);
 };
 
 struct _GtkSourceCompletionProposal
@@ -60,85 +65,33 @@ struct _GtkSourceCompletionProposal
 GType 
 gtk_source_completion_proposal_get_type (void) G_GNUC_CONST;
 
-/* Default functions */
-void 
-gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *proposal,
-						  GtkSourceCompletion *completion);
-gchar* 
-gtk_source_completion_proposal_get_info_default(GtkSourceCompletionProposal *proposal);
-/*********************/
-
-/**
- * gtk_source_completion_proposal_new_full:
- * @id: An id for identify this proposal
- * @name: Item name that will be shown in the completion popup
- * @icon: Item icon that will be shown in the completion popup
- * @priority: The proposal priority. Items with high priority will be
- * 				shown first in the completion popup
- * @provider: The provider that creates the proposal
- * @page_name: The page name of this proposal. If NULL, the proposal will be shown 
- * in the default page.
- * @apply_func: This function will be called when the user selects the proposal
- * @inf_func: This function will be called to get the proposal info markup 
- * @user_data: User data used by the providers
- *
- * If a function is NULL then we assign the default function.
- *
- * Returns The new GtkSourceCompletionProposal
- */
-GtkSourceCompletionProposal*
-gtk_source_completion_proposal_new_full(int id,
-				    const gchar *name,
-				    const GdkPixbuf *icon,
-				    int priority,
-				    const gchar *page_name,
-				    GtkSourceCompletionProposalApply apply_func,
-				    GtkSourceCompletionProposalGenInfo info_func,
-				    gpointer user_data);
-
 /**
  * gtk_source_completion_proposal_new:
- * @id: An id for identify this proposal. This can be used by the provider but the 
- * completion does not use this value
- * @name: Item name that will be shown in the completion popup
+ * @label: Item label that will be shown in the completion popup. 
+ * We copy this string
+ * @info: Item info markup that will be shown when the user select to view the item info.
+ * We copy this string
  * @icon: Item icon that will be shown in the completion popup
- * @priority: The proposal priority. Items with high priority will be
- * 				shown first in the completion popup
- * @user_data: User data used by the providers
  *
- * This function creates a new proposal. When the user selects the proposal, the 
- * proposal name will be inserted into the GtkTextView. You can create the proposal
- * using #gtk_source_completion_proposal_new_full to set a custom function.
- *
- * The proposal has not info by default.
+ * This function creates a new proposal. By default, when the user selects the proposal, the 
+ * proposal label will be inserted into the GtkTextView. You can connect to apply
+ * and disply-info signals to overwrite the default functions
  *
  * Returns The new GtkSourceCompletionProposal
  */
 GtkSourceCompletionProposal*
-gtk_source_completion_proposal_new(int id,
-				   const gchar *name,
-				   const GdkPixbuf *icon,
-				   int priority,
-				   gpointer user_data);
+gtk_source_completion_proposal_new(const gchar *label,
+				   const gchar *info,
+				   const GdkPixbuf *icon);
 
-/**
- * gtk_source_completion_proposal_get_id:
- * @proposal: The GtkSourceCompletionProposal
- *
- * Returns current proposal id
- *
- */
-int
-gtk_source_completion_proposal_get_id(GtkSourceCompletionProposal *proposal);
-
-/**
+/**apply
  * gtk_source_completion_proposal_get_name:
  * @proposal: The GtkSourceCompletionProposal
  *
- * Returns The proposal name
+ * Returns The proposal label
  */
 const gchar*
-gtk_source_completion_proposal_get_name(GtkSourceCompletionProposal *proposal);
+gtk_source_completion_proposal_get_label(GtkSourceCompletionProposal *proposal);
 
 /**
  * gtk_source_completion_proposal_get_icon:
@@ -150,24 +103,6 @@ const GdkPixbuf*
 gtk_source_completion_proposal_get_icon(GtkSourceCompletionProposal *proposal);
 
 /**
- * gtk_source_completion_proposal_get_priority:
- * @proposal: The GtkSourceCompletionProposal
- *
- * Returns the proposal priority
- */
-gint
-gtk_source_completion_proposal_get_priority(GtkSourceCompletionProposal *proposal);
-
-/**
- * gtk_source_completion_proposal_get_user_data:
- * @proposal: The GtkSourceCompletionProposal
- *
- * Returns the user data of this proposal
- */
-gpointer
-gtk_source_completion_proposal_get_user_data(GtkSourceCompletionProposal *proposal);
-
-/**
  * gtk_source_completion_proposal_get_page_name:
  * @proposal: The GtkSourceCompletionProposal
  *
@@ -177,30 +112,44 @@ const gchar*
 gtk_source_completion_proposal_get_page_name(GtkSourceCompletionProposal *proposal);
 
 /**
- * gtk_source_completion_proposal_selected:
+ * gtk_source_completion_proposal_get_info:
  * @proposal: The GtkSourceCompletionProposal
+ *
+ * Returns The proposal info markup asigned to this proposal.
+ *
+ */
+const gchar* 
+gtk_source_completion_proposal_get_info(GtkSourceCompletionProposal *proposal);
+
+/**
+ * gtk_source_completion_proposal_apply:
+ * @proposal: The #GtkSourceCompletionProposal
  * @completion: The #GtkSourceCompletion 
  * 
  * The completion calls this function when the user selects the proposal. This 
- * function will call to the #GtkSourceCompletionProposalApply setted on the creation.
+ * function emits the "apply" signal. The default handler insert the proposal 
+ * label into the view. You can overwrite this signal.
  *
  */
 void
-gtk_source_completion_proposal_selected(GtkSourceCompletionProposal *proposal,
+gtk_source_completion_proposal_apply(GtkSourceCompletionProposal *proposal,
 					GtkSourceCompletion *completion);
 
 /**
- * gtk_source_completion_proposal_get_info_markup:
- * @proposal: The GtkSourceCompletionProposal
- *
- * The completion calls this function to get the proposal info to be shown into 
- * the info window. This info must to be a markup. You can use #g_markup_escape_text
- *
- * Returns The proposal info markup (new allocated).
+ * gtk_source_completion_proposal_display_info:
+ * @proposal: The #GtkSourceCompletionProposal
+ * @completion: The #GtkSourceCompletion 
+ * 
+ * The completion calls this function when the user want to view the proposal info.
+ * This function emits the "display-info" signal. The default handler show the 
+ * current info asigned to this proposal. You can overwrite this signal and set
+ * the current info by hand using #gtk_source_completion_set_current_info.
  *
  */
-gchar* 
-gtk_source_completion_proposal_get_info_markup(GtkSourceCompletionProposal *proposal);
+void
+gtk_source_completion_proposal_display_info(GtkSourceCompletionProposal *proposal,
+					GtkSourceCompletion *completion);
+
 
 G_END_DECLS
 
