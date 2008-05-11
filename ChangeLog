@@ -1,5 +1,7 @@
 2008-05-11  Chuchi  <perriman@homer>
 
+	* gtksourcecompletion-marshal.list: Created the marshals for
+	gtksourcecompletion
 	* gtksourcecompletion-proposal: Changed the apply and display-info
 	mechanism. Now the proposal emits two signals: appy and display-info.
 	The default handler insert the label into the view and te display-info

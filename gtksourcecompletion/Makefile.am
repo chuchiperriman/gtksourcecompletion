@@ -15,6 +15,10 @@ AM_CFLAGS =\
 lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
+BUILT_SOURCES =                         \
+        gtksourcecompletion-marshal.c                 \
+        gtksourcecompletion-marshal.h
+
 libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-provider.h	\
 	gtksourcecompletion-trigger.h		\
@@ -30,6 +34,7 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
+	$(BUILT_SOURCES)		\
 	gtksourcecompletion.c			\
 	gtksourcecompletion-provider.c		\
 	gtksourcecompletion-trigger.c		\
@@ -63,11 +68,22 @@ INST_H_FILES = \
 	gtksourcecompletion-tree.h				\
 	gtksourcecompletion-i18n.h			\
 	gtksourcecompletion-popup.h
-	
+
+gtksourcecompletion-marshal.h: gtksourcecompletion-marshal.list $(GLIB_GENMARSHAL)
+	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@
+
+gtksourcecompletion-marshal.c: gtksourcecompletion-marshal.list $(GLIB_GENMARSHAL)
+	echo "#include \"gtksourcecompletion-marshal.h\"" > $@ && \
+	$(GLIB_GENMARSHAL) $< --body --prefix=gtksourcecompletion_marshal >> $@
+
+EXTRA_DIST=gtksourcecompletion-marshal.list
+
+CLEAN_FILES=$(BUILT_SOURCES)
+
 libgtksourcecompletion_1_0_includedir = $(includedir)/gtksourcecompletion-1.0/gtksourcecompletion
 
 libgtksourcecompletion_1_0_include_HEADERS =          \
-	$(libgtk_source_completion_headers)             
+	$(libgtksourcecompletion_headers)             
 
 #headerdir = $(prefix)/include/gtksourcecompletion
 

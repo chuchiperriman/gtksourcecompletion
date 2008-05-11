@@ -59,6 +59,8 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
 
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
 AC_OUTPUT([
 Makefile
 gtksourcecompletion-1.0.pc

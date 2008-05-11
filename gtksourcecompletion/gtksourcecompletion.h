@@ -246,6 +246,10 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion);
 void
 gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
 
+void
+gtk_source_completion_set_current_info(GtkSourceCompletion *self,
+					     gchar *info);
+
 G_END_DECLS
 
 #endif /* _GTK_SOURCE_COMPLETION_H_ */

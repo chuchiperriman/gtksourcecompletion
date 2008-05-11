@@ -923,3 +923,10 @@ gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion)
 	return completion->priv->active_trigger;
 }
 
+void
+gtk_source_completion_set_current_info(GtkSourceCompletion *self,
+					     gchar *info)
+{
+	gtk_source_completion_popup_set_current_info(self->priv->popup,info);
+}
+

@@ -103,6 +103,16 @@ const GdkPixbuf*
 gtk_source_completion_proposal_get_icon(GtkSourceCompletionProposal *proposal);
 
 /**
+ * gtk_source_completion_proposal_set_page_name:
+ * @proposal: The GtkSourceCompletionProposal
+ * @page_name: The page name where this proposal will be shown
+ *
+ */
+void
+gtk_source_completion_proposal_set_page_name(GtkSourceCompletionProposal *self,
+					     const gchar *page_name);
+					     
+/**
  * gtk_source_completion_proposal_get_page_name:
  * @proposal: The GtkSourceCompletionProposal
  *

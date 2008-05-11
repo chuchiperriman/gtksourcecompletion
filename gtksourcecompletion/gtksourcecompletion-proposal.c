@@ -21,6 +21,7 @@
   
 #include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
+#include "gtksourcecompletion-marshal.h"
 
 /* Signals */
 enum {
@@ -50,17 +51,15 @@ gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gtk_source_view_replace_actual_word(view,
 					    self->priv->label);
-	return TRUE;
+	return FALSE;
 }
 
 static gboolean
 gtk_source_completion_proposal_display_info_default(GtkSourceCompletionProposal *self,
 					     GtkSourceCompletion *completion)
 {
-	GtkTextView *view = gtk_source_completion_get_view(completion);
-	gtk_source_view_replace_actual_word(view,
-					    self->priv->label);
-	return TRUE;
+	gtk_source_completion_set_current_info(completion,self->priv->info);
+	return FALSE;
 }
 
 static void
@@ -104,10 +103,10 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 			      G_STRUCT_OFFSET (GtkSourceCompletionProposalClass, apply),
+			      g_signal_accumulator_true_handled,
 			      NULL,
-			      NULL,
-			      g_cclosure_marshal_VOID__POINTER,
-			      G_TYPE_NONE,
+			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
+			      G_TYPE_BOOLEAN,
 			      1,
 			      G_TYPE_POINTER);
 	signals [DISPLAY_INFO] =
@@ -115,10 +114,10 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 			      G_STRUCT_OFFSET (GtkSourceCompletionProposalClass, display_info),
+			      g_signal_accumulator_true_handled,
 			      NULL,
-			      NULL,
-			      g_cclosure_marshal_VOID__POINTER,
-			      G_TYPE_NONE,
+			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
+			      G_TYPE_BOOLEAN,
 			      1,
 			      G_TYPE_POINTER);
 }
@@ -174,6 +173,13 @@ const GdkPixbuf*
 gtk_source_completion_proposal_get_icon(GtkSourceCompletionProposal *self)
 {
 	return self->priv->icon;
+}
+
+void
+gtk_source_completion_proposal_set_page_name(GtkSourceCompletionProposal *self,
+					     const gchar *page_name)
+{
+	self->priv->page_name = page_name;
 }
 
 const gchar*
