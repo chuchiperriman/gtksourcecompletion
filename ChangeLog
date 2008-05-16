@@ -2,6 +2,7 @@
 
 	* gtksourcecompletion-provider: Changed get_data to get_proposals
 	* gtksourcecompletion-proposal: Solved some problems with the signals.
+	* Triggers: Renamed triggers with gtksourcecompletion namespace
 
 2008-05-11  Chuchi  <perriman@homer>
 

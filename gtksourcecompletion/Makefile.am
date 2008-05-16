@@ -25,9 +25,8 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
 	gtksourcecompletion-proposal.h			\
-	gsc-userrequest-trigger.h			\
-	gsc-customkey-trigger.h			\
-	gsc-autocompletion-trigger.h		\
+	gtksourcecompletion-trigger-customkey.h	\
+	gtksourcecompletion-trigger-autowords.h	\
 	gsc-documentwords-provider.h		\
 	gtksourcecompletion-tree.h				\
 	gtksourcecompletion-i18n.h			\
@@ -40,9 +39,8 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gtksourcecompletion-trigger.c		\
 	gtksourcecompletion-utils.c			\
 	gtksourcecompletion-proposal.c			\
-	gsc-userrequest-trigger.c			\
-	gsc-customkey-trigger.c			\
-	gsc-autocompletion-trigger.c		\
+	gtksourcecompletion-trigger-customkey.c	\
+	gtksourcecompletion-trigger-autowords.c	\
 	gsc-documentwords-provider.c		\
 	gtksourcecompletion-tree.c				\
 	gtksourcecompletion-popup.c				\
@@ -62,8 +60,8 @@ INST_H_FILES = \
 	gtksourcecompletion-utils.h		\
 	gtksourcecompletion.h				\
 	gtksourcecompletion-proposal.h			\
-	gsc-userrequest-trigger.h			\
-	gsc-autocompletion-trigger.h		\
+	gtksourcecompletion-trigger-customkey.h	\
+	gtksourcecompletion-trigger-autowords.h	\
 	gtksourcecompletion-providers.h		\
 	gtksourcecompletion-tree.h				\
 	gtksourcecompletion-i18n.h			\
