@@ -51,9 +51,11 @@ struct _GtkSourceCompletionProposalClass
 	GObjectClass parent_class;
 	
 	gboolean (*apply) (GtkSourceCompletionProposal *proposal,
-			   GtkSourceCompletion *completion);
+			   GtkSourceCompletion *completion,
+			   gpointer user_data);
 	gboolean (*display_info) (GtkSourceCompletionProposal *proposal,
-				  GtkSourceCompletion *completion);
+				  GtkSourceCompletion *completion,
+				  gpointer user_data);
 };
 
 struct _GtkSourceCompletionProposal
@@ -84,8 +86,8 @@ gtk_source_completion_proposal_new(const gchar *label,
 				   const gchar *info,
 				   const GdkPixbuf *icon);
 
-/**apply
- * gtk_source_completion_proposal_get_name:
+/**
+ * gtk_source_completion_proposal_get_label:
  * @proposal: The GtkSourceCompletionProposal
  *
  * Returns The proposal label

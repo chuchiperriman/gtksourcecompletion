@@ -136,7 +136,7 @@ static gboolean
 autocompletion_raise_event(gpointer event)
 {
 	gchar* word;
-	const gchar *active_trigger = NULL;
+	GtkSourceCompletionTrigger *active_trigger = NULL;
 	GscAutocompletionTrigger *self = GSC_AUTOCOMPLETION_TRIGGER(event);
 	/*Check if the user has changed the cursor position.If yes, we don't complete*/
 	gint offset = _get_text_offset(self);
@@ -156,8 +156,8 @@ autocompletion_raise_event(gpointer event)
 	}
 	else
 	{
-		active_trigger = gtk_source_completion_get_active_trigger_name(self->priv->completion);
-		if (active_trigger!=NULL && strcmp(active_trigger,GSC_AUTOCOMPLETION_TRIGGER_NAME)==0)
+		active_trigger = gtk_source_completion_get_active_trigger(self->priv->completion);
+		if (active_trigger!=NULL && strcmp(gtk_source_completion_trigger_get_name(active_trigger),GSC_AUTOCOMPLETION_TRIGGER_NAME)==0)
 		{
 			gtk_source_completion_finish_completion(completion);
 		}

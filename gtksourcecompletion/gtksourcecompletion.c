@@ -74,7 +74,7 @@ struct _GtkSourceCompletionPrivate
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	CompletionKeys keys[KEYS_LAST];
-	const gchar *active_trigger;
+	GtkSourceCompletionTrigger *active_trigger;
 };
 
 #define GTK_SOURCE_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionPrivate))
@@ -686,7 +686,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 		do
 		{
 			provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers_list->data);
-			data_list = gtk_source_completion_provider_get_data (
+			data_list = gtk_source_completion_provider_get_proposals (
 							provider, completion, trigger);
 			if (data_list != NULL)
 			{
@@ -716,7 +716,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
 				gtk_source_completion_popup_refresh(completion->priv->popup);
-				completion->priv->active_trigger = trigger_name;
+				completion->priv->active_trigger = trigger;
 			}
 			else
 			{
@@ -917,8 +917,8 @@ gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
 	}
 }
 
-const gchar*
-gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion)
+GtkSourceCompletionTrigger*
+gtk_source_completion_get_active_trigger(GtkSourceCompletion *completion)
 {
 	return completion->priv->active_trigger;
 }

@@ -46,7 +46,8 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 static gboolean
 gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
-					     GtkSourceCompletion *completion)
+					     GtkSourceCompletion *completion,
+					     gpointer user_data)
 {
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gtk_source_view_replace_actual_word(view,
@@ -56,7 +57,8 @@ gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
 
 static gboolean
 gtk_source_completion_proposal_display_info_default(GtkSourceCompletionProposal *self,
-					     GtkSourceCompletion *completion)
+					     GtkSourceCompletion *completion,
+					     gpointer user_data)
 {
 	gtk_source_completion_set_current_info(completion,self->priv->info);
 	return FALSE;
@@ -108,7 +110,7 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
 			      G_TYPE_BOOLEAN,
 			      1,
-			      G_TYPE_POINTER);
+			      GTK_TYPE_POINTER);
 	signals [DISPLAY_INFO] =
 		g_signal_new ("display-info",
 			      G_TYPE_FROM_CLASS (klass),
@@ -119,7 +121,7 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
 			      G_TYPE_BOOLEAN,
 			      1,
-			      G_TYPE_POINTER);
+			      GTK_TYPE_POINTER);
 }
 
 GType
@@ -198,13 +200,15 @@ void
 gtk_source_completion_proposal_apply(GtkSourceCompletionProposal *self,
 					GtkSourceCompletion *completion)
 {
-	g_signal_emit_by_name (self, "apply",completion);
+	gboolean ret = TRUE;
+	g_signal_emit_by_name (self, "apply",completion,&ret);
 }
 
 void
 gtk_source_completion_proposal_display_info(GtkSourceCompletionProposal *self,
 					    GtkSourceCompletion *completion)
 {
-	g_signal_emit_by_name (self, "display-info",completion);
+	gboolean ret = TRUE;
+	g_signal_emit_by_name (self, "display-info",completion,&ret);
 }
 

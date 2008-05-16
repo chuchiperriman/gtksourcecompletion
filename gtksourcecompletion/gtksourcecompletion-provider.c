@@ -27,11 +27,11 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider *self)
 }
 
 GList* 
-gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self,
+gtk_source_completion_provider_get_proposals (GtkSourceCompletionProvider* self,
 					GtkSourceCompletion* completion, 
 					GtkSourceCompletionTrigger *trigger)
 {
-	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_data (self, completion, trigger);
+	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_proposals (self, completion, trigger);
 }
 
 void 

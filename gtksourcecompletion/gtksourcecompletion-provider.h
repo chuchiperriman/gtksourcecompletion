@@ -44,7 +44,7 @@ struct _GtkSourceCompletionProviderIface {
 	
 	GTypeInterface parent;
 	const gchar* (*get_name) (GtkSourceCompletionProvider *self);
-	GList* (*get_data) (GtkSourceCompletionProvider* self,
+	GList* (*get_proposals) (GtkSourceCompletionProvider* self,
 	 		    GtkSourceCompletion* completion, 
 	 		    GtkSourceCompletionTrigger *trigger);
 	void (*finish) (GtkSourceCompletionProvider* self,
@@ -67,7 +67,7 @@ const gchar*
 gtk_source_completion_provider_get_name(GtkSourceCompletionProvider* self);
 
 /**
- * gtk_source_completion_provider_get_data:
+ * gtk_source_completion_provider_get_proposals:
  * @self: the #GtkSourceCompletionProvider
  * @completion: The #GtkSourceCompletion.
  * @trigger: The #GtkSourceCompletionTrigger that raise the event
@@ -80,7 +80,7 @@ gtk_source_completion_provider_get_name(GtkSourceCompletionProvider* self);
  * 
  **/
 GList* 
-gtk_source_completion_provider_get_data (GtkSourceCompletionProvider* self, 
+gtk_source_completion_provider_get_proposals (GtkSourceCompletionProvider* self, 
 					 GtkSourceCompletion* completion, 
 					 GtkSourceCompletionTrigger *trigger);
 

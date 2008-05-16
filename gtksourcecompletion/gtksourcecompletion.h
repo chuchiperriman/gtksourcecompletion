@@ -56,6 +56,26 @@ struct _GtkSourceCompletion
 GType 
 gtk_source_completion_get_type (void) G_GNUC_CONST;
 
+/********************** Control Functions *********************/
+/*
+ * This functions will be deleted when we insert GtkSourceCompletion
+ * into GtkSourceView. These functions store the relationship between the
+ * GtkSourceCompletions and the GtkTextView.
+ */
+
+/**
+ * gtk_source_completion_get_from_view:
+ * @view: the GtkSourceView
+ *
+ * Returns NULL if the GtkTextView haven't got an associated GtkSourceCompletion
+ * or the GtkSourceCompletion of this GtkTextView
+ * 
+ **/
+GtkSourceCompletion*
+gtk_source_completion_get_from_view(GtkTextView *view);
+
+/***************************************************************/
+
 /**
  * gtk_source_completion_new:
  * @view: a #GtkSourceView.
@@ -68,19 +88,24 @@ GtkSourceCompletion*
 gtk_source_completion_new (GtkTextView *view);
 
 /**
- * gtk_source_completion_trigger_event:
+ * gtk_source_completion_get_view:
  * @completion: the #GtkSourceCompletion
- * @trigger_name: The event name to raise
- * @event_data: This object will be passed to the providers to give them some special information of the event
  *
- * Calling this function, the completion call to all providers to get data and, if 
- * they return data, it shows the completion to the user. 
+ * Returns: The internal #GtkTextView of this completion.
  * 
  **/
-void 
-gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
-				    const gchar *trigger_name, 
-				    gpointer event_data);
+GtkTextView* 
+gtk_source_completion_get_view(GtkSourceCompletion *completion);
+
+/**
+ * gtk_source_completion_is_visible:
+ * @completion: The #GtkSourceCompletion
+ *
+ * Returns TRUE if the completion popup is visible.
+ *
+ */
+gboolean
+gtk_source_completion_is_visible(GtkSourceCompletion *completion);
 
 /**
  * gtk_source_completion_register_provider:
@@ -118,37 +143,6 @@ gboolean
 gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
 					  GtkSourceCompletionProvider *provider,
 					  const gchar *trigger_name);
-
-/**
- * gtk_source_completion_get_view:
- * @completion: the #GtkSourceCompletion
- *
- * Returns: The internal #GtkTextView of this completion.
- * 
- **/
-GtkTextView* 
-gtk_source_completion_get_view(GtkSourceCompletion *completion);
-
-/**
- * gtk_source_completion_is_visible:
- * @completion: The #GtkSourceCompletion
- *
- * Returns TRUE if the completion popup is visible.
- *
- */
-gboolean
-gtk_source_completion_is_visible(GtkSourceCompletion *completion);
-
-/**
- * gtk_source_completion_get_from_view:
- * @view: the GtkSourceView
- *
- * Returns NULL if the GtkTextView haven't got an associated GtkSourceCompletion
- * or the GtkSourceCompletion of this GtkTextView
- * 
- **/
-GtkSourceCompletion*
-gtk_source_completion_get_from_view(GtkTextView *view);
 
 /**
  * gtk_source_completion_get_provider:
@@ -203,19 +197,20 @@ GtkSourceCompletionTrigger*
 gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 				  const gchar* trigger_name);
 
+
 /**
- * gtk_source_completion_get_active_trigger_name:
+ * gtk_source_completion_get_active_trigger:
  * @completion: The #GtkSourceCompletion
  *
- * This function return the active trigger name. The active trigger is the last
+ * This function return the active trigger. The active trigger is the last
  * trigger raised if the completion is active. If the completion is not visible then
  * there is no an active trigger.
  *
- * Returns The trigger name or NULL if completion is not active
+ * Returns The trigger or NULL if completion is not active
  *
  */
-const gchar*
-gtk_source_completion_get_active_trigger_name(GtkSourceCompletion *completion);
+GtkSourceCompletionTrigger*
+gtk_source_completion_get_active_trigger(GtkSourceCompletion *completion);
 
 /**
  * gtk_source_completion_activate:
@@ -246,6 +241,28 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion);
 void
 gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
 
+/**
+ * gtk_source_completion_trigger_event:
+ * @completion: the #GtkSourceCompletion
+ * @trigger_name: The event name to raise
+ * @event_data: This object will be passed to the providers to give them some special information of the event
+ *
+ * Calling this function, the completion call to all providers to get data and, if 
+ * they return data, it shows the completion to the user. 
+ * 
+ **/
+void 
+gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+				    const gchar *trigger_name, 
+				    gpointer event_data);
+/**
+ * gtk_source_completion_set_current_info:
+ * @self: The #GtkSourceCompletion
+ * @info: Info markup to be shown into for current proposal.
+ *
+ * You can use this function when a GtkSourceCompletionProposal emit the 
+ * display-info signal to set the current info.
+ */
 void
 gtk_source_completion_set_current_info(GtkSourceCompletion *self,
 					     gchar *info);

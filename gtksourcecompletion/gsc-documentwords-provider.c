@@ -41,7 +41,7 @@ enum  {
 static const gchar* 
 gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self);
 static GList* 
-gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, 
+gsc_documentwords_provider_real_get_proposals (GtkSourceCompletionProvider* base, 
 					  GtkSourceCompletion* completion, 
 					  GtkSourceCompletionTrigger* trigger);
 static void 
@@ -198,7 +198,7 @@ gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self)
 }
 
 static GList* 
-gsc_documentwords_provider_real_get_data (GtkSourceCompletionProvider* base, 
+gsc_documentwords_provider_real_get_proposals (GtkSourceCompletionProvider* base, 
 					  GtkSourceCompletion* completion, 
 					  GtkSourceCompletionTrigger *trigger)
 {
@@ -312,7 +312,7 @@ gsc_documentwords_provider_interface_init (GtkSourceCompletionProviderIface * if
 {
 	gsc_documentwords_provider_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_documentwords_provider_real_get_name;
-	iface->get_data = gsc_documentwords_provider_real_get_data;
+	iface->get_proposals = gsc_documentwords_provider_real_get_proposals;
 	iface->finish = gsc_documentwords_provider_real_finish;
 }
 
