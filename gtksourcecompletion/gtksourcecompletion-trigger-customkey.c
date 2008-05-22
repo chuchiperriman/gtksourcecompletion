@@ -38,7 +38,7 @@ struct _GtkSourceCompletionTriggerCustomkeyPrivate {
 	GdkModifierType mod;
 };
 
-#define GTK_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GTK_SOURCE_COMPLETION_TYPE_TRIGGER_CUSTOMKEY, GtkSourceCompletionTriggerCustomkeyPrivate))
+#define GTK_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY, GtkSourceCompletionTriggerCustomkeyPrivate))
 
 static const gchar* 
 gtk_source_completion_trigger_customkey_real_get_name(GtkSourceCompletionTrigger* base);
@@ -180,7 +180,7 @@ gtk_source_completion_trigger_customkey_get_type ()
 									  (GInterfaceFinalizeFunc) NULL,
 									  NULL};
 		g_type_add_interface_static (g_define_type_id,
-					     GTK_SOURCE_COMPLETION_TYPE_TRIGGER, 
+					     GTK_TYPE_SOURCE_COMPLETION_TRIGGER, 
 					     &gtk_source_completion_trigger_customkey_info);
 	}
 	return g_define_type_id;
@@ -198,7 +198,7 @@ gtk_source_completion_trigger_customkey_new(GtkSourceCompletion *completion,
 			  const gchar* trigger_name, 
 			  const gchar* keys)
 {
-	GtkSourceCompletionTriggerCustomkey *self = GTK_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY (g_object_new (GTK_SOURCE_COMPLETION_TYPE_TRIGGER_CUSTOMKEY, NULL));
+	GtkSourceCompletionTriggerCustomkey *self = GTK_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY (g_object_new (GTK_TYPE_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY, NULL));
 	self->priv->completion = completion;
 	self->priv->trigger_name = g_strdup(trigger_name);
 	gtk_source_completion_trigger_customkey_set_keys(self,keys);

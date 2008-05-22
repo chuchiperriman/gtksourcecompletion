@@ -28,10 +28,10 @@
 G_BEGIN_DECLS
 
 
-#define GTK_SOURCE_COMPLETION_TYPE_TRIGGER (gtk_source_completion_trigger_get_type ())
-#define GTK_SOURCE_COMPLETION_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_SOURCE_COMPLETION_TYPE_TRIGGER, GtkSourceCompletionTrigger))
-#define GTK_SOURCE_COMPLETION_IS_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_SOURCE_COMPLETION_TYPE_TRIGGER))
-#define GTK_SOURCE_COMPLETION_TRIGGER_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GTK_SOURCE_COMPLETION_TYPE_TRIGGER, GtkSourceCompletionTriggerIface))
+#define GTK_TYPE_SOURCE_COMPLETION_TRIGGER (gtk_source_completion_trigger_get_type ())
+#define GTK_SOURCE_COMPLETION_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER, GtkSourceCompletionTrigger))
+#define GTK_IS_SOURCE_COMPLETION_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER))
+#define GTK_SOURCE_COMPLETION_TRIGGER_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER, GtkSourceCompletionTriggerIface))
 
 typedef struct _GtkSourceCompletionTrigger GtkSourceCompletionTrigger;
 typedef struct _GtkSourceCompletionTriggerIface GtkSourceCompletionTriggerIface;

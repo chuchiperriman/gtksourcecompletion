@@ -1,3 +1,7 @@
+2008-05-23  Chuchi  <perriman@homer>
+
+	* general: Changed GTK_SOURCE_IS... by GTK_IS_SOURCE...
+
 2008-05-16  Chuchi  <perriman@homer>
 
 	* gtksourcecompletion-provider: Changed get_data to get_proposals

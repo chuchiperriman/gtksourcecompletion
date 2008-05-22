@@ -352,7 +352,7 @@ GType gsc_documentwords_provider_get_type ()
 										   (GInterfaceFinalizeFunc) NULL, 
 										   NULL};
 		g_type_add_interface_static (g_define_type_id, 
-					     GTK_SOURCE_COMPLETION_TYPE_PROVIDER, 
+					     GTK_TYPE_SOURCE_COMPLETION_PROVIDER, 
 					     &gtk_source_completion_provider_info);
 	}
 	return g_define_type_id;

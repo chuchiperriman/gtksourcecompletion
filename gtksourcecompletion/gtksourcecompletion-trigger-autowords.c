@@ -44,7 +44,7 @@ struct _GtkSourceCompletionTriggerAutowordsPrivate {
 	gint text_offset;
 };
 
-#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GTK_SOURCE_COMPLETION_TYPE_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsPrivate))
+#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsPrivate))
 
 enum  {
 	GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_DUMMY_PROPERTY,
@@ -267,7 +267,7 @@ gtk_source_completion_trigger_autowords_get_type ()
 		static const GTypeInfo g_define_type_info = { sizeof (GtkSourceCompletionTriggerAutowordsClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gtk_source_completion_trigger_autowords_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GtkSourceCompletionTriggerAutowords), 0, (GInstanceInitFunc) gtk_source_completion_trigger_autowords_init };
 		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GtkSourceCompletionTriggerAutowords", &g_define_type_info, 0);
 		static const GInterfaceInfo gtk_source_completion_trigger_autowords_info = { (GInterfaceInitFunc) gtk_source_completion_trigger_autowords_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GTK_SOURCE_COMPLETION_TYPE_TRIGGER, &gtk_source_completion_trigger_autowords_info);
+		g_type_add_interface_static (g_define_type_id, GTK_TYPE_SOURCE_COMPLETION_TRIGGER, &gtk_source_completion_trigger_autowords_info);
 	}
 	return g_define_type_id;
 }
@@ -275,7 +275,7 @@ gtk_source_completion_trigger_autowords_get_type ()
 GtkSourceCompletionTriggerAutowords*
 gtk_source_completion_trigger_autowords_new(GtkSourceCompletion *completion)
 {
-	GtkSourceCompletionTriggerAutowords *self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (g_object_new (GTK_SOURCE_COMPLETION_TYPE_TRIGGER_AUTOWORDS, NULL));
+	GtkSourceCompletionTriggerAutowords *self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (g_object_new (GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, NULL));
 	self->priv->completion = completion;
 	
 	self->priv->actual_word = NULL;

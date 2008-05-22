@@ -40,7 +40,7 @@ struct _GtkSourceCompletionProposalPrivate
 
 static GObjectClass* parent_class = NULL;
 
-#define GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, GtkSourceCompletionProposalPrivate))
+#define GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION_PROPOSAL, GtkSourceCompletionProposalPrivate))
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
@@ -157,7 +157,7 @@ gtk_source_completion_proposal_new(const gchar *label,
 				   const GdkPixbuf *icon)
 {
 	GtkSourceCompletionProposal *self = 
-		GTK_SOURCE_COMPLETION_PROPOSAL(g_object_new (GTK_SOURCE_COMPLETION_TYPE_PROPOSAL, NULL));
+		GTK_SOURCE_COMPLETION_PROPOSAL(g_object_new (GTK_TYPE_SOURCE_COMPLETION_PROPOSAL, NULL));
 	self->priv->label = g_strdup(label);
 	self->priv->info = g_strdup(info);
 	self->priv->icon = icon;
