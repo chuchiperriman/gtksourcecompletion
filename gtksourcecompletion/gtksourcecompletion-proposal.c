@@ -46,8 +46,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 static gboolean
 gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
-					     GtkSourceCompletion *completion,
-					     gpointer user_data)
+					     GtkSourceCompletion *completion)
 {
 	GtkTextView *view = gtk_source_completion_get_view(completion);
 	gtk_source_view_replace_actual_word(view,
@@ -57,8 +56,7 @@ gtk_source_completion_proposal_apply_default(GtkSourceCompletionProposal *self,
 
 static gboolean
 gtk_source_completion_proposal_display_info_default(GtkSourceCompletionProposal *self,
-					     GtkSourceCompletion *completion,
-					     gpointer user_data)
+					     GtkSourceCompletion *completion)
 {
 	gtk_source_completion_set_current_info(completion,self->priv->info);
 	return FALSE;

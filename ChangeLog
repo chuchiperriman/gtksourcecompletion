@@ -1,3 +1,7 @@
+2008-05-24  Chuchi  <perriman@homer>
+
+	* gtksourcecompletion-proposal: Removed user_data from vfuncs
+
 2008-05-23  Chuchi  <perriman@homer>
 
 	* general: Changed GTK_SOURCE_IS... by GTK_IS_SOURCE...

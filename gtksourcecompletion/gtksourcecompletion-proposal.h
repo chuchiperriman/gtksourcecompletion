@@ -51,11 +51,9 @@ struct _GtkSourceCompletionProposalClass
 	GObjectClass parent_class;
 	
 	gboolean (*apply) (GtkSourceCompletionProposal *proposal,
-			   GtkSourceCompletion *completion,
-			   gpointer user_data);
+			   GtkSourceCompletion *completion);
 	gboolean (*display_info) (GtkSourceCompletionProposal *proposal,
-				  GtkSourceCompletion *completion,
-				  gpointer user_data);
+				  GtkSourceCompletion *completion);
 };
 
 struct _GtkSourceCompletionProposal
