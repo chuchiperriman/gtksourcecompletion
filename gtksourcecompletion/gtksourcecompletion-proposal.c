@@ -22,12 +22,21 @@
 #include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
 #include "gtksourcecompletion-marshal.h"
+#include "gtksourcecompletion-i18n.h"
 
 /* Signals */
 enum {
 	APPLY,
 	DISPLAY_INFO,
 	LAST_SIGNAL
+};
+
+/* Properties */
+enum {
+	PROP_0,
+	PROP_LABEL,
+	PROP_INFO,
+	PROP_ICON
 };
 
 struct _GtkSourceCompletionProposalPrivate
@@ -86,11 +95,74 @@ gtk_source_completion_proposal_finalize (GObject *object)
 }
 
 static void
+gtk_source_completion_proposal_get_property (GObject    *object,
+				    guint       prop_id,
+				    GValue     *value,
+				    GParamSpec *pspec)
+{
+	GtkSourceCompletionProposal *self;
+
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (object));
+
+	self = GTK_SOURCE_COMPLETION_PROPOSAL(object);
+
+	switch (prop_id)
+	{
+			
+		case PROP_LABEL:
+			g_value_set_string(value,self->priv->label);
+			break;
+		case PROP_INFO:
+			g_value_set_string(value,
+					   self->priv->info);
+			break;
+		case PROP_ICON:
+			g_value_set_pointer(value,
+					   (gpointer)self->priv->icon);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void
+gtk_source_completion_proposal_set_property (GObject      *object,
+					    guint         prop_id,
+					    const GValue *value,
+					    GParamSpec   *pspec)
+{
+	GtkSourceCompletionProposal *self;
+
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (object));
+
+	self = GTK_SOURCE_COMPLETION_PROPOSAL(object);
+
+	switch (prop_id)
+	{
+		case PROP_LABEL:
+			self->priv->label = g_value_dup_string(value);
+			break;
+		case PROP_INFO:
+			self->priv->info = g_value_dup_string(value);
+			break;
+		case PROP_ICON:
+			self->priv->icon = (GdkPixbuf*)g_value_get_pointer(value);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void
 gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
 
+	object_class->get_property = gtk_source_completion_proposal_get_property;
+	object_class->set_property = gtk_source_completion_proposal_set_property;
 	object_class->finalize = gtk_source_completion_proposal_finalize;
 
 	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionProposalPrivate));
@@ -98,6 +170,45 @@ gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *kla
 	klass->apply = gtk_source_completion_proposal_apply_default;
 	klass->display_info = gtk_source_completion_proposal_display_info_default;
 	
+	/* Proposal properties */
+	
+	/**
+	 * GtkSourceCompletionProposal:label:
+	 *
+	 * Label to be shown for this proposal
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_LABEL,
+					 g_param_spec_string ("label",
+							      _("Label to be shown for this proposal"),
+							      _("Label to be shown for this proposal"),
+							      NULL,
+							      G_PARAM_READWRITE));
+	/**
+	 * GtkSourceCompletionProposal:info:
+	 *
+	 * Info to be shown for this proposal
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_INFO,
+					 g_param_spec_string ("info",
+							      _("Info to be shown for this proposal"),
+							      _("Info to be shown for this proposal"),
+							      NULL,
+							      G_PARAM_READWRITE));
+	/**
+	 * GtkSourceCompletionProposal:icon:
+	 *
+	 * Icon to be shown for this proposal
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_ICON,
+					 g_param_spec_pointer ("icon",
+							      _("Icon to be shown for this proposal"),
+							      _("Icon to be shown for this proposal"),
+							      G_PARAM_READWRITE));
+	
+	/* Proposal Signals */
 	signals [APPLY] =
 		g_signal_new ("apply",
 			      G_TYPE_FROM_CLASS (klass),
