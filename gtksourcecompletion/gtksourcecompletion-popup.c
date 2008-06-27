@@ -622,4 +622,21 @@ gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
 	}
 }
 
+gint
+gtk_source_completion_popup_get_num_active_pages(GtkSourceCompletionPopup *self)
+{
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	guint i, num_pages_with_data = 0;
+	GtkSourceCompletionTree *tree;
+	for(i=0;i<pages;i++)
+	{
+		tree= GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gtk_source_completion_tree_has_proposals(tree))
+		{
+			++num_pages_with_data;
+		}
+	}
+	return num_pages_with_data;
+}
+
 

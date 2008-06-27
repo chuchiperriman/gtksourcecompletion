@@ -75,6 +75,7 @@ struct _GtkSourceCompletionPrivate
 	gboolean active;
 	CompletionKeys keys[KEYS_LAST];
 	GtkSourceCompletionTrigger *active_trigger;
+	gboolean autoselect;
 };
 
 #define GTK_SOURCE_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionPrivate))
@@ -465,6 +466,7 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 	completion->priv->triggers = NULL;
 	completion->priv->popup = NULL;
 	completion->priv->active_trigger = NULL;
+	completion->priv->autoselect = TRUE;
 	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
 							    g_str_equal,
 							    g_free,
@@ -666,6 +668,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	GList *providers_list;
 	GtkSourceCompletionProvider *provider;
 	GtkSourceCompletionTrigger *trigger;
+	gint proposals = 0;
 
 	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
@@ -693,7 +696,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 				original_list = data_list;
 				do
 				{
-					final_list = g_list_append(final_list, data_list->data);	
+					final_list = g_list_append(final_list, data_list->data);
 				}while((data_list = g_list_next(data_list)) != NULL);
 				g_list_free(original_list);
 			}
@@ -708,40 +711,41 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			{
 				gtk_source_completion_popup_add_data(completion->priv->popup,
 							      (GtkSourceCompletionProposal*)data_list->data);
+				++proposals;
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not proposals, we don't show the popup */
-			if (gtk_source_completion_popup_has_proposals(completion->priv->popup))
+			if (proposals > 0)
 			{
-				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
-					return;
-				gtk_source_completion_popup_refresh(completion->priv->popup);
-				completion->priv->active_trigger = trigger;
-			}
-			else
-			{
-				if (GTK_WIDGET_VISIBLE(completion->priv->popup))
+				if (proposals == 1 && completion->priv->autoselect)
 				{
-					end_completion (completion);
+					if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+						return;
+					
+					gtk_source_completion_popup_select_first(completion->priv->popup);
+					gboolean ret = _popup_tree_selection(completion);
+					if (!ret)
+						end_completion(completion);
+				}
+				else
+				{
+					if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+						return;
+					gtk_source_completion_popup_refresh(completion->priv->popup);
+					completion->priv->active_trigger = trigger;
 				}
 			}
-		}
-		else
-		{
-			if (gtk_source_completion_is_visible(completion))
-			{
+			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))
 				end_completion (completion);
-			}
 		}
+		else if (gtk_source_completion_is_visible(completion))
+			end_completion (completion);
 	}
 	else
 	{
 		if (gtk_source_completion_is_visible(completion))
-		{
 			end_completion (completion);
-		}
 	}
-	
 }
 
 gboolean
@@ -929,4 +933,18 @@ gtk_source_completion_set_current_info(GtkSourceCompletion *self,
 {
 	gtk_source_completion_popup_set_current_info(self->priv->popup,info);
 }
+
+void
+gtk_source_completion_set_autoselect(GtkSourceCompletion *self,
+					   gboolean autoselect)
+{
+	self->priv->autoselect = autoselect;
+}
+
+gboolean
+gtk_source_completion_get_autoselect(GtkSourceCompletion *self)
+{
+	return self->priv->autoselect;
+}
+
 

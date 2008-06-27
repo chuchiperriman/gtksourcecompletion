@@ -1,3 +1,8 @@
+2008-06-27  Chuchi  <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion: Added autoselection if there is only one proposal
+	in the completion popup (one poposal and one page)
+
 2008-06-07  Chuchi  <perriman@homer>
 
 	* gtksourcecompletion-proposal: Added label, info and icon properties

@@ -173,5 +173,8 @@ gtk_source_completion_tree_add_data(GtkSourceCompletionTree *self,
 gboolean
 gtk_source_completion_tree_has_proposals(GtkSourceCompletionTree *self);
 
+gint 
+gtk_source_completion_tree_get_num_proposals(GtkSourceCompletionTree *self);
+
 G_END_DECLS
 #endif

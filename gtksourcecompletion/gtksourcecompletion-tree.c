@@ -415,5 +415,12 @@ gtk_source_completion_tree_new()
 	return GTK_WIDGET(self);
 }
 
+gint 
+gtk_source_completion_tree_get_num_proposals(GtkSourceCompletionTree *self)
+{
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));	
+	return gtk_tree_model_iter_n_children(model, NULL);
+}
+
 
 

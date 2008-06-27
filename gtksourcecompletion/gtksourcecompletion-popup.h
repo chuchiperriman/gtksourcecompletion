@@ -201,9 +201,23 @@ gtk_source_completion_popup_page_next(GtkSourceCompletionPopup *self);
 void
 gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self);
 
+/**
+ * gtk_source_completion_popup_set_current_info:
+ * @self: The #GtkSourceCompletionPopup
+ * @info: Markup with the info to be shown into the info window
+ */
 void
 gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
 					     gchar *info);
+
+/**
+ * gtk_source_completion_popup_get_num_active_pags:
+ * @self: The #GtkSourceCompletionPopup
+ *
+ * Returns The number of active pages
+ */
+gint
+gtk_source_completion_popup_get_num_active_pages(GtkSourceCompletionPopup *self);
 
 G_END_DECLS
 
