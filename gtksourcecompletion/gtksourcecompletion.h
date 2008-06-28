@@ -267,30 +267,6 @@ void
 gtk_source_completion_set_current_info(GtkSourceCompletion *self,
 					     gchar *info);
 
-/**
- * gtk_source_completion_set_autoselect:
- * @self: The #GtkSourceCompletion
- * @autoselect: TRUE enable autoselect or FALSE to disable autoselect
- *
- * If Autoselect is enabled then the completion selects the current completion
- * proposal if there is only one.
- */
-void
-gtk_source_completion_set_autoselect(GtkSourceCompletion *self,
-					   gboolean autoselect);
-
-/**
- * gtk_source_completion_get_autoselect:
- * @self: The #GtkSourceCompletion
- *
- * If Autoselect is enabled then the completion selects the current completion
- * proposal if there is only one.
- *
- * Returns TRUE if autoselect is enabled;
- */
-gboolean
-gtk_source_completion_get_autoselect(GtkSourceCompletion *self);
-
 G_END_DECLS
 
 #endif /* _GTK_SOURCE_COMPLETION_H_ */

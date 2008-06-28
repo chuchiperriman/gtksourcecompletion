@@ -1,6 +1,9 @@
 2008-06-28  Chuchi  <perriman@homer>
 
-	* gtksourcecompletion: Fixed autoselection if the popup has not been
+	* gtksourcecompletion: 
+		- Removed autoselection because I don't like this feature, I
+		think I will insert that in the trigger_event options
+		- Fixed autoselection if the popup has not been
 	shown yet.
 
 2008-06-27  Chuchi  <chuchiperriman@gmail.com>
