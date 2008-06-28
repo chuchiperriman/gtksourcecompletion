@@ -669,6 +669,7 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 	GtkSourceCompletionProvider *provider;
 	GtkSourceCompletionTrigger *trigger;
 	gint proposals = 0;
+	GtkSourceCompletionProposal *last_proposal = NULL;
 
 	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
@@ -709,12 +710,15 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			/* Insert the data into the model */
 			do
 			{
+				last_proposal = (GtkSourceCompletionProposal*)data_list->data;
 				gtk_source_completion_popup_add_data(completion->priv->popup,
-							      (GtkSourceCompletionProposal*)data_list->data);
+							      last_proposal);
 				++proposals;
+				
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not proposals, we don't show the popup */
+			g_debug("proposals: %i",proposals);
 			if (proposals > 0)
 			{
 				if (proposals == 1 && completion->priv->autoselect)
@@ -722,10 +726,8 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 					if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 						return;
 					
-					gtk_source_completion_popup_select_first(completion->priv->popup);
-					gboolean ret = _popup_tree_selection(completion);
-					if (!ret)
-						end_completion(completion);
+					gtk_source_completion_proposal_apply(last_proposal,completion);
+					end_completion (completion);
 				}
 				else
 				{

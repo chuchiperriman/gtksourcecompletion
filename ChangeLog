@@ -1,3 +1,8 @@
+2008-06-28  Chuchi  <perriman@homer>
+
+	* gtksourcecompletion: Fixed autoselection if the popup has not been
+	shown yet.
+
 2008-06-27  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion: Added autoselection if there is only one proposal
