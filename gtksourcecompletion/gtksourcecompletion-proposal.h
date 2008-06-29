@@ -24,7 +24,6 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include "gtksourcecompletion.h"
 
 G_BEGIN_DECLS
 
@@ -41,6 +40,8 @@ G_BEGIN_DECLS
 typedef struct _GtkSourceCompletionProposalPrivate GtkSourceCompletionProposalPrivate;
 typedef struct _GtkSourceCompletionProposalClass GtkSourceCompletionProposalClass;
 typedef struct _GtkSourceCompletionProposal GtkSourceCompletionProposal;
+
+#include "gtksourcecompletion.h"
 
 typedef void (*GtkSourceCompletionProposalApply)  (GtkSourceCompletionProposal *proposal,
 						   GtkSourceCompletion *completion);

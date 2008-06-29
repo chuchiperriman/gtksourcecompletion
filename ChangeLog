@@ -1,3 +1,11 @@
+2008-06-29  Chuchi  <perriman@homer>
+
+	* gtksourcecompletion-popup: Added PopupOptions in refresh function.
+	You can now set the popup position, the filter type etc.
+	* gtksourcecompletion: Added EventOptions in trigger_event function.
+	You can now set the event options (popup options plus completion
+	options) when trigger an event.
+
 2008-06-28  Chuchi  <perriman@homer>
 
 	* gtksourcecompletion: 

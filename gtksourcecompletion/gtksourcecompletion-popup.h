@@ -21,9 +21,26 @@
 #define GTK_SOURCE_COMPLETION_POPUP_H
 
 #include <gtk/gtk.h>
-#include "gtksourcecompletion-proposal.h"
 
 G_BEGIN_DECLS
+
+typedef enum{
+	GTK_SOURCE_COMPLETION_POPUP_POSITION_CURSOR,
+	GTK_SOURCE_COMPLETION_POPUP_POSITION_CENTER_SCREEN
+}GtkSourceCompletionPopupPositionType;
+
+typedef enum{
+	GTK_SOURCE_COMPLETION_POPUP_FILTER_NONE,
+	GTK_SOURCE_COMPLETION_POPUP_FILTER_TREE
+}GtkSourceCompletionPopupFilterType;
+
+typedef struct{
+	GtkSourceCompletionPopupPositionType position_type;
+	GtkSourceCompletionPopupFilterType filter_type;
+}GtkSourceCompletionPopupOptions;
+
+#include "gtksourcecompletion-proposal.h"
+
 
 /*
  * Type checking and casting macros
@@ -173,11 +190,22 @@ gtk_source_completion_popup_toggle_proposal_info(GtkSourceCompletionPopup *self)
  * gtk_source_completion_popup_refresh:
  * @self: The #GtkSourceCompletionPopup
  *
- * Really only show the completion by now.
+ * Show the completion popup with the default the options.
  *
  */
 void
 gtk_source_completion_popup_refresh(GtkSourceCompletionPopup *self);
+
+/**
+ * gtk_source_completion_popup_refresh_with_opts:
+ * @self: The #GtkSourceCompletionPopup
+ * @options: Options to tell the popup how it must to be shown.
+ *
+ * Show the completion popup with the current the options.
+ */
+void
+gtk_source_completion_popup_refresh_with_opts(GtkSourceCompletionPopup *self,
+					      GtkSourceCompletionPopupOptions *options);
 
 /**
  * gtk_source_completion_popup_page_next:

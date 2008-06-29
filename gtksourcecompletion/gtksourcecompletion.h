@@ -39,8 +39,16 @@ typedef struct _GtkSourceCompletionPrivate GtkSourceCompletionPrivate;
 typedef struct _GtkSourceCompletionClass GtkSourceCompletionClass;
 typedef struct _GtkSourceCompletion GtkSourceCompletion;
 
+typedef struct _GtkSourceCompletionEventOptions GtkSourceCompletionEventOptions;
+
 #include "gtksourcecompletion-provider.h"
 #include "gtksourcecompletion-trigger.h"
+#include "gtksourcecompletion-popup.h"
+
+struct _GtkSourceCompletionEventOptions{
+	GtkSourceCompletionPopupOptions popup_options;
+	gboolean autoselect;
+};
 
 struct _GtkSourceCompletionClass
 {
@@ -53,8 +61,10 @@ struct _GtkSourceCompletion
 	GtkSourceCompletionPrivate *priv;
 };
 
+
 GType 
 gtk_source_completion_get_type (void) G_GNUC_CONST;
+
 
 /********************** Control Functions *********************/
 /*
@@ -255,6 +265,24 @@ void
 gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
 				    const gchar *trigger_name, 
 				    gpointer event_data);
+
+/**
+ * gtk_source_completion_trigger_event:
+ * @completion: the #GtkSourceCompletion
+ * @trigger_name: The event name to raise
+ * @options: Options to tell the completion how it must to work.
+ * @event_data: This object will be passed to the providers to give them some special information of the event
+ *
+ * Calling this function, the completion call to all providers to get data and, if 
+ * they return data, it shows the completion to the user. 
+ * 
+ **/
+void 
+gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion, 
+				    const gchar *trigger_name,
+				    GtkSourceCompletionEventOptions *options,
+				    gpointer event_data);
+
 /**
  * gtk_source_completion_set_current_info:
  * @self: The #GtkSourceCompletion

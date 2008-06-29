@@ -24,7 +24,6 @@
 #include "gtksourcecompletion-i18n.h"
 #include "gtksourcecompletion-proposal.h"
 #include "gtksourcecompletion-utils.h"
-#include "gtksourcecompletion-popup.h"
 
 static gboolean lib_initialized = FALSE;
 
@@ -656,8 +655,9 @@ gtk_source_completion_get_view(GtkSourceCompletion *completion)
 }
 
 void
-gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion, 
 				    const gchar *trigger_name, 
+				    GtkSourceCompletionEventOptions *options,
 				    gpointer event_data)
 {
 	GList* data_list;
@@ -721,7 +721,11 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 			{
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
-				gtk_source_completion_popup_refresh(completion->priv->popup);
+				if (options==NULL)
+					gtk_source_completion_popup_refresh(completion->priv->popup);
+				else
+					gtk_source_completion_popup_refresh_with_opts(completion->priv->popup,
+										      &options->popup_options);
 				completion->priv->active_trigger = trigger;
 			}
 			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))
@@ -735,6 +739,17 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
 		if (gtk_source_completion_is_visible(completion))
 			end_completion (completion);
 	}
+}
+
+void 
+gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+				    const gchar *trigger_name,
+				    gpointer event_data)
+{
+	gtk_source_completion_trigger_event_with_opts(completion,
+					    trigger_name,
+					    NULL,
+					    event_data);
 }
 
 gboolean

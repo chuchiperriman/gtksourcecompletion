@@ -57,6 +57,10 @@ struct _GtkSourceCompletionPopupPriv
 
 G_DEFINE_TYPE(GtkSourceCompletionPopup, gtk_source_completion_popup, GTK_TYPE_WINDOW);
 
+static GtkSourceCompletionPopupOptions default_options = {
+	GTK_SOURCE_COMPLETION_POPUP_POSITION_CURSOR,
+	GTK_SOURCE_COMPLETION_POPUP_FILTER_NONE
+};
 
 static void
 _proposal_selected_cb (GtkSourceCompletionTree *tree, 
@@ -114,7 +118,7 @@ _get_tree_by_name(GtkSourceCompletionPopup *self, const gchar* tree_name)
  * the position is under the text.
  */
 static gboolean 
-_get_popup_position(GtkSourceCompletionPopup *self, gint *x, gint *y)
+_get_popup_position_in_cursor(GtkSourceCompletionPopup *self, gint *x, gint *y)
 {
 	gint w,h,xtext,ytext;
 	gint sw = gdk_screen_width();
@@ -138,6 +142,18 @@ _get_popup_position(GtkSourceCompletionPopup *self, gint *x, gint *y)
 }
 
 static void
+_get_popup_position_center_screen(GtkSourceCompletionPopup *self, gint *x, gint *y)
+{
+	gint w,h;
+	gint sw = gdk_screen_width();
+	gint sh = gdk_screen_height();
+	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
+	
+	*x = (sw/2) - (w/2) - 20;
+	*y = (sh/2) - (h/2);
+}
+
+static void
 _show_completion_info(GtkSourceCompletionPopup *self)
 {
 	GtkSourceCompletionProposal *proposal;
@@ -147,7 +163,7 @@ _show_completion_info(GtkSourceCompletionPopup *self)
 		g_signal_emit_by_name (self, "display-info",proposal);
 	}
 	gint y, x, sw, sh;
-	_get_popup_position(self,&x,&y);
+	gtk_window_get_position(GTK_WINDOW(self),&x,&y);
 	sw = gdk_screen_width();
 	sh = gdk_screen_height();
 	x += WINDOW_WIDTH;
@@ -240,11 +256,14 @@ _update_pages_visibility(GtkSourceCompletionPopup *self)
 }
 
 static void
-gtk_source_completion_popup_show(GtkWidget *widget)
+gtk_source_completion_popup_show_with_opts(GtkWidget *widget, GtkSourceCompletionPopupOptions *options)
 {
 	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(widget);
 	gint x, y;
-	_get_popup_position(self,&x,&y);
+	if (options->position_type == GTK_SOURCE_COMPLETION_POPUP_POSITION_CURSOR)
+		_get_popup_position_in_cursor(self,&x,&y);
+	else if (options->position_type == GTK_SOURCE_COMPLETION_POPUP_POSITION_CENTER_SCREEN)
+		_get_popup_position_center_screen(self,&x,&y);
 	gtk_window_move(GTK_WINDOW(self), x, y);
 	
 	_update_pages_visibility(self);
@@ -255,6 +274,12 @@ gtk_source_completion_popup_show(GtkWidget *widget)
 		GTK_WIDGET_CLASS (gtk_source_completion_popup_parent_class)->show (widget);
 	}
 	gtk_source_completion_tree_select_first(_get_current_tree(self));
+}
+
+static void
+gtk_source_completion_popup_show(GtkWidget *widget)
+{
+	gtk_source_completion_popup_show_with_opts(widget,&default_options);
 }
 
 static void
@@ -350,6 +375,7 @@ static void
 gtk_source_completion_popup_init (GtkSourceCompletionPopup *self)
 {
 	g_debug("Init GtkSourceCompletionPopup");
+	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	self->priv = GTK_SOURCE_COMPLETION_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->trees = g_hash_table_new(g_str_hash,g_str_equal);
@@ -540,6 +566,13 @@ void
 gtk_source_completion_popup_refresh(GtkSourceCompletionPopup *self)
 {
 	gtk_source_completion_popup_show(GTK_WIDGET(self));
+}
+
+void
+gtk_source_completion_popup_refresh_with_opts(GtkSourceCompletionPopup *self,
+					      GtkSourceCompletionPopupOptions *options)
+{
+	gtk_source_completion_popup_show_with_opts(GTK_WIDGET(self),options);
 }
 
 void
