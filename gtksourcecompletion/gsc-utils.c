@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gtksourcecompletion-utils.c
+ *  gsc-utils.c
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -18,7 +18,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-#include "gtksourcecompletion-utils.h"
+#include "gsc-utils.h"
 
 gboolean
 gsc_char_is_separator(const gunichar ch)
@@ -32,7 +32,7 @@ gsc_char_is_separator(const gunichar ch)
 }
 
 gchar*
-gtk_source_view_get_last_word_and_iter(GtkTextView *text_view, 
+gsc_get_last_word_and_iter(GtkTextView *text_view, 
 					GtkTextIter *start_word, 
 					GtkTextIter *end_word)
 {
@@ -99,13 +99,13 @@ gtk_source_view_get_last_word_and_iter(GtkTextView *text_view,
 }
 
 gchar*
-gtk_source_view_get_last_word(GtkTextView *text_view)
+gsc_get_last_word(GtkTextView *text_view)
 {
-	return gtk_source_view_get_last_word_and_iter(text_view, NULL, NULL);
+	return gsc_get_last_word_and_iter(text_view, NULL, NULL);
 }
 
 void
-gtk_source_view_get_cursor_pos(GtkTextView *text_view, 
+gsc_get_cursor_pos(GtkTextView *text_view, 
 				gint *x, 
 				gint *y)
 {
@@ -139,7 +139,7 @@ gtk_source_view_get_cursor_pos(GtkTextView *text_view,
 }
 
 gchar*
-gtc_gsv_get_text(GtkTextView *text_view)
+gsc_get_text(GtkTextView *text_view)
 {
 	GtkTextIter start, end;
 	GtkTextBuffer *buffer;
@@ -152,7 +152,7 @@ gtc_gsv_get_text(GtkTextView *text_view)
 }
 
 void
-gtk_source_view_replace_actual_word(GtkTextView *text_view, 
+gsc_replace_actual_word(GtkTextView *text_view, 
 				    const gchar* text)
 {
 	GtkTextBuffer *buffer;
@@ -161,7 +161,7 @@ gtk_source_view_replace_actual_word(GtkTextView *text_view,
 	buffer = gtk_text_view_get_buffer(text_view);
 	gtk_text_buffer_begin_user_action(buffer);
 	
-	gtk_source_view_get_last_word_and_iter(text_view,&word_start, &word_end);
+	gsc_get_last_word_and_iter(text_view,&word_start, &word_end);
 									   
 	gtk_text_buffer_delete(buffer,&word_start,&word_end);
 	gtk_text_buffer_insert(buffer, &word_start, text,-1);

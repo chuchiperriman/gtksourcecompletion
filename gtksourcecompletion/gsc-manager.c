@@ -20,10 +20,10 @@
  
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
-#include "gtksourcecompletion.h"
-#include "gtksourcecompletion-i18n.h"
-#include "gtksourcecompletion-proposal.h"
-#include "gtksourcecompletion-utils.h"
+#include "gsc-manager.h"
+#include "gsc-i18n.h"
+#include "gsc-proposal.h"
+#include "gsc-utils.h"
 
 static gboolean lib_initialized = FALSE;
 
@@ -62,10 +62,10 @@ typedef struct
 	GdkModifierType mods;
 } CompletionKeys;
 
-struct _GtkSourceCompletionPrivate
+struct _GscManagerPrivate
 {
 	GtkTextView *text_view;
-	GtkSourceCompletionPopup *popup;
+	GscPopup *popup;
 	GList *triggers;
 	/*Providers of the triggers*/
 	GHashTable *trig_prov;
@@ -73,10 +73,10 @@ struct _GtkSourceCompletionPrivate
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	CompletionKeys keys[KEYS_LAST];
-	GtkSourceCompletionTrigger *active_trigger;
+	GscTrigger *active_trigger;
 };
 
-#define GTK_SOURCE_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionPrivate))
+#define GSC_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_MANAGER, GscManagerPrivate))
 
 struct _ProviderList
 {
@@ -86,17 +86,17 @@ typedef struct _ProviderList ProviderList;
 
 static GObjectClass* parent_class = NULL;
 
-/* **************** GtkTextView-GtkSourceCompletion Control *********** */
+/* **************** GtkTextView-GscManager Control *********** */
 
 /*
- * We save a map with a GtkTextView and his GtkSourceCompletion. If you 
- * call twice to gtk_source_completion_proposal_new, the second time it returns
- * the previous created GtkSourceCompletion, not creates a new one
+ * We save a map with a GtkTextView and his GscManager. If you 
+ * call twice to gsc_proposal_new, the second time it returns
+ * the previous created GscManager, not creates a new one
  */
 
 static GHashTable *completion_map = NULL;
 
-static GtkSourceCompletion* 
+static GscManager* 
 completion_control_get_completion(GtkTextView *view)
 {
 	if (completion_map==NULL)
@@ -106,7 +106,7 @@ completion_control_get_completion(GtkTextView *view)
 }
 
 static void 
-completion_control_add_completion(GtkTextView *view,GtkSourceCompletion *comp)
+completion_control_add_completion(GtkTextView *view,GscManager *comp)
 {
 	g_hash_table_insert(completion_map,view,comp);
 }
@@ -127,15 +127,15 @@ _prov_list_free(gpointer prov_list)
 }
 
 static void
-end_completion (GtkSourceCompletion *completion)
+end_completion (GscManager *completion)
 {
 	gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
 
 	GList *providers = completion->priv->providers;
 	do
 	{
-		GtkSourceCompletionProvider *provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers->data);
-		gtk_source_completion_provider_finish(provider,completion);
+		GscProvider *provider =  GSC_PROVIDER(providers->data);
+		gsc_provider_finish(provider,completion);
 			
 	}while((providers = g_list_next(providers)) != NULL);
 	
@@ -143,7 +143,7 @@ end_completion (GtkSourceCompletion *completion)
 }
 
 static void
-_set_keys(GtkSourceCompletion *completion, KeysType type, const gchar* keys)
+_set_keys(GscManager *completion, KeysType type, const gchar* keys)
 {
 	guint key;
 	GdkModifierType mods;
@@ -154,7 +154,7 @@ _set_keys(GtkSourceCompletion *completion, KeysType type, const gchar* keys)
 }
 
 static gboolean
-_compare_keys(GtkSourceCompletion *completion, KeysType type, GdkEventKey *event)
+_compare_keys(GscManager *completion, KeysType type, GdkEventKey *event)
 {
 	guint modifiers = gtk_accelerator_get_default_mod_mask ();
 	if (completion->priv->keys[type].mods == 0 &&
@@ -174,12 +174,12 @@ _compare_keys(GtkSourceCompletion *completion, KeysType type, GdkEventKey *event
 }
 
 static gboolean
-_popup_tree_selection(GtkSourceCompletion *completion)
+_popup_tree_selection(GscManager *completion)
 {
-	GtkSourceCompletionProposal *proposal;
-	if (gtk_source_completion_popup_get_selected_proposal(completion->priv->popup,&proposal))
+	GscProposal *proposal;
+	if (gsc_popup_get_selected_proposal(completion->priv->popup,&proposal))
 	{
-		gtk_source_completion_proposal_apply(proposal,completion);
+		gsc_proposal_apply(proposal,completion->priv->text_view);
 		end_completion (completion);
 		return TRUE;
 	}
@@ -195,11 +195,11 @@ view_key_press_event_cb(GtkWidget *view,
 	/* Catch only keys of popup movement */
 	gboolean ret = FALSE;
 	gboolean catched = FALSE;
-	GtkSourceCompletion *completion;
-	g_assert(GTK_IS_SOURCE_COMPLETION(user_data));
-	completion = GTK_SOURCE_COMPLETION(user_data);
+	GscManager *completion;
+	g_assert(GSC_IS_MANAGER(user_data));
+	completion = GSC_MANAGER(user_data);
 	
-	if (gtk_source_completion_is_visible(completion))
+	if (gsc_manager_is_visible(completion))
 	{
 		guint modifiers = gtk_accelerator_get_default_mod_mask ();
 		if ((event->state & modifiers)==0)
@@ -215,44 +215,44 @@ view_key_press_event_cb(GtkWidget *view,
 				}
 		 		case GDK_Down:
 				{
-					ret = gtk_source_completion_popup_select_next(completion->priv->popup, 1);
+					ret = gsc_popup_select_next(completion->priv->popup, 1);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Page_Down:
 				{
-					ret = gtk_source_completion_popup_select_next(completion->priv->popup, 5);
+					ret = gsc_popup_select_next(completion->priv->popup, 5);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Up:
 				{
-					if (gtk_source_completion_popup_select_previous(completion->priv->popup, 1))
+					if (gsc_popup_select_previous(completion->priv->popup, 1))
 					{
 						ret = TRUE;
 					}
 					else
 					{
-						ret = gtk_source_completion_popup_select_first(completion->priv->popup);
+						ret = gsc_popup_select_first(completion->priv->popup);
 					}
 					catched = TRUE;
 					break;
 				}
 				case GDK_Page_Up:
 				{
-					ret = gtk_source_completion_popup_select_previous(completion->priv->popup, 5);
+					ret = gsc_popup_select_previous(completion->priv->popup, 5);
 					catched = TRUE;
 					break;
 				}
 				case GDK_Home:
 				{
-					ret = gtk_source_completion_popup_select_first(completion->priv->popup);
+					ret = gsc_popup_select_first(completion->priv->popup);
 					catched = TRUE;
 					break;
 				}
 				case GDK_End:
 				{
-					ret = gtk_source_completion_popup_select_last(completion->priv->popup);
+					ret = gsc_popup_select_last(completion->priv->popup);
 					catched = TRUE;
 					break;
 				}
@@ -274,18 +274,18 @@ view_key_press_event_cb(GtkWidget *view,
 			if (_compare_keys(completion,KEYS_INFO,event))
 			{
 				/*View information of the proposal */
-				gtk_source_completion_popup_toggle_proposal_info(completion->priv->popup);
+				gsc_popup_toggle_proposal_info(completion->priv->popup);
 				ret = TRUE;
 			}else if (_compare_keys(completion,KEYS_PAGE_NEXT,event))
 			{
 				g_debug("next");
-				gtk_source_completion_popup_page_next(completion->priv->popup);
+				gsc_popup_page_next(completion->priv->popup);
 				ret = TRUE;
 				
 			}else if (_compare_keys(completion,KEYS_PAGE_PREV,event))
 			{
 				g_debug("prev");
-				gtk_source_completion_popup_page_previous(completion->priv->popup);
+				gsc_popup_page_previous(completion->priv->popup);
 				ret = TRUE;
 				
 			}
@@ -297,27 +297,29 @@ view_key_press_event_cb(GtkWidget *view,
 
 static void
 _popup_proposal_select_cb(GtkWidget *popup,
-		      GtkSourceCompletionProposal *proposal,
+		      GscProposal *proposal,
 		      gpointer user_data)
 {
-	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
-	gtk_source_completion_proposal_apply(proposal,completion);
+	GscManager *completion = GSC_MANAGER(user_data);
+	gsc_proposal_apply(proposal,completion->priv->text_view);
 	end_completion (completion);
 }
 
 static void
 _popup_display_info_cb(GtkWidget *popup,
-		      GtkSourceCompletionProposal *proposal,
+		      GscProposal *proposal,
 		      gpointer user_data)
 {
-	gtk_source_completion_proposal_display_info(proposal,GTK_SOURCE_COMPLETION(user_data));
+	GscManager *self = GSC_MANAGER(user_data);
+	const gchar *info = gsc_proposal_get_info(proposal);
+	gsc_popup_set_current_info(self->priv->popup,(gchar*)info);
 }
 
 static void
 view_destroy_event_cb(GtkWidget *widget,
 		      gpointer user_data)
 {
-	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
+	GscManager *completion = GSC_MANAGER(user_data);
 	g_object_unref(completion);
 }
 
@@ -326,8 +328,8 @@ view_focus_out_event_cb(GtkWidget *widget,
 			GdkEventFocus *event,
 			gpointer user_data)
 {
-	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
-	if (gtk_source_completion_is_visible(completion))
+	GscManager *completion = GSC_MANAGER(user_data);
+	if (gsc_manager_is_visible(completion))
 	{
 		end_completion(completion);
 	}
@@ -339,8 +341,8 @@ view_button_press_event_cb(GtkWidget *widget,
 			   GdkEventButton *event,
 			   gpointer user_data)
 {
-	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(user_data);
-	if (gtk_source_completion_is_visible(completion))
+	GscManager *completion = GSC_MANAGER(user_data);
+	if (gsc_manager_is_visible(completion))
 	{
 		end_completion(completion);
 	}
@@ -382,16 +384,16 @@ free_trigger_list(gpointer list)
 }
 
 static void
-gtk_source_completion_set_property (GObject      *object,
+gsc_manager_set_property (GObject      *object,
 				    guint         prop_id,
 				    const GValue *value,
 				    GParamSpec   *pspec)
 {
-	GtkSourceCompletion *self;
+	GscManager *self;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+	g_return_if_fail (GSC_IS_MANAGER (object));
 
-	self = GTK_SOURCE_COMPLETION(object);
+	self = GSC_MANAGER(object);
 
 	switch (prop_id)
 	{
@@ -411,16 +413,16 @@ gtk_source_completion_set_property (GObject      *object,
 }
 
 static void
-gtk_source_completion_get_property (GObject    *object,
+gsc_manager_get_property (GObject    *object,
 				    guint       prop_id,
 				    GValue     *value,
 				    GParamSpec *pspec)
 {
-	GtkSourceCompletion *self;
+	GscManager *self;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+	g_return_if_fail (GSC_IS_MANAGER (object));
 
-	self = GTK_SOURCE_COMPLETION(object);
+	self = GSC_MANAGER(object);
 
 	switch (prop_id)
 	{
@@ -447,9 +449,9 @@ gtk_source_completion_get_property (GObject    *object,
 }
 
 static void
-gtk_source_completion_init (GtkSourceCompletion *completion)
+gsc_manager_init (GscManager *completion)
 {
-	g_debug("Init GtkSourceCompletion");
+	g_debug("Init GscManager");
 	if (!lib_initialized)
 	{
 		bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -457,7 +459,7 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 		lib_initialized = TRUE;
 	}
 	gint i;
-	completion->priv = GTK_SOURCE_COMPLETION_GET_PRIVATE(completion);
+	completion->priv = GSC_MANAGER_GET_PRIVATE(completion);
 	
 	completion->priv->active = FALSE;
 	completion->priv->providers = NULL;
@@ -481,13 +483,13 @@ gtk_source_completion_init (GtkSourceCompletion *completion)
 }
 
 static void
-gtk_source_completion_finalize (GObject *object)
+gsc_manager_finalize (GObject *object)
 {
-	GtkSourceCompletion *completion = GTK_SOURCE_COMPLETION(object);
-	g_debug("Finish GtkSourceCompletion");
+	GscManager *completion = GSC_MANAGER(object);
+	g_debug("Finish GscManager");
 	if (completion->priv->active)
 	{
-		gtk_source_completion_deactivate(completion);
+		gsc_manager_deactivate(completion);
 	}
 	
 	gtk_widget_destroy(GTK_WIDGET(completion->priv->popup));
@@ -501,17 +503,17 @@ gtk_source_completion_finalize (GObject *object)
 }
 
 static void
-gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
+gsc_manager_class_init (GscManagerClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
 
-	object_class->get_property = gtk_source_completion_get_property;
-	object_class->set_property = gtk_source_completion_set_property;
-	object_class->finalize = gtk_source_completion_finalize;
+	object_class->get_property = gsc_manager_get_property;
+	object_class->set_property = gsc_manager_set_property;
+	object_class->finalize = gsc_manager_finalize;
 
 	/**
-	 * GtkSourceCompletion:info-keys:
+	 * GscManager:info-keys:
 	 *
 	 * Keys to show/hide the info window
 	 */
@@ -523,7 +525,7 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 							      DEFAULT_INFO_KEYS,
 							      G_PARAM_READWRITE));
 	/**
-	 * GtkSourceCompletion:next-page-keys:
+	 * GscManager:next-page-keys:
 	 *
 	 * Keys to show the next completion page
 	 */
@@ -536,7 +538,7 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 							      G_PARAM_READWRITE));
 							      
 	/**
-	 * GtkSourceCompletion:previous-page-keys:
+	 * GscManager:previous-page-keys:
 	 *
 	 * Keys to show the previous completion page
 	 */
@@ -548,11 +550,11 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 							      DEFAULT_PAGE_PREV_KEYS,
 							      G_PARAM_READWRITE));
 
-	g_type_class_add_private (object_class, sizeof(GtkSourceCompletionPrivate));				
+	g_type_class_add_private (object_class, sizeof(GscManagerPrivate));				
 }
 
 GType
-gtk_source_completion_get_type (void)
+gsc_manager_get_type (void)
 {
 	static GType our_type = 0;
 
@@ -560,41 +562,41 @@ gtk_source_completion_get_type (void)
 	{
 		static const GTypeInfo our_info =
 		{
-			sizeof (GtkSourceCompletionClass), /* class_size */
+			sizeof (GscManagerClass), /* class_size */
 			(GBaseInitFunc) NULL, /* base_init */
 			(GBaseFinalizeFunc) NULL, /* base_finalize */
-			(GClassInitFunc) gtk_source_completion_class_init, /* class_init */
+			(GClassInitFunc) gsc_manager_class_init, /* class_init */
 			(GClassFinalizeFunc) NULL, /* class_finalize */
 			NULL /* class_data */,
-			sizeof (GtkSourceCompletion), /* instance_size */
+			sizeof (GscManager), /* instance_size */
 			0, /* n_preallocs */
-			(GInstanceInitFunc) gtk_source_completion_init, /* instance_init */
+			(GInstanceInitFunc) gsc_manager_init, /* instance_init */
 			NULL /* value_table */  
 		};
 
-		our_type = g_type_register_static (G_TYPE_OBJECT, "GtkSourceCompletion",
+		our_type = g_type_register_static (G_TYPE_OBJECT, "GscManager",
 		                                   &our_info, 0);
 	}
 
 	return our_type;
 }
 
-GtkSourceCompletion*
-gtk_source_completion_new (GtkTextView *view)
+GscManager*
+gsc_manager_new (GtkTextView *view)
 {
 
 	g_assert(view!=NULL);
 	
-	GtkSourceCompletion *completion = completion_control_get_completion(view);
+	GscManager *completion = completion_control_get_completion(view);
 	if (completion !=NULL)
 	{
 		return completion;
 	}
 
-	completion = GTK_SOURCE_COMPLETION (g_object_new (GTK_TYPE_SOURCE_COMPLETION, NULL));
+	completion = GSC_MANAGER (g_object_new (GSC_TYPE_MANAGER, NULL));
 	completion->priv->text_view = view;
 	
-	completion->priv->popup = GTK_SOURCE_COMPLETION_POPUP(gtk_source_completion_popup_new(view));
+	completion->priv->popup = GSC_POPUP(gsc_popup_new(view));
 	
 	g_signal_connect(completion->priv->popup, 
 			 "proposal-selected",
@@ -612,18 +614,18 @@ gtk_source_completion_new (GtkTextView *view)
 }
 
 gboolean
-gtk_source_completion_register_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider,
+gsc_manager_register_provider(GscManager *completion,
+					GscProvider *provider,
 					const gchar *trigger_name)
 {
     
-	GtkSourceCompletionTrigger *trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	GscTrigger *trigger = gsc_manager_get_trigger(completion,trigger_name);
 	if (trigger==NULL) return FALSE;
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
 	g_assert(pl!=NULL);
 	pl->prov_list = g_list_append(pl->prov_list,provider);
-	GtkSourceCompletionProvider *prov = gtk_source_completion_get_provider(
-			completion,gtk_source_completion_provider_get_name(provider));
+	GscProvider *prov = gsc_manager_get_provider(
+			completion,gsc_provider_get_name(provider));
 	if (prov!=NULL) return FALSE;
 	completion->priv->providers = g_list_append(completion->priv->providers,provider);
 	g_object_ref(provider);
@@ -632,12 +634,12 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
 }
 
 gboolean
-gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
-					GtkSourceCompletionProvider *provider,
+gsc_manager_unregister_provider(GscManager *completion,
+					GscProvider *provider,
 					const gchar *trigger_name)
 {
 	g_return_val_if_fail(g_list_find(completion->priv->providers, provider) != NULL,FALSE);
-	GtkSourceCompletionTrigger *trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	GscTrigger *trigger = gsc_manager_get_trigger(completion,trigger_name);
 	if (trigger==NULL) return FALSE;
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
 	g_assert(pl!=NULL);
@@ -649,33 +651,33 @@ gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
 }
 
 GtkTextView*
-gtk_source_completion_get_view(GtkSourceCompletion *completion)
+gsc_manager_get_view(GscManager *completion)
 {
 	return completion->priv->text_view;
 }
 
 void
-gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion, 
+gsc_manager_trigger_event_with_opts(GscManager *completion, 
 				    const gchar *trigger_name, 
-				    GtkSourceCompletionEventOptions *options,
+				    GscManagerEventOptions *options,
 				    gpointer event_data)
 {
 	GList* data_list;
 	GList* original_list;
 	GList* final_list = NULL;
 	GList *providers_list;
-	GtkSourceCompletionProvider *provider;
-	GtkSourceCompletionTrigger *trigger;
+	GscProvider *provider;
+	GscTrigger *trigger;
 	gint proposals = 0;
-	GtkSourceCompletionProposal *last_proposal = NULL;
+	GscProposal *last_proposal = NULL;
 
-	trigger = gtk_source_completion_get_trigger(completion,trigger_name);
+	trigger = gsc_manager_get_trigger(completion,trigger_name);
 	g_return_if_fail(trigger!=NULL);
 	
 	if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 		return;
 	
-	gtk_source_completion_popup_clear(completion->priv->popup);
+	gsc_popup_clear(completion->priv->popup);
 	
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
 	if (pl==NULL) return;
@@ -687,8 +689,8 @@ gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion,
 		/*Getting the data...*/
 		do
 		{
-			provider =  GTK_SOURCE_COMPLETION_PROVIDER(providers_list->data);
-			data_list = gtk_source_completion_provider_get_proposals (
+			provider =  GSC_PROVIDER(providers_list->data);
+			data_list = gsc_provider_get_proposals (
 							provider, completion, trigger);
 			if (data_list != NULL)
 			{
@@ -708,8 +710,8 @@ gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion,
 			/* Insert the data into the model */
 			do
 			{
-				last_proposal = (GtkSourceCompletionProposal*)data_list->data;
-				gtk_source_completion_popup_add_data(completion->priv->popup,
+				last_proposal = (GscProposal*)data_list->data;
+				gsc_popup_add_data(completion->priv->popup,
 							      last_proposal);
 				++proposals;
 				
@@ -722,60 +724,60 @@ gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion,
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
 				if (options==NULL)
-					gtk_source_completion_popup_refresh(completion->priv->popup);
+					gsc_popup_refresh(completion->priv->popup);
 				else
-					gtk_source_completion_popup_refresh_with_opts(completion->priv->popup,
+					gsc_popup_refresh_with_opts(completion->priv->popup,
 										      &options->popup_options);
 				completion->priv->active_trigger = trigger;
 			}
 			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))
 				end_completion (completion);
 		}
-		else if (gtk_source_completion_is_visible(completion))
+		else if (gsc_manager_is_visible(completion))
 			end_completion (completion);
 	}
 	else
 	{
-		if (gtk_source_completion_is_visible(completion))
+		if (gsc_manager_is_visible(completion))
 			end_completion (completion);
 	}
 }
 
 void 
-gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+gsc_manager_trigger_event(GscManager *completion, 
 				    const gchar *trigger_name,
 				    gpointer event_data)
 {
-	gtk_source_completion_trigger_event_with_opts(completion,
+	gsc_manager_trigger_event_with_opts(completion,
 					    trigger_name,
 					    NULL,
 					    event_data);
 }
 
 gboolean
-gtk_source_completion_is_visible(GtkSourceCompletion *completion)
+gsc_manager_is_visible(GscManager *completion)
 {
 	return GTK_WIDGET_VISIBLE(completion->priv->popup);
 }
 
-GtkSourceCompletion*
-gtk_source_completion_get_from_view(GtkTextView *view)
+GscManager*
+gsc_manager_get_from_view(GtkTextView *view)
 {
 	return completion_control_get_completion(view);
 }
 
-GtkSourceCompletionProvider*
-gtk_source_completion_get_provider(GtkSourceCompletion *completion,
+GscProvider*
+gsc_manager_get_provider(GscManager *completion,
 				   const gchar* provider_name)
 {
 	GList *plist = completion->priv->providers;
-	GtkSourceCompletionProvider *provider;	
+	GscProvider *provider;	
 	if (plist != NULL)
 	{
 		do
 		{
-			provider =  GTK_SOURCE_COMPLETION_PROVIDER(plist->data);
-			if (strcmp(gtk_source_completion_provider_get_name(provider),provider_name)==0)
+			provider =  GSC_PROVIDER(plist->data);
+			if (strcmp(gsc_provider_get_name(provider),provider_name)==0)
 			{
 				return provider;
 			}
@@ -786,10 +788,10 @@ gtk_source_completion_get_provider(GtkSourceCompletion *completion,
 }
 
 void
-gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
-					GtkSourceCompletionTrigger *trigger)
+gsc_manager_register_trigger(GscManager *completion,
+					GscTrigger *trigger)
 {
-    const gchar* trigger_name = gtk_source_completion_trigger_get_name(trigger);
+    const gchar* trigger_name = gsc_trigger_get_name(trigger);
 	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
     /*Only register the trigger if it has not been registered yet*/
     if (pl==NULL)
@@ -797,44 +799,44 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
 
     	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
     	g_object_ref(trigger);
-    	const gchar *tn = gtk_source_completion_trigger_get_name(trigger);
+    	const gchar *tn = gsc_trigger_get_name(trigger);
         ProviderList *pl = g_malloc0(sizeof(ProviderList));
         pl->prov_list = NULL;
     	g_hash_table_insert(completion->priv->trig_prov,g_strdup(tn),pl);
     	if (completion->priv->active)
     	{
-    		gtk_source_completion_trigger_activate(trigger);
+    		gsc_trigger_activate(trigger);
     	}
     }
 }
 
 void
-gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
-					 GtkSourceCompletionTrigger *trigger)
+gsc_manager_unregister_trigger(GscManager *completion,
+					 GscTrigger *trigger)
 {
 	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);
 	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
 	if (completion->priv->active)
 	{
-		gtk_source_completion_trigger_deactivate(trigger);
+		gsc_trigger_deactivate(trigger);
 	}
 	g_hash_table_remove(completion->priv->trig_prov,
-			    gtk_source_completion_trigger_get_name(trigger));
+			    gsc_trigger_get_name(trigger));
 	g_object_unref(trigger);
 }
 
-GtkSourceCompletionTrigger*
-gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
+GscTrigger*
+gsc_manager_get_trigger(GscManager *completion,
 				  const gchar* trigger_name)
 {
 	GList *plist = completion->priv->triggers;
-	GtkSourceCompletionTrigger *trigger;	
+	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
 		do
 		{
-			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
-			if (strcmp(gtk_source_completion_trigger_get_name(trigger),trigger_name)==0)
+			trigger =  GSC_TRIGGER(plist->data);
+			if (strcmp(gsc_trigger_get_name(trigger),trigger_name)==0)
 			{
 				return trigger;
 			}
@@ -845,9 +847,9 @@ gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
 }
 
 void
-gtk_source_completion_activate(GtkSourceCompletion *completion)
+gsc_manager_activate(GscManager *completion)
 {
-	g_debug("Activating GtkSourceCompletion");
+	g_debug("Activating GscManager");
 	completion->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
 			g_signal_connect(completion->priv->text_view,
 					 "key-press-event",
@@ -871,13 +873,13 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 
 	/* We activate the triggers*/
 	GList *plist = completion->priv->triggers;
-	GtkSourceCompletionTrigger *trigger;	
+	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
 		do
 		{
-			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
-			gtk_source_completion_trigger_activate(trigger);
+			trigger =  GSC_TRIGGER(plist->data);
+			gsc_trigger_activate(trigger);
 
 		}while((plist = g_list_next(plist)) != NULL);
 	}	
@@ -886,9 +888,9 @@ gtk_source_completion_activate(GtkSourceCompletion *completion)
 }
 
 void
-gtk_source_completion_deactivate(GtkSourceCompletion *completion)
+gsc_manager_deactivate(GscManager *completion)
 {
-	g_debug("Deactivating GtkSourceCompletion");
+	g_debug("Deactivating GscManager");
 	gint i;
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
@@ -902,13 +904,13 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 	}
 	
 	GList *plist = completion->priv->triggers;
-	GtkSourceCompletionTrigger *trigger;	
+	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
 		do
 		{
-			trigger =  GTK_SOURCE_COMPLETION_TRIGGER(plist->data);
-			gtk_source_completion_trigger_deactivate(trigger);
+			trigger =  GSC_TRIGGER(plist->data);
+			gsc_trigger_deactivate(trigger);
 
 		}while((plist = g_list_next(plist)) != NULL);
 	}	
@@ -917,24 +919,24 @@ gtk_source_completion_deactivate(GtkSourceCompletion *completion)
 }
 
 void
-gtk_source_completion_finish_completion(GtkSourceCompletion *completion)
+gsc_manager_finish_completion(GscManager *completion)
 {
-	if (gtk_source_completion_is_visible(completion))
+	if (gsc_manager_is_visible(completion))
 	{
 		end_completion(completion);
 	}
 }
 
-GtkSourceCompletionTrigger*
-gtk_source_completion_get_active_trigger(GtkSourceCompletion *completion)
+GscTrigger*
+gsc_manager_get_active_trigger(GscManager *completion)
 {
 	return completion->priv->active_trigger;
 }
 
 void
-gtk_source_completion_set_current_info(GtkSourceCompletion *self,
+gsc_manager_set_current_info(GscManager *self,
 					     gchar *info)
 {
-	gtk_source_completion_popup_set_current_info(self->priv->popup,info);
+	gsc_popup_set_current_info(self->priv->popup,info);
 }
 

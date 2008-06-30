@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gtksourcecompletion-provider.c
+ *  gsc-provider.c
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -18,31 +18,31 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "gtksourcecompletion-provider.h"
+#include "gsc-provider.h"
 
 const gchar*
-gtk_source_completion_provider_get_name(GtkSourceCompletionProvider *self)
+gsc_provider_get_name(GscProvider *self)
 {
-	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_name (self);
+	return GSC_PROVIDER_GET_INTERFACE (self)->get_name (self);
 }
 
 GList* 
-gtk_source_completion_provider_get_proposals (GtkSourceCompletionProvider* self,
-					GtkSourceCompletion* completion, 
-					GtkSourceCompletionTrigger *trigger)
+gsc_provider_get_proposals (GscProvider* self,
+					GscManager* completion, 
+					GscTrigger *trigger)
 {
-	return GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->get_proposals (self, completion, trigger);
+	return GSC_PROVIDER_GET_INTERFACE (self)->get_proposals (self, completion, trigger);
 }
 
 void 
-gtk_source_completion_provider_finish (GtkSourceCompletionProvider* self, 
-				       GtkSourceCompletion* completion)
+gsc_provider_finish (GscProvider* self, 
+				       GscManager* completion)
 {
-	GTK_SOURCE_COMPLETION_PROVIDER_GET_INTERFACE (self)->finish(self, completion);
+	GSC_PROVIDER_GET_INTERFACE (self)->finish(self, completion);
 }
 
 static void 
-gtk_source_completion_provider_base_init (GtkSourceCompletionProviderIface * iface)
+gsc_provider_base_init (GscProviderIface * iface)
 {
 	static gboolean initialized = FALSE;
 	if (!initialized) {
@@ -52,14 +52,14 @@ gtk_source_completion_provider_base_init (GtkSourceCompletionProviderIface * ifa
 
 
 GType 
-gtk_source_completion_provider_get_type ()
+gsc_provider_get_type ()
 {
-	static GType gtk_source_completion_provider_type_id = 0;
-	if (!gtk_source_completion_provider_type_id) {
+	static GType gsc_provider_type_id = 0;
+	if (!gsc_provider_type_id) {
 		static const GTypeInfo g_define_type_info = 
 		{ 
-			sizeof (GtkSourceCompletionProviderIface), 
-			(GBaseInitFunc) gtk_source_completion_provider_base_init, 
+			sizeof (GscProviderIface), 
+			(GBaseInitFunc) gsc_provider_base_init, 
 			(GBaseFinalizeFunc) NULL, 
 			(GClassInitFunc) NULL, 
 			(GClassFinalizeFunc) NULL, 
@@ -69,13 +69,13 @@ gtk_source_completion_provider_get_type ()
 			(GInstanceInitFunc) NULL 
 		};
 						
-		gtk_source_completion_provider_type_id = 
+		gsc_provider_type_id = 
 				g_type_register_static (G_TYPE_INTERFACE, 
-							"GtkSourceCompletionProvider", 
+							"GscProvider", 
 							&g_define_type_info, 
 							0);
 	}
-	return gtk_source_completion_provider_type_id;
+	return gsc_provider_type_id;
 }
 
 

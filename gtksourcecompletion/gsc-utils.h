@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gtksourcecompletion-utils.h
+ *  gsc-utils.h
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -23,7 +23,7 @@
 #include <gtk/gtk.h>
 
 /**
-* gtk_source_view_get_last_word_and_iter:
+* gsc_get_last_word_and_iter:
 * @text_view: The #GtkTextView
 * @start_word: if != NULL then assign it the start position of the word
 * @end_word: if != NULL then assing it the end position of the word
@@ -32,21 +32,21 @@
 *
 **/
 gchar*
-gtk_source_view_get_last_word_and_iter(GtkTextView *text_view, 
+gsc_get_last_word_and_iter(GtkTextView *text_view, 
 					GtkTextIter *start_word, 
 					GtkTextIter *end_word);
 
 /**
- * gtk_source_view_get_last_word:
+ * gsc_get_last_word:
  * @text_view: The #GtkTextView
  *
  * Returns: the last word written in the #GtkTextView or ""
  */
 gchar*
-gtk_source_view_get_last_word(GtkTextView *text_view);
+gsc_get_last_word(GtkTextView *text_view);
 
 /** 
- * gtk_source_view_get_cursor_pos:
+ * gsc_get_cursor_pos:
  * @text_view: The #GtkTextView
  * @x: Assign the x position of the cursor
  * @y: Assign the y position of the cursor
@@ -54,21 +54,21 @@ gtk_source_view_get_last_word(GtkTextView *text_view);
  * Gets the cursor position on the screen.
  */
 void
-gtk_source_view_get_cursor_pos(GtkTextView *text_view, 
+gsc_get_cursor_pos(GtkTextView *text_view, 
 				gint *x, 
 				gint *y);
 
 /**
- * gtc_gsv_get_text: 
+ * gsc_get_text: 
  * @text_view: The #GtkTextView 
  *
  * Returns the #GtkTextView content .
  */
 gchar* 
-gtc_gsv_get_text(GtkTextView *text_view);
+gsc_gsv_get_text(GtkTextView *text_view);
 
 /**
- * gtk_source_view_replace_actual_word:
+ * gsc_replace_actual_word:
  * @text_view: The #GtkTextView
  * @text: The text to be inserted instead of the current word
  * 
@@ -76,7 +76,7 @@ gtc_gsv_get_text(GtkTextView *text_view);
  *
  */
 void
-gtk_source_view_replace_actual_word(GtkTextView *text_view, 
+gsc_replace_actual_word(GtkTextView *text_view, 
 				    const gchar* text);
 
 /**

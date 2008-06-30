@@ -18,8 +18,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GTK_SOURCE_COMPLETION_H_
-#define _GTK_SOURCE_COMPLETION_H_
+#ifndef _GSC_H_
+#define _GSC_H_
 
 #include <glib-object.h>
 #include <gtk/gtk.h>
@@ -27,100 +27,100 @@
 
 G_BEGIN_DECLS
 
-#define GTK_TYPE_SOURCE_COMPLETION             (gtk_source_completion_get_type ())
-#define GTK_SOURCE_COMPLETION(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletion))
-#define GTK_SOURCE_COMPLETION_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionClass))
-#define GTK_IS_SOURCE_COMPLETION(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_SOURCE_COMPLETION))
-#define GTK_IS_SOURCE_COMPLETION_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION))
-#define GTK_SOURCE_COMPLETION_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_SOURCE_COMPLETION, GtkSourceCompletionClass))
+#define GSC_TYPE_MANAGER             (gsc_manager_get_type ())
+#define GSC_MANAGER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MANAGER, GscManager))
+#define GSC_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))
+#define GSC_IS_MANAGER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_MANAGER))
+#define GSC_IS_MANAGER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_MANAGER))
+#define GSC_MANAGER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MANAGER, GscManagerClass))
 
-typedef struct _GtkSourceCompletionPrivate GtkSourceCompletionPrivate;
+typedef struct _GscManagerPrivate GscManagerPrivate;
 
-typedef struct _GtkSourceCompletionClass GtkSourceCompletionClass;
-typedef struct _GtkSourceCompletion GtkSourceCompletion;
+typedef struct _GscManagerClass GscManagerClass;
+typedef struct _GscManager GscManager;
 
-typedef struct _GtkSourceCompletionEventOptions GtkSourceCompletionEventOptions;
+typedef struct _GscManagerEventOptions GscManagerEventOptions;
 
-#include "gtksourcecompletion-provider.h"
-#include "gtksourcecompletion-trigger.h"
-#include "gtksourcecompletion-popup.h"
+#include "gsc-provider.h"
+#include "gsc-trigger.h"
+#include "gsc-popup.h"
 
-struct _GtkSourceCompletionEventOptions{
-	GtkSourceCompletionPopupOptions popup_options;
+struct _GscManagerEventOptions{
+	GscPopupOptions popup_options;
 	gboolean autoselect;
 };
 
-struct _GtkSourceCompletionClass
+struct _GscManagerClass
 {
 	GObjectClass parent_class;
 };
 
-struct _GtkSourceCompletion
+struct _GscManager
 {
 	GObject parent_instance;
-	GtkSourceCompletionPrivate *priv;
+	GscManagerPrivate *priv;
 };
 
 
 GType 
-gtk_source_completion_get_type (void) G_GNUC_CONST;
+gsc_manager_get_type (void) G_GNUC_CONST;
 
 
 /********************** Control Functions *********************/
 /*
- * This functions will be deleted when we insert GtkSourceCompletion
+ * This functions will be deleted when we insert GscManager
  * into GtkSourceView. These functions store the relationship between the
- * GtkSourceCompletions and the GtkTextView.
+ * GscManagers and the GtkTextView.
  */
 
 /**
- * gtk_source_completion_get_from_view:
+ * gsc_get_from_view:
  * @view: the GtkSourceView
  *
- * Returns NULL if the GtkTextView haven't got an associated GtkSourceCompletion
- * or the GtkSourceCompletion of this GtkTextView
+ * Returns NULL if the GtkTextView haven't got an associated GscManager
+ * or the GscManager of this GtkTextView
  * 
  **/
-GtkSourceCompletion*
-gtk_source_completion_get_from_view(GtkTextView *view);
+GscManager*
+gsc_manager_get_from_view(GtkTextView *view);
 
 /***************************************************************/
 
 /**
- * gtk_source_completion_new:
+ * gsc_new:
  * @view: a #GtkSourceView.
  *
- * Creates a new #GtkSourceCompletion asociated to a GtkSourceView
+ * Creates a new #GscManager asociated to a GtkSourceView
  *
- * Returns: value: A new #GtkSourceCompletion
+ * Returns: value: A new #GscManager
  **/
-GtkSourceCompletion* 
-gtk_source_completion_new (GtkTextView *view);
+GscManager* 
+gsc_manager_new (GtkTextView *view);
 
 /**
- * gtk_source_completion_get_view:
- * @completion: the #GtkSourceCompletion
+ * gsc_get_view:
+ * @completion: the #GscManager
  *
  * Returns: The internal #GtkTextView of this completion.
  * 
  **/
 GtkTextView* 
-gtk_source_completion_get_view(GtkSourceCompletion *completion);
+gsc_manager_get_view(GscManager *completion);
 
 /**
- * gtk_source_completion_is_visible:
- * @completion: The #GtkSourceCompletion
+ * gsc_is_visible:
+ * @completion: The #GscManager
  *
  * Returns TRUE if the completion popup is visible.
  *
  */
 gboolean
-gtk_source_completion_is_visible(GtkSourceCompletion *completion);
+gsc_manager_is_visible(GscManager *completion);
 
 /**
- * gtk_source_completion_register_provider:
- * @completion: the #GtkSourceCompletion
- * @provider: The #GtkSourceCompletionProvider.
+ * gsc_register_provider:
+ * @completion: the #GscManager
+ * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to register this provider
  *
  * This function register the provider into the completion and reference it. When 
@@ -133,14 +133,14 @@ gtk_source_completion_is_visible(GtkSourceCompletion *completion);
  *
  **/
 gboolean
-gtk_source_completion_register_provider(GtkSourceCompletion *completion, 
-					GtkSourceCompletionProvider *provider,
+gsc_manager_register_provider(GscManager *completion, 
+					GscProvider *provider,
 					const gchar *trigger_name);
 
 /**
- * gtk_source_completion_unregister_provider:
- * @completion: the #GtkSourceCompletion
- * @provider: The #GtkSourceCompletionProvider.
+ * gsc_unregister_provider:
+ * @completion: the #GscManager
+ * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to unregister this provider
  *
  * This function unregister the provider.
@@ -150,26 +150,26 @@ gtk_source_completion_register_provider(GtkSourceCompletion *completion,
  * 
  **/
 gboolean
-gtk_source_completion_unregister_provider(GtkSourceCompletion *completion,
-					  GtkSourceCompletionProvider *provider,
+gsc_manager_unregister_provider(GscManager *completion,
+					  GscProvider *provider,
 					  const gchar *trigger_name);
 
 /**
- * gtk_source_completion_get_provider:
- * @completion: The #GtkSourceCompletion
+ * gsc_get_provider:
+ * @completion: The #GscManager
  * @provider_name: Provider's name that you are looking for.
  *
  * Returns The provider if the completion has this provider registered or 
  * NULL if not.
  *
  */
-GtkSourceCompletionProvider*
-gtk_source_completion_get_provider(GtkSourceCompletion *completion,
+GscProvider*
+gsc_manager_get_provider(GscManager *completion,
 				   const gchar* provider_name);
 
 /**
- * gtk_source_completion_register_trigger:
- * @completion: The #GtkSourceCompletion
+ * gsc_register_trigger:
+ * @completion: The #GscManager
  * @trigger: The trigger to register
  *
  * This function register a completion trigger. If the completion is actived
@@ -177,12 +177,12 @@ gtk_source_completion_get_provider(GtkSourceCompletion *completion,
  * object
  */
 void
-gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
-				       GtkSourceCompletionTrigger *trigger);
+gsc_manager_register_trigger(GscManager *completion,
+				       GscTrigger *trigger);
 
 /**
- * gtk_source_completion_unregister_trigger:
- * @completion: The #GtkSourceCompletion
+ * gsc_unregister_trigger:
+ * @completion: The #GscManager
  * @trigger: The trigger to unregister
  *
  * This function unregister a completion trigger. If the completion is actived
@@ -190,12 +190,12 @@ gtk_source_completion_register_trigger(GtkSourceCompletion *completion,
  * object
  */																
 void
-gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
-					 GtkSourceCompletionTrigger *trigger);
+gsc_manager_unregister_trigger(GscManager *completion,
+					 GscTrigger *trigger);
 
 /**
- * gtk_source_completion_get_trigger:
- * @completion: The #GtkSourceCompletion
+ * gsc_get_trigger:
+ * @completion: The #GscManager
  * @trigger_name: The trigger name to get
  *
  * This function return the trigger with this name.
@@ -203,14 +203,14 @@ gtk_source_completion_unregister_trigger(GtkSourceCompletion *completion,
  * Returns The trigger or NULL if not exists
  *
  */
-GtkSourceCompletionTrigger*
-gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
+GscTrigger*
+gsc_manager_get_trigger(GscManager *completion,
 				  const gchar* trigger_name);
 
 
 /**
- * gtk_source_completion_get_active_trigger:
- * @completion: The #GtkSourceCompletion
+ * gsc_get_active_trigger:
+ * @completion: The #GscManager
  *
  * This function return the active trigger. The active trigger is the last
  * trigger raised if the completion is active. If the completion is not visible then
@@ -219,41 +219,41 @@ gtk_source_completion_get_trigger(GtkSourceCompletion *completion,
  * Returns The trigger or NULL if completion is not active
  *
  */
-GtkSourceCompletionTrigger*
-gtk_source_completion_get_active_trigger(GtkSourceCompletion *completion);
+GscTrigger*
+gsc_manager_get_active_trigger(GscManager *completion);
 
 /**
- * gtk_source_completion_activate:
- * @completion: The #GtkSourceCompletion
+ * gsc_activate:
+ * @completion: The #GscManager
  *
  * This function activate the completion mechanism. The completion connects 
  * all signals and activate all registered triggers.
  */
 void
-gtk_source_completion_activate(GtkSourceCompletion *completion);
+gsc_manager_activate(GscManager *completion);
 
 /**
- * gtk_source_completion_deactivate:
- * @completion: The #GtkSourceCompletion
+ * gsc_deactivate:
+ * @completion: The #GscManager
  *
  * This function deactivate the completion mechanism. The completion disconnect
  * all signals and deactivate all registered triggers.
  */
 void
-gtk_source_completion_deactivate(GtkSourceCompletion *completion);
+gsc_manager_deactivate(GscManager *completion);
 
 /**
- * gtk_source_completion_finish_completion:
- * @completion: The #GtkSourceCompletion
+ * gsc_finish_completion:
+ * @completion: The #GscManager
  *
  * This function finish the completion if it is active (visible).
  */
 void
-gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
+gsc_manager_finish_completion(GscManager *completion);
 
 /**
- * gtk_source_completion_trigger_event:
- * @completion: the #GtkSourceCompletion
+ * gsc_trigger_event:
+ * @completion: the #GscManager
  * @trigger_name: The event name to raise
  * @event_data: This object will be passed to the providers to give them some special information of the event
  *
@@ -262,13 +262,13 @@ gtk_source_completion_finish_completion(GtkSourceCompletion *completion);
  * 
  **/
 void 
-gtk_source_completion_trigger_event(GtkSourceCompletion *completion, 
+gsc_manager_trigger_event(GscManager *completion, 
 				    const gchar *trigger_name, 
 				    gpointer event_data);
 
 /**
- * gtk_source_completion_trigger_event:
- * @completion: the #GtkSourceCompletion
+ * gsc_trigger_event:
+ * @completion: the #GscManager
  * @trigger_name: The event name to raise
  * @options: Options to tell the completion how it must to work.
  * @event_data: This object will be passed to the providers to give them some special information of the event
@@ -278,23 +278,23 @@ gtk_source_completion_trigger_event(GtkSourceCompletion *completion,
  * 
  **/
 void 
-gtk_source_completion_trigger_event_with_opts(GtkSourceCompletion *completion, 
+gsc_manager_trigger_event_with_opts(GscManager *completion, 
 				    const gchar *trigger_name,
-				    GtkSourceCompletionEventOptions *options,
+				    GscManagerEventOptions *options,
 				    gpointer event_data);
 
 /**
- * gtk_source_completion_set_current_info:
- * @self: The #GtkSourceCompletion
+ * gsc_set_current_info:
+ * @self: The #GscManager
  * @info: Info markup to be shown into for current proposal.
  *
- * You can use this function when a GtkSourceCompletionProposal emit the 
+ * You can use this function when a GscProposal emit the 
  * display-info signal to set the current info.
  */
 void
-gtk_source_completion_set_current_info(GtkSourceCompletion *self,
+gsc_manager_set_current_info(GscManager *self,
 					     gchar *info);
 
 G_END_DECLS
 
-#endif /* _GTK_SOURCE_COMPLETION_H_ */
+#endif /* _GSC_H_ */

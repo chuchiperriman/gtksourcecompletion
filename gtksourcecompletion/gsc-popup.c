@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gtksourcecompletion-popup.c
+ *  gsc-popup.c
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -18,18 +18,18 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-#include "gtksourcecompletion-popup.h"
-#include "gtksourcecompletion-tree.h"
-#include "gtksourcecompletion-i18n.h"
-#include "gtksourcecompletion-utils.h"
-#include "gtksourcecompletion-proposal.h"
+#include "gsc-popup.h"
+#include "gsc-tree.h"
+#include "gsc-i18n.h"
+#include "gsc-utils.h"
+#include "gsc-proposal.h"
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
 
-#define GTK_SOURCE_COMPLETION_POPUP_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
-					 GTK_TYPE_SOURCE_COMPLETION_POPUP,                    \
-					 GtkSourceCompletionPopupPriv))
+#define GSC_POPUP_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
+					 GSC_TYPE_POPUP,                    \
+					 GscPopupPriv))
 					 
 
 /* Signals */
@@ -42,7 +42,7 @@ enum
 
 static guint popup_signals[LAST_SIGNAL] = { 0 };
 
-struct _GtkSourceCompletionPopupPriv
+struct _GscPopupPriv
 {
 	GtkWidget *info_window;
 	GtkWidget *info_button;
@@ -55,49 +55,49 @@ struct _GtkSourceCompletionPopupPriv
 	gboolean destroy_has_run;
 };
 
-G_DEFINE_TYPE(GtkSourceCompletionPopup, gtk_source_completion_popup, GTK_TYPE_WINDOW);
+G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
 
-static GtkSourceCompletionPopupOptions default_options = {
-	GTK_SOURCE_COMPLETION_POPUP_POSITION_CURSOR,
-	GTK_SOURCE_COMPLETION_POPUP_FILTER_NONE
+static GscPopupOptions default_options = {
+	GSC_POPUP_POSITION_CURSOR,
+	GSC_POPUP_FILTER_NONE
 };
 
 static void
-_proposal_selected_cb (GtkSourceCompletionTree *tree, 
-		   GtkSourceCompletionProposal *proposal,
+_proposal_selected_cb (GscTree *tree, 
+		   GscProposal *proposal,
 		   gpointer user_data);
 
 static void 
-_selection_changed_cd(GtkSourceCompletionTree *tree, 
-		      GtkSourceCompletionProposal *proposal,
+_selection_changed_cd(GscTree *tree, 
+		      GscProposal *proposal,
 		      gpointer user_data);
 
 
-static GtkSourceCompletionTree*
-_get_current_tree(GtkSourceCompletionPopup *self)
+static GscTree*
+_get_current_tree(GscPopup *self)
 {
 	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
-	GtkSourceCompletionTree *tree =
-		GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
+	GscTree *tree =
+		GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
 	
 	return tree;
 }
 
-static GtkSourceCompletionTree*
-_get_tree_by_name(GtkSourceCompletionPopup *self, const gchar* tree_name)
+static GscTree*
+_get_tree_by_name(GscPopup *self, const gchar* tree_name)
 {
-	GtkSourceCompletionTree *tree =
-		GTK_SOURCE_COMPLETION_TREE(g_hash_table_lookup(self->priv->trees,tree_name));
+	GscTree *tree =
+		GSC_TREE(g_hash_table_lookup(self->priv->trees,tree_name));
 		
 	if (tree==NULL)
 	{
 		/*We create the new trees*/
-		GtkWidget *completion_tree = gtk_source_completion_tree_new(); 
+		GtkWidget *completion_tree = gsc_tree_new(); 
 		g_hash_table_insert(self->priv->trees,(gpointer)tree_name,completion_tree);
 		GtkWidget *label = gtk_label_new(tree_name);
 		gtk_notebook_append_page(GTK_NOTEBOOK(self->priv->notebook),
 			GTK_WIDGET(completion_tree),label);
-		tree = GTK_SOURCE_COMPLETION_TREE(completion_tree);
+		tree = GSC_TREE(completion_tree);
 		gtk_widget_show_all(completion_tree);
 		g_signal_connect(completion_tree, 
 				"proposal-selected",
@@ -118,13 +118,13 @@ _get_tree_by_name(GtkSourceCompletionPopup *self, const gchar* tree_name)
  * the position is under the text.
  */
 static gboolean 
-_get_popup_position_in_cursor(GtkSourceCompletionPopup *self, gint *x, gint *y)
+_get_popup_position_in_cursor(GscPopup *self, gint *x, gint *y)
 {
 	gint w,h,xtext,ytext;
 	gint sw = gdk_screen_width();
 	gint sh = gdk_screen_height();
 
-	gtk_source_view_get_cursor_pos(GTK_TEXT_VIEW(self->priv->view),x,y);
+	gsc_get_cursor_pos(GTK_TEXT_VIEW(self->priv->view),x,y);
 	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
 	if (*x+w > sw) *x = sw - w -4;
 	/*If we cannot show it down, we show it up.*/
@@ -142,7 +142,7 @@ _get_popup_position_in_cursor(GtkSourceCompletionPopup *self, gint *x, gint *y)
 }
 
 static void
-_get_popup_position_center_screen(GtkSourceCompletionPopup *self, gint *x, gint *y)
+_get_popup_position_center_screen(GscPopup *self, gint *x, gint *y)
 {
 	gint w,h;
 	gint sw = gdk_screen_width();
@@ -154,10 +154,10 @@ _get_popup_position_center_screen(GtkSourceCompletionPopup *self, gint *x, gint 
 }
 
 static void
-_show_completion_info(GtkSourceCompletionPopup *self)
+_show_completion_info(GscPopup *self)
 {
-	GtkSourceCompletionProposal *proposal;
-	gtk_source_completion_popup_get_selected_proposal(self,&proposal);
+	GscProposal *proposal;
+	gsc_popup_get_selected_proposal(self,&proposal);
 	if (proposal!=NULL)
 	{
 		g_signal_emit_by_name (self, "display-info",proposal);
@@ -180,7 +180,7 @@ static void
 _info_toggled_cb(GtkToggleButton *widget,
 		 gpointer user_data)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(user_data);
+	GscPopup *self = GSC_POPUP(user_data);
 	if (gtk_toggle_button_get_active(widget))
 	{
 		_show_completion_info(self);
@@ -192,19 +192,19 @@ _info_toggled_cb(GtkToggleButton *widget,
 }
 
 static void
-_proposal_selected_cb (GtkSourceCompletionTree *tree, 
-		   GtkSourceCompletionProposal *proposal,
+_proposal_selected_cb (GscTree *tree, 
+		   GscProposal *proposal,
 		   gpointer user_data)
 {
 	g_signal_emit (G_OBJECT (user_data), popup_signals[ITEM_SELECTED], 0, proposal);
 }
 
 static void 
-_selection_changed_cd(GtkSourceCompletionTree *tree, 
-		      GtkSourceCompletionProposal *proposal,
+_selection_changed_cd(GscTree *tree, 
+		      GscProposal *proposal,
 		      gpointer user_data)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(user_data);
+	GscPopup *self = GSC_POPUP(user_data);
 
 	if (GTK_WIDGET_VISIBLE(self->priv->info_window))
 	{
@@ -218,7 +218,7 @@ _switch_page_cb(GtkNotebook *notebook,
 		gint page_num, 
 		gpointer user_data)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(user_data);
+	GscPopup *self = GSC_POPUP(user_data);
 	GtkWidget *tree = gtk_notebook_get_nth_page(notebook,page_num);
 	const gchar* label_text = gtk_notebook_get_tab_label_text(notebook,tree);
 	
@@ -228,16 +228,16 @@ _switch_page_cb(GtkNotebook *notebook,
 }
 
 static void
-_update_pages_visibility(GtkSourceCompletionPopup *self)
+_update_pages_visibility(GscPopup *self)
 {
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	guint i, num_pages_with_data = 0;
 	gboolean first_set = FALSE;
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	for(i=0;i<pages;i++)
 	{
-		tree= GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gtk_source_completion_tree_has_proposals(tree))
+		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gsc_tree_has_proposals(tree))
 		{
 			if (!first_set)
 			{
@@ -256,13 +256,13 @@ _update_pages_visibility(GtkSourceCompletionPopup *self)
 }
 
 static void
-gtk_source_completion_popup_show_with_opts(GtkWidget *widget, GtkSourceCompletionPopupOptions *options)
+gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(widget);
+	GscPopup *self = GSC_POPUP(widget);
 	gint x, y;
-	if (options->position_type == GTK_SOURCE_COMPLETION_POPUP_POSITION_CURSOR)
+	if (options->position_type == GSC_POPUP_POSITION_CURSOR)
 		_get_popup_position_in_cursor(self,&x,&y);
-	else if (options->position_type == GTK_SOURCE_COMPLETION_POPUP_POSITION_CENTER_SCREEN)
+	else if (options->position_type == GSC_POPUP_POSITION_CENTER_SCREEN)
 		_get_popup_position_center_screen(self,&x,&y);
 	gtk_window_move(GTK_WINDOW(self), x, y);
 	
@@ -271,86 +271,86 @@ gtk_source_completion_popup_show_with_opts(GtkWidget *widget, GtkSourceCompletio
 	if (!GTK_WIDGET_VISIBLE(self))
 	{
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),FALSE);
-		GTK_WIDGET_CLASS (gtk_source_completion_popup_parent_class)->show (widget);
+		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);
 	}
-	gtk_source_completion_tree_select_first(_get_current_tree(self));
+	gsc_tree_select_first(_get_current_tree(self));
 }
 
 static void
-gtk_source_completion_popup_show(GtkWidget *widget)
+gsc_popup_show(GtkWidget *widget)
 {
-	gtk_source_completion_popup_show_with_opts(widget,&default_options);
+	gsc_popup_show_with_opts(widget,&default_options);
 }
 
 static void
-gtk_source_completion_popup_hide(GtkWidget *widget)
+gsc_popup_hide(GtkWidget *widget)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(widget);
+	GscPopup *self = GSC_POPUP(widget);
 	
-	GTK_WIDGET_CLASS (gtk_source_completion_popup_parent_class)->hide (widget);
+	GTK_WIDGET_CLASS (gsc_popup_parent_class)->hide (widget);
 	gtk_widget_hide(self->priv->info_window);
 
 }
 
 static void
-gtk_source_completion_popup_realize (GtkWidget *widget)
+gsc_popup_realize (GtkWidget *widget)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(widget);
+	GscPopup *self = GSC_POPUP(widget);
 	gtk_container_set_border_width(GTK_CONTAINER(self),1);
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_resizable(GTK_WINDOW(self),TRUE);
 	
-	GTK_WIDGET_CLASS (gtk_source_completion_popup_parent_class)->realize (widget);
+	GTK_WIDGET_CLASS (gsc_popup_parent_class)->realize (widget);
 }
 
 static void
-gtk_source_completion_popup_finalize (GObject *object)
+gsc_popup_finalize (GObject *object)
 {
-	g_debug("Finish GtkSourceCompletionPopup");
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(object);
+	g_debug("Finish GscPopup");
+	GscPopup *self = GSC_POPUP(object);
 	
 	g_hash_table_destroy(self->priv->trees);
 	
-	G_OBJECT_CLASS (gtk_source_completion_popup_parent_class)->finalize (object);
+	G_OBJECT_CLASS (gsc_popup_parent_class)->finalize (object);
 	
 }
 
 static void
-gtk_source_completion_popup_destroy (GtkObject *object)
+gsc_popup_destroy (GtkObject *object)
 {
-	g_debug("Destroy GtkSourceCompletionPopup");
+	g_debug("Destroy GscPopup");
 
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP(object);
+	GscPopup *self = GSC_POPUP(object);
 	
 	if (!self->priv->destroy_has_run)
 	{
-		gtk_source_completion_popup_clear(self);
+		gsc_popup_clear(self);
 		self->priv->destroy_has_run = TRUE;
 	}
 	
-	GTK_OBJECT_CLASS (gtk_source_completion_popup_parent_class)->destroy (object);
+	GTK_OBJECT_CLASS (gsc_popup_parent_class)->destroy (object);
 	
 }
 
 static void
-gtk_source_completion_popup_class_init (GtkSourceCompletionPopupClass *klass)
+gsc_popup_class_init (GscPopupClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	GtkObjectClass *gtkobject_class = GTK_OBJECT_CLASS (klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-	g_type_class_add_private (klass, sizeof(GtkSourceCompletionPopupPriv));
+	g_type_class_add_private (klass, sizeof(GscPopupPriv));
 	
-	object_class->finalize = gtk_source_completion_popup_finalize;
-	gtkobject_class->destroy = gtk_source_completion_popup_destroy;
-	widget_class->show = gtk_source_completion_popup_show;
-	widget_class->hide = gtk_source_completion_popup_hide;
-	widget_class->realize = gtk_source_completion_popup_realize;
+	object_class->finalize = gsc_popup_finalize;
+	gtkobject_class->destroy = gsc_popup_destroy;
+	widget_class->show = gsc_popup_show;
+	widget_class->hide = gsc_popup_hide;
+	widget_class->realize = gsc_popup_realize;
 	
 	popup_signals[ITEM_SELECTED] =
 		g_signal_new ("proposal-selected",
 			      G_TYPE_FROM_CLASS (klass),
 			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      G_STRUCT_OFFSET (GtkSourceCompletionPopupClass, proposal_selected),
+			      G_STRUCT_OFFSET (GscPopupClass, proposal_selected),
 			      NULL, 
 			      NULL,
 			      g_cclosure_marshal_VOID__POINTER, 
@@ -372,15 +372,15 @@ gtk_source_completion_popup_class_init (GtkSourceCompletionPopupClass *klass)
 }
 
 static void
-gtk_source_completion_popup_init (GtkSourceCompletionPopup *self)
+gsc_popup_init (GscPopup *self)
 {
-	g_debug("Init GtkSourceCompletionPopup");
+	g_debug("Init GscPopup");
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
-	self->priv = GTK_SOURCE_COMPLETION_POPUP_GET_PRIVATE(self);
+	self->priv = GSC_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->trees = g_hash_table_new(g_str_hash,g_str_equal);
 
-	GtkWidget *completion_tree = gtk_source_completion_tree_new();
+	GtkWidget *completion_tree = gsc_tree_new();
 	
 	g_hash_table_insert(self->priv->trees,DEFAULT_PAGE,completion_tree);
 	
@@ -476,109 +476,109 @@ gtk_source_completion_popup_init (GtkSourceCompletionPopup *self)
 }
 
 GtkWidget*
-gtk_source_completion_popup_new (GtkTextView *view)
+gsc_popup_new (GtkTextView *view)
 {
-	GtkSourceCompletionPopup *self = GTK_SOURCE_COMPLETION_POPUP ( g_object_new (gtk_source_completion_popup_get_type() , NULL));
+	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() , NULL));
 	self->priv->view = GTK_WIDGET(view);
 	GTK_WINDOW(self)->type = GTK_WINDOW_POPUP;
 	return GTK_WIDGET(self);
 }
 
 void
-gtk_source_completion_popup_add_data(GtkSourceCompletionPopup *self,
-			      GtkSourceCompletionProposal* data)
+gsc_popup_add_data(GscPopup *self,
+			      GscProposal* data)
 {
-	GtkSourceCompletionTree *tree = _get_tree_by_name(self,
-						    gtk_source_completion_proposal_get_page_name(data));
+	GscTree *tree = _get_tree_by_name(self,
+						    gsc_proposal_get_page_name(data));
 	
-	gtk_source_completion_tree_add_data(tree,data);
+	gsc_tree_add_data(tree,data);
 }
 
 void
-gtk_source_completion_popup_clear(GtkSourceCompletionPopup *self)
+gsc_popup_clear(GscPopup *self)
 {
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	guint i;
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	for(i=0;i<pages;i++)
 	{
-		tree= GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		gtk_source_completion_tree_clear(tree);
+		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		gsc_tree_clear(tree);
 	}
 }
 
 gboolean
-gtk_source_completion_popup_select_first(GtkSourceCompletionPopup *self)
+gsc_popup_select_first(GscPopup *self)
 {
-	return gtk_source_completion_tree_select_first(_get_current_tree(self));
+	return gsc_tree_select_first(_get_current_tree(self));
 }
 
 gboolean 
-gtk_source_completion_popup_select_last(GtkSourceCompletionPopup *self)
+gsc_popup_select_last(GscPopup *self)
 {
-	return gtk_source_completion_tree_select_last(_get_current_tree(self));
+	return gsc_tree_select_last(_get_current_tree(self));
 }
 
 gboolean
-gtk_source_completion_popup_select_previous(GtkSourceCompletionPopup *self, 
+gsc_popup_select_previous(GscPopup *self, 
 				     gint rows)
 {
-	return gtk_source_completion_tree_select_previous(_get_current_tree(self),rows);
+	return gsc_tree_select_previous(_get_current_tree(self),rows);
 }
 
 gboolean
-gtk_source_completion_popup_select_next(GtkSourceCompletionPopup *self, 
+gsc_popup_select_next(GscPopup *self, 
 				 gint rows)
 {
-	return gtk_source_completion_tree_select_next(_get_current_tree(self),rows);
+	return gsc_tree_select_next(_get_current_tree(self),rows);
 }
 
 gboolean
-gtk_source_completion_popup_get_selected_proposal(GtkSourceCompletionPopup *self,
-					GtkSourceCompletionProposal **proposal)
+gsc_popup_get_selected_proposal(GscPopup *self,
+					GscProposal **proposal)
 {
-	return gtk_source_completion_tree_get_selected_proposal(_get_current_tree(self),proposal);
+	return gsc_tree_get_selected_proposal(_get_current_tree(self),proposal);
 }
 
 gboolean
-gtk_source_completion_popup_has_proposals(GtkSourceCompletionPopup *self)
+gsc_popup_has_proposals(GscPopup *self)
 {
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	guint i;
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	for(i=0;i<pages;i++)
 	{
-		tree= GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gtk_source_completion_tree_has_proposals(tree))
+		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gsc_tree_has_proposals(tree))
 			return TRUE;
 	}
 	return FALSE;
 }
 
 void
-gtk_source_completion_popup_toggle_proposal_info(GtkSourceCompletionPopup *self)
+gsc_popup_toggle_proposal_info(GscPopup *self)
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),
 				     !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->priv->info_button)));
 }
 
 void
-gtk_source_completion_popup_refresh(GtkSourceCompletionPopup *self)
+gsc_popup_refresh(GscPopup *self)
 {
-	gtk_source_completion_popup_show(GTK_WIDGET(self));
+	gsc_popup_show(GTK_WIDGET(self));
 }
 
 void
-gtk_source_completion_popup_refresh_with_opts(GtkSourceCompletionPopup *self,
-					      GtkSourceCompletionPopupOptions *options)
+gsc_popup_refresh_with_opts(GscPopup *self,
+					      GscPopupOptions *options)
 {
-	gtk_source_completion_popup_show_with_opts(GTK_WIDGET(self),options);
+	gsc_popup_show_with_opts(GTK_WIDGET(self),options);
 }
 
 void
-gtk_source_completion_popup_page_next(GtkSourceCompletionPopup *self)
+gsc_popup_page_next(GscPopup *self)
 {
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
 	gint original_page = page;
@@ -589,11 +589,11 @@ gtk_source_completion_popup_page_next(GtkSourceCompletionPopup *self)
 		if (page == pages)
 			page = 0;
 		
-		tree = GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
-		if (gtk_source_completion_tree_has_proposals(tree))
+		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
+		if (gsc_tree_has_proposals(tree))
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
-			gtk_source_completion_tree_select_first(tree);
+			gsc_tree_select_first(tree);
 			break;
 		}
 	
@@ -609,9 +609,9 @@ gtk_source_completion_popup_page_next(GtkSourceCompletionPopup *self)
 }
 
 void
-gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self)
+gsc_popup_page_previous(GscPopup *self)
 {
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	gint page = gtk_notebook_get_current_page(GTK_NOTEBOOK(self->priv->notebook));
 	gint original_page = page;
@@ -622,11 +622,11 @@ gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self)
 		if (page < 0)
 			page = pages -1;
 	
-		tree = GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));	
-		if (gtk_source_completion_tree_has_proposals(tree))
+		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));	
+		if (gsc_tree_has_proposals(tree))
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
-			gtk_source_completion_tree_select_first(tree);
+			gsc_tree_select_first(tree);
 			break;
 		}
 	}while(page!=original_page);
@@ -641,7 +641,7 @@ gtk_source_completion_popup_page_previous(GtkSourceCompletionPopup *self)
 }
 
 void
-gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
+gsc_popup_set_current_info(GscPopup *self,
 					     gchar *info)
 {
 	if (info!=NULL)
@@ -656,15 +656,15 @@ gtk_source_completion_popup_set_current_info(GtkSourceCompletionPopup *self,
 }
 
 gint
-gtk_source_completion_popup_get_num_active_pages(GtkSourceCompletionPopup *self)
+gsc_popup_get_num_active_pages(GscPopup *self)
 {
 	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
 	guint i, num_pages_with_data = 0;
-	GtkSourceCompletionTree *tree;
+	GscTree *tree;
 	for(i=0;i<pages;i++)
 	{
-		tree= GTK_SOURCE_COMPLETION_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gtk_source_completion_tree_has_proposals(tree))
+		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		if (gsc_tree_has_proposals(tree))
 		{
 			++num_pages_with_data;
 		}
