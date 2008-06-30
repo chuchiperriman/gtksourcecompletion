@@ -16,35 +16,35 @@ lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
 BUILT_SOURCES =                         \
-        gtksourcecompletion-marshal.c                 \
-        gtksourcecompletion-marshal.h
+        gsc-marshal.c                 \
+        gsc-marshal.h
 
 libgtksourcecompletion_headers = 	\
-	gtksourcecompletion-provider.h	\
-	gtksourcecompletion-trigger.h		\
-	gtksourcecompletion-utils.h		\
-	gtksourcecompletion.h				\
-	gtksourcecompletion-proposal.h			\
-	gtksourcecompletion-trigger-customkey.h	\
-	gtksourcecompletion-trigger-autowords.h	\
+	gsc-provider.h	\
+	gsc-trigger.h		\
+	gsc-utils.h		\
+	gsc-manager.h				\
+	gsc-proposal.h			\
+	gsc-trigger-customkey.h	\
+	gsc-trigger-autowords.h	\
 	gsc-documentwords-provider.h		\
-	gtksourcecompletion-tree.h				\
-	gtksourcecompletion-i18n.h			\
-	gtksourcecompletion-popup.h
+	gsc-tree.h				\
+	gsc-i18n.h			\
+	gsc-popup.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
-	gtksourcecompletion.c			\
-	gtksourcecompletion-provider.c		\
-	gtksourcecompletion-trigger.c		\
-	gtksourcecompletion-utils.c			\
-	gtksourcecompletion-proposal.c			\
-	gtksourcecompletion-trigger-customkey.c	\
-	gtksourcecompletion-trigger-autowords.c	\
+	gsc-manager.c			\
+	gsc-provider.c		\
+	gsc-trigger.c		\
+	gsc-utils.c			\
+	gsc-proposal.c			\
+	gsc-trigger-customkey.c	\
+	gsc-trigger-autowords.c	\
 	gsc-documentwords-provider.c		\
-	gtksourcecompletion-tree.c				\
-	gtksourcecompletion-popup.c				\
-	$(libgtk_source_completion_headers)
+	gsc-tree.c				\
+	gsc-popup.c				\
+	$(libgtksourcecompletion_headers)
 	
 
 libgtksourcecompletion_1_0_la_LIBADD = \
@@ -55,26 +55,26 @@ libgtksourcecompletion_1_0_la_LDFLAGS = \
 	`pkg-config --libs gtksourceview-2.0`
 
 INST_H_FILES = \
-	gtksourcecompletion-provider.h	\
-	gtksourcecompletion-trigger.h		\
-	gtksourcecompletion-utils.h		\
-	gtksourcecompletion.h				\
-	gtksourcecompletion-proposal.h			\
-	gtksourcecompletion-trigger-customkey.h	\
-	gtksourcecompletion-trigger-autowords.h	\
-	gtksourcecompletion-providers.h		\
-	gtksourcecompletion-tree.h				\
-	gtksourcecompletion-i18n.h			\
-	gtksourcecompletion-popup.h
+	gsc-provider.h	\
+	gsc-trigger.h		\
+	gsc-utils.h		\
+	gsc-manager.h				\
+	gsc-proposal.h			\
+	gsc-trigger-customkey.h	\
+	gsc-trigger-autowords.h	\
+	gsc-providers.h		\
+	gsc-tree.h				\
+	gsc-i18n.h			\
+	gsc-popup.h
 
-gtksourcecompletion-marshal.h: gtksourcecompletion-marshal.list $(GLIB_GENMARSHAL)
+gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@
 
-gtksourcecompletion-marshal.c: gtksourcecompletion-marshal.list $(GLIB_GENMARSHAL)
-	echo "#include \"gtksourcecompletion-marshal.h\"" > $@ && \
+gsc-marshal.c: gsc-marshal.list $(GLIB_GENMARSHAL)
+	echo "#include \"gsc-marshal.h\"" > $@ && \
 	$(GLIB_GENMARSHAL) $< --body --prefix=gtksourcecompletion_marshal >> $@
 
-EXTRA_DIST=gtksourcecompletion-marshal.list
+EXTRA_DIST=gsc-marshal.list
 
 CLEAN_FILES=$(BUILT_SOURCES)
 

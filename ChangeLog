@@ -1,3 +1,8 @@
+2008-06-30  Chuchi  <perriman@homer>
+
+	* namespace: Change all application namespace. Now all objects start
+	with gsc_
+
 2008-06-29  Chuchi  <perriman@homer>
 
 	* gtksourcecompletion-popup: Added PopupOptions in refresh function.

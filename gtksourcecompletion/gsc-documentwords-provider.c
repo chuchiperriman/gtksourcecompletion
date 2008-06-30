@@ -19,7 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "gsc-documentwords-provider.h"
-#include "gtksourcecompletion-utils.h"
+#include "gsc-utils.h"
 
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
 
@@ -39,16 +39,16 @@ enum  {
 	GSC_DOCUMENTWORDS_PROVIDER_DUMMY_PROPERTY,
 };
 static const gchar* 
-gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self);
+gsc_documentwords_provider_real_get_name(GscProvider *self);
 static GList* 
-gsc_documentwords_provider_real_get_proposals (GtkSourceCompletionProvider* base, 
-					  GtkSourceCompletion* completion, 
-					  GtkSourceCompletionTrigger* trigger);
+gsc_documentwords_provider_real_get_proposals (GscProvider* base, 
+					  GscManager* completion, 
+					  GscTrigger* trigger);
 static void 
-gsc_documentwords_provider_real_finish (GtkSourceCompletionProvider* base, 
-						GtkSourceCompletion* completion);
+gsc_documentwords_provider_real_finish (GscProvider* base, 
+						GscManager* completion);
 
-static GtkSourceCompletionProviderIface* gsc_documentwords_provider_parent_iface = NULL;
+static GscProviderIface* gsc_documentwords_provider_parent_iface = NULL;
 static gpointer gsc_documentwords_provider_parent_class = NULL;
 
 static gboolean
@@ -61,8 +61,8 @@ static gint
 utf8_len_compare(gconstpointer a, gconstpointer b)
 {
     glong lena,lenb;
-    lena = g_utf8_strlen(gtk_source_completion_proposal_get_label((GtkSourceCompletionProposal*)a),-1);
-    lenb = g_utf8_strlen(gtk_source_completion_proposal_get_label((GtkSourceCompletionProposal*)b),-1);
+    lena = g_utf8_strlen(gsc_proposal_get_label((GscProposal*)a),-1);
+    lenb = g_utf8_strlen(gsc_proposal_get_label((GscProposal*)b),-1);
     if (lena==lenb)
         return 0;
     else if (lena<lenb)
@@ -161,11 +161,11 @@ gh_add_key_to_list(gpointer key,
 	{
 		return;
 	}
-	GtkSourceCompletionProposal *data;
+	GscProposal *data;
 	if (is_valid_word(self->priv->cleaned_word,(gchar*)key))
 	{
 		self->priv->count++;
-		data = gtk_source_completion_proposal_new((gchar*)key,
+		data = gsc_proposal_new((gchar*)key,
 							  NULL,
 							  self->priv->icon);
 		self->priv->data_list = g_list_append(self->priv->data_list,data);
@@ -192,20 +192,20 @@ _sort_completion_list(GscDocumentwordsProvider *self, GList *data_list)
 
 
 static const gchar* 
-gsc_documentwords_provider_real_get_name(GtkSourceCompletionProvider *self)
+gsc_documentwords_provider_real_get_name(GscProvider *self)
 {
 	return GSC_DOCUMENTWORDS_PROVIDER_NAME;
 }
 
 static GList* 
-gsc_documentwords_provider_real_get_proposals (GtkSourceCompletionProvider* base, 
-					  GtkSourceCompletion* completion, 
-					  GtkSourceCompletionTrigger *trigger)
+gsc_documentwords_provider_real_get_proposals (GscProvider* base, 
+					  GscManager* completion, 
+					  GscTrigger *trigger)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
-	GtkTextView *view = gtk_source_completion_get_view(completion);
+	GtkTextView *view = gsc_manager_get_view(completion);
 	
-	gchar* current_word = gtk_source_view_get_last_word_and_iter(view,
+	gchar* current_word = gsc_get_last_word_and_iter(view,
 								     &self->priv->start_iter,
 								     NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
@@ -245,13 +245,13 @@ gsc_documentwords_provider_real_get_proposals (GtkSourceCompletionProvider* base
 		self->priv->is_completing = FALSE;
 	}
 
-	/* GtkSourceCompletion frees this list and data */
+	/* GscManager frees this list and data */
 	return self->priv->data_list;
 }
 
 static void 
-gsc_documentwords_provider_real_finish (GtkSourceCompletionProvider* base, 
-						GtkSourceCompletion* completion)
+gsc_documentwords_provider_real_finish (GscProvider* base, 
+						GscManager* completion)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	/*Clean current word list*/
@@ -308,7 +308,7 @@ gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass * klass)
 
 
 static void 
-gsc_documentwords_provider_interface_init (GtkSourceCompletionProviderIface * iface)
+gsc_documentwords_provider_interface_init (GscProviderIface * iface)
 {
 	gsc_documentwords_provider_parent_iface = g_type_interface_peek_parent (iface);
 	iface->get_name = gsc_documentwords_provider_real_get_name;
@@ -348,12 +348,12 @@ GType gsc_documentwords_provider_get_type ()
 							   "GscDocumentwordsProvider", 
 							   &g_define_type_info,
 							   0);
-		static const GInterfaceInfo gtk_source_completion_provider_info = {(GInterfaceInitFunc) gsc_documentwords_provider_interface_init,
+		static const GInterfaceInfo gsc_provider_info = {(GInterfaceInitFunc) gsc_documentwords_provider_interface_init,
 										   (GInterfaceFinalizeFunc) NULL, 
 										   NULL};
 		g_type_add_interface_static (g_define_type_id, 
-					     GTK_TYPE_SOURCE_COMPLETION_PROVIDER, 
-					     &gtk_source_completion_provider_info);
+					     GSC_TYPE_PROVIDER, 
+					     &gsc_provider_info);
 	}
 	return g_define_type_id;
 }
