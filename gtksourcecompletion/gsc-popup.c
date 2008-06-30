@@ -22,7 +22,6 @@
 #include "gsc-tree.h"
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
-#include "gsc-proposal.h"
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200

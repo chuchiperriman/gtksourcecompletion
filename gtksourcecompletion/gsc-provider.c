@@ -28,17 +28,15 @@ gsc_provider_get_name(GscProvider *self)
 
 GList* 
 gsc_provider_get_proposals (GscProvider* self,
-					GscManager* completion, 
-					GscTrigger *trigger)
+			    GscTrigger *trigger)
 {
-	return GSC_PROVIDER_GET_INTERFACE (self)->get_proposals (self, completion, trigger);
+	return GSC_PROVIDER_GET_INTERFACE (self)->get_proposals (self, trigger);
 }
 
 void 
-gsc_provider_finish (GscProvider* self, 
-				       GscManager* completion)
+gsc_provider_finish (GscProvider* self)
 {
-	GSC_PROVIDER_GET_INTERFACE (self)->finish(self, completion);
+	GSC_PROVIDER_GET_INTERFACE (self)->finish(self);
 }
 
 static void 

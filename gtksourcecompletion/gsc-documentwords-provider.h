@@ -59,7 +59,7 @@ typedef enum{
  *
  */
 GscDocumentwordsProvider* 
-gsc_documentwords_provider_new();
+gsc_documentwords_provider_new(GtkTextView *view);
 
 /**
  * gsc_documentwords_provider_set_sort_type:

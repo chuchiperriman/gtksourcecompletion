@@ -162,7 +162,7 @@ gsc_tree_clear(GscTree *self);
  */
 void
 gsc_tree_add_data(GscTree *self,
-			     GscProposal* data);
+		GscProposal* data);
 
 /**
  * gsc_tree_has_proposals:

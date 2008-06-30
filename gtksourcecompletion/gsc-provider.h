@@ -24,6 +24,8 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include "gsc-proposal.h"
+#include "gsc-trigger.h"
 
 G_BEGIN_DECLS
 
@@ -36,19 +38,12 @@ G_BEGIN_DECLS
 typedef struct _GscProvider GscProvider;
 typedef struct _GscProviderIface GscProviderIface;
 
-#include "gsc-manager.h"
-#include "gsc-trigger.h"
-#include "gsc-proposal.h"
-
 struct _GscProviderIface {
-	
 	GTypeInterface parent;
 	const gchar* (*get_name) (GscProvider *self);
 	GList* (*get_proposals) (GscProvider* self,
-	 		    GscManager* completion, 
-	 		    GscTrigger *trigger);
-	void (*finish) (GscProvider* self,
-	 			GscManager* completion);							
+				 GscTrigger *trigger);
+	void (*finish) (GscProvider* self);
 };
 
 GType 
@@ -69,7 +64,6 @@ gsc_provider_get_name(GscProvider* self);
 /**
  * gsc_provider_get_proposals:
  * @self: the #GscProvider
- * @completion: The #GscManager.
  * @trigger: The #GscTrigger that raise the event
  *
  * The completion call this function when an event is raised.
@@ -81,20 +75,17 @@ gsc_provider_get_name(GscProvider* self);
  **/
 GList* 
 gsc_provider_get_proposals (GscProvider* self, 
-					 GscManager* completion, 
-					 GscTrigger *trigger);
+			    GscTrigger *trigger);
 
 /**
  * gsc_provider_finish:
  * @self: the #GscProvider
- * @view: The #GscManager.
  *
  * The completion call this function when it is goint to hide the popup
  * 
  **/					
 void 
-gsc_provider_finish (GscProvider* self, 
-				       GscManager* completion);
+gsc_provider_finish (GscProvider* self);
 
 G_END_DECLS
 

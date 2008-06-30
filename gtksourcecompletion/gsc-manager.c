@@ -135,7 +135,7 @@ end_completion (GscManager *completion)
 	do
 	{
 		GscProvider *provider =  GSC_PROVIDER(providers->data);
-		gsc_provider_finish(provider,completion);
+		gsc_provider_finish(provider);
 			
 	}while((providers = g_list_next(providers)) != NULL);
 	
@@ -690,8 +690,7 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 		do
 		{
 			provider =  GSC_PROVIDER(providers_list->data);
-			data_list = gsc_provider_get_proposals (
-							provider, completion, trigger);
+			data_list = gsc_provider_get_proposals (provider, trigger);
 			if (data_list != NULL)
 			{
 				original_list = data_list;

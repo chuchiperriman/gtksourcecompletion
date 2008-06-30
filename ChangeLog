@@ -2,6 +2,8 @@
 
 	* namespace: Change all application namespace. Now all objects start
 	with gsc_
+	* structure: Changed some methods to remove the gsc-manager dependency
+	en proposal, trigger and provider
 
 2008-06-29  Chuchi  <perriman@homer>
 

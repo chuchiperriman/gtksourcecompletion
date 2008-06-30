@@ -75,8 +75,8 @@ gsc_proposal_get_type (void) G_GNUC_CONST;
  */
 GscProposal*
 gsc_proposal_new(const gchar *label,
-				   const gchar *info,
-				   const GdkPixbuf *icon);
+		const gchar *info,
+		const GdkPixbuf *icon);
 
 /**
  * gsc_proposal_get_label:
@@ -121,9 +121,7 @@ gsc_proposal_get_page_name(GscProposal *proposal);
  *
  * Returns The proposal info markup asigned for this proposal.
  * The completion calls this function when the user want to view the proposal info.
- * This function emits the "display-info" signal. The default handler show the 
- * current info asigned to this proposal. You can overwrite this signal and set
- * the current info by hand using #gsc_set_current_info.
+ * You can overwrite this function if you need to change the default mechanism
  *
  */
 const gchar* 

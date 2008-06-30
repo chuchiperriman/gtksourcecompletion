@@ -32,6 +32,7 @@ struct _GscDocumentwordsProviderPrivate {
 	gint count;
 	GscDocumentwordsProviderSortType sort_type;
 	GtkTextIter start_iter;
+	GtkTextView *view;
 };
 
 #define GSC_DOCUMENTWORDS_PROVIDER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderPrivate))
@@ -40,13 +41,13 @@ enum  {
 };
 static const gchar* 
 gsc_documentwords_provider_real_get_name(GscProvider *self);
+
 static GList* 
-gsc_documentwords_provider_real_get_proposals (GscProvider* base, 
-					  GscManager* completion, 
-					  GscTrigger* trigger);
+gsc_documentwords_provider_real_get_proposals (GscProvider* base,
+					       GscTrigger* trigger);
+
 static void 
-gsc_documentwords_provider_real_finish (GscProvider* base, 
-						GscManager* completion);
+gsc_documentwords_provider_real_finish (GscProvider* base);
 
 static GscProviderIface* gsc_documentwords_provider_parent_iface = NULL;
 static gpointer gsc_documentwords_provider_parent_class = NULL;
@@ -166,8 +167,8 @@ gh_add_key_to_list(gpointer key,
 	{
 		self->priv->count++;
 		data = gsc_proposal_new((gchar*)key,
-							  NULL,
-							  self->priv->icon);
+					NULL,
+					self->priv->icon);
 		self->priv->data_list = g_list_append(self->priv->data_list,data);
 	}
 }
@@ -199,31 +200,25 @@ gsc_documentwords_provider_real_get_name(GscProvider *self)
 
 static GList* 
 gsc_documentwords_provider_real_get_proposals (GscProvider* base, 
-					  GscManager* completion, 
 					  GscTrigger *trigger)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
-	GtkTextView *view = gsc_manager_get_view(completion);
 	
-	gchar* current_word = gsc_get_last_word_and_iter(view,
-								     &self->priv->start_iter,
-								     NULL);
+	gchar* current_word = gsc_get_last_word_and_iter(self->priv->view,
+						         &self->priv->start_iter,
+							 NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
 	if (self->priv->cleaned_word == NULL)
 	{
 		if (self->priv->is_completing)
-		{
-			gsc_documentwords_provider_real_finish(base,
-							       completion);
-		}
+			gsc_documentwords_provider_real_finish(base);
 		return NULL;
 	}
 	
 	if (!self->priv->is_completing)
 	{
-		
-		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(view);
+		GtkTextBuffer *text_buffer = gtk_text_view_get_buffer(self->priv->view);
 		self->priv->current_words = get_all_words(self,text_buffer);
 	}
 	
@@ -250,8 +245,7 @@ gsc_documentwords_provider_real_get_proposals (GscProvider* base,
 }
 
 static void 
-gsc_documentwords_provider_real_finish (GscProvider* base, 
-						GscManager* completion)
+gsc_documentwords_provider_real_finish (GscProvider* base)
 {
 	GscDocumentwordsProvider *self = GSC_DOCUMENTWORDS_PROVIDER(base);
 	/*Clean current word list*/
@@ -289,8 +283,8 @@ gsc_documentwords_provider_finalize(GObject *object)
 	self->priv->cleaned_word = NULL;
 	self->priv->data_list = NULL;
 	self->priv->count= 0;
+	self->priv->view = NULL;
 	gdk_pixbuf_unref (self->priv->icon);
-	//g_completion_free(self->priv->completion);
 	
 	G_OBJECT_CLASS(gsc_documentwords_provider_parent_class)->finalize(object);
 }
@@ -320,11 +314,10 @@ gsc_documentwords_provider_interface_init (GscProviderIface * iface)
 static void gsc_documentwords_provider_init (GscDocumentwordsProvider * self)
 {
 	self->priv = g_new0(GscDocumentwordsProviderPrivate, 1);
-	//self->priv->completion = g_completion_new(NULL);
 	self->priv->current_words = NULL;
-	//self->priv->temp_list = NULL;
 	self->priv->is_completing = FALSE;
 	self->priv->count=0;
+	self->priv->view = NULL;
 	self->priv->cleaned_word=NULL;
 	self->priv->icon = gdk_pixbuf_new_from_file(ICON_FILE,NULL);
 	self->priv->sort_type = GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH;
@@ -359,9 +352,11 @@ GType gsc_documentwords_provider_get_type ()
 }
 
 GscDocumentwordsProvider*
-gsc_documentwords_provider_new()
+gsc_documentwords_provider_new(GtkTextView *view)
 {
-	return GSC_DOCUMENTWORDS_PROVIDER (g_object_new (TYPE_GSC_DOCUMENTWORDS_PROVIDER, NULL));
+	GscDocumentwordsProvider* self = GSC_DOCUMENTWORDS_PROVIDER (g_object_new (TYPE_GSC_DOCUMENTWORDS_PROVIDER, NULL));
+	self->priv->view = view;
+	return self;
 }
 
 void

@@ -36,8 +36,6 @@ G_BEGIN_DECLS
 typedef struct _GscTrigger GscTrigger;
 typedef struct _GscTriggerIface GscTriggerIface;
 
-#include "gsc-manager.h"
-
 struct _GscTriggerIface {
 	GTypeInterface parent;
 	const gchar* (*get_name) (GscTrigger *self);

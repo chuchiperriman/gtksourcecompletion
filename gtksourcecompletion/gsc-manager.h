@@ -24,6 +24,10 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+#include "gsc-provider.h"
+#include "gsc-trigger.h"
+#include "gsc-popup.h"
+
 
 G_BEGIN_DECLS
 
@@ -40,10 +44,6 @@ typedef struct _GscManagerClass GscManagerClass;
 typedef struct _GscManager GscManager;
 
 typedef struct _GscManagerEventOptions GscManagerEventOptions;
-
-#include "gsc-provider.h"
-#include "gsc-trigger.h"
-#include "gsc-popup.h"
 
 struct _GscManagerEventOptions{
 	GscPopupOptions popup_options;

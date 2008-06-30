@@ -21,6 +21,7 @@
 #define GSC_POPUP_H
 
 #include <gtk/gtk.h>
+#include "gsc-proposal.h"
 
 G_BEGIN_DECLS
 
@@ -38,9 +39,6 @@ typedef struct{
 	GscPopupPositionType position_type;
 	GscPopupFilterType filter_type;
 }GscPopupOptions;
-
-#include "gsc-proposal.h"
-
 
 /*
  * Type checking and casting macros
