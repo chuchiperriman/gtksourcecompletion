@@ -329,7 +329,7 @@ view_focus_out_event_cb(GtkWidget *widget,
 			gpointer user_data)
 {
 	GscManager *completion = GSC_MANAGER(user_data);
-	if (gsc_manager_is_visible(completion))
+	if (gsc_manager_is_visible(completion) && GTK_WIDGET_HAS_FOCUS(completion->priv->popup))
 	{
 		end_completion(completion);
 	}
@@ -711,7 +711,7 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 			{
 				last_proposal = (GscProposal*)data_list->data;
 				gsc_popup_add_data(completion->priv->popup,
-							      last_proposal);
+						   last_proposal);
 				++proposals;
 				
 			}while((data_list = g_list_next(data_list)) != NULL);
@@ -726,7 +726,8 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 					gsc_popup_refresh(completion->priv->popup);
 				else
 					gsc_popup_refresh_with_opts(completion->priv->popup,
-										      &options->popup_options);
+								    &options->popup_options);
+				
 				completion->priv->active_trigger = trigger;
 			}
 			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))

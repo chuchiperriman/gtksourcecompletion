@@ -80,6 +80,9 @@ void
 gsc_trigger_customkey_set_keys(GscTriggerCustomkey * self, 
 				 const gchar* keys);
 
+void
+gsc_trigger_customkey_set_opts(GscTriggerCustomkey *self,
+				GscManagerEventOptions *options);
 
 GType 
 gsc_trigger_customkey_get_type ();

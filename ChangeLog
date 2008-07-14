@@ -1,3 +1,11 @@
+2008-07-15  Chuchi  <perriman@homer>
+
+	* GscTriggerCustomKey: Add support to popup options
+	* GscPopup: 
+		- Added the filter(only the widget and the option to show it)
+		- Using the new hint type for the filter
+
+
 2008-06-30  Chuchi  <perriman@homer>
 
 	* namespace: Change all application namespace. Now all objects start

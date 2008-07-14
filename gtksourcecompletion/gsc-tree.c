@@ -166,7 +166,7 @@ gsc_tree_init (GscTree *self)
 						       G_TYPE_STRING, 
 						       G_TYPE_POINTER, 
 						       G_TYPE_POINTER);
-		
+
 	gtk_tree_view_set_model(GTK_TREE_VIEW(self->priv->tree_view),
 				GTK_TREE_MODEL(list_store));
 	

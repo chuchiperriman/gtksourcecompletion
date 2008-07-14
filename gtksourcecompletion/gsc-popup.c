@@ -50,6 +50,7 @@ struct _GscPopupPriv
 	GtkWidget *notebook;
 	GtkWidget *tab_label;
 	GtkWidget *next_page_icon;
+	GtkWidget *filter;
 	GHashTable *trees;
 	gboolean destroy_has_run;
 };
@@ -71,6 +72,10 @@ _selection_changed_cd(GscTree *tree,
 		      GscProposal *proposal,
 		      gpointer user_data);
 
+static void
+_filter_key_release_cb (GtkEntry *entry,
+			GdkEventKey    *event,
+			gpointer  user_data);
 
 static GscTree*
 _get_current_tree(GscPopup *self)
@@ -258,6 +263,11 @@ static void
 gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 {
 	GscPopup *self = GSC_POPUP(widget);
+	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->view),
+				GTK_TYPE_WINDOW));
+	gtk_window_set_transient_for(GTK_WINDOW(self),
+		parent);
+	
 	gint x, y;
 	if (options->position_type == GSC_POPUP_POSITION_CURSOR)
 		_get_popup_position_in_cursor(self,&x,&y);
@@ -272,7 +282,30 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),FALSE);
 		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);
 	}
+	
 	gsc_tree_select_first(_get_current_tree(self));
+	
+	/*Filter*/
+	switch(options->filter_type)
+	{
+		case GSC_POPUP_FILTER_NONE:
+		{
+			g_debug("sin filtro");
+			gtk_widget_hide(self->priv->filter);
+			gtk_widget_grab_focus(self->priv->view);
+			break;
+		}
+		default:
+		{
+			g_debug("con filtro");
+			gtk_widget_show(self->priv->filter);
+			gtk_window_present(GTK_WINDOW(self));
+			gtk_window_activate_focus(GTK_WINDOW(self));
+			gtk_widget_grab_focus(self->priv->filter);
+			return;
+		}
+	}
+	
 }
 
 static void
@@ -298,7 +331,6 @@ gsc_popup_realize (GtkWidget *widget)
 	gtk_container_set_border_width(GTK_CONTAINER(self),1);
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_resizable(GTK_WINDOW(self),TRUE);
-	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->realize (widget);
 }
 
@@ -374,7 +406,13 @@ static void
 gsc_popup_init (GscPopup *self)
 {
 	g_debug("Init GscPopup");
+	gtk_window_set_type_hint(GTK_WINDOW(self),
+		GDK_WINDOW_TYPE_HINT_POPUP_MENU);
+	//gtk_window_set_focus_on_map(GTK_WINDOW(self),FALSE);
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
+	gtk_window_set_decorated(GTK_WINDOW(self),FALSE);
+	
+	
 	self->priv = GSC_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->trees = g_hash_table_new(g_str_hash,g_str_equal);
@@ -396,6 +434,7 @@ gsc_popup_init (GscPopup *self)
 	gtk_widget_set_tooltip_text(info_icon, _("Show Proposal Info"));
 	GtkWidget *info_button = gtk_toggle_button_new();
 	self->priv->info_button = info_button;
+	gtk_button_set_focus_on_click(GTK_BUTTON(info_button),FALSE);
 	gtk_container_add(GTK_CONTAINER(info_button),info_icon);
 	g_signal_connect (G_OBJECT (info_button),
 			  "toggled",
@@ -424,7 +463,16 @@ gsc_popup_init (GscPopup *self)
 			 TRUE,
 			 10);
 	
+	/*Filter entry*/
+	self->priv->filter = gtk_entry_new();
+	
 	GtkWidget *vbox = gtk_vbox_new(FALSE,1);
+	gtk_box_pack_start(GTK_BOX(vbox),
+			   self->priv->filter,
+			   FALSE,
+			   FALSE,
+			   0);
+			   
 	gtk_box_pack_start(GTK_BOX(vbox),
 			   self->priv->notebook,
 			   TRUE,
@@ -472,6 +520,11 @@ gsc_popup_init (GscPopup *self)
 			"switch-page",
 			G_CALLBACK(_switch_page_cb),
 			(gpointer) self);
+			
+	g_signal_connect(self->priv->filter,
+			"key-release-event",
+			G_CALLBACK(_filter_key_release_cb),
+			(gpointer) self);
 }
 
 GtkWidget*
@@ -479,7 +532,6 @@ gsc_popup_new (GtkTextView *view)
 {
 	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() , NULL));
 	self->priv->view = GTK_WIDGET(view);
-	GTK_WINDOW(self)->type = GTK_WINDOW_POPUP;
 	return GTK_WIDGET(self);
 }
 
@@ -569,7 +621,7 @@ gsc_popup_refresh(GscPopup *self)
 
 void
 gsc_popup_refresh_with_opts(GscPopup *self,
-					      GscPopupOptions *options)
+			    GscPopupOptions *options)
 {
 	gsc_popup_show_with_opts(GTK_WIDGET(self),options);
 }
@@ -671,4 +723,19 @@ gsc_popup_get_num_active_pages(GscPopup *self)
 	return num_pages_with_data;
 }
 
+/* Control filter signals */
+
+static void
+_filter_set_content(GscPopup *self)
+{
+}
+
+static void
+_filter_key_release_cb (GtkEntry *entry,
+			GdkEventKey    *event,
+			gpointer  user_data)
+{
+	GscPopup *self = GSC_POPUP(user_data);
+	g_debug("Filer text: %s",gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
+}
 
