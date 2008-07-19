@@ -176,5 +176,9 @@ gsc_tree_has_proposals(GscTree *self);
 gint 
 gsc_tree_get_num_proposals(GscTree *self);
 
+void
+gsc_tree_filter(GscTree *self, const gchar* filter);
+
+
 G_END_DECLS
 #endif

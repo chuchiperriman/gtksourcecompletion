@@ -26,6 +26,8 @@
 #define GSC_TREE_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
 					 GSC_TYPE_TREE,                    \
 					 GscTreePriv))
+					 
+#include <string.h>
 
 /* Signals */
 enum
@@ -41,6 +43,10 @@ struct _GscTreePriv
 {
 	GtkWidget *tree_view;
 	gboolean destroy_has_run;
+	GtkListStore *list_store;
+	GtkTreeModelFilter *model_filter;
+	const gchar* current_filter;
+	gboolean active_filter;
 };
 
 static void
@@ -81,10 +87,44 @@ _selection_changed_cd(GtkTreeSelection *treeselection,
 
 G_DEFINE_TYPE(GscTree, gsc_tree, GTK_TYPE_SCROLLED_WINDOW);
 
+static gboolean
+_filter_by_name_func (GtkTreeModel *model,
+			GtkTreeIter *iter,
+			gpointer data)
+{
+	
+	GscTree *self = GSC_TREE(data);
+	if (!self->priv->active_filter)
+		return TRUE;
+		
+	const gchar* filter = self->priv->current_filter;
+	if (filter == NULL)
+		return TRUE;
+		
+	GValue current_name_value = {0,};
+	gtk_tree_model_get_value(model,
+				iter,
+				1,
+				&current_name_value);
+	const gchar* current_name = g_value_get_string(&current_name_value);
+	
+	if (current_name == NULL)
+		return TRUE;
+	
+	gint len_cur = strlen (filter);
+	if (strncmp(filter,current_name,len_cur)==0)
+	{
+		return TRUE;
+	}
+	return FALSE;
+}
+
 static void
 gsc_tree_finalize (GObject *object)
 {
 	g_debug("Finish GscTree");
+	GscTree *self = GSC_TREE(object);
+	self->priv->current_filter = NULL;
 	G_OBJECT_CLASS (gsc_tree_parent_class)->finalize (object);
 }
 
@@ -127,6 +167,8 @@ gsc_tree_init (GscTree *self)
 	g_debug("Init GscTree");
 	self->priv = GSC_TREE_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
+	self->priv->current_filter = NULL;
+	self->priv->active_filter = FALSE;
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(self),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
@@ -161,14 +203,25 @@ gsc_tree_init (GscTree *self)
 	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->tree_view), column);
 	
 	/* Create the model */
-	GtkListStore *list_store = gtk_list_store_new (4,
+	self->priv->list_store = gtk_list_store_new (4,
 						       GDK_TYPE_PIXBUF, 
 						       G_TYPE_STRING, 
 						       G_TYPE_POINTER, 
 						       G_TYPE_POINTER);
+	
+	GtkTreeModel *model = gtk_tree_model_filter_new(GTK_TREE_MODEL(self->priv->list_store),
+							NULL);
+
+	self->priv->model_filter = GTK_TREE_MODEL_FILTER(model);
+	
+	gtk_tree_model_filter_set_visible_func(self->priv->model_filter,
+						_filter_by_name_func,
+						self,
+						NULL);
 
 	gtk_tree_view_set_model(GTK_TREE_VIEW(self->priv->tree_view),
-				GTK_TREE_MODEL(list_store));
+				model);
+	
 	
 	/* Connect signals */
 	
@@ -212,9 +265,7 @@ gsc_tree_add_data(GscTree *self,
 	g_assert(data != NULL);
 	
 	GtkTreeIter iter;
-	GtkListStore *store;
-	
-	store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view)));
+	GtkListStore *store = self->priv->list_store;
 	
 	gtk_list_store_append (store,&iter);
 			
@@ -229,7 +280,7 @@ gsc_tree_add_data(GscTree *self,
 void
 gsc_tree_clear(GscTree *self)
 {
-	GtkListStore *store = store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view)));
+	GtkListStore *store = self->priv->list_store;
 	GtkTreeModel *model = GTK_TREE_MODEL(store);
 	GtkTreeIter iter;
 	GscProposal *data;
@@ -273,17 +324,24 @@ gsc_tree_select_first(GscTree *self)
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
 		
-	gtk_tree_model_get_iter_first(model, &iter);
-	gtk_tree_selection_select_iter(selection, &iter);
-	path = gtk_tree_model_get_path(model, &iter);
-	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
+	if (gtk_tree_model_get_iter_first(model, &iter))
+	{
+		gtk_tree_selection_select_iter(selection, &iter);
+		path = gtk_tree_model_get_path(model, &iter);
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
 						   path, 
 						   NULL, 
 						   FALSE, 
 						   0, 
 						   0);
-	gtk_tree_path_free(path);
-	return TRUE;
+		gtk_tree_path_free(path);
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+	
 }
 
 gboolean 
@@ -422,5 +480,17 @@ gsc_tree_get_num_proposals(GscTree *self)
 	return gtk_tree_model_iter_n_children(model, NULL);
 }
 
+
+
+void
+gsc_tree_filter(GscTree *self, const gchar* filter)
+{
+	self->priv->active_filter = TRUE;
+	self->priv->current_filter = filter;
+	gtk_tree_model_filter_refilter(self->priv->model_filter);
+	self->priv->active_filter = FALSE;
+	self->priv->current_filter = NULL;
+	gsc_tree_select_first(self);
+}
 
 

@@ -298,6 +298,7 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 		default:
 		{
 			g_debug("con filtro");
+			gtk_entry_set_text(GTK_ENTRY(self->priv->filter),"");
 			gtk_widget_show(self->priv->filter);
 			gtk_window_present(GTK_WINDOW(self));
 			gtk_window_activate_focus(GTK_WINDOW(self));
@@ -726,16 +727,20 @@ gsc_popup_get_num_active_pages(GscPopup *self)
 /* Control filter signals */
 
 static void
-_filter_set_content(GscPopup *self)
-{
-}
-
-static void
 _filter_key_release_cb (GtkEntry *entry,
 			GdkEventKey    *event,
 			gpointer  user_data)
 {
 	GscPopup *self = GSC_POPUP(user_data);
-	g_debug("Filer text: %s",gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
+	
+	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	guint i;
+	GscTree *tree;
+	for(i=0;i<pages;i++)
+	{
+		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
+		gsc_tree_filter(tree,
+				gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
+	}
 }
 

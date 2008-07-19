@@ -1,3 +1,12 @@
+2008-07-19  Chuchi  <perriman@homer>
+
+	* GscTree:
+	* GscPopup:
+		- Filter is working!!! We have some issues yet (alt-F4 close
+		and crash the completion popup and we currently don't hide the
+		popup when the user change the current window by pressing
+		alt-tab)
+
 2008-07-15  Chuchi  <perriman@homer>
 
 	* GscTriggerCustomKey: Add support to popup options
