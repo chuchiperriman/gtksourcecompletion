@@ -1,5 +1,7 @@
 2008-07-26  Chuchi  <perriman@homer>
 
+	* GscPopup: Added CENTER_PARENT to center the popup relative to the
+	parent
 	* GscManager: Control the filter widget keys like in the GtkTextView
 	* GscPopup: 
 		- We control the delete event (alt+F4 problem fixed)

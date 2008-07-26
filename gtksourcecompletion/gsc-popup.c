@@ -156,9 +156,22 @@ _get_popup_position_center_screen(GscPopup *self, gint *x, gint *y)
 	gint sw = gdk_screen_width();
 	gint sh = gdk_screen_height();
 	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
-	
 	*x = (sw/2) - (w/2) - 20;
 	*y = (sh/2) - (h/2);
+}
+
+static void
+_get_popup_position_center_parent(GscPopup *self, gint *x, gint *y)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->view),
+				GTK_TYPE_WINDOW));
+	gint w,h,px,py, pw,ph;
+	gtk_window_get_position(parent,&px,&py);
+	gtk_window_get_size(parent, &pw, &ph);
+	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
+	
+	*x = px + ((pw/2) - (w/2) -20);
+	*y = py + ((ph/2) - (h/2));
 }
 
 static void
@@ -285,10 +298,14 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 		parent);
 	
 	gint x, y;
+	/*Position control*/
 	if (options->position_type == GSC_POPUP_POSITION_CURSOR)
 		_get_popup_position_in_cursor(self,&x,&y);
 	else if (options->position_type == GSC_POPUP_POSITION_CENTER_SCREEN)
 		_get_popup_position_center_screen(self,&x,&y);
+	else if (options->position_type == GSC_POPUP_POSITION_CENTER_PARENT)
+		_get_popup_position_center_parent(self,&x,&y);
+		
 	gtk_window_move(GTK_WINDOW(self), x, y);
 	
 	_update_pages_visibility(self);
