@@ -490,7 +490,7 @@ gsc_tree_filter(GscTree *self, const gchar* filter)
 	gtk_tree_model_filter_refilter(self->priv->model_filter);
 	self->priv->active_filter = FALSE;
 	self->priv->current_filter = NULL;
-	gsc_tree_select_first(self);
+	//gsc_tree_select_first(self);
 }
 
 

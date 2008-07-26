@@ -58,10 +58,10 @@ typedef struct _GscPopupClass GscPopupClass;
 
 struct _GscPopupClass
 {
-  GtkWindowClass parent_class;
+	GtkWindowClass parent_class;
   
-  void	 (* proposal_selected)(GscPopup *popup,
-			   GscProposal *proposal);
+	void (* proposal_selected)(GscPopup *popup,
+				   GscProposal *proposal);
 };
 
 struct _GscPopup
@@ -244,6 +244,19 @@ gsc_popup_set_current_info(GscPopup *self,
  */
 gint
 gsc_popup_get_num_active_pages(GscPopup *self);
+
+/**
+ * gsc_popup_get_filter_widget:
+ * @self: The #GscPopup
+ *
+ * This is the widget (Normally GtkEntry) where the user
+ * write the filter. This function is used internally for the
+ * completion components. You will not use this function, usually.
+ *
+ * Returns The internal filter widget
+ */
+GtkWidget*
+gsc_popup_get_filter_widget(GscPopup *self);
 
 G_END_DECLS
 

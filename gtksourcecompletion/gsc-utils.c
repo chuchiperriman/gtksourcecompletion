@@ -179,18 +179,12 @@ gsc_clear_word(const gchar* word)
 	for (i=0;i<len;i++)
 	{
 		if (gsc_char_is_separator(g_utf8_get_char(temp)))
-		{
 			temp = g_utf8_next_char(temp);
-		}
 		else
-		{
 			return g_strdup(temp);
-		}
 		
 	}
-	
 	return NULL;
-
 }
 
 

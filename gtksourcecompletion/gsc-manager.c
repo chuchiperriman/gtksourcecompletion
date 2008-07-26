@@ -207,7 +207,6 @@ view_key_press_event_cb(GtkWidget *view,
 			switch (event->keyval)
 		 	{
 				case GDK_Escape:
-				case GDK_space:
 				{
 					end_completion (completion);
 					catched = TRUE;
@@ -606,6 +605,12 @@ gsc_manager_new (GtkTextView *view)
 	g_signal_connect(completion->priv->popup, 
 			 "display-info",
 			 G_CALLBACK(_popup_display_info_cb),
+			 (gpointer) completion);
+			 
+	GtkWidget *filter = gsc_popup_get_filter_widget(completion->priv->popup);
+	g_signal_connect(filter,
+			 "key-press-event",
+			 G_CALLBACK(view_key_press_event_cb),
 			 (gpointer) completion);
 
 	completion_control_add_completion(view,completion);

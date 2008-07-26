@@ -17,7 +17,8 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
+#include <gdk/gdkkeysyms.h> 
 #include "gsc-popup.h"
 #include "gsc-tree.h"
 #include "gsc-i18n.h"
@@ -61,6 +62,9 @@ static GscPopupOptions default_options = {
 	GSC_POPUP_POSITION_CURSOR,
 	GSC_POPUP_FILTER_NONE
 };
+
+static void
+gsc_popup_hide(GtkWidget *widget);
 
 static void
 _proposal_selected_cb (GscTree *tree, 
@@ -217,6 +221,18 @@ _selection_changed_cd(GscTree *tree,
 }
 
 static gboolean
+_focus_out_event_cb(GtkWidget *widget,
+			GdkEventFocus *event,
+			gpointer user_data)
+{
+	if (GTK_WIDGET_VISIBLE(widget))
+	{
+		gsc_popup_hide(widget);
+	}
+	return FALSE;
+}
+
+static gboolean
 _switch_page_cb(GtkNotebook *notebook, 
 		GtkNotebookPage *page,
 		gint page_num, 
@@ -335,6 +351,15 @@ gsc_popup_realize (GtkWidget *widget)
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->realize (widget);
 }
 
+static gboolean
+gsc_popup_delete_event_cb(GtkWidget *widget,
+			GdkEvent  *event,
+			gpointer   user_data) 
+{
+	/*Prevent the alt+F4 keys*/
+	return TRUE;
+}
+
 static void
 gsc_popup_finalize (GObject *object)
 {
@@ -412,7 +437,6 @@ gsc_popup_init (GscPopup *self)
 	//gtk_window_set_focus_on_map(GTK_WINDOW(self),FALSE);
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated(GTK_WINDOW(self),FALSE);
-	
 	
 	self->priv = GSC_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
@@ -526,6 +550,16 @@ gsc_popup_init (GscPopup *self)
 			"key-release-event",
 			G_CALLBACK(_filter_key_release_cb),
 			(gpointer) self);
+			
+	g_signal_connect(self,
+			"delete-event",
+			G_CALLBACK(gsc_popup_delete_event_cb),
+			NULL);
+	
+	g_signal_connect(self,
+			 "focus-out-event",
+			 G_CALLBACK(_focus_out_event_cb),
+			 (gpointer)self);
 }
 
 GtkWidget*
@@ -743,4 +777,11 @@ _filter_key_release_cb (GtkEntry *entry,
 				gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
 	}
 }
+
+GtkWidget*
+gsc_popup_get_filter_widget(GscPopup *self)
+{
+	return self->priv->filter;
+}
+
 

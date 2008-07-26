@@ -1,3 +1,11 @@
+2008-07-26  Chuchi  <perriman@homer>
+
+	* GscManager: Control the filter widget keys like in the GtkTextView
+	* GscPopup: 
+		- We control the delete event (alt+F4 problem fixed)
+		- Hide the popup on focus-out event
+		- Added method to get the filter widget
+
 2008-07-19  Chuchi  <perriman@homer>
 
 	* GscTree:
