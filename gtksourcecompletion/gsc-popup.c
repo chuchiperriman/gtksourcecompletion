@@ -238,7 +238,9 @@ _focus_out_event_cb(GtkWidget *widget,
 			GdkEventFocus *event,
 			gpointer user_data)
 {
-	if (GTK_WIDGET_VISIBLE(widget))
+	GscPopup *self = GSC_POPUP(user_data);
+	/* Only Close if the filter is visible */
+	if (GTK_WIDGET_VISIBLE(GTK_WIDGET(self->priv->filter)))
 	{
 		gsc_popup_hide(widget);
 	}
@@ -323,14 +325,16 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 	{
 		case GSC_POPUP_FILTER_NONE:
 		{
-			g_debug("sin filtro");
 			gtk_widget_hide(self->priv->filter);
+			
+			gtk_window_present(parent);
+			gtk_window_activate_focus(parent);
 			gtk_widget_grab_focus(self->priv->view);
+			gtk_window_set_focus(parent,self->priv->view);
 			break;
 		}
 		default:
 		{
-			g_debug("con filtro");
 			gtk_entry_set_text(GTK_ENTRY(self->priv->filter),"");
 			gtk_widget_show(self->priv->filter);
 			gtk_window_present(GTK_WINDOW(self));

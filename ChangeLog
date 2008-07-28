@@ -1,3 +1,8 @@
+2008-07-28  Chuchi  <chuchi@chuchint>
+
+	* GscPopup: Fixed problem with the popup window in Gnome to set the 
+	focus into the view
+
 2008-07-26  Chuchi  <perriman@homer>
 
 	* GscPopup: Added CENTER_PARENT to center the popup relative to the
