@@ -35,3 +35,14 @@ Description: Development files of libgtksourcecompletion
  This package contains the header files required if you wish to develop
  software that uses the GtkSourceCompletion
 
+Package: libgtksourcecompletion1.0-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}
+Description: Development files of libgtksourcecompletion
+ This library contains a generic popup to add completion
+ support to GtkSourceView. It has some default events and
+ a document words provider that adds (auto)completion of
+ previously written words.
+ .
+ This package contains the GtkSourceCompletion reference manual.
