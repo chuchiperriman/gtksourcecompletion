@@ -1,7 +1,7 @@
-This package was debianized by Jesús Barbero Rodríguez <chuchiperriman@gmail.com> on
-Mon, 10 Dec 2007 02:32:27 +0100.
+This package was debianized by Jesús Barbero Rodríguez 
+<chuchiperriman@gmail.com> on Mon, 10 Dec 2007 02:32:27 +0100.
 
-It was downloaded from <url://example.com>
+It was downloaded from <http://sourceforge.net/projects/gtksourcecomple/>
 
 Upstream Author(s): 
 		Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
@@ -24,8 +24,6 @@ Copyright:
     You should have received a copy of the GNU Lesser General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-The Debian packaging is (C) 2007, iJesús Barbero Rodríguez <chuchiperriman@gmail.com> and
-is licensed under the LGPL, see `/usr/share/common-licenses/LGPL'.
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.
+The Debian packaging is (C) 2007, Jesús Barbero Rodríguez 
+<chuchiperriman@gmail.com> and is licensed under the LGPL,
+see `/usr/share/common-licenses/LGPL'.

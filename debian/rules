@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# $Id: rules 8276 2007-01-09 21:41:21Z kilian $
+# $Id: rules 15206 2008-03-16 23:28:35Z slomo $
 # (C) 2002 Colin Walters
 
 # CDBS Classes & Rules
@@ -12,12 +12,12 @@ include /usr/share/gnome-pkg-tools/1/rules/clean-la.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-version.mk
 -include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
+# GNOME_MODULE = gtksourceview
+
 # Compile options
-# DEB_CONFIGURE_EXTRA_FLAGS += --enable-static
+DEB_CONFIGURE_EXTRA_FLAGS += --enable-static
+LDFLAGS += -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
 
 # Debhelper Arguments
-# DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourceview1.0-0 (>= 1.7.2)'
+DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourcecompletion1.0-0 (>= 1.0.0)'
 
-# Record build-time version information
-# binary-post-install/libgtksourceview-common::
-#	dh_buildinfo -plibgtksourceview-common
