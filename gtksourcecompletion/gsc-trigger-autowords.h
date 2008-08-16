@@ -49,7 +49,7 @@ struct _GscTriggerAutowordsClass {
 
 /**
  * gsc_trigger_autowords_new:
- *
+ * @completion: The #GscManager where the triggered will be used
  * Returns The new #GscTriggerAutowords
  *
  */

@@ -27,7 +27,12 @@ IGNORE_HFILES =					\
 	provider-template.h			\
 	provider-template.c			\
 	trigger-template.h			\
-	trigger-template.c
+	trigger-template.c	\
+	getopt.h			\
+	system.h			\
+	gsc-i18n.h		\
+	gsc-i18n.c		\
+	gsc-marshal.h		
 
 # Extra options to supply to gtkdoc-mkdb
 MKDB_OPTIONS = --sgml-mode --output-format=xml --ignore-files=trio

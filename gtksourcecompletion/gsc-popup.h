@@ -25,6 +25,13 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GscPopupPositionType:
+ * @GSC_POPUP_POSITION_CURSOR: Places the popup up/down the GtkTextView cursor
+ * @GSC_POPUP_POSITION_CENTER_SCREEN: Places the popup centered in the screen
+ * @GSC_POPUP_POSITION_CENTER_PARENT: Places the popup centered in the popup 
+ * parent (the parent window)
+ **/
 typedef enum{
 	GSC_POPUP_POSITION_CURSOR,
 	GSC_POPUP_POSITION_CENTER_SCREEN,
@@ -36,10 +43,13 @@ typedef enum{
 	GSC_POPUP_FILTER_TREE
 }GscPopupFilterType;
 
-typedef struct{
+
+struct _GscPopupOptions{
 	GscPopupPositionType position_type;
 	GscPopupFilterType filter_type;
-}GscPopupOptions;
+};
+
+typedef struct _GscPopupOptions GscPopupOptions;
 
 /*
  * Type checking and casting macros

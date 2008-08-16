@@ -82,7 +82,7 @@ gsc_proposal_new(const gchar *label,
  * gsc_proposal_get_label:
  * @proposal: The GscProposal
  *
- * Returns The proposal label
+ * Returns The proposal label that will be shown into the popup
  */
 const gchar*
 gsc_proposal_get_label(GscProposal *proposal);
@@ -91,7 +91,7 @@ gsc_proposal_get_label(GscProposal *proposal);
  * gsc_proposal_get_icon:
  * @proposal: The GscProposal
  *
- * Returns the icon of this proposal
+ * Returns the icon of this proposal that will be shown into the popup
  */
 const GdkPixbuf*
 gsc_proposal_get_icon(GscProposal *proposal);
@@ -99,7 +99,8 @@ gsc_proposal_get_icon(GscProposal *proposal);
 /**
  * gsc_proposal_set_page_name:
  * @proposal: The GscProposal
- * @page_name: The page name where this proposal will be shown
+ * @page_name: The page name where this proposal will be shown. If NULL the 
+ * default page will be used.
  *
  */
 void

@@ -206,6 +206,15 @@ gsc_proposal_class_init (GscProposalClass *klass)
 							      G_PARAM_READWRITE));
 	
 	/* Proposal Signals */
+	/**
+	 * GscProposal::apply:
+	 * @proposal: The proposal who emits the signal
+	 * @view: The #GtkTextView where the proposal must be applied
+	 *
+	 * The ::apply signal is emitted when the proposal has been selected
+	 * and must to be applied.
+	 *
+	 **/
 	signals [APPLY] =
 		g_signal_new ("apply",
 			      G_TYPE_FROM_CLASS (klass),

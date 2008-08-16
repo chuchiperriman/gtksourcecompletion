@@ -136,6 +136,13 @@ gsc_tree_class_init (GscTreeClass *klass)
 	
 	object_class->finalize = gsc_tree_finalize;
 	
+	/**
+	 * GscTree::proposal-selected:
+	 * @gsctree: the object which received the signal.
+	 * @proposal: The #GscProposal selected
+	 *
+	 * Emits when the user selects a proposal of this tree.
+	 **/
 	signals[ITEM_SELECTED] =
 		g_signal_new ("proposal-selected",
 			      G_TYPE_FROM_CLASS (klass),
@@ -147,7 +154,14 @@ gsc_tree_class_init (GscTreeClass *klass)
 			      G_TYPE_NONE,
 			      1,
 			      GTK_TYPE_POINTER);
-			      
+	
+	/**
+	 * GscTree::selection-changed:
+	 * @gsctree: the object which received the signal.
+	 * @proposal: The current #GscProposal in the tree
+	 *
+	 * Emits when the user change the current proposal
+	 **/		      
 	signals[SELECTION_CHANGED] =
 		g_signal_new ("selection-changed",
 			      G_TYPE_FROM_CLASS (klass),
@@ -297,14 +311,6 @@ gsc_tree_clear(GscTree *self)
 	}
 	
 	gtk_list_store_clear(store);
-}
-
-gboolean
-gsc_tree_has_proposals(GscTree *self)
-{
-	GtkTreeIter iter;
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
-	return gtk_tree_model_get_iter_first(GTK_TREE_MODEL(model),&iter);
 }
 
 gboolean
@@ -476,7 +482,7 @@ gsc_tree_new()
 gint 
 gsc_tree_get_num_proposals(GscTree *self)
 {
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));	
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
 	return gtk_tree_model_iter_n_children(model, NULL);
 }
 

@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 
 #define GSC_TYPE_MANAGER             (gsc_manager_get_type ())
 #define GSC_MANAGER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MANAGER, GscManager))
-#define GSC_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))
+#define GSC_MANAGER_CLASS(klass)             (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))
 #define GSC_IS_MANAGER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_MANAGER))
 #define GSC_IS_MANAGER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_MANAGER))
 #define GSC_MANAGER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MANAGER, GscManagerClass))
@@ -43,6 +43,13 @@ typedef struct _GscManagerPrivate GscManagerPrivate;
 typedef struct _GscManagerClass GscManagerClass;
 typedef struct _GscManager GscManager;
 
+/**
+ * GscManagerEventOptions:
+ * @popup_options: Options to tell how the popup will be shown
+ * @autoselect: If TRUE, the completion selects automatically if there
+ * is only one proposal and only one page
+ * 
+ */
 typedef struct _GscManagerEventOptions GscManagerEventOptions;
 
 struct _GscManagerEventOptions{
@@ -66,7 +73,7 @@ GType
 gsc_manager_get_type (void) G_GNUC_CONST;
 
 
-/********************** Control Functions *********************/
+/* ********************* Control Functions ******************** */
 /*
  * This functions will be deleted when we insert GscManager
  * into GtkSourceView. These functions store the relationship between the
@@ -74,7 +81,7 @@ gsc_manager_get_type (void) G_GNUC_CONST;
  */
 
 /**
- * gsc_get_from_view:
+ * gsc_manager_get_from_view:
  * @view: the GtkSourceView
  *
  * Returns NULL if the GtkTextView haven't got an associated GscManager
@@ -84,10 +91,10 @@ gsc_manager_get_type (void) G_GNUC_CONST;
 GscManager*
 gsc_manager_get_from_view(GtkTextView *view);
 
-/***************************************************************/
+/* ************************************************************* */
 
 /**
- * gsc_new:
+ * gsc_manager_new:
  * @view: a #GtkSourceView.
  *
  * Creates a new #GscManager asociated to a GtkSourceView
@@ -98,7 +105,7 @@ GscManager*
 gsc_manager_new (GtkTextView *view);
 
 /**
- * gsc_get_view:
+ * gsc_manager_get_view:
  * @completion: the #GscManager
  *
  * Returns: The internal #GtkTextView of this completion.
@@ -108,7 +115,7 @@ GtkTextView*
 gsc_manager_get_view(GscManager *completion);
 
 /**
- * gsc_is_visible:
+ * gsc_manager_is_visible:
  * @completion: The #GscManager
  *
  * Returns TRUE if the completion popup is visible.
@@ -118,7 +125,7 @@ gboolean
 gsc_manager_is_visible(GscManager *completion);
 
 /**
- * gsc_register_provider:
+ * gsc_manager_register_provider:
  * @completion: the #GscManager
  * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to register this provider
@@ -138,7 +145,7 @@ gsc_manager_register_provider(GscManager *completion,
 					const gchar *trigger_name);
 
 /**
- * gsc_unregister_provider:
+ * gsc_manager_unregister_provider:
  * @completion: the #GscManager
  * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to unregister this provider
@@ -155,7 +162,7 @@ gsc_manager_unregister_provider(GscManager *completion,
 					  const gchar *trigger_name);
 
 /**
- * gsc_get_provider:
+ * gsc_manager_get_provider:
  * @completion: The #GscManager
  * @provider_name: Provider's name that you are looking for.
  *
@@ -168,7 +175,7 @@ gsc_manager_get_provider(GscManager *completion,
 				   const gchar* provider_name);
 
 /**
- * gsc_register_trigger:
+ * gsc_manager_register_trigger:
  * @completion: The #GscManager
  * @trigger: The trigger to register
  *
@@ -181,7 +188,7 @@ gsc_manager_register_trigger(GscManager *completion,
 				       GscTrigger *trigger);
 
 /**
- * gsc_unregister_trigger:
+ * gsc_manager_unregister_trigger:
  * @completion: The #GscManager
  * @trigger: The trigger to unregister
  *
@@ -194,7 +201,7 @@ gsc_manager_unregister_trigger(GscManager *completion,
 					 GscTrigger *trigger);
 
 /**
- * gsc_get_trigger:
+ * gsc_manager_get_trigger:
  * @completion: The #GscManager
  * @trigger_name: The trigger name to get
  *
@@ -209,7 +216,7 @@ gsc_manager_get_trigger(GscManager *completion,
 
 
 /**
- * gsc_get_active_trigger:
+ * gsc_manager_get_active_trigger:
  * @completion: The #GscManager
  *
  * This function return the active trigger. The active trigger is the last
@@ -223,7 +230,7 @@ GscTrigger*
 gsc_manager_get_active_trigger(GscManager *completion);
 
 /**
- * gsc_activate:
+ * gsc_manager_activate:
  * @completion: The #GscManager
  *
  * This function activate the completion mechanism. The completion connects 
@@ -233,7 +240,7 @@ void
 gsc_manager_activate(GscManager *completion);
 
 /**
- * gsc_deactivate:
+ * gsc_manager_deactivate:
  * @completion: The #GscManager
  *
  * This function deactivate the completion mechanism. The completion disconnect
@@ -243,7 +250,7 @@ void
 gsc_manager_deactivate(GscManager *completion);
 
 /**
- * gsc_finish_completion:
+ * gsc_manager_finish_completion:
  * @completion: The #GscManager
  *
  * This function finish the completion if it is active (visible).
@@ -252,7 +259,7 @@ void
 gsc_manager_finish_completion(GscManager *completion);
 
 /**
- * gsc_trigger_event:
+ * gsc_manager_trigger_event:
  * @completion: the #GscManager
  * @trigger_name: The event name to raise
  * @event_data: This object will be passed to the providers to give them some special information of the event
@@ -263,18 +270,19 @@ gsc_manager_finish_completion(GscManager *completion);
  **/
 void 
 gsc_manager_trigger_event(GscManager *completion, 
-				    const gchar *trigger_name, 
-				    gpointer event_data);
+			  const gchar *trigger_name, 
+			  gpointer event_data);
 
 /**
- * gsc_trigger_event:
+ * gsc_manager_trigger_event_with_opts:
  * @completion: the #GscManager
  * @trigger_name: The event name to raise
  * @options: Options to tell the completion how it must to work.
  * @event_data: This object will be passed to the providers to give them some special information of the event
  *
  * Calling this function, the completion call to all providers to get data and, if 
- * they return data, it shows the completion to the user. 
+ * they return data, it shows the completion to the user. Use this function if
+ * you want to show the popup with special parameters (position, filter, etc)
  * 
  **/
 void 
@@ -284,7 +292,7 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 				    gpointer event_data);
 
 /**
- * gsc_set_current_info:
+ * gsc_manager_set_current_info:
  * @self: The #GscManager
  * @info: Info markup to be shown into for current proposal.
  *
@@ -293,7 +301,7 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
  */
 void
 gsc_manager_set_current_info(GscManager *self,
-					     gchar *info);
+			     gchar *info);
 
 G_END_DECLS
 

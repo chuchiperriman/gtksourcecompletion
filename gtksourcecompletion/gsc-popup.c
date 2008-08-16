@@ -272,7 +272,7 @@ _update_pages_visibility(GscPopup *self)
 	for(i=0;i<pages;i++)
 	{
 		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gsc_tree_has_proposals(tree))
+		if (gsc_tree_get_num_proposals(tree)>0)
 		{
 			if (!first_set)
 			{
@@ -656,7 +656,7 @@ gsc_popup_has_proposals(GscPopup *self)
 	for(i=0;i<pages;i++)
 	{
 		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gsc_tree_has_proposals(tree))
+		if (gsc_tree_get_num_proposals(tree) > 0)
 			return TRUE;
 	}
 	return FALSE;
@@ -697,7 +697,7 @@ gsc_popup_page_next(GscPopup *self)
 			page = 0;
 		
 		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));
-		if (gsc_tree_has_proposals(tree))
+		if (gsc_tree_get_num_proposals(tree) > 0)
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
 			gsc_tree_select_first(tree);
@@ -730,7 +730,7 @@ gsc_popup_page_previous(GscPopup *self)
 			page = pages -1;
 	
 		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),page));	
-		if (gsc_tree_has_proposals(tree))
+		if (gsc_tree_get_num_proposals(tree) > 0)
 		{
 			gtk_notebook_set_current_page(GTK_NOTEBOOK(self->priv->notebook),page);
 			gsc_tree_select_first(tree);
@@ -771,7 +771,7 @@ gsc_popup_get_num_active_pages(GscPopup *self)
 	for(i=0;i<pages;i++)
 	{
 		tree= GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		if (gsc_tree_has_proposals(tree))
+		if (gsc_tree_get_num_proposals(tree) > 0)
 		{
 			++num_pages_with_data;
 		}

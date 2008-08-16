@@ -1,1 +1,3 @@
-gtksourcecompletion/gtksourcecompletion.c
+gtksourcecompletion/gsc-manager.c
+gtksourcecompletion/gsc-popup.c
+gtksourcecompletion/gsc-proposal.c

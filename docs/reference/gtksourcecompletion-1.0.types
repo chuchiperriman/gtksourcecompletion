@@ -7,12 +7,3 @@ gsc_trigger_autowords_get_type
 gsc_provider_get_type
 gsc_tree_get_type
 gsc_popup_get_type
-gsc_trigger_get_type
-gsc_trigger_customkey_get_type
-gsc_manager_get_type
-gsc_documentwords_provider_get_type
-gsc_proposal_get_type
-gsc_trigger_autowords_get_type
-gsc_provider_get_type
-gsc_tree_get_type
-gsc_popup_get_type

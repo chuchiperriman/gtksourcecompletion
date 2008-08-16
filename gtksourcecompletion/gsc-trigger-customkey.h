@@ -68,8 +68,8 @@ gsc_trigger_customkey_new(GscManager *completion,
 			  const gchar* keys);
 
 /**
- * gsc_userrequest_trigger_set_keys:
- * @self: The #GscUserRequestTrigger 
+ * gsc_trigger_customkey_set_keys:
+ * @self: The #GscTriggerCustomkey 
  * @keys: The string representation of the keys that we will
  * use to activate the user request event. You can get this 
  * string with #gtk_accelerator_name
@@ -80,6 +80,15 @@ void
 gsc_trigger_customkey_set_keys(GscTriggerCustomkey * self, 
 				 const gchar* keys);
 
+/**
+ * gsc_trigger_customkey_set_opts:
+ * @self: The #GscTriggerCustomkey
+ * @options: The trigger options
+ *
+ * Use this function if you want to tell the completion how must
+ * show the popup (position, filter, etc.) then this trigger occurs
+ * 
+ **/
 void
 gsc_trigger_customkey_set_opts(GscTriggerCustomkey *self,
 				GscManagerEventOptions *options);

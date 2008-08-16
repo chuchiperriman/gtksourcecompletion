@@ -165,17 +165,23 @@ gsc_tree_add_data(GscTree *self,
 		GscProposal* data);
 
 /**
- * gsc_tree_has_proposals:
+ * gsc_tree_get_num_proposals:
  * @self: The #GscTree
  *
- * Returns TRUE if the tree has one or more proposals.
+ * Returns The proposals number of this tree.
  */
-gboolean
-gsc_tree_has_proposals(GscTree *self);
-
 gint 
 gsc_tree_get_num_proposals(GscTree *self);
 
+/**
+ * gsc_tree_filter:
+ * @self: The #GscTree
+ * @filter: The filter to be applied.
+ *
+ * This function filter the proposals in the current tree. This function
+ * filter the proposals by name (proposals stating by "filter")
+ *
+ **/
 void
 gsc_tree_filter(GscTree *self, const gchar* filter);
 
