@@ -19,5 +19,5 @@ DEB_CONFIGURE_EXTRA_FLAGS += --enable-static
 LDFLAGS += -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
 
 # Debhelper Arguments
-DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourcecompletion1.0-0 (>= 1.0.0)'
+DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourcecompletion1.0-0 (>= 0.5.0)'
 
