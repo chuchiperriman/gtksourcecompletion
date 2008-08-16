@@ -424,6 +424,13 @@ gsc_popup_class_init (GscPopupClass *klass)
 	widget_class->hide = gsc_popup_hide;
 	widget_class->realize = gsc_popup_realize;
 	
+	/**
+	 * GscPopup::proposal-selected:
+	 * @popup: The #GscPopup who emits the signal
+	 * @proposal: The selected #GscProposal
+	 *
+	 * When the user selects a proposal
+	 **/
 	popup_signals[ITEM_SELECTED] =
 		g_signal_new ("proposal-selected",
 			      G_TYPE_FROM_CLASS (klass),
@@ -435,7 +442,14 @@ gsc_popup_class_init (GscPopupClass *klass)
 			      G_TYPE_NONE,
 			      1,
 			      GTK_TYPE_POINTER);
-			      
+	
+	/**
+	 * GscPopup::display-info:
+	 * @popup: The #GscPopup who emits the signal
+	 * @proposal: The #GscProposal the user wants to see the information
+	 *
+	 * When the user want to see the information of a proposal
+	 **/	      
 	popup_signals[DISPLAY_INFO] =
 		g_signal_new ("display-info",
 			      G_TYPE_FROM_CLASS (klass),

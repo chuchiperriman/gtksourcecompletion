@@ -35,7 +35,7 @@ struct _GscDocumentwordsProviderPrivate {
 	GtkTextView *view;
 };
 
-#define GSC_DOCUMENTWORDS_PROVIDER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderPrivate))
+#define GSC_DOCUMENTWORDS_PROVIDER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSC_TYPE_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderPrivate))
 enum  {
 	GSC_DOCUMENTWORDS_PROVIDER_DUMMY_PROPERTY,
 };
@@ -354,7 +354,7 @@ GType gsc_documentwords_provider_get_type ()
 GscDocumentwordsProvider*
 gsc_documentwords_provider_new(GtkTextView *view)
 {
-	GscDocumentwordsProvider* self = GSC_DOCUMENTWORDS_PROVIDER (g_object_new (TYPE_GSC_DOCUMENTWORDS_PROVIDER, NULL));
+	GscDocumentwordsProvider* self = GSC_DOCUMENTWORDS_PROVIDER (g_object_new (GSC_TYPE_DOCUMENTWORDS_PROVIDER, NULL));
 	self->priv->view = view;
 	return self;
 }

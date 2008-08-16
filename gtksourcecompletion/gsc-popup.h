@@ -38,6 +38,12 @@ typedef enum{
 	GSC_POPUP_POSITION_CENTER_PARENT
 }GscPopupPositionType;
 
+/**
+ * GscPopupFilterType:
+ * @GSC_POPUP_FILTER_NONE: Show the popup without the filter entry
+ * @GSC_POPUP_FILTER_TREE: Show the popup with the filter entry visible
+ * and set the focus on this entry.
+ **/
 typedef enum{
 	GSC_POPUP_FILTER_NONE,
 	GSC_POPUP_FILTER_TREE
@@ -49,6 +55,11 @@ struct _GscPopupOptions{
 	GscPopupFilterType filter_type;
 };
 
+/**
+ * GscPopupOptions:
+ * @position_type: Sets where the popup will be placed
+ * @filter_type: Sets if the popup mus to be the filter and its type.
+ **/
 typedef struct _GscPopupOptions GscPopupOptions;
 
 /*
@@ -135,7 +146,7 @@ gsc_popup_select_next(GscPopup *self,
  * gsc_popup_get_selected_proposal:
  * @self: The #GscPopup
  *
- * See #gsc_tree_select_proposal. Not free the proposal!
+ * See #gsc_tree_get_selected_proposal. Not free the proposal!
  *
  * Returns
  */
@@ -248,10 +259,10 @@ gsc_popup_set_current_info(GscPopup *self,
 					     gchar *info);
 
 /**
- * gsc_popup_get_num_active_pags:
+ * gsc_popup_get_num_active_pages:
  * @self: The #GscPopup
  *
- * Returns The number of active pages
+ * Returns The number of active pages (pages with proposals)
  */
 gint
 gsc_popup_get_num_active_pages(GscPopup *self);

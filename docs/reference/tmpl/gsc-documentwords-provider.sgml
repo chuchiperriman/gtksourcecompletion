@@ -17,53 +17,6 @@ GscDocumentwordsProvider
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### MACRO TYPE_GSC_DOCUMENTWORDS_PROVIDER ##### -->
-<para>
-
-</para>
-
-
-
-<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER ##### -->
-<para>
-
-</para>
-
-@obj: 
-
-
-<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_CLASS ##### -->
-<para>
-
-</para>
-
-@klass: 
-
-
-<!-- ##### MACRO IS_GSC_DOCUMENTWORDS_PROVIDER ##### -->
-<para>
-
-</para>
-
-@obj: 
-
-
-<!-- ##### MACRO IS_GSC_DOCUMENTWORDS_PROVIDER_CLASS ##### -->
-<para>
-
-</para>
-
-@klass: 
-
-
-<!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS ##### -->
-<para>
-
-</para>
-
-@obj: 
-
-
 <!-- ##### MACRO GSC_DOCUMENTWORDS_PROVIDER_NAME ##### -->
 <para>
 
@@ -115,14 +68,6 @@ GscDocumentwordsProvider
 </para>
 
 @prov: 
-@Returns: 
-
-
-<!-- ##### FUNCTION gsc_documentwords_provider_get_type ##### -->
-<para>
-
-</para>
-
 @Returns: 
 
 

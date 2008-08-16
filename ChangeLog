@@ -1,7 +1,10 @@
+=== Version 0.5.0 ===
+
 2008-08-16  Chuchi  <perriman@homer>
 
 	* doc: Updated api documentation
 	* GscTree: removed gsc_tree_has_proposals function
+	* Version: Closed release 0.5.0
 
 2008-07-28  Chuchi  <chuchi@chuchint>
 

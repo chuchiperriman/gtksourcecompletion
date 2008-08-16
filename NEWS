@@ -1,4 +1,17 @@
 ===========================
+ gtksourcecompletion 0.5.0
+===========================
+
+New Features and fixes
+======================
+- Changed all namespaces to GSC. All object names are changed.
+- Added filter options. You can set the filter on/off to show 
+	a filter entry into the completion popup
+- Added popup positioning.
+- Better API names and functions
+
+
+===========================
  gtksourcecompletion 0.4.1
 ===========================
 

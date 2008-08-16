@@ -25,12 +25,12 @@
 
 G_BEGIN_DECLS
 
-#define TYPE_GSC_DOCUMENTWORDS_PROVIDER (gsc_documentwords_provider_get_type ())
-#define GSC_DOCUMENTWORDS_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProvider))
-#define GSC_DOCUMENTWORDS_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderClass))
-#define IS_GSC_DOCUMENTWORDS_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_GSC_DOCUMENTWORDS_PROVIDER))
-#define IS_GSC_DOCUMENTWORDS_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_GSC_DOCUMENTWORDS_PROVIDER))
-#define GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_GSC_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderClass))
+#define GSC_TYPE_DOCUMENTWORDS_PROVIDER (gsc_documentwords_provider_get_type ())
+#define GSC_DOCUMENTWORDS_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProvider))
+#define GSC_DOCUMENTWORDS_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderClass))
+#define GSC_IS_DOCUMENTWORDS_PROVIDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_DOCUMENTWORDS_PROVIDER))
+#define GSC_IS_DOCUMENTWORDS_PROVIDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_DOCUMENTWORDS_PROVIDER))
+#define GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_DOCUMENTWORDS_PROVIDER, GscDocumentwordsProviderClass))
 
 #define GSC_DOCUMENTWORDS_PROVIDER_NAME "GscDocumentwordsProvider"
 
@@ -47,6 +47,12 @@ struct _GscDocumentwordsProviderClass {
 	GObjectClass parent;
 };
 
+/**
+ * GscDocumentwordsProviderSortType:
+ * @GSC_DOCUMENTWORDS_PROVIDER_SORT_NONE: Does not sort the proposals
+ * @GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH: Sort the proposals by label 
+ * lenght. Sets the small words first an large words last.
+ **/
 typedef enum{
 	GSC_DOCUMENTWORDS_PROVIDER_SORT_NONE,
 	GSC_DOCUMENTWORDS_PROVIDER_SORT_BY_LENGTH
@@ -54,7 +60,7 @@ typedef enum{
 
 /**
  * gsc_documentwords_provider_new:
- *
+ * @view: #GtkTextView where the provider must search for words
  * Returns The new #GscDocumentwordsProvider
  *
  */
