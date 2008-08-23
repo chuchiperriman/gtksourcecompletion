@@ -1,3 +1,7 @@
+2008-08-23  Chuchi  <perriman@homer>
+
+	* Makefile: Fixed error with portable libraries. I remove all -module
+
 === Version 0.5.0 ===
 
 2008-08-16  Chuchi  <perriman@homer>

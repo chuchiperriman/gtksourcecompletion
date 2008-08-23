@@ -51,7 +51,7 @@ libgtksourcecompletion_1_0_la_LIBADD = \
 	$(PACKAGE_LIBS) 
 	
 libgtksourcecompletion_1_0_la_LDFLAGS = \
-	-version-info 1:0:0 -module	\
+	-version-info 1:0:0 	\
 	`pkg-config --libs gtksourceview-2.0`
 
 INST_H_FILES = \
