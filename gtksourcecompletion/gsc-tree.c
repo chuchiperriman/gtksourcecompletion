@@ -191,6 +191,10 @@ gsc_tree_init (GscTree *self)
 	gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(self),NULL);
 
 	self->priv->tree_view = gtk_tree_view_new();
+	GValue val = {0,};
+	g_value_init(&val,G_TYPE_BOOLEAN);
+	g_value_set_boolean(&val,FALSE);
+	g_object_set_property(G_OBJECT(self->priv->tree_view),"can-focus",&val);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(self->priv->tree_view),FALSE);
 	
 	gtk_container_add(GTK_CONTAINER(self),self->priv->tree_view);

@@ -479,9 +479,15 @@ gsc_popup_init (GscPopup *self)
 
 	GtkWidget *completion_tree = gsc_tree_new();
 	
+	GValue val = {0,};
+	g_value_init(&val,G_TYPE_BOOLEAN);
+	g_value_set_boolean(&val,FALSE);
+	g_object_set_property(G_OBJECT(completion_tree),"can-focus",&val);
+	
 	g_hash_table_insert(self->priv->trees,DEFAULT_PAGE,completion_tree);
 	
 	self->priv->notebook = gtk_notebook_new();
+	g_object_set_property(G_OBJECT(self->priv->notebook),"can-focus",&val);
 	gtk_notebook_set_show_tabs(GTK_NOTEBOOK(self->priv->notebook),FALSE);
 	gtk_notebook_set_show_border(GTK_NOTEBOOK(self->priv->notebook),FALSE);
 
@@ -493,6 +499,7 @@ gsc_popup_init (GscPopup *self)
 		gtk_image_new_from_stock(GTK_STOCK_INFO,GTK_ICON_SIZE_SMALL_TOOLBAR);
 	gtk_widget_set_tooltip_text(info_icon, _("Show Proposal Info"));
 	GtkWidget *info_button = gtk_toggle_button_new();
+	g_object_set_property(G_OBJECT(info_button),"can-focus",&val);
 	self->priv->info_button = info_button;
 	gtk_button_set_focus_on_click(GTK_BUTTON(info_button),FALSE);
 	gtk_container_add(GTK_CONTAINER(info_button),info_icon);
@@ -550,6 +557,7 @@ gsc_popup_init (GscPopup *self)
 
 	/*Info window*/
 	self->priv->info_window = gtk_window_new(GTK_WINDOW_POPUP);
+	g_object_set_property(G_OBJECT(self->priv->info_window),"can-focus",&val);
 	gtk_widget_set_size_request(self->priv->info_window,WINDOW_WIDTH,WINDOW_HEIGHT);
 	GtkWidget* info_scroll = gtk_scrolled_window_new(NULL,NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(info_scroll),
