@@ -104,4 +104,38 @@ gsc_char_is_separator(gunichar ch);
 gchar*
 gsc_clear_word(const gchar* word);
 
+/**
+ * gsc_compute_line_indentation:
+ * @view: The #GtkTextView
+ * @cur: Cursor in the line where we compute the indentation
+ *
+ * Returns: New allocated string with the indentation of this line
+ */
+gchar *
+gsc_compute_line_indentation (GtkTextView *view,
+			     GtkTextIter *cur);
+
+/**
+ * gsc_get_text_with_indent:
+ * @content: The initial text to indent
+ * @indent: Indentation string. You can get the indentation of a line with
+ * #gsc_compute_line_indentation.
+ *
+ * Returns: New allocated string with the content indented.
+ */
+gchar*
+gsc_get_text_with_indent(const gchar* content,gchar *indent);
+
+/**
+ * gsc_insert_text_with_indent:
+ * @view: The #GtkTextView where we will insert the indented text
+ * @text: Text to indent and insert into the view.
+ *
+ * This function indent the text and insert it into the view in the current
+ * position.
+ */
+void
+gsc_insert_text_with_indent(GtkTextView *view, const gchar* text);
+
+
 #endif 

@@ -1,3 +1,14 @@
+2008-08-30  Chuchi  <perriman@homer>
+
+	* gsc-trigger-custom-key.c,
+	  gsc-manager: Fixed problem with keys. There is a bug in
+	  gtk_accelerator_name & gtk_accelerator_parse but I have fixed it in
+	  this library.
+
+2008-08-26  Chuchi  <perriman@homer>
+
+	* gsc-utils: Added indentation functions
+
 2008-08-23  Chuchi  <perriman@homer>
 
 	* Makefile: Fixed error with portable libraries. I remove all -module

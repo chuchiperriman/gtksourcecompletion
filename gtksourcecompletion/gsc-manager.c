@@ -157,15 +157,20 @@ static gboolean
 _compare_keys(GscManager *completion, KeysType type, GdkEventKey *event)
 {
 	guint modifiers = gtk_accelerator_get_default_mod_mask ();
+	/*This is for a gtk bug!!!!*/
+	guint key = completion->priv->keys[type].key;
+	if ((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK)
+		key = gdk_keyval_to_upper(key);
+	
 	if (completion->priv->keys[type].mods == 0 &&
 	    (event->state & modifiers)==0)
 	{
-		if (event->keyval == completion->priv->keys[type].key)
+		if (event->keyval == key)
 		{
 			return TRUE;
 		}
-	}else if ((event->state & completion->priv->keys[type].mods) && 
-	    event->keyval == completion->priv->keys[type].key)
+	}else if ((event->state == completion->priv->keys[type].mods) && 
+	    event->keyval == key)
 	{
 		return TRUE;
 	}
