@@ -215,6 +215,7 @@ view_key_press_event_cb(GtkWidget *view,
 				{
 					end_completion (completion);
 					catched = TRUE;
+					ret = TRUE;
 					break;
 				}
 		 		case GDK_Down:
@@ -267,6 +268,7 @@ view_key_press_event_cb(GtkWidget *view,
 					if (!ret)
 					{
 						end_completion(completion);
+						ret = TRUE;
 					}
 					catched = TRUE;
 					break;

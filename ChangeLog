@@ -1,3 +1,8 @@
+2008-09-02  Chuchi  <perriman@homer>
+
+	* gsc-manager.c: Stops the key signal when the manager gets the
+	control
+
 2008-08-30  Chuchi  <perriman@homer>
 
 	* gsc-trigger-custom-key.c,
