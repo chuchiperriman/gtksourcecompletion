@@ -31,6 +31,8 @@
 
 G_BEGIN_DECLS
 
+#define USER_REQUEST_TRIGGER_NAME "user-request"
+
 #define GSC_TYPE_MANAGER             (gsc_manager_get_type ())
 #define GSC_MANAGER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MANAGER, GscManager))
 #define GSC_MANAGER_CLASS(klass)             (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))

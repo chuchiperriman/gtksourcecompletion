@@ -169,7 +169,7 @@ _compare_keys(GscManager *completion, KeysType type, GdkEventKey *event)
 		{
 			return TRUE;
 		}
-	}else if ((event->state == completion->priv->keys[type].mods) && 
+	}else if (((event->state & completion->priv->keys[type].mods)  == completion->priv->keys[type].mods) && 
 	    event->keyval == key)
 	{
 		return TRUE;

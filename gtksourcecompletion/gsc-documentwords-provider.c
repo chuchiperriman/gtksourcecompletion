@@ -125,12 +125,15 @@ get_all_words(GscDocumentwordsProvider* self, GtkTextBuffer *buffer )
 static gboolean
 is_valid_word(gchar *current_word, gchar *completion_word)
 {
+	if (current_word==NULL)
+		return TRUE;
+	
 	gint len_cur = strlen (current_word);
-	if (g_utf8_collate(current_word,completion_word) == 0 ||
-			g_utf8_strlen(completion_word,-1)<4)
+	if (g_utf8_collate(current_word,completion_word) == 0)
 			return FALSE;
 
-	if (strncmp(current_word,completion_word,len_cur)==0)
+	g_debug("len_cur: %d",len_cur);
+	if (len_cur!=0 && strncmp(current_word,completion_word,len_cur)==0)
 	{
 		return TRUE;
 	}
@@ -209,12 +212,6 @@ gsc_documentwords_provider_real_get_proposals (GscProvider* base,
 							 NULL);
 	self->priv->cleaned_word = gsc_clear_word(current_word);
 	g_free(current_word);
-	if (self->priv->cleaned_word == NULL)
-	{
-		if (self->priv->is_completing)
-			gsc_documentwords_provider_real_finish(base);
-		return NULL;
-	}
 	
 	if (!self->priv->is_completing)
 	{

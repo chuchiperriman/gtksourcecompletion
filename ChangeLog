@@ -1,3 +1,18 @@
+2008-09-17  Chuchi  <perriman@homer>
+
+	* gsc-manager.c,
+	  gsc-trigger-custom-key.c,
+	  Fixed #2114854: Fixed problems with lock caps etc. keys
+
+2008-09-04  Chuchi  <perriman@homer>
+
+	* gsc-manager.h: Added USER_REQUEST_TRIGGER_NAME. This trigger name
+	can be used in a lot of applications (like gedit plugins) to share the
+	same trigger for an user request completion.
+	* gsc-documentwords-provider.c: Modified to support completion of
+	empty filter. If the current word is null, the provider returns all
+	document words.
+
 2008-09-02  Chuchi  <perriman@homer>
 
 	* gsc-manager.c: Stops the key signal when the manager gets the
