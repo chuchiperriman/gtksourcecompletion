@@ -61,13 +61,10 @@ _view_key_press_event_cb(GtkWidget *view,
 	
 	if (completion != NULL)
 	{       
-		/*This is for a gtk bug!!!!*/
-		guint key = self->priv->key;
-		if ((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK)
-			key = gdk_keyval_to_upper(key);
+		guint key = gdk_keyval_to_lower(self->priv->key);
 		
 		if ((event->state & self->priv->mod) ==  self->priv->mod &&
-			event->keyval == key)
+			gdk_keyval_to_lower(event->keyval) == key)
 		{
 			if (self->priv->options!=NULL)
 				gsc_manager_trigger_event_with_opts(completion,
