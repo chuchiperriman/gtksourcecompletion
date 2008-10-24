@@ -1,5 +1,10 @@
 2008-09-17  Chuchi  <perriman@homer>
 
+	* gsc-utils.c: Fixed problem replacing the current word. This solves 
+	problems with gtksnippets
+
+2008-09-17  Chuchi  <perriman@homer>
+
 	* gsc-manager.c,
 	  gsc-trigger-custom-key.c,
 	  Fixed #2114854: Fixed problems with lock caps etc. keys

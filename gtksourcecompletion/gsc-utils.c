@@ -163,10 +163,12 @@ gsc_replace_actual_word(GtkTextView *text_view,
 	gtk_text_buffer_begin_user_action(buffer);
 	
 	gsc_get_last_word_and_iter(text_view,&word_start, &word_end);
-									   
+
+	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,"temp_replace",&word_start, TRUE);
 	gtk_text_buffer_delete(buffer,&word_start,&word_end);
+	gtk_text_buffer_get_iter_at_mark(buffer,&word_start,mark);
 	gtk_text_buffer_insert(buffer, &word_start, text,-1);
-	
+	gtk_text_buffer_delete_mark(buffer,mark);
 	gtk_text_buffer_end_user_action(buffer);
 }
 
