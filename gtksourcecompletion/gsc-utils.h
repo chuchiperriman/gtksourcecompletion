@@ -159,5 +159,30 @@ gsc_insert_text_with_indent(GtkTextView *view, const gchar* text);
 gboolean
 gsc_is_valid_word(gchar *current_word, gchar *completion_word);
 
+/**
+ * gsc_get_window_position_in_cursor:
+ * @window: Window to set
+ * @view: Parent view where we get the cursor position
+ * @x: The returned x position
+ * @y: The returned y position
+ *
+ * Returns: TRUE if the position is over the text and FALSE if 
+ * the position is under the text.
+ */
+gboolean 
+gsc_get_window_position_in_cursor(GtkWindow *window,
+				  GtkTextView *view,
+				  gint *x,
+				  gint *y);
+
+void
+gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y);
+
+void
+gsc_get_window_position_center_parent(GtkWindow *window,
+				      GtkWidget *parent,
+				      gint *x,
+				      gint *y);
+
 
 #endif 

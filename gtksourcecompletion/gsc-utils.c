@@ -304,3 +304,57 @@ gsc_is_valid_word(gchar *current_word, gchar *completion_word)
 
 	return FALSE;
 }
+
+void
+gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y)
+{
+	gint w,h;
+	gint sw = gdk_screen_width();
+	gint sh = gdk_screen_height();
+	gtk_window_get_size(window, &w, &h);
+	*x = (sw/2) - (w/2) - 20;
+	*y = (sh/2) - (h/2);
+}
+
+void
+gsc_get_window_position_center_parent(GtkWindow *window,
+				      GtkWidget *parent,
+				      gint *x,
+				      gint *y)
+{
+	GtkWindow *parent_win = GTK_WINDOW(gtk_widget_get_ancestor(parent,
+				GTK_TYPE_WINDOW));
+	gint w,h,px,py, pw,ph;
+	gtk_window_get_position(parent_win,&px,&py);
+	gtk_window_get_size(parent_win, &pw, &ph);
+	gtk_window_get_size(window, &w, &h);
+	
+	*x = px + ((pw/2) - (w/2) -20);
+	*y = py + ((ph/2) - (h/2));
+}
+
+gboolean 
+gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x, gint *y)
+{
+	gint w,h,xtext,ytext;
+	gint sw = gdk_screen_width();
+	gint sh = gdk_screen_height();
+
+	gsc_get_cursor_pos(view,x,y);
+	gtk_window_get_size(window, &w, &h);
+	if (*x+w > sw) *x = sw - w -4;
+	/*If we cannot show it down, we show it up.*/
+	if (*y+h > sh)
+	{
+		PangoLayout* layout = 
+			gtk_widget_create_pango_layout(GTK_WIDGET(view), NULL);
+		pango_layout_get_pixel_size(layout,&xtext,&ytext);
+		*y = *y -ytext - h;
+		g_object_unref(layout);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+
+

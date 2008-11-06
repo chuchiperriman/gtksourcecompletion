@@ -47,21 +47,16 @@ struct _GscPopupPriv
 	GtkWidget *info_window;
 	GtkWidget *info_button;
 	GtkWidget *info_label;
-	GtkWidget *view;
 	GtkWidget *notebook;
 	GtkWidget *tab_label;
 	GtkWidget *next_page_icon;
 	GtkWidget *filter;
 	GHashTable *trees;
+	GscPopupFilterType filter_type;
 	gboolean destroy_has_run;
 };
 
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
-
-static GscPopupOptions default_options = {
-	GSC_POPUP_POSITION_CURSOR,
-	GSC_POPUP_FILTER_NONE
-};
 
 static void
 gsc_popup_hide(GtkWidget *widget);
@@ -119,59 +114,6 @@ _get_tree_by_name(GscPopup *self, const gchar* tree_name)
 	}
 
 	return tree;
-}
-
-/*
- * Return TRUE if the position is over the text and FALSE if 
- * the position is under the text.
- */
-static gboolean 
-_get_popup_position_in_cursor(GscPopup *self, gint *x, gint *y)
-{
-	gint w,h,xtext,ytext;
-	gint sw = gdk_screen_width();
-	gint sh = gdk_screen_height();
-
-	gsc_get_cursor_pos(GTK_TEXT_VIEW(self->priv->view),x,y);
-	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
-	if (*x+w > sw) *x = sw - w -4;
-	/*If we cannot show it down, we show it up.*/
-	if (*y+h > sh)
-	{
-		PangoLayout* layout = 
-			gtk_widget_create_pango_layout(GTK_WIDGET(self->priv->view), NULL);
-		pango_layout_get_pixel_size(layout,&xtext,&ytext);
-		*y = *y -ytext - h;
-		g_object_unref(layout);
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
-static void
-_get_popup_position_center_screen(GscPopup *self, gint *x, gint *y)
-{
-	gint w,h;
-	gint sw = gdk_screen_width();
-	gint sh = gdk_screen_height();
-	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
-	*x = (sw/2) - (w/2) - 20;
-	*y = (sh/2) - (h/2);
-}
-
-static void
-_get_popup_position_center_parent(GscPopup *self, gint *x, gint *y)
-{
-	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->view),
-				GTK_TYPE_WINDOW));
-	gint w,h,px,py, pw,ph;
-	gtk_window_get_position(parent,&px,&py);
-	gtk_window_get_size(parent, &pw, &ph);
-	gtk_window_get_size(GTK_WINDOW(self), &w, &h);
-	
-	*x = px + ((pw/2) - (w/2) -20);
-	*y = py + ((ph/2) - (h/2));
 }
 
 static void
@@ -291,24 +233,15 @@ _update_pages_visibility(GscPopup *self)
 }
 
 static void
-gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
+gsc_popup_show(GtkWidget *widget)
 {
+	/*Only show the popup, the positions is set before this function*/
+	
 	GscPopup *self = GSC_POPUP(widget);
-	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->view),
-				GTK_TYPE_WINDOW));
+	/*
 	gtk_window_set_transient_for(GTK_WINDOW(self),
 		parent);
-	
-	gint x, y;
-	/*Position control*/
-	if (options->position_type == GSC_POPUP_POSITION_CURSOR)
-		_get_popup_position_in_cursor(self,&x,&y);
-	else if (options->position_type == GSC_POPUP_POSITION_CENTER_SCREEN)
-		_get_popup_position_center_screen(self,&x,&y);
-	else if (options->position_type == GSC_POPUP_POSITION_CENTER_PARENT)
-		_get_popup_position_center_parent(self,&x,&y);
-		
-	gtk_window_move(GTK_WINDOW(self), x, y);
+	*/
 	
 	_update_pages_visibility(self);
 	
@@ -321,16 +254,11 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 	gsc_tree_select_first(_get_current_tree(self));
 	
 	/*Filter*/
-	switch(options->filter_type)
+	switch(self->priv->filter_type)
 	{
 		case GSC_POPUP_FILTER_NONE:
 		{
 			gtk_widget_hide(self->priv->filter);
-			
-			gtk_window_present(parent);
-			gtk_window_activate_focus(parent);
-			gtk_widget_grab_focus(self->priv->view);
-			gtk_window_set_focus(parent,self->priv->view);
 			break;
 		}
 		default:
@@ -343,13 +271,6 @@ gsc_popup_show_with_opts(GtkWidget *widget, GscPopupOptions *options)
 			return;
 		}
 	}
-	
-}
-
-static void
-gsc_popup_show(GtkWidget *widget)
-{
-	gsc_popup_show_with_opts(widget,&default_options);
 }
 
 static void
@@ -609,13 +530,13 @@ GtkWidget*
 gsc_popup_new (GtkTextView *view)
 {
 	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() , NULL));
-	self->priv->view = GTK_WIDGET(view);
+	//TODO self->priv->view = GTK_WIDGET(view);
 	return GTK_WIDGET(self);
 }
 
 void
 gsc_popup_add_data(GscPopup *self,
-			      GscProposal* data)
+		   GscProposal* data)
 {
 	GscTree *tree = _get_tree_by_name(self,
 						    gsc_proposal_get_page_name(data));
@@ -689,19 +610,6 @@ gsc_popup_toggle_proposal_info(GscPopup *self)
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->priv->info_button),
 				     !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->priv->info_button)));
-}
-
-void
-gsc_popup_refresh(GscPopup *self)
-{
-	gsc_popup_show(GTK_WIDGET(self));
-}
-
-void
-gsc_popup_refresh_with_opts(GscPopup *self,
-			    GscPopupOptions *options)
-{
-	gsc_popup_show_with_opts(GTK_WIDGET(self),options);
 }
 
 void
@@ -827,4 +735,10 @@ gsc_popup_get_filter_widget(GscPopup *self)
 	return self->priv->filter;
 }
 
+void
+gsc_popup_set_filter_type(GscPopup *self,
+			  GscPopupFilterType filter_type)
+{
+	self->priv->filter_type = filter_type;
+}
 

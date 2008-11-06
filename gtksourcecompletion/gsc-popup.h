@@ -49,19 +49,6 @@ typedef enum{
 	GSC_POPUP_FILTER_TREE
 }GscPopupFilterType;
 
-
-struct _GscPopupOptions{
-	GscPopupPositionType position_type;
-	GscPopupFilterType filter_type;
-};
-
-/**
- * GscPopupOptions:
- * @position_type: Sets where the popup will be placed
- * @filter_type: Sets if the popup mus to be the filter and its type.
- **/
-typedef struct _GscPopupOptions GscPopupOptions;
-
 /*
  * Type checking and casting macros
  */
@@ -207,27 +194,6 @@ void
 gsc_popup_toggle_proposal_info(GscPopup *self);
 
 /**
- * gsc_popup_refresh:
- * @self: The #GscPopup
- *
- * Show the completion popup with the default the options.
- *
- */
-void
-gsc_popup_refresh(GscPopup *self);
-
-/**
- * gsc_popup_refresh_with_opts:
- * @self: The #GscPopup
- * @options: Options to tell the popup how it must to be shown.
- *
- * Show the completion popup with the current the options.
- */
-void
-gsc_popup_refresh_with_opts(GscPopup *self,
-					      GscPopupOptions *options);
-
-/**
  * gsc_popup_page_next:
  * @self: The #GscPopup
  *
@@ -279,6 +245,10 @@ gsc_popup_get_num_active_pages(GscPopup *self);
  */
 GtkWidget*
 gsc_popup_get_filter_widget(GscPopup *self);
+
+void
+gsc_popup_set_filter_type(GscPopup *self,
+			  GscPopupFilterType filter_type);
 
 G_END_DECLS
 

@@ -390,6 +390,36 @@ free_trigger_list(gpointer list)
 }
 
 static void
+set_popup_position(GscManager *self, GscManagerEventOptions *options)
+{
+	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->text_view),
+				GTK_TYPE_WINDOW));
+	gtk_window_set_transient_for(GTK_WINDOW(self->priv->popup),
+		parent);
+	
+	gint x, y;
+	GscPopupPositionType type = GSC_POPUP_POSITION_CURSOR;
+	
+	if (options!=NULL) 
+		type = options->position_type;
+		
+	switch(type)
+	{
+		case GSC_POPUP_POSITION_CENTER_SCREEN:
+			gsc_get_window_position_center_screen(GTK_WINDOW(self->priv->popup),&x,&y);
+			break;
+		case GSC_POPUP_POSITION_CENTER_PARENT:
+			gsc_get_window_position_center_parent(GTK_WINDOW(self->priv->popup),GTK_WIDGET(self->priv->text_view),&x,&y);
+			break;
+		default:
+			gsc_get_window_position_in_cursor(GTK_WINDOW(self->priv->popup),self->priv->text_view,&x,&y);
+			break;
+	}
+		
+	gtk_window_move(GTK_WINDOW(self->priv->popup), x, y);
+}
+
+static void
 gsc_manager_set_property (GObject      *object,
 				    guint         prop_id,
 				    const GValue *value,
@@ -729,16 +759,25 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 			}while((data_list = g_list_next(data_list)) != NULL);
 			g_list_free(final_list);
 			/* If there are not proposals, we don't show the popup */
-			g_debug("proposals: %i",proposals);
 			if (proposals > 0)
 			{
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
-				if (options==NULL)
-					gsc_popup_refresh(completion->priv->popup);
+				
+				set_popup_position(completion, options);
+				
+				if (options!=NULL)
+				{
+					gsc_popup_set_filter_type(completion->priv->popup,
+								  options->filter_type);
+				}
 				else
-					gsc_popup_refresh_with_opts(completion->priv->popup,
-								    &options->popup_options);
+				{
+					gsc_popup_set_filter_type(completion->priv->popup,
+								  GSC_POPUP_FILTER_NONE);
+				}
+				
+				gtk_widget_show(GTK_WIDGET(completion->priv->popup));
 				
 				completion->priv->active_trigger = trigger;
 			}

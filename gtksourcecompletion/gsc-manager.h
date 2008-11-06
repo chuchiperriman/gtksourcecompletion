@@ -55,7 +55,8 @@ typedef struct _GscManager GscManager;
 typedef struct _GscManagerEventOptions GscManagerEventOptions;
 
 struct _GscManagerEventOptions{
-	GscPopupOptions popup_options;
+	GscPopupPositionType position_type;
+	GscPopupFilterType filter_type;
 	gboolean autoselect;
 };
 
