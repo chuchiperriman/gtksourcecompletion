@@ -1,5 +1,5 @@
 /* Copyright (C) 2007 - Jesús Barbero <chuchiperriman@gmail.com>
- *  *
+ *  
  *  This file is part of gtksourcecompletion.
  *
  *  gtksourcecompletion is free software: you can redistribute it and/or modify

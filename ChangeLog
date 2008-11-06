@@ -1,3 +1,15 @@
+2008-11-06  Chuchi  <perriman@homer>
+
+	* gsc-provider-file: Created a new provider that reads the words of
+	file
+	* gsc-utils:
+		- gsc_is_valid_word: Check if the completion_word starts
+		with current_word and it is not the same word.
+		- Added gsc_get_last_word_cleaned: Return the current word
+		in the GtkTextView without special chars at the start
+	* provider-templates: Updates provider templates
+	* test: Created a test folder with some examples
+
 2008-09-17  Chuchi  <perriman@homer>
 
 	* gsc-utils.c: Fixed problem replacing the current word. This solves 

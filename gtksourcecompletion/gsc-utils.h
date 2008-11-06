@@ -45,6 +45,17 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 gchar*
 gsc_get_last_word(GtkTextView *text_view);
 
+/**
+ * gsc_get_last_word_cleaned:
+ * @text_view: The #GtkTextView
+ *
+ * See #gsc_get_last_word and #gsc_clear_word
+ *
+ * Returns: the last word written in the #GtkTextView or "" (new allocated)
+ */
+gchar*
+gsc_get_last_word_cleaned(GtkTextView *text_view);
+
 /** 
  * gsc_get_cursor_pos:
  * @text_view: The #GtkTextView
@@ -136,6 +147,17 @@ gsc_get_text_with_indent(const gchar* content,gchar *indent);
  */
 void
 gsc_insert_text_with_indent(GtkTextView *view, const gchar* text);
+
+/**
+ * gsc_is_valid_word:
+ * @current_word: The current word 
+ * @completion_word: The completion word
+ *
+ * Returns: TRUE if the completion_word starts with current_word and it is not
+ * the same word.
+ */
+gboolean
+gsc_is_valid_word(gchar *current_word, gchar *completion_word);
 
 
 #endif 

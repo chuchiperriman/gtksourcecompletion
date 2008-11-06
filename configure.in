@@ -69,6 +69,7 @@ gtksourcecompletion-1.0.pc
 gtksourcecompletion.lsm
 gtksourcecompletion.spec
 gtksourcecompletion/Makefile
+test/Makefile
 pixmaps/Makefile
 docs/Makefile
 docs/reference/Makefile

@@ -20,7 +20,7 @@ BUILT_SOURCES =                         \
         gsc-marshal.h
 
 libgtksourcecompletion_headers = 	\
-	gsc-provider.h	\
+	gsc-provider.h		\
 	gsc-trigger.h		\
 	gsc-utils.h		\
 	gsc-manager.h				\
@@ -30,7 +30,8 @@ libgtksourcecompletion_headers = 	\
 	gsc-documentwords-provider.h		\
 	gsc-tree.h				\
 	gsc-i18n.h			\
-	gsc-popup.h
+	gsc-popup.h		\
+	gsc-provider-file.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
@@ -44,6 +45,7 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gsc-documentwords-provider.c		\
 	gsc-tree.c				\
 	gsc-popup.c				\
+	gsc-provider-file.c			\
 	$(libgtksourcecompletion_headers)
 	
 

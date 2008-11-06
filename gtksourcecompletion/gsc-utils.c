@@ -24,7 +24,7 @@
 gboolean
 gsc_char_is_separator(const gunichar ch)
 {
-	if (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_"))
+	if (g_unichar_isprint(ch) && (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
 	{
 		return FALSE;
 	}
@@ -103,6 +103,15 @@ gchar*
 gsc_get_last_word(GtkTextView *text_view)
 {
 	return gsc_get_last_word_and_iter(text_view, NULL, NULL);
+}
+
+gchar*
+gsc_get_last_word_cleaned(GtkTextView *view)
+{
+	gchar *word = gsc_get_last_word_and_iter(view, NULL, NULL);
+	gchar *clean_word = gsc_clear_word(word);
+	g_free(word);
+	return clean_word;
 }
 
 void
@@ -278,3 +287,20 @@ gsc_insert_text_with_indent(GtkTextView *view, const gchar* text)
 	gtk_text_view_scroll_mark_onscreen(view,insert);
 }
 
+gboolean
+gsc_is_valid_word(gchar *current_word, gchar *completion_word)
+{
+	if (completion_word==NULL)
+		return FALSE;
+	if (current_word==NULL)
+		return TRUE;
+	
+	gint len_cur = g_utf8_strlen (current_word,-1);
+	if (g_utf8_collate(current_word,completion_word) == 0)
+		return FALSE;
+
+	if (len_cur!=0 && strncmp(current_word,completion_word,len_cur)==0)
+		return TRUE;
+
+	return FALSE;
+}

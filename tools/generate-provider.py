@@ -46,7 +46,7 @@ USAGE = """Usage:
    %s [OPTIONS...] pluginname
 """ % os.path.basename(sys.argv[0])
 HELP = USAGE + """
-generate skeleton source tree for a new GtkTextCompletionProvider.
+generate skeleton source tree for a new GscProvider.
 
 Options:
 Features:
@@ -120,8 +120,8 @@ directives = {
 output_files = {
 }
 
-output_files['provider-template.c'] = '%s/gsc-%s-provider.c' % (plugin_module, plugin_module)
-output_files['provider-template.h'] = '%s/gsc-%s-provider.h' % (plugin_module, plugin_module)
+output_files['provider-template.c'] = '%s/gsc-provider-%s.c' % (plugin_module, plugin_module)
+output_files['provider-template.h'] = '%s/gsc-provider-%s.h' % (plugin_module, plugin_module)
 
 # Generate the plugin base
 for infile, outfile in output_files.iteritems():

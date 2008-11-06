@@ -132,7 +132,6 @@ is_valid_word(gchar *current_word, gchar *completion_word)
 	if (g_utf8_collate(current_word,completion_word) == 0)
 			return FALSE;
 
-	g_debug("len_cur: %d",len_cur);
 	if (len_cur!=0 && strncmp(current_word,completion_word,len_cur)==0)
 	{
 		return TRUE;
