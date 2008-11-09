@@ -30,7 +30,6 @@
 #define GSC_POPUP_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
 					 GSC_TYPE_POPUP,                    \
 					 GscPopupPriv))
-					 
 
 /* Signals */
 enum
@@ -41,6 +40,17 @@ enum
 };
 
 static guint popup_signals[LAST_SIGNAL] = { 0 };
+
+/* Keys */
+#define DEFAULT_INFO_KEYS "<Control>i"
+#define DEFAULT_PAGE_NEXT_KEYS "Right"
+#define DEFAULT_PAGE_PREV_KEYS "Left"
+
+typedef struct 
+{
+	guint key;
+	GdkModifierType mods;
+} KeyDef;
 
 struct _GscPopupPriv
 {
@@ -54,6 +64,7 @@ struct _GscPopupPriv
 	GHashTable *trees;
 	GscPopupFilterType filter_type;
 	gboolean destroy_has_run;
+	KeyDef keys[KEYS_LAST];
 };
 
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
@@ -63,8 +74,8 @@ gsc_popup_hide(GtkWidget *widget);
 
 static void
 _proposal_selected_cb (GscTree *tree, 
-		   GscProposal *proposal,
-		   gpointer user_data);
+		       GscProposal *proposal,
+		       gpointer user_data);
 
 static void 
 _selection_changed_cd(GscTree *tree, 
@@ -119,9 +130,8 @@ _get_tree_by_name(GscPopup *self, const gchar* tree_name)
 static void
 _show_completion_info(GscPopup *self)
 {
-	GscProposal *proposal;
-	gsc_popup_get_selected_proposal(self,&proposal);
-	if (proposal!=NULL)
+	GscProposal *proposal = NULL;
+	if (gsc_popup_get_selected_proposal(self,&proposal))
 	{
 		g_signal_emit_by_name (self, "display-info",proposal);
 	}
@@ -230,6 +240,111 @@ _update_pages_visibility(GscPopup *self)
 		gtk_widget_hide(self->priv->next_page_icon);
 	
 	
+}
+
+static gboolean
+_filter_key_press_event_cb(GtkWidget *view,
+			   GdkEventKey *event, 
+			   gpointer user_data)
+{
+	GscPopup *self = GSC_POPUP(user_data);
+	return gsc_popup_manage_key(self,event);
+}
+
+gboolean
+gsc_popup_manage_key(GscPopup *self,
+		     GdkEventKey *event)
+{
+	gboolean catched = FALSE;
+	gboolean ret = FALSE;
+	switch (event->keyval)
+ 	{
+		case GDK_Escape:
+		{
+			gsc_popup_hide(GTK_WIDGET(self));
+			catched = TRUE;
+			ret = TRUE;
+			break;
+		}
+ 		case GDK_Down:
+		{
+			ret = gsc_popup_select_next(self, 1);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Down:
+		{
+			ret = gsc_popup_select_next(self, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Up:
+		{
+			ret = gsc_popup_select_previous(self, 1);
+			if (!ret)
+				ret = gsc_popup_select_first(self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Up:
+		{
+			ret = gsc_popup_select_previous(self, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Home:
+		{
+			ret = gsc_popup_select_first(self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_End:
+		{
+			ret = gsc_popup_select_last(self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Return:
+		case GDK_Tab:
+		{
+			GscProposal *prop = NULL;
+			if (gsc_popup_get_selected_proposal(self,&prop))
+			{
+				g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED], 0, prop);
+				gsc_popup_hide(GTK_WIDGET(self));
+			}
+			else
+			{
+				gsc_popup_hide(GTK_WIDGET(self));
+			}
+			ret = FALSE;
+			catched = TRUE;
+			break;
+		}
+	}
+	if (!catched)
+	{
+		if (gsc_compare_keys(self->priv->keys[KEYS_INFO].key,
+				     self->priv->keys[KEYS_INFO].mods,
+				     event))
+		{
+			gsc_popup_toggle_proposal_info(self);
+			ret = TRUE;
+		}else if (gsc_compare_keys(self->priv->keys[KEYS_PAGE_NEXT].key,
+					   self->priv->keys[KEYS_PAGE_NEXT].mods,
+					   event))
+		{
+			gsc_popup_page_next(self);
+			ret = TRUE;
+		}else if (gsc_compare_keys(self->priv->keys[KEYS_PAGE_PREV].key,
+					   self->priv->keys[KEYS_PAGE_PREV].mods,
+					   event))
+		{
+			gsc_popup_page_previous(self);
+			ret = TRUE;
+		}
+	}
+	return ret;
 }
 
 static void
@@ -397,6 +512,10 @@ gsc_popup_init (GscPopup *self)
 	self->priv = GSC_POPUP_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->trees = g_hash_table_new(g_str_hash,g_str_equal);
+	
+	gsc_popup_set_key(self,KEYS_INFO,DEFAULT_INFO_KEYS);
+	gsc_popup_set_key(self,KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
+	gsc_popup_set_key(self,KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
 
 	GtkWidget *completion_tree = gsc_tree_new();
 	
@@ -514,6 +633,11 @@ gsc_popup_init (GscPopup *self)
 			"key-release-event",
 			G_CALLBACK(_filter_key_release_cb),
 			(gpointer) self);
+	
+	g_signal_connect(self->priv->filter,
+			"key-press-event",
+			G_CALLBACK(_filter_key_press_event_cb),
+			(gpointer) self);
 			
 	g_signal_connect(self,
 			"delete-event",
@@ -527,10 +651,9 @@ gsc_popup_init (GscPopup *self)
 }
 
 GtkWidget*
-gsc_popup_new (GtkTextView *view)
+gsc_popup_new ()
 {
 	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() , NULL));
-	//TODO self->priv->view = GTK_WIDGET(view);
 	return GTK_WIDGET(self);
 }
 
@@ -539,7 +662,7 @@ gsc_popup_add_data(GscPopup *self,
 		   GscProposal* data)
 {
 	GscTree *tree = _get_tree_by_name(self,
-						    gsc_proposal_get_page_name(data));
+					  gsc_proposal_get_page_name(data));
 	
 	gsc_tree_add_data(tree,data);
 }
@@ -585,7 +708,7 @@ gsc_popup_select_next(GscPopup *self,
 
 gboolean
 gsc_popup_get_selected_proposal(GscPopup *self,
-					GscProposal **proposal)
+				GscProposal **proposal)
 {
 	return gsc_tree_get_selected_proposal(_get_current_tree(self),proposal);
 }
@@ -741,4 +864,23 @@ gsc_popup_set_filter_type(GscPopup *self,
 {
 	self->priv->filter_type = filter_type;
 }
+
+void
+gsc_popup_set_key(GscPopup *self, KeysType type, const gchar* keys)
+{
+	guint key;
+	GdkModifierType mods;
+	gtk_accelerator_parse(keys,&key,&mods);
+	g_return_if_fail(key!=0);
+	self->priv->keys[type].key = key;
+	self->priv->keys[type].mods = mods;
+}
+
+gchar*
+gsc_popup_get_key(GscPopup *self, KeysType type)
+{
+	return gtk_accelerator_name(self->priv->keys[type].key,
+				    self->priv->keys[type].mods);
+}
+
 

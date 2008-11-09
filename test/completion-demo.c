@@ -31,6 +31,7 @@
 #include <config.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourcecompletion/gsc-manager.h>
 #include <gtksourcecompletion/gsc-documentwords-provider.h>
@@ -39,12 +40,27 @@
 #include <gtksourcecompletion/gsc-provider-file.h>
 
 GtkWidget *view;
+
 static const gboolean change_keys = FALSE;
 
 static void
 destroy_cb(GtkObject *object,gpointer   user_data)
 {
 	gtk_main_quit ();
+}
+
+static gboolean
+key_press(GtkWidget   *widget,
+	GdkEventKey *event,
+	gpointer     user_data)
+{
+
+	if (event->keyval == GDK_P)
+	{
+		g_debug("Test popup");
+	}
+	
+	return FALSE;
 }
 
 GtkWidget*
@@ -57,6 +73,8 @@ create_window (void)
 	GtkWidget *scroll = gtk_scrolled_window_new(NULL,NULL);
 	gtk_container_add(GTK_CONTAINER(scroll),view);
 	gtk_container_add(GTK_CONTAINER(window),scroll);
+	
+	g_signal_connect(view, "key-press-event", G_CALLBACK(key_press), NULL);
 	
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
 	
@@ -95,7 +113,7 @@ create_completion(void)
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscManagerEventOptions *opts = g_new0(GscManagerEventOptions,1);
-	opts->popup_options.filter_type = GSC_POPUP_FILTER_TREE;
+	opts->filter_type = GSC_POPUP_FILTER_TREE;
 	gsc_trigger_customkey_set_opts(ur_trigger,opts);
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
@@ -108,7 +126,6 @@ create_completion(void)
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);
-		
 }
 
 

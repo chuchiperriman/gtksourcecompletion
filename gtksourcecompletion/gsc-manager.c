@@ -49,19 +49,6 @@ enum {
 	PROP_PREV_PAGE_KEYS
 };
 
-typedef enum {
-	KEYS_INFO,
-	KEYS_PAGE_NEXT,
-	KEYS_PAGE_PREV,
-	KEYS_LAST
-} KeysType;
-
-typedef struct 
-{
-	guint key;
-	GdkModifierType mods;
-} CompletionKeys;
-
 struct _GscManagerPrivate
 {
 	GtkTextView *text_view;
@@ -72,7 +59,6 @@ struct _GscManagerPrivate
 	GList *providers;
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
-	CompletionKeys keys[KEYS_LAST];
 	GscTrigger *active_trigger;
 };
 
@@ -129,176 +115,23 @@ _prov_list_free(gpointer prov_list)
 static void
 end_completion (GscManager *completion)
 {
-	gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
-
-	GList *providers = completion->priv->providers;
-	do
+	
+	if (GTK_WIDGET_VISIBLE(completion->priv->popup))
 	{
-		GscProvider *provider =  GSC_PROVIDER(providers->data);
-		gsc_provider_finish(provider);
+		gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
+	}
+	else
+	{
+		GList *providers = completion->priv->providers;
+		do
+		{
+			GscProvider *provider =  GSC_PROVIDER(providers->data);
+			gsc_provider_finish(provider);
 			
-	}while((providers = g_list_next(providers)) != NULL);
+		}while((providers = g_list_next(providers)) != NULL);
 	
-	completion->priv->active_trigger = NULL;
-}
-
-static void
-_set_keys(GscManager *completion, KeysType type, const gchar* keys)
-{
-	guint key;
-	GdkModifierType mods;
-	gtk_accelerator_parse(keys,&key,&mods);
-	g_return_if_fail(key!=0);
-	completion->priv->keys[type].key = key;
-	completion->priv->keys[type].mods = mods;
-}
-
-static gboolean
-_compare_keys(GscManager *completion, KeysType type, GdkEventKey *event)
-{
-	guint modifiers = gtk_accelerator_get_default_mod_mask ();
-	/*This is for a gtk bug!!!!*/
-	guint key = completion->priv->keys[type].key;
-	if ((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK)
-		key = gdk_keyval_to_upper(key);
-	
-	if (completion->priv->keys[type].mods == 0 &&
-	    (event->state & modifiers)==0)
-	{
-		if (event->keyval == key)
-		{
-			return TRUE;
-		}
-	}else if (((event->state & completion->priv->keys[type].mods)  == completion->priv->keys[type].mods) && 
-	    event->keyval == key)
-	{
-		return TRUE;
+		completion->priv->active_trigger = NULL;
 	}
-	
-	return FALSE;
-}
-
-static gboolean
-_popup_tree_selection(GscManager *completion)
-{
-	GscProposal *proposal;
-	if (gsc_popup_get_selected_proposal(completion->priv->popup,&proposal))
-	{
-		gsc_proposal_apply(proposal,completion->priv->text_view);
-		end_completion (completion);
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-static gboolean
-view_key_press_event_cb(GtkWidget *view,
-			GdkEventKey *event, 
-			gpointer user_data)
-{
-	/* Catch only keys of popup movement */
-	gboolean ret = FALSE;
-	gboolean catched = FALSE;
-	GscManager *completion;
-	g_assert(GSC_IS_MANAGER(user_data));
-	completion = GSC_MANAGER(user_data);
-	
-	if (gsc_manager_is_visible(completion))
-	{
-		guint modifiers = gtk_accelerator_get_default_mod_mask ();
-		if ((event->state & modifiers)==0)
-		{
-			switch (event->keyval)
-		 	{
-				case GDK_Escape:
-				{
-					end_completion (completion);
-					catched = TRUE;
-					ret = TRUE;
-					break;
-				}
-		 		case GDK_Down:
-				{
-					ret = gsc_popup_select_next(completion->priv->popup, 1);
-					catched = TRUE;
-					break;
-				}
-				case GDK_Page_Down:
-				{
-					ret = gsc_popup_select_next(completion->priv->popup, 5);
-					catched = TRUE;
-					break;
-				}
-				case GDK_Up:
-				{
-					if (gsc_popup_select_previous(completion->priv->popup, 1))
-					{
-						ret = TRUE;
-					}
-					else
-					{
-						ret = gsc_popup_select_first(completion->priv->popup);
-					}
-					catched = TRUE;
-					break;
-				}
-				case GDK_Page_Up:
-				{
-					ret = gsc_popup_select_previous(completion->priv->popup, 5);
-					catched = TRUE;
-					break;
-				}
-				case GDK_Home:
-				{
-					ret = gsc_popup_select_first(completion->priv->popup);
-					catched = TRUE;
-					break;
-				}
-				case GDK_End:
-				{
-					ret = gsc_popup_select_last(completion->priv->popup);
-					catched = TRUE;
-					break;
-				}
-				case GDK_Return:
-				case GDK_Tab:
-				{
-					ret = _popup_tree_selection(completion);
-					if (!ret)
-					{
-						end_completion(completion);
-						ret = TRUE;
-					}
-					catched = TRUE;
-					break;
-				}
-			}
-		}
-		if (!catched)
-		{
-			if (_compare_keys(completion,KEYS_INFO,event))
-			{
-				/*View information of the proposal */
-				gsc_popup_toggle_proposal_info(completion->priv->popup);
-				ret = TRUE;
-			}else if (_compare_keys(completion,KEYS_PAGE_NEXT,event))
-			{
-				g_debug("next");
-				gsc_popup_page_next(completion->priv->popup);
-				ret = TRUE;
-				
-			}else if (_compare_keys(completion,KEYS_PAGE_PREV,event))
-			{
-				g_debug("prev");
-				gsc_popup_page_previous(completion->priv->popup);
-				ret = TRUE;
-				
-			}
-		}
-
-	}
-	return ret;
 }
 
 static void
@@ -319,6 +152,14 @@ _popup_display_info_cb(GtkWidget *popup,
 	GscManager *self = GSC_MANAGER(user_data);
 	const gchar *info = gsc_proposal_get_info(proposal);
 	gsc_popup_set_current_info(self->priv->popup,(gchar*)info);
+}
+
+static void
+_popup_hide_cb(GtkWidget *widget,
+	       gpointer user_data)
+{
+	GscManager *self = GSC_MANAGER(user_data);
+	end_completion(self);
 }
 
 static void
@@ -419,6 +260,17 @@ set_popup_position(GscManager *self, GscManagerEventOptions *options)
 	gtk_window_move(GTK_WINDOW(self->priv->popup), x, y);
 }
 
+static gboolean
+view_key_press_event_cb(GtkWidget *view,
+			GdkEventKey *event, 
+			gpointer user_data)
+{
+	GscManager *self = GSC_MANAGER(user_data);
+	if (gsc_manager_is_visible(self))
+		return gsc_popup_manage_key(self->priv->popup,event);
+	return FALSE;
+}
+
 static void
 gsc_manager_set_property (GObject      *object,
 				    guint         prop_id,
@@ -434,13 +286,13 @@ gsc_manager_set_property (GObject      *object,
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
-			_set_keys(self, KEYS_INFO, g_value_get_string(value));
+			gsc_popup_set_key(self->priv->popup,KEYS_INFO,g_value_get_string(value));
 			break;
 		case PROP_NEXT_PAGE_KEYS:
-			_set_keys(self,KEYS_PAGE_NEXT,g_value_get_string(value));
+			gsc_popup_set_key(self->priv->popup,KEYS_PAGE_NEXT,g_value_get_string(value));
 			break;
 		case PROP_PREV_PAGE_KEYS:
-			_set_keys(self,KEYS_PAGE_PREV,g_value_get_string(value));
+			gsc_popup_set_key(self->priv->popup,KEYS_PAGE_PREV,g_value_get_string(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -464,18 +316,15 @@ gsc_manager_get_property (GObject    *object,
 	{
 		case PROP_INFO_KEYS:
 			g_value_set_string(value,
-					   gtk_accelerator_name(self->priv->keys[KEYS_INFO].key,
-								self->priv->keys[KEYS_INFO].mods));
+					   gsc_popup_get_key(self->priv->popup,KEYS_INFO));
 			break;
 		case PROP_NEXT_PAGE_KEYS:
 			g_value_set_string(value,
-					   gtk_accelerator_name(self->priv->keys[KEYS_PAGE_NEXT].key,
-								self->priv->keys[KEYS_PAGE_NEXT].mods));
+					   gsc_popup_get_key(self->priv->popup,KEYS_PAGE_NEXT));
 			break;
 		case PROP_PREV_PAGE_KEYS:
 			g_value_set_string(value,
-					   gtk_accelerator_name(self->priv->keys[KEYS_PAGE_PREV].key,
-								self->priv->keys[KEYS_PAGE_PREV].mods));
+					   gsc_popup_get_key(self->priv->popup,KEYS_PAGE_PREV));
 			break;
 
 		default:
@@ -506,15 +355,28 @@ gsc_manager_init (GscManager *completion)
 							    g_str_equal,
 							    g_free,
 							    (GDestroyNotify)_prov_list_free);
-	
-	_set_keys(completion, KEYS_INFO, DEFAULT_INFO_KEYS);
-	_set_keys(completion, KEYS_PAGE_NEXT, DEFAULT_PAGE_NEXT_KEYS);
-	_set_keys(completion, KEYS_PAGE_PREV, DEFAULT_PAGE_PREV_KEYS);
+
+	completion->priv->popup = GSC_POPUP(gsc_popup_new());
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
 		completion->priv->internal_signal_ids[i] = 0;
 	}
+	
+	g_signal_connect(completion->priv->popup, 
+			 "proposal-selected",
+			 G_CALLBACK(_popup_proposal_select_cb),
+			 (gpointer) completion);
+			 
+	g_signal_connect(completion->priv->popup, 
+			 "display-info",
+			 G_CALLBACK(_popup_display_info_cb),
+			 (gpointer) completion);
+	
+	g_signal_connect(completion->priv->popup, 
+			 "hide",
+			 G_CALLBACK(_popup_hide_cb),
+			 (gpointer) completion);
 
 }
 
@@ -620,7 +482,6 @@ gsc_manager_get_type (void)
 GscManager*
 gsc_manager_new (GtkTextView *view)
 {
-
 	g_assert(view!=NULL);
 	
 	GscManager *completion = completion_control_get_completion(view);
@@ -632,24 +493,6 @@ gsc_manager_new (GtkTextView *view)
 	completion = GSC_MANAGER (g_object_new (GSC_TYPE_MANAGER, NULL));
 	completion->priv->text_view = view;
 	
-	completion->priv->popup = GSC_POPUP(gsc_popup_new(view));
-	
-	g_signal_connect(completion->priv->popup, 
-			 "proposal-selected",
-			 G_CALLBACK(_popup_proposal_select_cb),
-			 (gpointer) completion);
-			 
-	g_signal_connect(completion->priv->popup, 
-			 "display-info",
-			 G_CALLBACK(_popup_display_info_cb),
-			 (gpointer) completion);
-			 
-	GtkWidget *filter = gsc_popup_get_filter_widget(completion->priv->popup);
-	g_signal_connect(filter,
-			 "key-press-event",
-			 G_CALLBACK(view_key_press_event_cb),
-			 (gpointer) completion);
-
 	completion_control_add_completion(view,completion);
 	
 	return completion;

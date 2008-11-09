@@ -175,14 +175,43 @@ gsc_get_window_position_in_cursor(GtkWindow *window,
 				  gint *x,
 				  gint *y);
 
+/**
+ * gsc_get_window_position_center_screen:
+ * @window: Window to set
+ * @x: The returned x position
+ * @y: The returned y position
+ *
+ * Assing x and y values to center the window in the screen
+ *
+ */
 void
 gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y);
 
+/**
+ * gsc_get_window_position_center_parent:
+ * @window: Window to set
+ * @parent: Parent widget where we want to center the window
+ * @x: The returned x position
+ * @y: The returned y position
+ *
+ * Assing x and y values to center the window in the parent widget
+ *
+ */
 void
 gsc_get_window_position_center_parent(GtkWindow *window,
 				      GtkWidget *parent,
 				      gint *x,
 				      gint *y);
 
+/**
+ * gsc_compare_keys:
+ * @key: key to compare
+ * @mods: modifiers to compare
+ * @event: Event to be compared with the previous key and modifiers
+ *
+ * Returns: TRUE if the event key has the same key and mods.
+ */
+gboolean
+gsc_compare_keys(guint key, guint mods, GdkEventKey *event);
 
 #endif 

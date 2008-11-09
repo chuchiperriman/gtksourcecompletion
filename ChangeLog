@@ -1,5 +1,17 @@
-2008-11-06  Chuchi  <perriman@homer>
+2008-11-06  Chuchi  <chuchiperriman@gmail.com>
 
+	* gsc-popup: 
+		- It is independent of a GtkTextView!!
+		- Removed positioning. The popup does not set its position.
+		- Gets the keys control into the filter
+		- created a new function gsc_popup_manage_key for manage an
+		event key from other widgets (GtkTextView for example)
+	* gsc-manager: 
+		- Does not control the key events, only call to the new
+		function  gsc_popup_manage_key.
+		- Manage the completion option, popup position and type
+	* API: Api broken!!!!!!!!! removed popup refresh methods and removed 
+	GscPopupOptions (now in GscManagerEventOptions)
 	* gsc-provider-file: Created a new provider that reads the words of
 	file
 	* gsc-utils:
@@ -10,18 +22,18 @@
 	* provider-templates: Updates provider templates
 	* test: Created a test folder with some examples
 
-2008-09-17  Chuchi  <perriman@homer>
+2008-09-17  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-utils.c: Fixed problem replacing the current word. This solves 
 	problems with gtksnippets
 
-2008-09-17  Chuchi  <perriman@homer>
+2008-09-17  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-manager.c,
 	  gsc-trigger-custom-key.c,
 	  Fixed #2114854: Fixed problems with lock caps etc. keys
 
-2008-09-04  Chuchi  <perriman@homer>
+2008-09-04  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-manager.h: Added USER_REQUEST_TRIGGER_NAME. This trigger name
 	can be used in a lot of applications (like gedit plugins) to share the
@@ -30,23 +42,23 @@
 	empty filter. If the current word is null, the provider returns all
 	document words.
 
-2008-09-02  Chuchi  <perriman@homer>
+2008-09-02  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-manager.c: Stops the key signal when the manager gets the
 	control
 
-2008-08-30  Chuchi  <perriman@homer>
+2008-08-30  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-trigger-custom-key.c,
 	  gsc-manager: Fixed problem with keys. There is a bug in
 	  gtk_accelerator_name & gtk_accelerator_parse but I have fixed it in
 	  this library.
 
-2008-08-26  Chuchi  <perriman@homer>
+2008-08-26  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-utils: Added indentation functions
 
-2008-08-23  Chuchi  <perriman@homer>
+2008-08-23  Chuchi  <chuchiperriman@gmail.com>
 
 	* Makefile: Fixed error with portable libraries. I remove all -module
 	* gsc-popup, gsc-tree #2057971: Fixed focus problem when change the
@@ -54,7 +66,7 @@
 
 === Version 0.5.0 ===
 
-2008-08-16  Chuchi  <perriman@homer>
+2008-08-16  Chuchi  <chuchiperriman@gmail.com>
 
 	* doc: Updated api documentation
 	* GscTree: removed gsc_tree_has_proposals function
@@ -65,7 +77,7 @@
 	* GscPopup: Fixed problem with the popup window in Gnome to set the 
 	focus into the view
 
-2008-07-26  Chuchi  <perriman@homer>
+2008-07-26  Chuchi  <chuchiperriman@gmail.com>
 
 	* GscPopup: Added CENTER_PARENT to center the popup relative to the
 	parent
@@ -75,7 +87,7 @@
 		- Hide the popup on focus-out event
 		- Added method to get the filter widget
 
-2008-07-19  Chuchi  <perriman@homer>
+2008-07-19  Chuchi  <chuchiperriman@gmail.com>
 
 	* GscTree:
 	* GscPopup:
@@ -84,7 +96,7 @@
 		popup when the user change the current window by pressing
 		alt-tab)
 
-2008-07-15  Chuchi  <perriman@homer>
+2008-07-15  Chuchi  <chuchiperriman@gmail.com>
 
 	* GscTriggerCustomKey: Add support to popup options
 	* GscPopup: 
@@ -92,14 +104,14 @@
 		- Using the new hint type for the filter
 
 
-2008-06-30  Chuchi  <perriman@homer>
+2008-06-30  Chuchi  <chuchiperriman@gmail.com>
 
 	* namespace: Change all application namespace. Now all objects start
 	with gsc_
 	* structure: Changed some methods to remove the gsc-manager dependency
 	en proposal, trigger and provider
 
-2008-06-29  Chuchi  <perriman@homer>
+2008-06-29  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion-popup: Added PopupOptions in refresh function.
 	You can now set the popup position, the filter type etc.
@@ -107,7 +119,7 @@
 	You can now set the event options (popup options plus completion
 	options) when trigger an event.
 
-2008-06-28  Chuchi  <perriman@homer>
+2008-06-28  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion: 
 		- Removed autoselection because I don't like this feature, I
@@ -120,25 +132,25 @@
 	* gtksourcecompletion: Added autoselection if there is only one proposal
 	in the completion popup (one poposal and one page)
 
-2008-06-07  Chuchi  <perriman@homer>
+2008-06-07  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion-proposal: Added label, info and icon properties
 
-2008-05-24  Chuchi  <perriman@homer>
+2008-05-24  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion-proposal: Removed user_data from vfuncs
 
-2008-05-23  Chuchi  <perriman@homer>
+2008-05-23  Chuchi  <chuchiperriman@gmail.com>
 
 	* general: Changed GTK_SOURCE_IS... by GTK_IS_SOURCE...
 
-2008-05-16  Chuchi  <perriman@homer>
+2008-05-16  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion-provider: Changed get_data to get_proposals
 	* gtksourcecompletion-proposal: Solved some problems with the signals.
 	* Triggers: Renamed triggers with gtksourcecompletion namespace
 
-2008-05-11  Chuchi  <perriman@homer>
+2008-05-11  Chuchi  <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion-marshal.list: Created the marshals for
 	gtksourcecompletion
@@ -152,7 +164,7 @@
 		-Adapted to the new changes on proposal and popup
 		-Remove the priority mechanism
 
-2008-05-05  Chuchi  <perriman@homer>
+2008-05-05  Chuchi  <chuchiperriman@gmail.com>
 	
 	* gtksourcecompletion-tree:
 	* gtksourcecompletion-popup:
@@ -171,7 +183,7 @@
 		- Uses the new GtkSourceCompletionProposal object.
 	* gtksourcecompletion-item: Removed the old item files
 
-2008-05-03  Chuchi  <perriman@homer>
+2008-05-03  Chuchi  <chuchiperriman@gmail.com>
 
 	* version: Updated to 0.5.0 version because we will break the API
 

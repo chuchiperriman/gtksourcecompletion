@@ -49,6 +49,13 @@ typedef enum{
 	GSC_POPUP_FILTER_TREE
 }GscPopupFilterType;
 
+typedef enum {
+	KEYS_INFO,
+	KEYS_PAGE_NEXT,
+	KEYS_PAGE_PREV,
+	KEYS_LAST
+}KeysType;
+
 /*
  * Type checking and casting macros
  */
@@ -143,12 +150,11 @@ gsc_popup_get_selected_proposal(GscPopup *self,
 
 /**
  * gsc_popup_new:
- * @view: The #GtkTextView where the popup gets and put the completion.
  *
  * Returns The new #GscPopup
  */
 GtkWidget*
-gsc_popup_new (GtkTextView *view);
+gsc_popup_new ();
 
 /**
  * gsc_popup_clear:
@@ -246,10 +252,56 @@ gsc_popup_get_num_active_pages(GscPopup *self);
 GtkWidget*
 gsc_popup_get_filter_widget(GscPopup *self);
 
+/**
+ * gsc_popup_set_filter_type:
+ * @self: The #GscPopup
+ * @filter_type: The filter type
+ *
+ * Sets the current filter type to be used when the popup will
+ * be shown.
+ *
+ */
 void
 gsc_popup_set_filter_type(GscPopup *self,
 			  GscPopupFilterType filter_type);
 
+/**
+ * gsc_popup_set_key:
+ * @self: The #GscPopup
+ * @type: Key what you want to set
+ * @keys: Keys to be assigned to the key type
+ *
+ * Sets the keys for the key type. By example you can set the info keys 
+ * by passing KEYS_INFO type and "<control>i" keys.
+ *
+ */
+void
+gsc_popup_set_key(GscPopup *self, KeysType type, const gchar* keys);
+
+/**
+ * gsc_popup_get_key:
+ * @self: The #GscPopup
+ * @type: The key type what you want to get
+ *
+ * Returns: New allocated string representation with #gtk_accelerator_name
+ */
+gchar*
+gsc_popup_get_key(GscPopup *self, KeysType type);
+
+/**
+ * gsc_popup_manage_key:
+ * @self: The #GscPopup
+ * @event: Key event to be managed
+ *
+ * Manage the event keys. If it is Return, it will select the current proposal, 
+ * if it is a Down key then selects the next proposal etc.
+ *
+ * Returns: TRUE if the key has been used.
+ */
+gboolean
+gsc_popup_manage_key(GscPopup *self,
+		     GdkEventKey *event);
+			   
 G_END_DECLS
 
 #endif 
