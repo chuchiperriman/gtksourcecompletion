@@ -20,110 +20,109 @@
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
-#include "gtksourcecompletion-utils.h"
-#include "gsc-##(PLUGIN_ID.lower)-trigger.h"
+#include "gsc-trigger-##(PLUGIN_ID.lower).h"
 
-struct _Gsc##(PLUGIN_ID.camel)TriggerPrivate {
-	GtkSourceCompletion *completion;
+struct _GscTrigger##(PLUGIN_ID.camel)Private {
+	GscManager *completion;
 };
 
-#define GSC_##(PLUGIN_ID.upper)_TRIGGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER, Gsc##(PLUGIN_ID.camel)TriggerPrivate))
+#define GSC_TRIGGER_##(PLUGIN_ID.upper)_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), GscTrigger##(PLUGIN_ID.camel)Private))
 
 enum  {
-	GSC_##(PLUGIN_ID.upper)_TRIGGER_DUMMY_PROPERTY,
+	GSC_TRIGGER_##(PLUGIN_ID.upper)_DUMMY_PROPERTY,
 };
 
-static const gchar* gsc_##(PLUGIN_ID.lower)_trigger_real_get_name(GtkSourceCompletionTrigger* base);
-static gboolean gsc_##(PLUGIN_ID.lower)_trigger_real_activate (GtkSourceCompletionTrigger* base);
-static gboolean gsc_##(PLUGIN_ID.lower)_trigger_real_deactivate (GtkSourceCompletionTrigger* base);
+static const gchar* gsc_trigger_##(PLUGIN_ID.lower)_real_get_name(GscTrigger* base);
+static gboolean gsc_trigger_##(PLUGIN_ID.lower)_real_activate (GscTrigger* base);
+static gboolean gsc_trigger_##(PLUGIN_ID.lower)_real_deactivate (GscTrigger* base);
 
-static gpointer gsc_##(PLUGIN_ID.lower)_trigger_parent_class = NULL;
-static GtkSourceCompletionTriggerIface* gsc_##(PLUGIN_ID.lower)_trigger_parent_iface = NULL;
+static gpointer gsc_trigger_##(PLUGIN_ID.lower)_parent_class = NULL;
+static GscTriggerIface* gsc_trigger_##(PLUGIN_ID.lower)_parent_iface = NULL;
 
 
-static const gchar* gsc_##(PLUGIN_ID.lower)_trigger_real_get_name(GtkSourceCompletionTrigger *self)
+static const gchar* gsc_trigger_##(PLUGIN_ID.lower)_real_get_name(GscTrigger *self)
 {
-	return GSC_##(PLUGIN_ID.upper)_TRIGGER_NAME;
+	return GSC_TRIGGER_##(PLUGIN_ID.upper)_NAME;
 }
 
 static gboolean
-gsc_##(PLUGIN_ID.lower)_trigger_real_activate (GtkSourceCompletionTrigger* base)
+gsc_trigger_##(PLUGIN_ID.lower)_real_activate (GscTrigger* base)
 {
 	g_debug("Activating ##(PLUGIN_ID.camel) trigger");
-	Gsc##(PLUGIN_ID.camel)Trigger *self = GSC_##(PLUGIN_ID.upper)_TRIGGER(base);
+	GscTrigger##(PLUGIN_ID.camel) *self = GSC_TRIGGER_##(PLUGIN_ID.upper)(base);
 
 	return TRUE;
 }
 
 static gboolean
-gsc_##(PLUGIN_ID.lower)_trigger_real_deactivate (GtkSourceCompletionTrigger* base)
+gsc_trigger_##(PLUGIN_ID.lower)_real_deactivate (GscTrigger* base)
 {
 	g_debug("Deactivating ##(PLUGIN_ID.camel) trigger");
-	Gsc##(PLUGIN_ID.camel)Trigger *self = GSC_##(PLUGIN_ID.upper)_TRIGGER(base);
+	GscTrigger##(PLUGIN_ID.camel) *self = GSC_TRIGGER_##(PLUGIN_ID.upper)(base);
 	return FALSE;
 }
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
+static void gsc_trigger_##(PLUGIN_ID.lower)_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
 {
 }
 
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
+static void gsc_trigger_##(PLUGIN_ID.lower)_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
 {
 }
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_init (Gsc##(PLUGIN_ID.camel)Trigger * self)
+static void gsc_trigger_##(PLUGIN_ID.lower)_init (GscTrigger##(PLUGIN_ID.camel) * self)
 {
-	self->priv = g_new0(Gsc##(PLUGIN_ID.camel)TriggerPrivate, 1);
+	self->priv = g_new0(GscTrigger##(PLUGIN_ID.camel)Private, 1);
 	g_debug("Init ##(PLUGIN_ID.camel) trigger");
 }
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_finalize(GObject *object)
+static void gsc_trigger_##(PLUGIN_ID.lower)_finalize(GObject *object)
 {
 	g_debug("Finish ##(PLUGIN_ID.camel) trigger");
-	Gsc##(PLUGIN_ID.camel)Trigger *self;
-	self = GSC_##(PLUGIN_ID.upper)_TRIGGER(object);
-	G_OBJECT_CLASS(gsc_##(PLUGIN_ID.lower)_trigger_parent_class)->finalize(object);
+	GscTrigger##(PLUGIN_ID.camel) *self;
+	self = GSC_TRIGGER_##(PLUGIN_ID.upper)(object);
+	G_OBJECT_CLASS(gsc_trigger_##(PLUGIN_ID.lower)_parent_class)->finalize(object);
 }
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_class_init (Gsc##(PLUGIN_ID.camel)TriggerClass * klass)
+static void gsc_trigger_##(PLUGIN_ID.lower)_class_init (GscTrigger##(PLUGIN_ID.camel)Class * klass)
 {
-	gsc_##(PLUGIN_ID.lower)_trigger_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->get_property = gsc_##(PLUGIN_ID.lower)_trigger_get_property;
-	G_OBJECT_CLASS (klass)->set_property = gsc_##(PLUGIN_ID.lower)_trigger_set_property;
-	G_OBJECT_CLASS (klass)->finalize = gsc_##(PLUGIN_ID.lower)_trigger_finalize;
+	gsc_trigger_##(PLUGIN_ID.lower)_parent_class = g_type_class_peek_parent (klass);
+	G_OBJECT_CLASS (klass)->get_property = gsc_trigger_##(PLUGIN_ID.lower)_get_property;
+	G_OBJECT_CLASS (klass)->set_property = gsc_trigger_##(PLUGIN_ID.lower)_set_property;
+	G_OBJECT_CLASS (klass)->finalize = gsc_trigger_##(PLUGIN_ID.lower)_finalize;
 }
 
-static void gsc_##(PLUGIN_ID.lower)_trigger_interface_init (GtkSourceCompletionTriggerIface * iface)
+static void gsc_trigger_##(PLUGIN_ID.lower)_interface_init (GscTriggerIface * iface)
 {
-	gsc_##(PLUGIN_ID.lower)_trigger_parent_iface = g_type_interface_peek_parent (iface);
-	iface->get_name = gsc_##(PLUGIN_ID.lower)_trigger_real_get_name;
-	iface->activate = gsc_##(PLUGIN_ID.lower)_trigger_real_activate;
-	iface->deactivate = gsc_##(PLUGIN_ID.lower)_trigger_real_deactivate;
+	gsc_trigger_##(PLUGIN_ID.lower)_parent_iface = g_type_interface_peek_parent (iface);
+	iface->get_name = gsc_trigger_##(PLUGIN_ID.lower)_real_get_name;
+	iface->activate = gsc_trigger_##(PLUGIN_ID.lower)_real_activate;
+	iface->deactivate = gsc_trigger_##(PLUGIN_ID.lower)_real_deactivate;
 }
 
-GType gsc_##(PLUGIN_ID.lower)_trigger_get_type ()
+GType gsc_trigger_##(PLUGIN_ID.lower)_get_type ()
 {
 	static GType g_define_type_id = 0;
 	if (G_UNLIKELY (g_define_type_id == 0)) {
-		static const GTypeInfo g_define_type_info = { sizeof (Gsc##(PLUGIN_ID.camel)TriggerClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_##(PLUGIN_ID.lower)_trigger_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (Gsc##(PLUGIN_ID.camel)Trigger), 0, (GInstanceInitFunc) gsc_##(PLUGIN_ID.lower)_trigger_init };
-		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "Gsc##(PLUGIN_ID.camel)Trigger", &g_define_type_info, 0);
-		static const GInterfaceInfo gsc_##(PLUGIN_ID.lower)_trigger_info = { (GInterfaceInitFunc) gsc_##(PLUGIN_ID.lower)_trigger_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GTK_SOURCE_COMPLETION_TYPE_TRIGGER, &gsc_##(PLUGIN_ID.lower)_trigger_info);
+		static const GTypeInfo g_define_type_info = { sizeof (GscTrigger##(PLUGIN_ID.camel)Class), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_trigger_##(PLUGIN_ID.lower)_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GscTrigger##(PLUGIN_ID.camel)), 0, (GInstanceInitFunc) gsc_trigger_##(PLUGIN_ID.lower)_init };
+		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscTrigger##(PLUGIN_ID.camel)", &g_define_type_info, 0);
+		static const GInterfaceInfo gsc_trigger_##(PLUGIN_ID.lower)_info = { (GInterfaceInitFunc) gsc_trigger_##(PLUGIN_ID.lower)_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
+		g_type_add_interface_static (g_define_type_id, GSC_TYPE_TRIGGER, &gsc_trigger_##(PLUGIN_ID.lower)_info);
 	}
 	return g_define_type_id;
 }
 
 /**
- * gsc_##(PLUGIN_ID.lower)_trigger_new:
+ * gsc_trigger_##(PLUGIN_ID.lower)_new:
  *
- * Returns The new #Gsc##(PLUGIN_ID.camel)Trigger
+ * Returns The new #GscTrigger##(PLUGIN_ID.camel)
  *
  */
-Gsc##(PLUGIN_ID.camel)Trigger*
-gsc_##(PLUGIN_ID.lower)_trigger_new(GtkSourceCompletion *completion)
+GscTrigger##(PLUGIN_ID.camel)*
+gsc_trigger_##(PLUGIN_ID.lower)_new(GscManager *completion)
 {
-	Gsc##(PLUGIN_ID.camel)Trigger *self = GSC_##(PLUGIN_ID.upper)_TRIGGER (g_object_new (TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER, NULL));
+	GscTrigger##(PLUGIN_ID.camel) *self = GSC_TRIGGER_##(PLUGIN_ID.upper) (g_object_new (GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), NULL));
 	self->priv->completion = completion;
 	return self;
 }

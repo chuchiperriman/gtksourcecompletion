@@ -122,7 +122,6 @@ _filter_by_name_func (GtkTreeModel *model,
 static void
 gsc_tree_finalize (GObject *object)
 {
-	g_debug("Finish GscTree");
 	GscTree *self = GSC_TREE(object);
 	self->priv->current_filter = NULL;
 	G_OBJECT_CLASS (gsc_tree_parent_class)->finalize (object);
@@ -178,7 +177,6 @@ gsc_tree_class_init (GscTreeClass *klass)
 static void
 gsc_tree_init (GscTree *self)
 {
-	g_debug("Init GscTree");
 	self->priv = GSC_TREE_GET_PRIVATE(self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->current_filter = NULL;

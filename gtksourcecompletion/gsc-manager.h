@@ -57,7 +57,9 @@ typedef struct _GscManagerEventOptions GscManagerEventOptions;
 struct _GscManagerEventOptions{
 	GscPopupPositionType position_type;
 	GscPopupFilterType filter_type;
+	const gchar* filter_text;
 	gboolean autoselect;
+	gboolean show_bottom_bar;
 };
 
 struct _GscManagerClass
@@ -188,7 +190,7 @@ gsc_manager_get_provider(GscManager *completion,
  */
 void
 gsc_manager_register_trigger(GscManager *completion,
-				       GscTrigger *trigger);
+			     GscTrigger *trigger);
 
 /**
  * gsc_manager_unregister_trigger:
@@ -201,7 +203,7 @@ gsc_manager_register_trigger(GscManager *completion,
  */																
 void
 gsc_manager_unregister_trigger(GscManager *completion,
-					 GscTrigger *trigger);
+				GscTrigger *trigger);
 
 /**
  * gsc_manager_get_trigger:
@@ -215,7 +217,7 @@ gsc_manager_unregister_trigger(GscManager *completion,
  */
 GscTrigger*
 gsc_manager_get_trigger(GscManager *completion,
-				  const gchar* trigger_name);
+			const gchar* trigger_name);
 
 
 /**
@@ -287,7 +289,7 @@ gsc_manager_trigger_event(GscManager *completion,
  * they return data, it shows the completion to the user. Use this function if
  * you want to show the popup with special parameters (position, filter, etc)
  * 
- **/
+ */
 void 
 gsc_manager_trigger_event_with_opts(GscManager *completion, 
 				    const gchar *trigger_name,
@@ -305,6 +307,28 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 void
 gsc_manager_set_current_info(GscManager *self,
 			     gchar *info);
+
+/**
+ * gsc_manager_update_event_options:
+ * @self: The #GscManager
+ * @options: Options to tell the completion how it must to work.
+ * 
+ * Change the completion options if it is visible.
+ */
+void
+gsc_manager_update_event_options(GscManager *self,
+				 GscManagerEventOptions *options);
+
+/**
+ * gsc_manager_update_event_options:
+ * @self: The #GscManager
+ * @options: Options struct where the option will be set.
+ * 
+ * Sets the current event options 
+ */
+void
+gsc_manager_get_current_event_options(GscManager *self,
+				      GscManagerEventOptions *options);
 
 G_END_DECLS
 

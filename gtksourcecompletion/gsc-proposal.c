@@ -73,7 +73,6 @@ gsc_proposal_init (GscProposal *self)
 {
 	self->priv = GSC_PROPOSAL_GET_PRIVATE(self);
 	
-	g_debug("Created GscProposal");
 	self->priv->label = NULL;
 	self->priv->info = NULL;
 	self->priv->icon = NULL;
@@ -84,7 +83,6 @@ static void
 gsc_proposal_finalize (GObject *object)
 {
 	GscProposal *self = GSC_PROPOSAL(object);
-	g_debug("Free GscProposal");
 	g_free(self->priv->label);
 	g_free(self->priv->info);
 	
@@ -257,8 +255,8 @@ gsc_proposal_get_type (void)
 
 GscProposal*
 gsc_proposal_new(const gchar *label,
-				   const gchar *info,
-				   const GdkPixbuf *icon)
+		 const gchar *info,
+		 const GdkPixbuf *icon)
 {
 	GscProposal *self = 
 		GSC_PROPOSAL(g_object_new (GSC_TYPE_PROPOSAL, NULL));

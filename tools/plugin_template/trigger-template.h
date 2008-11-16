@@ -18,42 +18,42 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef __##(PLUGIN_ID.upper)_TRIGGER_H__
-#define __##(PLUGIN_ID.upper)_TRIGGER_H__
+#ifndef __TRIGGER_##(PLUGIN_ID.upper)_H__
+#define __TRIGGER_##(PLUGIN_ID.upper)_H__
 
 #include <glib.h>
 #include <glib-object.h>
-#include "gtksourcecompletion-trigger.h"
-#include "gtksourcecompletion.h"
+#include <gtksourcecompletion/gsc-trigger.h>
+#include <gtksourcecompletion/gsc-manager.h>
 
 G_BEGIN_DECLS
 
-#define TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER (gsc_##(PLUGIN_ID.lower)_trigger_get_type ())
-#define GSC_##(PLUGIN_ID.upper)_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER, Gsc##(PLUGIN_ID.camel)Trigger))
-#define GSC_##(PLUGIN_ID.upper)_TRIGGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER, Gsc##(PLUGIN_ID.camel)TriggerClass))
-#define IS_GSC_##(PLUGIN_ID.upper)_TRIGGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER))
-#define IS_GSC_##(PLUGIN_ID.upper)_TRIGGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER))
-#define GSC_##(PLUGIN_ID.upper)_TRIGGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_GSC_##(PLUGIN_ID.upper)_TRIGGER, Gsc##(PLUGIN_ID.camel)TriggerClass))
+#define GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper) (gsc_trigger_##(PLUGIN_ID.lower)_get_type ())
+#define GSC_TRIGGER_##(PLUGIN_ID.upper)(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), GscTrigger##(PLUGIN_ID.camel)))
+#define GSC_TRIGGER_##(PLUGIN_ID.upper)_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), GscTrigger##(PLUGIN_ID.camel)Class))
+#define GSC_IS_TRIGGER_##(PLUGIN_ID.upper)(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper)))
+#define GSC_IS_TRIGGER_##(PLUGIN_ID.upper)_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper)))
+#define GSC_TRIGGER_##(PLUGIN_ID.upper)_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), GscTrigger##(PLUGIN_ID.camel)Class))
 
-#define GSC_##(PLUGIN_ID.upper)_TRIGGER_NAME "Gsc##(PLUGIN_ID.camel)Trigger"
+#define GSC_TRIGGER_##(PLUGIN_ID.upper)_NAME "GscTrigger##(PLUGIN_ID.camel)"
 
-typedef struct _Gsc##(PLUGIN_ID.camel)Trigger Gsc##(PLUGIN_ID.camel)Trigger;
-typedef struct _Gsc##(PLUGIN_ID.camel)TriggerClass Gsc##(PLUGIN_ID.camel)TriggerClass;
-typedef struct _Gsc##(PLUGIN_ID.camel)TriggerPrivate Gsc##(PLUGIN_ID.camel)TriggerPrivate;
+typedef struct _GscTrigger##(PLUGIN_ID.camel) GscTrigger##(PLUGIN_ID.camel);
+typedef struct _GscTrigger##(PLUGIN_ID.camel)Class GscTrigger##(PLUGIN_ID.camel)Class;
+typedef struct _GscTrigger##(PLUGIN_ID.camel)Private GscTrigger##(PLUGIN_ID.camel)Private;
 
-struct _Gsc##(PLUGIN_ID.camel)Trigger {
+struct _GscTrigger##(PLUGIN_ID.camel) {
 	GObject parent;
-	Gsc##(PLUGIN_ID.camel)TriggerPrivate *priv;	
+	GscTrigger##(PLUGIN_ID.camel)Private *priv;	
 };
 
-struct _Gsc##(PLUGIN_ID.camel)TriggerClass {
+struct _GscTrigger##(PLUGIN_ID.camel)Class {
 	GObjectClass parent;
 };
 
-Gsc##(PLUGIN_ID.camel)Trigger* 
-gsc_##(PLUGIN_ID.lower)_trigger_new(GtkSourceCompletion *completion);
+GscTrigger##(PLUGIN_ID.camel)* 
+gsc_trigger_##(PLUGIN_ID.lower)_new(GscManager *completion);
 
-GType gsc_##(PLUGIN_ID.lower)_trigger_get_type ();
+GType gsc_trigger_##(PLUGIN_ID.lower)_get_type ();
 
 G_END_DECLS
 

@@ -173,7 +173,6 @@ static const gchar* gsc_trigger_autowords_real_get_name(GscTrigger *self)
 static gboolean
 gsc_trigger_autowords_real_activate (GscTrigger* base)
 {
-	g_debug("Activating Autocompletion trigger");
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS(base);
 	self->priv->signals[AS_GTK_TEXT_VIEW_KR] = g_signal_connect_data(self->priv->view,
 						"key-release-event",
@@ -193,7 +192,6 @@ gsc_trigger_autowords_real_activate (GscTrigger* base)
 static gboolean
 gsc_trigger_autowords_real_deactivate (GscTrigger* base)
 {
-	g_debug("Deactivating Autocompletion trigger");
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS(base);
 	gint i;
 	
@@ -228,13 +226,11 @@ static void
 gsc_trigger_autowords_init (GscTriggerAutowords * self)
 {
 	self->priv = g_new0(GscTriggerAutowordsPrivate, 1);
-	g_debug("Init Autocompletion trigger");
 }
 
 static void 
 gsc_trigger_autowords_finalize(GObject *object)
 {
-	g_debug("Finish Autocompletion trigger");
 	GscTriggerAutowords *self;
 	self = GSC_TRIGGER_AUTOWORDS(object);
 	g_free(self->priv->actual_word);

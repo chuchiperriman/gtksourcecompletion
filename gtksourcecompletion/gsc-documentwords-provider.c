@@ -125,9 +125,12 @@ get_all_words(GscDocumentwordsProvider* self, GtkTextBuffer *buffer )
 static gboolean
 is_valid_word(gchar *current_word, gchar *completion_word)
 {
+	if (g_utf8_strlen(completion_word, -1) < 3)
+		return FALSE;
+	
 	if (current_word==NULL)
 		return TRUE;
-	
+		
 	gint len_cur = strlen (current_word);
 	if (g_utf8_collate(current_word,completion_word) == 0)
 			return FALSE;
@@ -271,7 +274,6 @@ gsc_documentwords_provider_set_property (GObject * object,
 static void 
 gsc_documentwords_provider_finalize(GObject *object)
 {
-	g_debug("Finish GscDocumentwordsProvider");
 	GscDocumentwordsProvider *self;
 	self = GSC_DOCUMENTWORDS_PROVIDER(object);
 	clean_current_words(self);
@@ -289,7 +291,6 @@ gsc_documentwords_provider_finalize(GObject *object)
 static void 
 gsc_documentwords_provider_class_init (GscDocumentwordsProviderClass * klass)
 {
-	g_debug("Init GscDocumentwordsProvider");
 	gsc_documentwords_provider_parent_class = g_type_class_peek_parent (klass);
 	G_OBJECT_CLASS (klass)->get_property = gsc_documentwords_provider_get_property;
 	G_OBJECT_CLASS (klass)->set_property = gsc_documentwords_provider_set_property;

@@ -42,11 +42,14 @@ typedef enum{
  * GscPopupFilterType:
  * @GSC_POPUP_FILTER_NONE: Show the popup without the filter entry
  * @GSC_POPUP_FILTER_TREE: Show the popup with the filter entry visible
+ * @GSC_POPUP_FILTER_TREE_HIDDEN: Doesn't show the popup but you can set the 
+ * filter text and filter the contents without showing the filter entry.
  * and set the focus on this entry.
  **/
 typedef enum{
 	GSC_POPUP_FILTER_NONE,
-	GSC_POPUP_FILTER_TREE
+	GSC_POPUP_FILTER_TREE,
+	GSC_POPUP_FILTER_TREE_HIDDEN
 }GscPopupFilterType;
 
 typedef enum {
@@ -122,7 +125,7 @@ gsc_popup_select_last(GscPopup *self);
  */
 gboolean
 gsc_popup_select_previous(GscPopup *self, 
-				     gint rows);
+			  gint rows);
 
 /**
  * gsc_popup_select_next:
@@ -134,7 +137,7 @@ gsc_popup_select_previous(GscPopup *self,
  */
 gboolean
 gsc_popup_select_next(GscPopup *self, 
-				 gint rows);
+		      gint rows);
 
 /**
  * gsc_popup_get_selected_proposal:
@@ -146,7 +149,7 @@ gsc_popup_select_next(GscPopup *self,
  */
 gboolean
 gsc_popup_get_selected_proposal(GscPopup *self,
-					GscProposal **proposal);
+				GscProposal **proposal);
 
 /**
  * gsc_popup_new:
@@ -176,7 +179,7 @@ gsc_popup_clear(GscPopup *self);
  */
 void
 gsc_popup_add_data(GscPopup *self,
-			      GscProposal* data);
+		   GscProposal* data);
 
 /**
  * gsc_popup_has_proposals:
@@ -228,7 +231,7 @@ gsc_popup_page_previous(GscPopup *self);
  */
 void
 gsc_popup_set_current_info(GscPopup *self,
-					     gchar *info);
+			   gchar *info);
 
 /**
  * gsc_popup_get_num_active_pages:
@@ -264,6 +267,24 @@ gsc_popup_get_filter_widget(GscPopup *self);
 void
 gsc_popup_set_filter_type(GscPopup *self,
 			  GscPopupFilterType filter_type);
+
+GscPopupFilterType
+gsc_popup_get_filter_type(GscPopup *self);
+
+/**
+ * gsc_popup_set_filter_text:
+ * @self: The #GscPopup
+ * @text: The filter text
+ *
+ * Sets the filter text. This function refilter the completion proposals
+ *
+ */
+void
+gsc_popup_set_filter_text(GscPopup *self,
+			  const gchar* text);
+
+const gchar* 
+gsc_popup_get_filter_text(GscPopup *self);
 
 /**
  * gsc_popup_set_key:
@@ -301,6 +322,23 @@ gsc_popup_get_key(GscPopup *self, KeysType type);
 gboolean
 gsc_popup_manage_key(GscPopup *self,
 		     GdkEventKey *event);
+
+/**
+ * gsc_popup_show_or_update:
+ * @widget: The #GscPopup
+ *
+ * Show the completion popup or update if it is visible because 
+ * using gtk_widget_show only works if the popup is not visible.
+ *
+ */
+void
+gsc_popup_show_or_update(GtkWidget *widget);
+
+void
+gsc_popup_bottom_bar_set_visible(GscPopup *self, gboolean visible);
+
+gboolean
+gsc_popup_bottom_bar_get_visible(GscPopup *self);
 			   
 G_END_DECLS
 

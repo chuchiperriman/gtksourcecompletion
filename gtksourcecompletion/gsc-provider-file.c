@@ -161,7 +161,6 @@ gsc_provider_file_real_get_proposals (GscProvider* base,
 	if (!result)
 	{
 		g_free(buffer);
-		g_debug("Error while reading from file");
 		return NULL;
 	}
 	

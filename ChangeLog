@@ -1,3 +1,23 @@
+2008-11-16  Chuchi  <perriman@homer>
+
+	* gsc-popup:
+		- gsc_popup_show_or_update: Use this function because
+		gtk_widget_show don't call to popup show if the widget is
+		visible and we need to update the pages, selection etc.
+		- GSC_POPUP_FILTER_TREE_HIDDEN: added new filter type to
+		filter the content without show the filter widget. You can set
+		the filter text programmatically.
+		- gsc_popup_set_filter_text: You can set the filter text
+		programmatically.
+	* gsc_manager: 
+		- gsc_manager_update_event_options: You can update the event
+		options without recall to trigger event. Use this function to
+		update the filter text without recall to providers.
+	* gsc_documentwords_provider: 
+		- Only complete words with len > 2
+	* tools: Updated trigger template
+
+
 2008-11-06  Chuchi  <chuchiperriman@gmail.com>
 
 	* gsc-popup: 

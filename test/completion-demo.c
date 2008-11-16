@@ -39,7 +39,8 @@
 #include <gtksourcecompletion/gsc-trigger-autowords.h>
 #include <gtksourcecompletion/gsc-provider-file.h>
 
-GtkWidget *view;
+static GtkWidget *view;
+static GscManager *comp;
 
 static const gboolean change_keys = FALSE;
 
@@ -55,9 +56,16 @@ key_press(GtkWidget   *widget,
 	gpointer     user_data)
 {
 
-	if (event->keyval == GDK_P)
+	if (event->keyval == GDK_F2)
 	{
 		g_debug("Test popup");
+		GscManagerEventOptions opts;
+		gsc_manager_get_current_event_options(comp,&opts);
+		opts.filter_type = GSC_POPUP_FILTER_TREE_HIDDEN;
+		opts.filter_text = "chuchi";
+		opts.show_bottom_bar = FALSE;
+		gsc_manager_update_event_options(comp,&opts);
+		return TRUE;
 	}
 	
 	return FALSE;
@@ -74,7 +82,7 @@ create_window (void)
 	gtk_container_add(GTK_CONTAINER(scroll),view);
 	gtk_container_add(GTK_CONTAINER(window),scroll);
 	
-	g_signal_connect(view, "key-press-event", G_CALLBACK(key_press), NULL);
+	g_signal_connect(view, "key-release-event", G_CALLBACK(key_press), NULL);
 	
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
 	
@@ -109,7 +117,7 @@ create_completion(void)
 	GscProviderFile *prov_file = gsc_provider_file_new(GTK_TEXT_VIEW(view));
 	gsc_provider_file_set_file(prov_file,"/tmp/main.c");
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
-	GscManager *comp = gsc_manager_new(GTK_TEXT_VIEW(view));
+	comp = gsc_manager_new(GTK_TEXT_VIEW(view));
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscManagerEventOptions *opts = g_new0(GscManagerEventOptions,1);

@@ -120,8 +120,8 @@ directives = {
 output_files = {
 }
 
-output_files['trigger-template.c'] = '%s/gsc-%s-trigger.c' % (plugin_module, plugin_module)
-output_files['trigger-template.h'] = '%s/gsc-%s-trigger.h' % (plugin_module, plugin_module)
+output_files['trigger-template.c'] = '%s/gsc-trigger-%s.c' % (plugin_module, plugin_module)
+output_files['trigger-template.h'] = '%s/gsc-trigger-%s.h' % (plugin_module, plugin_module)
 
 # Generate the plugin base
 for infile, outfile in output_files.iteritems():

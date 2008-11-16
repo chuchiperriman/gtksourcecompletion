@@ -61,6 +61,7 @@ struct _GscPopupPriv
 	GtkWidget *tab_label;
 	GtkWidget *next_page_icon;
 	GtkWidget *filter;
+	GtkWidget *bottom_bar;
 	GHashTable *trees;
 	GscPopupFilterType filter_type;
 	gboolean destroy_has_run;
@@ -83,8 +84,7 @@ _selection_changed_cd(GscTree *tree,
 		      gpointer user_data);
 
 static void
-_filter_key_release_cb (GtkEntry *entry,
-			GdkEventKey    *event,
+_filter_changed_cb (GtkEntry *entry,
 			gpointer  user_data);
 
 static GscTree*
@@ -105,7 +105,7 @@ _get_tree_by_name(GscPopup *self, const gchar* tree_name)
 		
 	if (tree==NULL)
 	{
-		/*We create the new trees*/
+		/*Creates the new trees*/
 		GtkWidget *completion_tree = gsc_tree_new(); 
 		g_hash_table_insert(self->priv->trees,(gpointer)tree_name,completion_tree);
 		GtkWidget *label = gtk_label_new(tree_name);
@@ -317,7 +317,7 @@ gsc_popup_manage_key(GscPopup *self,
 			{
 				gsc_popup_hide(GTK_WIDGET(self));
 			}
-			ret = FALSE;
+			ret = TRUE;
 			catched = TRUE;
 			break;
 		}
@@ -347,11 +347,12 @@ gsc_popup_manage_key(GscPopup *self,
 	return ret;
 }
 
-static void
-gsc_popup_show(GtkWidget *widget)
+void
+gsc_popup_show_or_update(GtkWidget *widget)
 {
-	/*Only show the popup, the positions is set before this function*/
+	/*TODO This function called only if the widget has not been shown previously*/
 	
+	/*Only show the popup, the positions is set before this function*/
 	GscPopup *self = GSC_POPUP(widget);
 	/*
 	gtk_window_set_transient_for(GTK_WINDOW(self),
@@ -366,7 +367,7 @@ gsc_popup_show(GtkWidget *widget)
 		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);
 	}
 	
-	gsc_tree_select_first(_get_current_tree(self));
+	gtk_entry_set_text(GTK_ENTRY(self->priv->filter),"");
 	
 	/*Filter*/
 	switch(self->priv->filter_type)
@@ -378,14 +379,13 @@ gsc_popup_show(GtkWidget *widget)
 		}
 		default:
 		{
-			gtk_entry_set_text(GTK_ENTRY(self->priv->filter),"");
 			gtk_widget_show(self->priv->filter);
 			gtk_window_present(GTK_WINDOW(self));
 			gtk_window_activate_focus(GTK_WINDOW(self));
 			gtk_widget_grab_focus(self->priv->filter);
-			return;
 		}
 	}
+	gsc_tree_select_first(_get_current_tree(self));
 }
 
 static void
@@ -420,7 +420,6 @@ gsc_popup_delete_event_cb(GtkWidget *widget,
 static void
 gsc_popup_finalize (GObject *object)
 {
-	g_debug("Finish GscPopup");
 	GscPopup *self = GSC_POPUP(object);
 	
 	g_hash_table_destroy(self->priv->trees);
@@ -432,8 +431,6 @@ gsc_popup_finalize (GObject *object)
 static void
 gsc_popup_destroy (GtkObject *object)
 {
-	g_debug("Destroy GscPopup");
-
 	GscPopup *self = GSC_POPUP(object);
 	
 	if (!self->priv->destroy_has_run)
@@ -456,7 +453,7 @@ gsc_popup_class_init (GscPopupClass *klass)
 	
 	object_class->finalize = gsc_popup_finalize;
 	gtkobject_class->destroy = gsc_popup_destroy;
-	widget_class->show = gsc_popup_show;
+	widget_class->show = gsc_popup_show_or_update;
 	widget_class->hide = gsc_popup_hide;
 	widget_class->realize = gsc_popup_realize;
 	
@@ -502,7 +499,6 @@ gsc_popup_class_init (GscPopupClass *klass)
 static void
 gsc_popup_init (GscPopup *self)
 {
-	g_debug("Init GscPopup");
 	gtk_window_set_type_hint(GTK_WINDOW(self),
 		GDK_WINDOW_TYPE_HINT_POPUP_MENU);
 	//gtk_window_set_focus_on_map(GTK_WINDOW(self),FALSE);
@@ -548,8 +544,8 @@ gsc_popup_init (GscPopup *self)
 			  G_CALLBACK (_info_toggled_cb),
 			  self);
 
-	GtkWidget *hbox = gtk_hbox_new(FALSE,1);
-	gtk_box_pack_start(GTK_BOX(hbox),
+	self->priv->bottom_bar = gtk_hbox_new(FALSE,1);
+	gtk_box_pack_start(GTK_BOX(self->priv->bottom_bar),
 			   info_button,
 			   FALSE,
 			   FALSE,
@@ -557,14 +553,14 @@ gsc_popup_init (GscPopup *self)
 
 	/*Next page icon*/
 	self->priv->next_page_icon = gtk_image_new_from_stock(GTK_STOCK_GO_FORWARD,GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_box_pack_end(GTK_BOX(hbox),
+	gtk_box_pack_end(GTK_BOX(self->priv->bottom_bar),
 			 self->priv->next_page_icon,
 			 FALSE,
 			 FALSE,
 			 1);
 	/*Page label*/
 	self->priv->tab_label = gtk_label_new(DEFAULT_PAGE);
-	gtk_box_pack_end(GTK_BOX(hbox),
+	gtk_box_pack_end(GTK_BOX(self->priv->bottom_bar),
 			 self->priv->tab_label,
 			 FALSE,
 			 TRUE,
@@ -587,7 +583,7 @@ gsc_popup_init (GscPopup *self)
 			   0);
 
 	gtk_box_pack_end(GTK_BOX(vbox),
-			 hbox,
+			 self->priv->bottom_bar,
 			 FALSE,
 			 FALSE,
 			 0);
@@ -630,8 +626,8 @@ gsc_popup_init (GscPopup *self)
 			(gpointer) self);
 			
 	g_signal_connect(self->priv->filter,
-			"key-release-event",
-			G_CALLBACK(_filter_key_release_cb),
+			"changed",
+			G_CALLBACK(_filter_changed_cb),
 			(gpointer) self);
 	
 	g_signal_connect(self->priv->filter,
@@ -835,9 +831,8 @@ gsc_popup_get_num_active_pages(GscPopup *self)
 /* Control filter signals */
 
 static void
-_filter_key_release_cb (GtkEntry *entry,
-			GdkEventKey    *event,
-			gpointer  user_data)
+_filter_changed_cb (GtkEntry *entry,
+		    gpointer  user_data)
 {
 	GscPopup *self = GSC_POPUP(user_data);
 	
@@ -850,6 +845,7 @@ _filter_key_release_cb (GtkEntry *entry,
 		gsc_tree_filter(tree,
 				gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
 	}
+	gsc_popup_select_first(self);
 }
 
 GtkWidget*
@@ -863,6 +859,22 @@ gsc_popup_set_filter_type(GscPopup *self,
 			  GscPopupFilterType filter_type)
 {
 	self->priv->filter_type = filter_type;
+}
+
+void
+gsc_popup_set_filter_text(GscPopup *self,
+			  const gchar* text)
+{
+	if (self->priv->filter_type == GSC_POPUP_FILTER_NONE)
+		g_warning("You cannot set the filter text because there is no filter active");
+	else
+		gtk_entry_set_text(GTK_ENTRY(self->priv->filter),text);
+}
+
+const gchar* 
+gsc_popup_get_filter_text(GscPopup *self)
+{
+	return gtk_entry_get_text(GTK_ENTRY(self->priv->filter));
 }
 
 void
@@ -882,5 +894,27 @@ gsc_popup_get_key(GscPopup *self, KeysType type)
 	return gtk_accelerator_name(self->priv->keys[type].key,
 				    self->priv->keys[type].mods);
 }
+
+GscPopupFilterType
+gsc_popup_get_filter_type(GscPopup *self)
+{
+	return self->priv->filter_type;
+}
+
+void
+gsc_popup_bottom_bar_set_visible(GscPopup *self, gboolean visible)
+{
+	if (visible)
+		gtk_widget_show(self->priv->bottom_bar);
+	else
+		gtk_widget_hide(self->priv->bottom_bar);
+}
+
+gboolean
+gsc_popup_bottom_bar_get_visible(GscPopup *self)
+{
+	return GTK_WIDGET_VISIBLE(self->priv->bottom_bar);
+}
+
 
 

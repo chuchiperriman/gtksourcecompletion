@@ -92,7 +92,6 @@ static gboolean
 gsc_trigger_customkey_real_activate (GscTrigger* base)
 {
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY(base);
-	g_debug("Activating Customkey trigger: %s",self->priv->trigger_name);
 	GscManager* comp = self->priv->completion;
 	GtkTextView *view = gsc_manager_get_view(comp);
 
@@ -110,7 +109,6 @@ gsc_trigger_customkey_real_activate (GscTrigger* base)
 static gboolean
 gsc_trigger_customkey_real_deactivate (GscTrigger* base)
 {
-	g_debug("Deactivating Customkey trigger");
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY(base);
 	GtkTextView *view = gsc_manager_get_view(self->priv->completion);
 	g_signal_handler_disconnect(view,self->priv->signals[CKP_GTK_TEXT_VIEW_KP]);
@@ -137,13 +135,11 @@ gsc_trigger_customkey_init (GscTriggerCustomkey * self)
 	self->priv = g_new0(GscTriggerCustomkeyPrivate, 1);
 	self->priv->trigger_name = NULL;
 	self->priv->options = NULL;
-	g_debug("Init Customkey trigger");
 }
 
 static void 
 gsc_trigger_customkey_finalize(GObject *object)
 {
-	g_debug("Finish Customkey trigger");
 	GscTriggerCustomkey *self;
 	self = GSC_TRIGGER_CUSTOMKEY(object);
 	g_free(self->priv->trigger_name);
