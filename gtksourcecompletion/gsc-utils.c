@@ -149,7 +149,7 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 }
 
 gchar*
-gsc_get_text(GtkTextView *text_view)
+gsc_gsv_get_text(GtkTextView *text_view)
 {
 	GtkTextIter start, end;
 	GtkTextBuffer *buffer;

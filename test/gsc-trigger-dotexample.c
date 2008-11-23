@@ -17,13 +17,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <gdk/gdkkeysyms.h>
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
 #include "gsc-trigger-dotexample.h"
+#include <gtksourcecompletion/gsc-utils.h>
+
+enum  {
+	GTK_TEXT_VIEW_KP,
+	LAST_SIGNAL
+};
 
 struct _GscTriggerDotexamplePrivate {
 	GscManager *completion;
+	gulong signals[LAST_SIGNAL];
+	gboolean with_dot;
 };
 
 #define GSC_TRIGGER_DOTEXAMPLE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSC_TYPE_TRIGGER_DOTEXAMPLE, GscTriggerDotexamplePrivate))
@@ -39,6 +48,53 @@ static gboolean gsc_trigger_dotexample_real_deactivate (GscTrigger* base);
 static gpointer gsc_trigger_dotexample_parent_class = NULL;
 static GscTriggerIface* gsc_trigger_dotexample_parent_iface = NULL;
 
+static gboolean
+_view_key_release_event_cb(GtkWidget *view,
+			 GdkEventKey *event, 
+			 gpointer user_data)
+{
+	GscTriggerDotexample *self = GSC_TRIGGER_DOTEXAMPLE(user_data);
+	GscManager* completion = self->priv->completion;
+	
+	if (completion != NULL)
+	{       
+		if (event->keyval == GDK_period)
+		{
+			g_debug("dot");
+			GscManagerEventOptions opts;
+			opts.filter_type = GSC_POPUP_FILTER_TREE_HIDDEN;
+			opts.filter_text = NULL;
+			opts.show_bottom_bar = FALSE;
+			
+			gsc_manager_trigger_event_with_opts(completion,
+							    GSC_TRIGGER_DOTEXAMPLE_NAME,
+							    &opts,
+							    NULL);
+			self->priv->with_dot = TRUE;
+		}
+		else if (event->keyval == GDK_BackSpace)
+		{
+			gsc_manager_finish_completion(completion);
+		}
+		else if (self->priv->with_dot == TRUE)
+		{
+			if (!gsc_manager_is_visible(completion))
+			{
+				self->priv->with_dot = FALSE;
+			}
+			else
+			{
+				GtkTextView *view = gsc_manager_get_view(completion);
+				GscManagerEventOptions opts;
+				gsc_manager_get_current_event_options(completion,&opts);
+				opts.filter_text = gsc_get_last_word(view);
+				gsc_manager_update_event_options(completion,&opts);
+			}
+		}
+		
+	}
+	return FALSE;
+} 
 
 static const gchar* gsc_trigger_dotexample_real_get_name(GscTrigger *self)
 {
@@ -50,7 +106,17 @@ gsc_trigger_dotexample_real_activate (GscTrigger* base)
 {
 	g_debug("Activating Dotexample trigger");
 	GscTriggerDotexample *self = GSC_TRIGGER_DOTEXAMPLE(base);
+	GscManager* comp = self->priv->completion;
+	GtkTextView *view = gsc_manager_get_view(comp);
 
+	g_assert(GTK_IS_TEXT_VIEW(view));
+	self->priv->signals[GTK_TEXT_VIEW_KP] =  
+			g_signal_connect_data(view,
+					      "key-release-event",
+					      G_CALLBACK(_view_key_release_event_cb),
+					      (gpointer) self,
+					      (GClosureNotify)NULL,
+					      0);
 	return TRUE;
 }
 
@@ -59,13 +125,14 @@ gsc_trigger_dotexample_real_deactivate (GscTrigger* base)
 {
 	g_debug("Deactivating Dotexample trigger");
 	GscTriggerDotexample *self = GSC_TRIGGER_DOTEXAMPLE(base);
+	GtkTextView *view = gsc_manager_get_view(self->priv->completion);
+	g_signal_handler_disconnect(view,self->priv->signals[GTK_TEXT_VIEW_KP]);
 	return FALSE;
 }
 
 static void gsc_trigger_dotexample_get_property (GObject * object, guint property_id, GValue * value, GParamSpec * pspec)
 {
 }
-
 
 static void gsc_trigger_dotexample_set_property (GObject * object, guint property_id, const GValue * value, GParamSpec * pspec)
 {
@@ -74,6 +141,7 @@ static void gsc_trigger_dotexample_set_property (GObject * object, guint propert
 static void gsc_trigger_dotexample_init (GscTriggerDotexample * self)
 {
 	self->priv = g_new0(GscTriggerDotexamplePrivate, 1);
+	self->priv->with_dot = FALSE;
 	g_debug("Init Dotexample trigger");
 }
 

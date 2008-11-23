@@ -31,6 +31,7 @@ libgtksourcecompletion_headers = 	\
 	gsc-tree.h				\
 	gsc-i18n.h			\
 	gsc-popup.h		\
+	gsc-info.h		\
 	gsc-provider-file.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
@@ -45,6 +46,7 @@ libgtksourcecompletion_1_0_la_SOURCES = \
 	gsc-documentwords-provider.c		\
 	gsc-tree.c				\
 	gsc-popup.c				\
+	gsc-info.c				\
 	gsc-provider-file.c			\
 	$(libgtksourcecompletion_headers)
 	
@@ -57,17 +59,18 @@ libgtksourcecompletion_1_0_la_LDFLAGS = \
 	`pkg-config --libs gtksourceview-2.0`
 
 INST_H_FILES = \
-	gsc-provider.h	\
-	gsc-trigger.h		\
-	gsc-utils.h		\
-	gsc-manager.h				\
+	gsc-provider.h			\
+	gsc-trigger.h			\
+	gsc-utils.h			\
+	gsc-manager.h			\
 	gsc-proposal.h			\
-	gsc-trigger-customkey.h	\
-	gsc-trigger-autowords.h	\
-	gsc-providers.h		\
-	gsc-tree.h				\
+	gsc-trigger-customkey.h		\
+	gsc-trigger-autowords.h		\
+	gsc-providers.h			\
+	gsc-tree.h			\
 	gsc-i18n.h			\
-	gsc-popup.h
+	gsc-popup.h			\
+	gsc-info.h
 
 gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@

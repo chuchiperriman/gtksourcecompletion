@@ -1,0 +1,19 @@
+TODO (last update: 2008-11-22)
+=================================
+
+[X] Try to separe GscPopup and GtkTextView. Remove the GtkTextView dependency 
+    to use in anjuta
+[X] Create File Words Provider: Provide words from a file
+[X] New popup filter type: Hidden filter. The filter will be hidden but 
+    programmativally you can change the current filter.
+[X] Add function to hide the bottom bar
+
+GscInfo:
+----------------
+[ ] Add movement functions (center screen, parent, mouse pointer etc.)
+[ ] Implement adjust height (adjust window height to the content)
+[ ] Implement adjust width (adjust window width to the content)
+[ ] Add bottom bar with extend buttom
+[ ] Implement set_info_type with sort or extended
+[X] Add signal info-type-changed
+

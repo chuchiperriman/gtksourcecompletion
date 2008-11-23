@@ -372,6 +372,7 @@ gsc_popup_show_or_update(GtkWidget *widget)
 	/*Filter*/
 	switch(self->priv->filter_type)
 	{
+		case GSC_POPUP_FILTER_TREE_HIDDEN:
 		case GSC_POPUP_FILTER_NONE:
 		{
 			gtk_widget_hide(self->priv->filter);

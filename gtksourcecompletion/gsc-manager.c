@@ -581,6 +581,16 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 	
 	if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 		return;
+		
+	/*
+	 * If the completion is visble and there is a trigger active, you cannot
+	 * raise a different trigger until the current trigger finish
+	 */
+	if (gsc_manager_is_visible(completion) && completion->priv->active_trigger != trigger)
+	{
+		g_debug("no");
+		return;
+	}
 	
 	gsc_popup_clear(completion->priv->popup);
 	
