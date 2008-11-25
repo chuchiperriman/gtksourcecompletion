@@ -20,3 +20,7 @@ GscInfo:
 GscPopup:
 ---------------
 [ ] Change the "display-info" signal and use a proposal function like apply
+
+Bugs
+---------------
+[ ] Fix focus problems on gnome (not in xfce)
