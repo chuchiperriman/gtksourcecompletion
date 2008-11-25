@@ -594,6 +594,10 @@ gsc_popup_init (GscPopup *self)
 
 	/*Info window*/
 	self->priv->info_window = GTK_WIDGET(gsc_info_new());
+	g_object_set(self->priv->info_window, 
+			     "can-focus", FALSE,
+			     "accept-focus", FALSE,
+			      NULL);
 	
 	/* Connect signals */
 	

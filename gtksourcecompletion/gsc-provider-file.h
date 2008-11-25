@@ -21,6 +21,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <gio/gio.h>
 #include <gtksourcecompletion/gsc-provider.h>
 #include <gtksourcecompletion/gsc-manager.h>
 

@@ -655,7 +655,20 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 				}
 				
 				gsc_popup_show_or_update(GTK_WIDGET(completion->priv->popup));
-				
+				/*
+				TODO Wrong, we need control this issue better because we add 
+				a new filter_type, we must to change this
+				*/
+				if (options == NULL || (options->filter_type != GSC_POPUP_FILTER_TREE))
+				{
+					/*Set the focus to the View, not the completion popup*/
+					GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(completion->priv->text_view),
+																		GTK_TYPE_WINDOW));
+					gtk_window_present(win);
+					//gtk_window_activate_focus(GTK_WINDOW(self));
+					gtk_widget_grab_focus(GTK_WIDGET(completion->priv->text_view));
+				}
+
 				completion->priv->active_trigger = trigger;
 			}
 			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))
