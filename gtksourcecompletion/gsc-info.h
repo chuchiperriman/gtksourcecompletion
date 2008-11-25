@@ -89,6 +89,11 @@ gsc_info_set_adjust_height(GscInfo* self,
 			   gboolean adjust,
 			   gint max_height);
 
+void
+gsc_info_set_adjust_width(GscInfo* self,
+			  gboolean adjust,
+			  gint max_width);
+
 G_END_DECLS
 
 #endif

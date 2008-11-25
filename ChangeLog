@@ -1,3 +1,9 @@
+2008-11-25  Chuchi  <perriman@homer>
+
+	* gsc-info: added gsc_info_set_adjust_width to adjust width to the
+	text.
+	* gsc-popup: Use the new GscInfo object to show the info
+
 2008-11-24  Chuchi  <perriman@homer>
 
 	* gsc-info: Created the new object to show information like calltips,

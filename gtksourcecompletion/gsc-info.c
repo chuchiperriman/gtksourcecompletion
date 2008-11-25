@@ -27,7 +27,9 @@ struct _GscInfoPrivate
 	GtkWidget *label;
 	GscInfoType type;
 	gboolean adjust_height;
+	gboolean adjust_width;
 	gint max_height;
+	gint max_width;
 };
 
 /* Signals */
@@ -59,6 +61,8 @@ _focus_out_event_cb(GtkWidget *widget,
 static void
 _show(GtkWidget *widget)
 {
+
+	/*TODO Control the "+30" for the scrollbars*/
 	GscInfo *self = GSC_INFO(widget);
 	const gchar* text = gtk_label_get_text(GTK_LABEL(self->priv->label));
 	if (text == NULL || g_strcmp0(text,"") == 0)
@@ -69,17 +73,20 @@ _show(GtkWidget *widget)
 	gtk_widget_size_request(self->priv->label, &req);
 	
 	if (self->priv->adjust_height)
-	{
 		h = req.height > self->priv->max_height 
 			? self->priv->max_height 
-			: req.height;
-	}
+			: req.height + 30;
 	else
-	{
 		h = WINDOW_HEIGHT;
-	}
-	/*TODO Control width*/
-	gtk_window_resize(GTK_WINDOW(self),req.width + 30, h + 30);
+	
+	if (self->priv->adjust_width)
+		w = req.width > self->priv->max_width 
+			? self->priv->max_width
+			: req.width + 30;
+	else
+		w = WINDOW_WIDTH;
+
+	gtk_window_resize(GTK_WINDOW(self),w , h );
 	
 	GTK_WIDGET_CLASS (parent_class)->show (GTK_WIDGET(self));
 }
@@ -97,7 +104,9 @@ gsc_info_init (GscInfo *self)
 {
 	self->priv = GSC_INFO_GET_PRIVATE(self);
 	self->priv->adjust_height = FALSE;
+	self->priv->adjust_width = FALSE;
 	self->priv->max_height = WINDOW_HEIGHT;
+	self->priv->max_width = WINDOW_WIDTH;
 	g_object_set(G_OBJECT(self),"can-focus",FALSE,NULL);
 	gtk_window_set_type_hint(GTK_WINDOW(self),
 		GDK_WINDOW_TYPE_HINT_POPUP_MENU);
@@ -196,9 +205,21 @@ gsc_info_set_adjust_height(GscInfo* self,
 			   gboolean adjust,
 			   gint max_height)
 {
+	/*TODO Control if max_height > screen height*/
 	self->priv->adjust_height = adjust;
 	if (max_height > 0)
 		self->priv->max_height = max_height;
+}
+
+void
+gsc_info_set_adjust_width(GscInfo* self,
+			  gboolean adjust,
+			  gint max_width)
+{
+	/*TODO Control if max_width > screen width*/
+	self->priv->adjust_width = adjust;
+	if (max_width > 0)
+		self->priv->max_width = max_width;
 }
 
 void
@@ -211,7 +232,5 @@ gsc_info_set_info_type(GscInfo* self,
 		g_signal_emit (G_OBJECT (self), signals[INFO_TYPE_CHANGED], 0, type);
 	}
 }
-
-
 
 

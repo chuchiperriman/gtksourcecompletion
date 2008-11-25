@@ -23,6 +23,7 @@
 #include "gsc-tree.h"
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
+#include "gsc-info.h"
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
@@ -56,7 +57,6 @@ struct _GscPopupPriv
 {
 	GtkWidget *info_window;
 	GtkWidget *info_button;
-	GtkWidget *info_label;
 	GtkWidget *notebook;
 	GtkWidget *tab_label;
 	GtkWidget *next_page_icon;
@@ -593,21 +593,7 @@ gsc_popup_init (GscPopup *self)
 	gtk_widget_show_all(vbox);
 
 	/*Info window*/
-	self->priv->info_window = gtk_window_new(GTK_WINDOW_POPUP);
-	g_object_set_property(G_OBJECT(self->priv->info_window),"can-focus",&val);
-	gtk_widget_set_size_request(self->priv->info_window,WINDOW_WIDTH,WINDOW_HEIGHT);
-	GtkWidget* info_scroll = gtk_scrolled_window_new(NULL,NULL);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(info_scroll),
-					GTK_POLICY_AUTOMATIC,
-					GTK_POLICY_AUTOMATIC);
-	self->priv->info_label = gtk_label_new(NULL);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(info_scroll),
-					      self->priv->info_label);
-	gtk_container_set_border_width(GTK_CONTAINER(self->priv->info_window),1);
-	gtk_container_add(GTK_CONTAINER(self->priv->info_window),info_scroll);
-	
-	gtk_widget_show(info_scroll);
-	gtk_widget_show(self->priv->info_label);
+	self->priv->info_window = GTK_WIDGET(gsc_info_new());
 	
 	/* Connect signals */
 	
@@ -803,11 +789,11 @@ gsc_popup_set_current_info(GscPopup *self,
 {
 	if (info!=NULL)
 	{
-		gtk_label_set_markup(GTK_LABEL(self->priv->info_label),info);
+		gsc_info_set_markup(GSC_INFO(self->priv->info_window),info);
 	}
 	else
 	{
-		gtk_label_set_markup(GTK_LABEL(self->priv->info_label), 
+		gsc_info_set_markup(GSC_INFO(self->priv->info_window),
 				     _("There is no info for the current proposal"));
 	}
 }

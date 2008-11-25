@@ -255,6 +255,7 @@ create_info()
 	GtkRequisition req = {100,100};
 	gtk_widget_size_request(GTK_WIDGET(info),&req);
 	gsc_info_set_adjust_height(info,TRUE,-1);
+	gsc_info_set_adjust_width(info,TRUE,-1);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
 	return info;
 }

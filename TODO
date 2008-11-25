@@ -1,4 +1,4 @@
-TODO (last update: 2008-11-22)
+TODO (last update: 2008-11-25)
 =================================
 
 [X] Try to separe GscPopup and GtkTextView. Remove the GtkTextView dependency 
@@ -11,9 +11,12 @@ TODO (last update: 2008-11-22)
 GscInfo:
 ----------------
 [ ] Add movement functions (center screen, parent, mouse pointer etc.)
-[ ] Implement adjust height (adjust window height to the content)
-[ ] Implement adjust width (adjust window width to the content)
+[X] Implement adjust height (adjust window height to the content)
+[X] Implement adjust width (adjust window width to the content)
 [ ] Add bottom bar with extend buttom
-[ ] Implement set_info_type with sort or extended
+[X] Implement set_info_type with sort or extended
 [X] Add signal info-type-changed
 
+GscPopup:
+---------------
+[ ] Change the "display-info" signal and use a proposal function like apply
