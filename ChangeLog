@@ -1,3 +1,9 @@
+2008-12-02  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-trigger.c:
+	* gtksourcecompletion/gsc-trigger.h:
+	Use the right coding style.
+
 2008-11-25  Chuchi  <perriman@homer>
 
 	* gsc-info: added gsc_info_set_adjust_width to adjust width to the

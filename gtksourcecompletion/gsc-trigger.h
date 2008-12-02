@@ -38,50 +38,19 @@ typedef struct _GscTriggerIface GscTriggerIface;
 
 struct _GscTriggerIface {
 	GTypeInterface parent;
-	const gchar* (*get_name) (GscTrigger *self);
-	gboolean (*activate) (GscTrigger* self);
-	gboolean (*deactivate) (GscTrigger* self);
+	
+	const gchar* (*get_name)   (GscTrigger *self);
+	gboolean     (*activate)   (GscTrigger* self);
+	gboolean     (*deactivate) (GscTrigger* self);
 };
 
-/**
- * gsc_trigger_get_name:
- * @self: the #GscTrigger
- *
- * The trigger name. By example: "C autocompletion trigger"
- *
- * Returns: The trigger's name
- * 
- **/
-const gchar*
-gsc_trigger_get_name(GscTrigger* self);
+GType         gsc_trigger_get_type   (void);
 
-/**
- * gsc_trigger_activate:
- * @self: the #GscTrigger
- *
- * Activate the completion trigger.
- *
- * Returns: TRUE if activation is OK, FALSE if not.
- * 
- **/
-gboolean
-gsc_trigger_activate (GscTrigger* self);
+const gchar  *gsc_trigger_get_name   (GscTrigger* self);
 
-/**
- * gsc_trigger_deactivate:
- * @self: the #GscTrigger
- *
- * Deactive the completion trigger
- *
- * Returns: TRUE if activation is OK, FALSE if not.
- * 
- **/				
-gboolean
-gsc_trigger_deactivate (GscTrigger* self);
-
-GType 
-gsc_trigger_get_type ();
-
+gboolean      gsc_trigger_activate   (GscTrigger* self);
+				
+gboolean      gsc_trigger_deactivate (GscTrigger* self);
 
 G_END_DECLS
 

@@ -20,10 +20,81 @@
 
 #include "gsc-trigger.h"
 
+/**
+ * gsc_trigger_get_name:
+ * @self: a #GscTrigger
+ *
+ * The trigger name. By example: "C autocompletion trigger".
+ *
+ * Returns: The trigger's name
+ */
+const gchar*
+gsc_trigger_get_name(GscTrigger *self)
+{
+	g_return_val_if_fail (GSC_IS_TRIGGER (self), NULL);
+	return GSC_TRIGGER_GET_INTERFACE (self)->get_name (self);
+}
+
+/* Default implementation */
+static const gchar *
+gsc_trigger_get_name_default (GscTrigger *self)
+{
+	g_return_val_if_reached (NULL);
+}
+
+/**
+ * gsc_trigger_activate:
+ * @self: a #GscTrigger
+ *
+ * Activate the completion trigger.
+ *
+ * Returns: TRUE if the activation was OK, FALSE if not.
+ */
+gboolean
+gsc_trigger_activate (GscTrigger* self)
+{
+	g_return_val_if_fail (GSC_IS_TRIGGER (self), FALSE);
+	return GSC_TRIGGER_GET_INTERFACE (self)->activate (self);
+}
+
+/* Default implementation */
+static gboolean
+gsc_trigger_activate_default (GscTrigger *self)
+{
+	g_return_val_if_reached (FALSE);
+}
+
+/**
+ * gsc_trigger_deactivate:
+ * @self: a #GscTrigger
+ *
+ * Deactive the completion trigger
+ *
+ * Returns: TRUE if the deactivation was OK, FALSE if not.
+ */
+gboolean
+gsc_trigger_deactivate (GscTrigger* self)
+{
+	g_return_val_if_fail (GSC_IS_TRIGGER (self), FALSE);
+	return GSC_TRIGGER_GET_INTERFACE (self)->deactivate (self);
+}
+
+/* Default implementation */
+static gboolean
+gsc_trigger_deactivate_default (GscTrigger *self)
+{
+	g_return_val_if_reached (FALSE);
+}
+
 static void 
 gsc_trigger_base_init (GscTriggerIface * iface)
 {
 	static gboolean initialized = FALSE;
+	
+	iface->get_name = gsc_trigger_get_name_default;
+	iface->activate = gsc_trigger_activate_default;
+	iface->deactivate = gsc_trigger_deactivate_default;
+	
 	if (!initialized) {
 		initialized = TRUE;
 	}
@@ -55,22 +126,3 @@ gsc_trigger_get_type ()
 	}
 	return gsc_trigger_type_id;
 }
-
-const gchar*
-gsc_trigger_get_name(GscTrigger *self)
-{
-	return GSC_TRIGGER_GET_INTERFACE (self)->get_name (self);
-}
-
-gboolean
-gsc_trigger_activate (GscTrigger* self)
-{
-	return GSC_TRIGGER_GET_INTERFACE (self)->activate (self);
-}
-
-gboolean
-gsc_trigger_deactivate (GscTrigger* self)
-{
-	return GSC_TRIGGER_GET_INTERFACE (self)->deactivate (self);
-}
-
