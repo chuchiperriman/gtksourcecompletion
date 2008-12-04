@@ -1,4 +1,11 @@
 2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+	
+	* depcomp:
+	* ltmain.sh:
+	* missing:
+	Removed useless files.
+
+2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* aclocal.m4:
 	* install-sh:
