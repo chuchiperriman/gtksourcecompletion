@@ -1,5 +1,11 @@
 2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* aclocal.m4:
+	* install-sh:
+	Removed useless files.
+
+2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-provider.c:
 	* gtksourcecompletion/gsc-provider.h:
 	* gtksourcecompletion/gsc-provider-file.c:
