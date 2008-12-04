@@ -1,4 +1,9 @@
 2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-provider-file.c:
+	First hack for having it cleaner.
+
+2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 	
 	* depcomp:
 	* ltmain.sh:
