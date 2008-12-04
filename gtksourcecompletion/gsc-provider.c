@@ -20,29 +20,84 @@
 
 #include "gsc-provider.h"
 
+/**
+ * gsc_provider_get_name:
+ * @self: a #GscProvider
+ *
+ * The provider name. By example: "Document word completion provider"
+ *
+ * Returns: The provider's name 
+ */
 const gchar*
-gsc_provider_get_name(GscProvider *self)
+gsc_provider_get_name (GscProvider *self)
 {
+	g_return_val_if_fail (GSC_IS_PROVIDER (self), NULL);
 	return GSC_PROVIDER_GET_INTERFACE (self)->get_name (self);
 }
 
+/* Default implementation */
+static const gchar *
+gsc_provider_get_name_default (GscProvider *self)
+{
+	g_return_val_if_reached (NULL);
+}
+
+/**
+ * gsc_provider_get_proposals:
+ * @self: a #GscProvider
+ * @trigger: The #GscTrigger that raise the event
+ *
+ * The completion call this function when an event is raised.
+ * This function may return a list of #GscProposal to be shown
+ * in the popup to the user.
+ *
+ * Returns: a list of #GscProposal or NULL if there are no proposals
+ */
 GList* 
 gsc_provider_get_proposals (GscProvider* self,
 			    GscTrigger *trigger)
 {
+	g_return_val_if_fail (GSC_IS_PROVIDER (self), NULL);
 	return GSC_PROVIDER_GET_INTERFACE (self)->get_proposals (self, trigger);
 }
 
+/* Default implementation */
+static GList *
+gsc_provider_get_proposals_default (GscProvider *self,
+				    GscTrigger *trigger)
+{
+	g_return_val_if_reached (NULL);
+}
+
+/**
+ * gsc_provider_finish:
+ * @self: a #GscProvider
+ *
+ * The completion call this function when it is goint to hide the popup
+ */
 void 
 gsc_provider_finish (GscProvider* self)
 {
-	GSC_PROVIDER_GET_INTERFACE (self)->finish(self);
+	g_return_if_fail (GSC_IS_PROVIDER (self));
+	GSC_PROVIDER_GET_INTERFACE (self)->finish (self);
+}
+
+/* Default implementation */
+static void
+gsc_provider_finish_default (GscProvider *self)
+{
+	g_return_if_reached ();
 }
 
 static void 
 gsc_provider_base_init (GscProviderIface * iface)
 {
 	static gboolean initialized = FALSE;
+	
+	iface->get_name = gsc_provider_get_name_default;
+	iface->get_proposals = gsc_provider_get_proposals_default;
+	iface->finish = gsc_provider_finish_default;
+	
 	if (!initialized) {
 		initialized = TRUE;
 	}
@@ -75,5 +130,3 @@ gsc_provider_get_type ()
 	}
 	return gsc_provider_type_id;
 }
-
-

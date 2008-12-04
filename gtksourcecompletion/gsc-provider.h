@@ -38,54 +38,25 @@ G_BEGIN_DECLS
 typedef struct _GscProvider GscProvider;
 typedef struct _GscProviderIface GscProviderIface;
 
-struct _GscProviderIface {
-	GTypeInterface parent;
-	const gchar* (*get_name) (GscProvider *self);
-	GList* (*get_proposals) (GscProvider* self,
-				 GscTrigger *trigger);
-	void (*finish) (GscProvider* self);
+struct _GscProviderIface
+{
+	GTypeInterface g_iface;
+	
+	const gchar* (*get_name)       (GscProvider *self);
+	GList*       (*get_proposals)  (GscProvider* self,
+				        GscTrigger *trigger);
+	void         (*finish)         (GscProvider* self);
 };
 
-GType 
-gsc_provider_get_type ();
+GType         gsc_provider_get_type            (void);
 
-/**
- * gsc_provider_get_name:
- * @self: the #GscProvider
- *
- * The provider name. By example: "Document word completion provider"
- *
- * Returns: The provider's name
- * 
- **/
-const gchar*
-gsc_provider_get_name(GscProvider* self);
 
-/**
- * gsc_provider_get_proposals:
- * @self: the #GscProvider
- * @trigger: The #GscTrigger that raise the event
- *
- * The completion call this function when an event is raised.
- * This function may return a list of #GscProposal to be shown
- * in the popup to the user.
- *
- * Returns: a list of #GscProposal or NULL if there are no proposals
- * 
- **/
-GList* 
-gsc_provider_get_proposals (GscProvider* self, 
-			    GscTrigger *trigger);
+const gchar  *gsc_provider_get_name      (GscProvider* self);
 
-/**
- * gsc_provider_finish:
- * @self: the #GscProvider
- *
- * The completion call this function when it is goint to hide the popup
- * 
- **/					
-void 
-gsc_provider_finish (GscProvider* self);
+GList        *gsc_provider_get_proposals (GscProvider* self, 
+					  GscTrigger *trigger);
+				
+void          gsc_provider_finish        (GscProvider* self);
 
 G_END_DECLS
 

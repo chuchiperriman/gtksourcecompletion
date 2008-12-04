@@ -1,3 +1,11 @@
+2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-provider.c:
+	* gtksourcecompletion/gsc-provider.h:
+	* gtksourcecompletion/gsc-provider-file.c:
+	* gtksourcecompletion/gsc-provider-file.h:
+	Use the right coding style.
+
 2008-12-02  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-trigger.c:

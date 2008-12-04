@@ -16,8 +16,8 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __FILE_PROVIDER_H__
-#define __FILE_PROVIDER_H__
+#ifndef __GSC_FILE_PROVIDER_H__
+#define __GSC_FILE_PROVIDER_H__
 
 #include <glib.h>
 #include <glib-object.h>
@@ -27,12 +27,12 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_PROVIDER_FILE (gsc_provider_file_get_type ())
-#define GSC_PROVIDER_FILE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROVIDER_FILE, GscProviderFile))
-#define GSC_PROVIDER_FILE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_PROVIDER_FILE, GscProviderFileClass))
-#define GSC_IS_PROVIDER_FILE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROVIDER_FILE))
-#define GSC_IS_PROVIDER_FILE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_PROVIDER_FILE))
-#define GSC_PROVIDER_FILE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_PROVIDER_FILE, GscProviderFileClass))
+#define GSC_TYPE_PROVIDER_FILE             (gsc_provider_file_get_type ())
+#define GSC_PROVIDER_FILE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROVIDER_FILE, GscProviderFile))
+#define GSC_PROVIDER_FILE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_PROVIDER_FILE, GscProviderFileClass))
+#define GSC_IS_PROVIDER_FILE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROVIDER_FILE))
+#define GSC_IS_PROVIDER_FILE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_PROVIDER_FILE))
+#define GSC_PROVIDER_FILE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_PROVIDER_FILE, GscProviderFileClass))
 
 #define GSC_PROVIDER_FILE_NAME "GscProviderFile"
 
@@ -40,22 +40,24 @@ typedef struct _GscProviderFile GscProviderFile;
 typedef struct _GscProviderFileClass GscProviderFileClass;
 typedef struct _GscProviderFilePrivate GscProviderFilePrivate;
 
-struct _GscProviderFile {
+struct _GscProviderFile
+{
 	GObject parent;
-	GscProviderFilePrivate *priv;	
+	
+	GscProviderFilePrivate *priv;
 };
 
-struct _GscProviderFileClass {
+struct _GscProviderFileClass
+{
 	GObjectClass parent;
 };
 
-GType gsc_provider_file_get_type ();
+GType 		 gsc_provider_file_get_type		(void);
 
-GscProviderFile* gsc_provider_file_new(GtkTextView *view);
+GscProviderFile *gsc_provider_file_new			(GtkTextView *view);
 
-void
-gsc_provider_file_set_file(GscProviderFile *self,
-			   const gchar* file);
+void		 gsc_provider_file_set_file		(GscProviderFile *self,
+							 const gchar* file);
 
 G_END_DECLS
 
