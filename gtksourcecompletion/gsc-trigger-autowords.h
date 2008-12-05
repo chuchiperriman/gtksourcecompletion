@@ -32,49 +32,33 @@ G_BEGIN_DECLS
 #define GSC_IS_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_TRIGGER_AUTOWORDS))
 #define GSC_TRIGGER_AUTOWORDS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_TRIGGER_AUTOWORDS, GscTriggerAutowordsClass))
 
+/*
+ * FIXME: Is this define really needed here?
+ */
 #define GSC_TRIGGER_AUTOWORDS_NAME "GscTriggerAutowords"
 
 typedef struct _GscTriggerAutowords GscTriggerAutowords;
 typedef struct _GscTriggerAutowordsClass GscTriggerAutowordsClass;
 typedef struct _GscTriggerAutowordsPrivate GscTriggerAutowordsPrivate;
 
-struct _GscTriggerAutowords {
+struct _GscTriggerAutowords
+{
 	GObject parent;
-	GscTriggerAutowordsPrivate *priv;	
+	
+	GscTriggerAutowordsPrivate *priv;
 };
 
-struct _GscTriggerAutowordsClass {
+struct _GscTriggerAutowordsClass
+{
 	GObjectClass parent;
 };
 
-/**
- * gsc_trigger_autowords_new:
- * @completion: The #GscManager where the triggered will be used
- * Returns The new #GscTriggerAutowords
- *
- */
-GscTriggerAutowords*
-gsc_trigger_autowords_new(GscManager *completion);
+GType			 gsc_trigger_autowords_get_type		(void);
 
-/**
- * gsc_trigger_autowords_set_delay:
- * @trigger: The #GscTriggerAutowords
- * @delay: milliseconds to delay the autocompletion event.
- *
- * The delay time is the time between the last user key pressed
- * and the instant when the trigger call to the completion. If 
- * delay is 2000 then the user press a key and 2 seconds later
- * this trigger call to the completion if the user don't press
- * another key.
- *
- * Returns The new #GscTriggerAutowords
- *
- */
-void
-gsc_trigger_autowords_set_delay(GscTriggerAutowords* trigger,
-				     guint delay);
+GscTriggerAutowords	*gsc_trigger_autowords_new		(GscManager *completion);
 
-GType gsc_trigger_autowords_get_type ();
+void			 gsc_trigger_autowords_set_delay	(GscTriggerAutowords* trigger,
+								 guint delay);
 
 G_END_DECLS
 

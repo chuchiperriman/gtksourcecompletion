@@ -1,5 +1,12 @@
 2008-12-05  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-trigger-autowords.h:
+	* gtksourcecompletion/gsc-trigger-autowords.c:
+	Cleaning up the code and follow the gsv coding style.
+	Added several FIXME comments too.
+
+2008-12-05  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-provider-file.c:
 	Cleaning up the code and add several FIXME comments.
 
