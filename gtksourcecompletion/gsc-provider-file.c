@@ -55,15 +55,16 @@ table_foreach (gpointer key,
 	       gpointer value,
 	       gpointer user_data)
 {
-	GscProposal* prop = NULL;
 	GscProviderFile *self = GSC_PROVIDER_FILE (user_data);
+	GscProposal* prop = NULL;
 	
 	if (gsc_is_valid_word (self->priv->current_word, (gchar*)key))
 	{
 		prop = gsc_proposal_new ((gchar*)key,
 					 NULL,
 					 self->priv->icon);
-		self->priv->current_props = g_list_append (self->priv->current_props,prop);
+		self->priv->current_props = g_list_append (self->priv->current_props,
+							   prop);
 	}
 	
 	/*For free the current item into the table*/
@@ -74,31 +75,42 @@ static GList*
 get_words (GscProviderFile *self,
 	   gchar* buffer)
 {
-
-	self->priv->current_word = gsc_get_last_word_cleaned (self->priv->view);
-	GHashTable *table = g_hash_table_new_full (g_str_hash,
-						   g_str_equal,
-						   g_free,
-						   NULL);
 	gchar* ini = NULL;
 	gchar* cur = buffer;
 	gunichar c;
 	gint count = 0;
 	gint words = 0;
+	GHashTable *table;
+	
+	self->priv->current_word = gsc_get_last_word_cleaned (self->priv->view);
+	
+	table = g_hash_table_new_full (g_str_hash,
+				       g_str_equal,
+				       g_free,
+				       NULL);
+	
+	/*
+	 * FIXME: I do not like this loop
+	 */
 	while (TRUE)
 	{
 		ini = cur;
 		count = 0;
+		
 		c = g_utf8_get_char (cur);
+		
 		while (!gsc_char_is_separator (c))
 		{
 			count++;
 			cur = g_utf8_next_char (cur);
 			c = g_utf8_get_char (cur);
 		}
+		
 		if (count > 0)
 		{
-			g_hash_table_insert (table, g_strndup (ini,count), NULL);
+			g_hash_table_insert (table,
+					     g_strndup (ini, count),
+					     NULL);
 			words++;
 		}
 		
@@ -108,14 +120,18 @@ get_words (GscProviderFile *self,
 		cur = g_utf8_next_char (cur);
 	}
 	
+	/*
+	 * FIXME: We should check if current_props is not NULL and free the
+	 * memory in that case.
+	 */
 	self->priv->current_props = NULL;
 	g_hash_table_foreach_remove (table,
 				     table_foreach,
 				     self);
 	
 	g_hash_table_unref (table);
-	return g_list_first (self->priv->current_props);
 	
+	return g_list_first (self->priv->current_props);
 }
 
 static GList* 
@@ -123,39 +139,53 @@ gsc_provider_file_real_get_proposals (GscProvider* base,
 				      GscTrigger *trigger)
 {
 	GscProviderFile *self = GSC_PROVIDER_FILE (base);
-	GFileInfo *info = g_file_query_info (self->priv->file_uri,
-					     G_FILE_ATTRIBUTE_STANDARD_SIZE,
-					     G_FILE_QUERY_INFO_NONE,
-					     NULL,
-					     NULL);
+	GFileInfo *info;
+	guint64 size;
+	GFileInputStream *stream;
+	gboolean result;
+	gsize nchars;
+	gchar *buffer = NULL;
+	GList *proposals = NULL;
+	
+	//FIXME: Use GError
+	info = g_file_query_info (self->priv->file_uri,
+				  G_FILE_ATTRIBUTE_STANDARD_SIZE,
+				  G_FILE_QUERY_INFO_NONE,
+				  NULL,
+				  NULL);
 	if (info == NULL)
 	{
 		g_warning ("The file does not exist");
 		return NULL;
 	}
 	
-	guint64 size; 
-	size = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
+	size = g_file_info_get_attribute_uint64 (info,
+						 G_FILE_ATTRIBUTE_STANDARD_SIZE);
 	g_object_unref (info);
 	
-	gchar *buffer = NULL;
+	/*
+	 * FIXME: I do not like this
+	 */
 	buffer = g_malloc (size + 1);
 	if (buffer == NULL && size != 0)
 	{
 		g_warning ("This file is too big. Unable to allocate memory.");
 		return NULL;
 	}
-	GFileInputStream *stream;
-	gboolean result;
-	gsize nchars;
-	stream = g_file_read (self->priv->file_uri, NULL, NULL);
+	
+	//FIXME: Use GError
+	stream = g_file_read (self->priv->file_uri,
+			      NULL, NULL);
 	if (stream == NULL)
 	{
 		g_warning ("Could not open file");
 		return NULL;
 	}
-	result = g_input_stream_read_all (G_INPUT_STREAM (stream), 
-					  buffer, size, &nchars, NULL, NULL);
+	
+	//FIXME: Use Gerror
+	result = g_input_stream_read_all (G_INPUT_STREAM (stream),
+					  buffer, size, &nchars,
+					  NULL, NULL);
 	if (!result)
 	{
 		g_free (buffer);
@@ -192,21 +222,22 @@ gsc_provider_file_real_get_proposals (GscProvider* base,
 			if (converted_text == NULL)
 			{
 				g_free (buffer);
-				g_warning("The file does not look like a text file or the file encoding is not supported.");
+				g_warning ("The file does not look like a text file"
+					   " or the file encoding is not supported.");
 				return NULL;
 			}
 			g_free (buffer);
 			buffer = converted_text;
 		}
 	}
-		
-	GList *proposals = get_words (self, buffer);
+	
+	proposals = get_words (self, buffer);
 	g_free (buffer);
 	
 	return proposals;
 }
 
-static void 
+static void
 gsc_provider_file_real_finish (GscProvider* base)
 {
 
@@ -219,6 +250,13 @@ gsc_provider_file_finalize (GObject *object)
 	
 	if (self->priv->file_uri != NULL)
 		g_object_unref (self->priv->file_uri);
+	
+	if (self->priv->current_props != NULL)
+	{
+		g_list_foreach (self->priv->current_props,
+				(GFunc) g_object_unref, NULL);
+		g_list_free (self->priv->current_props);
+	}
 	
 	gdk_pixbuf_unref (self->priv->icon);
 	
@@ -251,7 +289,7 @@ gsc_provider_file_init (GscProviderFile * self)
 	self->priv = GSC_PROVIDER_FILE_GET_PRIVATE (self);
 	
 	self->priv->file_uri = NULL;
-	self->priv->icon = gdk_pixbuf_new_from_file (ICON_FILE,NULL);
+	self->priv->icon = gdk_pixbuf_new_from_file (ICON_FILE, NULL);
 	self->priv->current_props = NULL;
 	self->priv->view = NULL;
 }
@@ -268,7 +306,7 @@ gsc_provider_file_new (GtkTextView *view)
 
 void
 gsc_provider_file_set_file (GscProviderFile *self,
-			    const gchar* file)
+			    const gchar *file)
 {
 	g_return_if_fail (GSC_IS_PROVIDER_FILE (self));
 	g_return_if_fail (file != NULL);
@@ -276,5 +314,5 @@ gsc_provider_file_set_file (GscProviderFile *self,
 	if (self->priv->file_uri != NULL)
 		g_object_unref (self->priv->file_uri);
 	
-	self->priv->file_uri = g_file_new_for_path (file);	
+	self->priv->file_uri = g_file_new_for_path (file);
 }

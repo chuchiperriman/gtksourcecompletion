@@ -1,3 +1,8 @@
+2008-12-05  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-provider-file.c:
+	Cleaning up the code and add several FIXME comments.
+
 2008-12-04  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-provider-file.c:
