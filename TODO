@@ -16,10 +16,12 @@ GscInfo:
 [ ] Add bottom bar with extend buttom
 [X] Implement set_info_type with sort or extended
 [X] Add signal info-type-changed
+[ ] Add custom widget functionality
 
 GscPopup:
 ---------------
 [ ] Change the "display-info" signal and use a proposal function like apply
+[ ] Clean all filter and options features. 
 
 Bugs
 ---------------
