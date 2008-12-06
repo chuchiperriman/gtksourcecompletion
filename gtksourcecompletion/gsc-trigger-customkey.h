@@ -80,19 +80,6 @@ void
 gsc_trigger_customkey_set_keys(GscTriggerCustomkey * self, 
 				 const gchar* keys);
 
-/**
- * gsc_trigger_customkey_set_opts:
- * @self: The #GscTriggerCustomkey
- * @options: The trigger options
- *
- * Use this function if you want to tell the completion how must
- * show the popup (position, filter, etc.) then this trigger occurs
- * 
- **/
-void
-gsc_trigger_customkey_set_opts(GscTriggerCustomkey *self,
-				GscManagerEventOptions *options);
-
 GType 
 gsc_trigger_customkey_get_type ();
 

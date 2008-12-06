@@ -40,7 +40,6 @@
 #include <gtksourcecompletion/gsc-provider-file.h>
 #include <gtksourcecompletion/gsc-info.h>
 #include <gtksourcecompletion/gsc-utils.h>
-#include "gsc-trigger-dotexample.h"
 
 
 static GtkWidget *view;
@@ -119,18 +118,7 @@ key_press(GtkWidget   *widget,
 {
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 
-	if (event->keyval == GDK_F2)
-	{
-		g_debug("Test popup");
-		GscManagerEventOptions opts;
-		gsc_manager_get_current_event_options(comp,&opts);
-		opts.filter_type = GSC_POPUP_FILTER_TREE_HIDDEN;
-		opts.filter_text = "chuchi";
-		opts.show_bottom_bar = FALSE;
-		gsc_manager_update_event_options(comp,&opts);
-		return TRUE;
-	}
-	else if (event->keyval == GDK_F3)
+	if (event->keyval == GDK_F3)
 	{
 		g_debug("Show tooltip");
 		//gtk_widget_set_tooltip_text(view,"holaaaaaaaaaaaaa");
@@ -225,17 +213,11 @@ create_completion(void)
 	comp = gsc_manager_new(GTK_TEXT_VIEW(view));
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
-	GscManagerEventOptions *opts = g_new0(GscManagerEventOptions,1);
-	opts->filter_type = GSC_POPUP_FILTER_TREE;
-	gsc_trigger_customkey_set_opts(ur_trigger,opts);
-	GscTriggerDotexample *dot_trigger = gsc_trigger_dotexample_new(comp);
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
 	
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));
-	gsc_manager_register_trigger(comp,GSC_TRIGGER(dot_trigger));
 	
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER_DOTEXAMPLE_NAME);
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER_AUTOWORDS_NAME);
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),"User Request Trigger");
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_file),"User Request Trigger");
@@ -243,7 +225,6 @@ create_completion(void)
 	gsc_manager_activate(comp);
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
-	g_object_unref(dot_trigger);
 	g_object_unref(ac_trigger);
 	
 }

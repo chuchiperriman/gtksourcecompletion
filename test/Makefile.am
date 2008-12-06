@@ -1,4 +1,4 @@
-bin_PROGRAMS = gio-test completion-demo testtooltips
+bin_PROGRAMS = gio-test completion-demo 
 
 INCLUDES=	\
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
@@ -12,7 +12,7 @@ INCLUDES=	\
 AM_CFLAGS = \
 	-Wall	
 
-noinst_PROGRAMS = gio-test completion-demo testtooltips
+noinst_PROGRAMS = gio-test completion-demo
 
 gio_test_SOURCES = 		\
 	gio-test.c
@@ -26,25 +26,12 @@ gio_test_LDADD = 	\
 	$(PACKAGE_LIBS)
 
 completion_demo_SOURCES = 		\
-	completion-demo.c		\
-	gsc-trigger-dotexample.h	\
-	gsc-trigger-dotexample.c
+	completion-demo.c
 
 completion_demo_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\
 	`pkg-config --libs gio-2.0`
 
 completion_demo_LDADD = 	\
-	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-1.0.la	\
-	$(PACKAGE_LIBS)
-
-testtooltips_SOURCES = 		\
-	testtooltips.c
-
-testtooltips_LDFLAGS =  \
-	`pkg-config --libs gtksourceview-2.0`	\
-	`pkg-config --libs gio-2.0`
-
-testtooltips_LDADD = 	\
 	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-1.0.la	\
 	$(PACKAGE_LIBS)

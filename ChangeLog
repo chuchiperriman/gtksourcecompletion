@@ -1,3 +1,14 @@
+2008-12-06  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-info.c: 
+	Cleaning up the code
+	* gtksourcecompletion/gsc-manager.c:
+	* gtksourcecompletion/gsc-manager.h:
+	* gtksourcecompletion/gsc-popup.c:
+	* gtksourcecompletion/gsc-popup.h:
+	Removing filter management and the trigger options.
+
+
 2008-12-05  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-trigger-autowords.h:

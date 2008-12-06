@@ -60,7 +60,6 @@ struct _GscManagerPrivate
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	GscTrigger *active_trigger;
-	GscPopupPositionType position_type;
 };
 
 #define GSC_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_MANAGER, GscManagerPrivate))
@@ -231,36 +230,6 @@ free_trigger_list(gpointer list)
 	
 }
 
-static void
-set_popup_position(GscManager *self, GscManagerEventOptions *options)
-{
-	GtkWindow *parent = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->text_view),
-				GTK_TYPE_WINDOW));
-
-	gtk_window_set_transient_for(GTK_WINDOW(self->priv->popup),
-		parent);
-	
-	gint x, y;
-	
-	if (options!=NULL) 
-		self->priv->position_type = options->position_type;
-		
-	switch(self->priv->position_type)
-	{
-		case GSC_POPUP_POSITION_CENTER_SCREEN:
-			gsc_get_window_position_center_screen(GTK_WINDOW(self->priv->popup),&x,&y);
-			break;
-		case GSC_POPUP_POSITION_CENTER_PARENT:
-			gsc_get_window_position_center_parent(GTK_WINDOW(self->priv->popup),GTK_WIDGET(self->priv->text_view),&x,&y);
-			break;
-		default:
-			gsc_get_window_position_in_cursor(GTK_WINDOW(self->priv->popup),self->priv->text_view,&x,&y);
-			break;
-	}
-		
-	gtk_window_move(GTK_WINDOW(self->priv->popup), x, y);
-}
-
 static gboolean
 view_key_press_event_cb(GtkWidget *view,
 			GdkEventKey *event, 
@@ -351,7 +320,6 @@ gsc_manager_init (GscManager *completion)
 	completion->priv->triggers = NULL;
 	completion->priv->popup = NULL;
 	completion->priv->active_trigger = NULL;
-	completion->priv->position_type = GSC_POPUP_POSITION_CURSOR;
 	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
 							    g_str_equal,
 							    g_free,
@@ -542,29 +510,8 @@ gsc_manager_get_view(GscManager *completion)
 }
 
 void
-gsc_manager_update_event_options(GscManager *self,
-				 GscManagerEventOptions *options)
-{
-	if (options != NULL)
-	{
-		set_popup_position(self, options);
-
-		gsc_popup_set_filter_type(self->priv->popup,
-					  options->filter_type);
-					  
-		gsc_popup_bottom_bar_set_visible(self->priv->popup,
-						 options->show_bottom_bar);
-		
-		if (options->filter_text!=NULL)
-			gsc_popup_set_filter_text(self->priv->popup,
-						  options->filter_text);
-	}
-}
-
-void
-gsc_manager_trigger_event_with_opts(GscManager *completion, 
-				    const gchar *trigger_name, 
-				    GscManagerEventOptions *options,
+gsc_manager_trigger_event(GscManager *completion, 
+				    const gchar *trigger_name,
 				    gpointer event_data)
 {
 	GList* data_list;
@@ -637,37 +584,15 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
 					return;
 
-				if (options == NULL)
-				{
-					GscManagerEventOptions opts = 
-					{
-						GSC_POPUP_POSITION_CURSOR,
-						GSC_POPUP_FILTER_NONE,
-						NULL,
-						FALSE,
-						TRUE
-					};
-					gsc_manager_update_event_options(completion, &opts);
-				}
-				else
-				{
-					gsc_manager_update_event_options(completion, options);
-				}
-				
+				gint x, y;
+				gsc_get_window_position_in_cursor(GTK_WINDOW(completion->priv->popup),completion->priv->text_view,&x,&y);
+				gtk_window_move(GTK_WINDOW(completion->priv->popup), x, y);
 				gsc_popup_show_or_update(GTK_WIDGET(completion->priv->popup));
-				/*
-				TODO Wrong, we need control this issue better because we add 
-				a new filter_type, we must to change this
-				*/
-				if (options == NULL || (options->filter_type != GSC_POPUP_FILTER_TREE))
-				{
-					/*Set the focus to the View, not the completion popup*/
-					GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(completion->priv->text_view),
-																		GTK_TYPE_WINDOW));
-					gtk_window_present(win);
-					//gtk_window_activate_focus(GTK_WINDOW(self));
-					gtk_widget_grab_focus(GTK_WIDGET(completion->priv->text_view));
-				}
+
+				/*Set the focus to the View, not the completion popup*/
+				GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(completion->priv->text_view),GTK_TYPE_WINDOW));
+				gtk_window_present(win);
+				gtk_widget_grab_focus(GTK_WIDGET(completion->priv->text_view));
 
 				completion->priv->active_trigger = trigger;
 			}
@@ -682,17 +607,6 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 		if (gsc_manager_is_visible(completion))
 			end_completion (completion);
 	}
-}
-
-void 
-gsc_manager_trigger_event(GscManager *completion, 
-				    const gchar *trigger_name,
-				    gpointer event_data)
-{
-	gsc_manager_trigger_event_with_opts(completion,
-					    trigger_name,
-					    NULL,
-					    event_data);
 }
 
 gboolean
@@ -879,14 +793,3 @@ gsc_manager_set_current_info(GscManager *self,
 	gsc_popup_set_current_info(self->priv->popup,info);
 }
 
-void
-gsc_manager_get_current_event_options(GscManager *self,
-				      GscManagerEventOptions *options)
-{
-	g_return_if_fail(options != NULL);
-	options->filter_type = gsc_popup_get_filter_type(self->priv->popup);
-	options->position_type = self->priv->position_type;
-	options->filter_text = gsc_popup_get_filter_text(self->priv->popup);
-	options->autoselect = FALSE;
-	options->show_bottom_bar = gsc_popup_bottom_bar_get_visible(self->priv->popup);
-}

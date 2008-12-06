@@ -87,7 +87,6 @@ _show(GtkWidget *widget)
 		w = WINDOW_WIDTH;
 
 	gtk_window_resize(GTK_WINDOW(self),w , h );
-	
 	GTK_WIDGET_CLASS (parent_class)->show (GTK_WIDGET(self));
 }
 
@@ -107,27 +106,44 @@ gsc_info_init (GscInfo *self)
 	self->priv->adjust_width = FALSE;
 	self->priv->max_height = WINDOW_HEIGHT;
 	self->priv->max_width = WINDOW_WIDTH;
-	g_object_set(G_OBJECT(self),"can-focus",FALSE,NULL);
-	gtk_window_set_type_hint(GTK_WINDOW(self),
-		GDK_WINDOW_TYPE_HINT_POPUP_MENU);
-	//gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
+
 	gtk_window_set_default_size(GTK_WINDOW(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated(GTK_WINDOW(self),FALSE);
 	GtkWidget* info_scroll = gtk_scrolled_window_new(NULL,NULL);
+	g_object_set (info_scroll, 
+	    "has-default", FALSE,
+	    "can-default", FALSE,
+	    "has-focus", FALSE,
+	    "is-focus", FALSE, 
+	    NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(info_scroll),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 	self->priv->label = gtk_label_new(NULL);
-	gtk_label_set_selectable(GTK_LABEL(self->priv->label),TRUE);
+	g_object_set (self->priv->label, 
+	    "has-default", FALSE,
+	    "can-default", FALSE,
+	    "has-focus", FALSE,
+	    "is-focus", FALSE, 
+	    NULL);
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(info_scroll),
 					      self->priv->label);
 	gtk_container_set_border_width(GTK_CONTAINER(self),1);
 	gtk_container_add(GTK_CONTAINER(self),info_scroll);
-	
-	gtk_widget_show(info_scroll);
-	gtk_widget_show(self->priv->label);
-	
-	g_signal_connect(self,"focus-out-event",G_CALLBACK(_focus_out_event_cb),self);
+
+	gtk_window_set_type_hint (GTK_WINDOW(self), GDK_WINDOW_TYPE_HINT_NORMAL);
+
+	gtk_window_set_skip_pager_hint (GTK_WINDOW(self), TRUE);
+	gtk_window_set_skip_taskbar_hint (GTK_WINDOW(self), TRUE);	
+	gtk_window_set_focus_on_map(GTK_WINDOW(self), FALSE);
+	gtk_window_set_accept_focus(GTK_WINDOW(self), FALSE);
+	g_object_set (self,
+	    "has-default", FALSE,
+	    "can-default", FALSE,
+	    "has-focus", FALSE,
+	    "is-focus", FALSE, 
+	    NULL);
+	gtk_widget_show_all(self);
 }
 
 static void
@@ -175,8 +191,9 @@ gsc_info_class_init (GscInfoClass *klass)
 GscInfo*
 gsc_info_new(void)
 {
-	GscInfo *self = GSC_INFO(g_object_new (GSC_TYPE_INFO, NULL));
-	//GTK_WINDOW(self)->type = GTK_WINDOW_POPUP;
+	GscInfo *self = GSC_INFO(g_object_new (GSC_TYPE_INFO,
+					"type", GTK_WINDOW_POPUP,
+					NULL));
 	/*Window type (TOPLEVEL,POPUP...)*/
 	
 	return self;

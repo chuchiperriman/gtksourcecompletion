@@ -60,10 +60,8 @@ struct _GscPopupPriv
 	GtkWidget *notebook;
 	GtkWidget *tab_label;
 	GtkWidget *next_page_icon;
-	GtkWidget *filter;
 	GtkWidget *bottom_bar;
 	GHashTable *trees;
-	GscPopupFilterType filter_type;
 	gboolean destroy_has_run;
 	KeyDef keys[KEYS_LAST];
 };
@@ -82,10 +80,6 @@ static void
 _selection_changed_cd(GscTree *tree, 
 		      GscProposal *proposal,
 		      gpointer user_data);
-
-static void
-_filter_changed_cb (GtkEntry *entry,
-			gpointer  user_data);
 
 static GscTree*
 _get_current_tree(GscPopup *self)
@@ -146,6 +140,7 @@ _show_completion_info(GscPopup *self)
 		x -= (WINDOW_WIDTH * 2);
 	}
 	gtk_window_move(GTK_WINDOW(self->priv->info_window), x, y);
+	gtk_window_set_transient_for(GTK_WINDOW(self->priv->info_window), gtk_window_get_transient_for (GTK_WINDOW(self)));
 	gtk_widget_show(self->priv->info_window);
 }
 
@@ -183,20 +178,6 @@ _selection_changed_cd(GscTree *tree,
 	{
 		_show_completion_info(self);
 	}
-}
-
-static gboolean
-_focus_out_event_cb(GtkWidget *widget,
-			GdkEventFocus *event,
-			gpointer user_data)
-{
-	GscPopup *self = GSC_POPUP(user_data);
-	/* Only Close if the filter is visible */
-	if (GTK_WIDGET_VISIBLE(GTK_WIDGET(self->priv->filter)))
-	{
-		gsc_popup_hide(widget);
-	}
-	return FALSE;
 }
 
 static gboolean
@@ -240,15 +221,6 @@ _update_pages_visibility(GscPopup *self)
 		gtk_widget_hide(self->priv->next_page_icon);
 	
 	
-}
-
-static gboolean
-_filter_key_press_event_cb(GtkWidget *view,
-			   GdkEventKey *event, 
-			   gpointer user_data)
-{
-	GscPopup *self = GSC_POPUP(user_data);
-	return gsc_popup_manage_key(self,event);
 }
 
 gboolean
@@ -367,25 +339,6 @@ gsc_popup_show_or_update(GtkWidget *widget)
 		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);
 	}
 	
-	gtk_entry_set_text(GTK_ENTRY(self->priv->filter),"");
-	
-	/*Filter*/
-	switch(self->priv->filter_type)
-	{
-		case GSC_POPUP_FILTER_TREE_HIDDEN:
-		case GSC_POPUP_FILTER_NONE:
-		{
-			gtk_widget_hide(self->priv->filter);
-			break;
-		}
-		default:
-		{
-			gtk_widget_show(self->priv->filter);
-			gtk_window_present(GTK_WINDOW(self));
-			gtk_window_activate_focus(GTK_WINDOW(self));
-			gtk_widget_grab_focus(self->priv->filter);
-		}
-	}
 	gsc_tree_select_first(_get_current_tree(self));
 }
 
@@ -501,8 +454,8 @@ static void
 gsc_popup_init (GscPopup *self)
 {
 	gtk_window_set_type_hint(GTK_WINDOW(self),
-		GDK_WINDOW_TYPE_HINT_POPUP_MENU);
-	//gtk_window_set_focus_on_map(GTK_WINDOW(self),FALSE);
+		GDK_WINDOW_TYPE_HINT_NORMAL);
+	gtk_window_set_focus_on_map(GTK_WINDOW(self),FALSE);
 	gtk_widget_set_size_request(GTK_WIDGET(self),WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated(GTK_WINDOW(self),FALSE);
 	
@@ -567,15 +520,7 @@ gsc_popup_init (GscPopup *self)
 			 TRUE,
 			 10);
 	
-	/*Filter entry*/
-	self->priv->filter = gtk_entry_new();
-	
 	GtkWidget *vbox = gtk_vbox_new(FALSE,1);
-	gtk_box_pack_start(GTK_BOX(vbox),
-			   self->priv->filter,
-			   FALSE,
-			   FALSE,
-			   0);
 			   
 	gtk_box_pack_start(GTK_BOX(vbox),
 			   self->priv->notebook,
@@ -594,11 +539,12 @@ gsc_popup_init (GscPopup *self)
 
 	/*Info window*/
 	self->priv->info_window = GTK_WIDGET(gsc_info_new());
+	/*
 	g_object_set(self->priv->info_window, 
 			     "can-focus", FALSE,
 			     "accept-focus", FALSE,
 			      NULL);
-	
+	*/
 	/* Connect signals */
 	
 	g_signal_connect(completion_tree, 
@@ -616,31 +562,19 @@ gsc_popup_init (GscPopup *self)
 			G_CALLBACK(_switch_page_cb),
 			(gpointer) self);
 			
-	g_signal_connect(self->priv->filter,
-			"changed",
-			G_CALLBACK(_filter_changed_cb),
-			(gpointer) self);
-	
-	g_signal_connect(self->priv->filter,
-			"key-press-event",
-			G_CALLBACK(_filter_key_press_event_cb),
-			(gpointer) self);
-			
 	g_signal_connect(self,
 			"delete-event",
 			G_CALLBACK(gsc_popup_delete_event_cb),
 			NULL);
 	
-	g_signal_connect(self,
-			 "focus-out-event",
-			 G_CALLBACK(_focus_out_event_cb),
-			 (gpointer)self);
 }
 
 GtkWidget*
 gsc_popup_new ()
 {
-	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() , NULL));
+	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() ,
+					"type", GTK_WINDOW_POPUP,
+					NULL));
 	return GTK_WIDGET(self);
 }
 
@@ -819,7 +753,7 @@ gsc_popup_get_num_active_pages(GscPopup *self)
 	return num_pages_with_data;
 }
 
-/* Control filter signals */
+/* TODO We will need this code to filter the popup content
 
 static void
 _filter_changed_cb (GtkEntry *entry,
@@ -838,35 +772,7 @@ _filter_changed_cb (GtkEntry *entry,
 	}
 	gsc_popup_select_first(self);
 }
-
-GtkWidget*
-gsc_popup_get_filter_widget(GscPopup *self)
-{
-	return self->priv->filter;
-}
-
-void
-gsc_popup_set_filter_type(GscPopup *self,
-			  GscPopupFilterType filter_type)
-{
-	self->priv->filter_type = filter_type;
-}
-
-void
-gsc_popup_set_filter_text(GscPopup *self,
-			  const gchar* text)
-{
-	if (self->priv->filter_type == GSC_POPUP_FILTER_NONE)
-		g_warning("You cannot set the filter text because there is no filter active");
-	else
-		gtk_entry_set_text(GTK_ENTRY(self->priv->filter),text);
-}
-
-const gchar* 
-gsc_popup_get_filter_text(GscPopup *self)
-{
-	return gtk_entry_get_text(GTK_ENTRY(self->priv->filter));
-}
+*/
 
 void
 gsc_popup_set_key(GscPopup *self, KeysType type, const gchar* keys)
@@ -884,12 +790,6 @@ gsc_popup_get_key(GscPopup *self, KeysType type)
 {
 	return gtk_accelerator_name(self->priv->keys[type].key,
 				    self->priv->keys[type].mods);
-}
-
-GscPopupFilterType
-gsc_popup_get_filter_type(GscPopup *self)
-{
-	return self->priv->filter_type;
 }
 
 void

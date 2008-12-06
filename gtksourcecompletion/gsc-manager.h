@@ -45,23 +45,6 @@ typedef struct _GscManagerPrivate GscManagerPrivate;
 typedef struct _GscManagerClass GscManagerClass;
 typedef struct _GscManager GscManager;
 
-/**
- * GscManagerEventOptions:
- * @popup_options: Options to tell how the popup will be shown
- * @autoselect: If TRUE, the completion selects automatically if there
- * is only one proposal and only one page
- * 
- */
-typedef struct _GscManagerEventOptions GscManagerEventOptions;
-
-struct _GscManagerEventOptions{
-	GscPopupPositionType position_type;
-	GscPopupFilterType filter_type;
-	const gchar* filter_text;
-	gboolean autoselect;
-	gboolean show_bottom_bar;
-};
-
 struct _GscManagerClass
 {
 	GObjectClass parent_class;
@@ -279,24 +262,6 @@ gsc_manager_trigger_event(GscManager *completion,
 			  gpointer event_data);
 
 /**
- * gsc_manager_trigger_event_with_opts:
- * @completion: the #GscManager
- * @trigger_name: The event name to raise
- * @options: Options to tell the completion how it must to work.
- * @event_data: This object will be passed to the providers to give them some special information of the event
- *
- * Calling this function, the completion call to all providers to get data and, if 
- * they return data, it shows the completion to the user. Use this function if
- * you want to show the popup with special parameters (position, filter, etc)
- * 
- */
-void 
-gsc_manager_trigger_event_with_opts(GscManager *completion, 
-				    const gchar *trigger_name,
-				    GscManagerEventOptions *options,
-				    gpointer event_data);
-
-/**
  * gsc_manager_set_current_info:
  * @self: The #GscManager
  * @info: Info markup to be shown into for current proposal.
@@ -307,28 +272,6 @@ gsc_manager_trigger_event_with_opts(GscManager *completion,
 void
 gsc_manager_set_current_info(GscManager *self,
 			     gchar *info);
-
-/**
- * gsc_manager_update_event_options:
- * @self: The #GscManager
- * @options: Options to tell the completion how it must to work.
- * 
- * Change the completion options if it is visible.
- */
-void
-gsc_manager_update_event_options(GscManager *self,
-				 GscManagerEventOptions *options);
-
-/**
- * gsc_manager_update_event_options:
- * @self: The #GscManager
- * @options: Options struct where the option will be set.
- * 
- * Sets the current event options 
- */
-void
-gsc_manager_get_current_event_options(GscManager *self,
-				      GscManagerEventOptions *options);
 
 G_END_DECLS
 

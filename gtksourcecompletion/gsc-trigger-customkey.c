@@ -36,7 +36,6 @@ struct _GscTriggerCustomkeyPrivate {
 	gchar *trigger_name;
 	guint key;
 	GdkModifierType mod;
-	GscManagerEventOptions *options;
 };
 
 #define GSC_TRIGGER_CUSTOMKEY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSC_TYPE_TRIGGER_CUSTOMKEY, GscTriggerCustomkeyPrivate))
@@ -66,13 +65,7 @@ _view_key_press_event_cb(GtkWidget *view,
 		if ((event->state & self->priv->mod) ==  self->priv->mod &&
 			gdk_keyval_to_lower(event->keyval) == key)
 		{
-			if (self->priv->options!=NULL)
-				gsc_manager_trigger_event_with_opts(completion,
-								    self->priv->trigger_name,
-								    self->priv->options,
-								    NULL);
-			else
-				gsc_manager_trigger_event(completion,self->priv->trigger_name,NULL);
+			gsc_manager_trigger_event(completion,self->priv->trigger_name,NULL);
 			return TRUE;
 		}
 		
@@ -134,7 +127,6 @@ gsc_trigger_customkey_init (GscTriggerCustomkey * self)
 {
 	self->priv = g_new0(GscTriggerCustomkeyPrivate, 1);
 	self->priv->trigger_name = NULL;
-	self->priv->options = NULL;
 }
 
 static void 
@@ -143,8 +135,6 @@ gsc_trigger_customkey_finalize(GObject *object)
 	GscTriggerCustomkey *self;
 	self = GSC_TRIGGER_CUSTOMKEY(object);
 	g_free(self->priv->trigger_name);
-	if (self->priv->options != NULL)
-		g_free(self->priv->options);
 
 	G_OBJECT_CLASS(gsc_trigger_customkey_parent_class)->finalize(object);
 }
@@ -214,12 +204,5 @@ gsc_trigger_customkey_new(GscManager *completion,
 	return self;
 }
 
-void
-gsc_trigger_customkey_set_opts(GscTriggerCustomkey *self,
-				GscManagerEventOptions *options)
-{
-	/*We must clone the data?*/
-	self->priv->options = options;
-}
 
 

@@ -25,33 +25,6 @@
 
 G_BEGIN_DECLS
 
-/**
- * GscPopupPositionType:
- * @GSC_POPUP_POSITION_CURSOR: Places the popup up/down the GtkTextView cursor
- * @GSC_POPUP_POSITION_CENTER_SCREEN: Places the popup centered in the screen
- * @GSC_POPUP_POSITION_CENTER_PARENT: Places the popup centered in the popup 
- * parent (the parent window)
- **/
-typedef enum{
-	GSC_POPUP_POSITION_CURSOR,
-	GSC_POPUP_POSITION_CENTER_SCREEN,
-	GSC_POPUP_POSITION_CENTER_PARENT
-}GscPopupPositionType;
-
-/**
- * GscPopupFilterType:
- * @GSC_POPUP_FILTER_NONE: Show the popup without the filter entry
- * @GSC_POPUP_FILTER_TREE: Show the popup with the filter entry visible
- * @GSC_POPUP_FILTER_TREE_HIDDEN: Doesn't show the popup but you can set the 
- * filter text and filter the contents without showing the filter entry.
- * and set the focus on this entry.
- **/
-typedef enum{
-	GSC_POPUP_FILTER_NONE,
-	GSC_POPUP_FILTER_TREE,
-	GSC_POPUP_FILTER_TREE_HIDDEN
-}GscPopupFilterType;
-
 typedef enum {
 	KEYS_INFO,
 	KEYS_PAGE_NEXT,
@@ -241,50 +214,6 @@ gsc_popup_set_current_info(GscPopup *self,
  */
 gint
 gsc_popup_get_num_active_pages(GscPopup *self);
-
-/**
- * gsc_popup_get_filter_widget:
- * @self: The #GscPopup
- *
- * This is the widget (Normally GtkEntry) where the user
- * write the filter. This function is used internally for the
- * completion components. You will not use this function, usually.
- *
- * Returns The internal filter widget
- */
-GtkWidget*
-gsc_popup_get_filter_widget(GscPopup *self);
-
-/**
- * gsc_popup_set_filter_type:
- * @self: The #GscPopup
- * @filter_type: The filter type
- *
- * Sets the current filter type to be used when the popup will
- * be shown.
- *
- */
-void
-gsc_popup_set_filter_type(GscPopup *self,
-			  GscPopupFilterType filter_type);
-
-GscPopupFilterType
-gsc_popup_get_filter_type(GscPopup *self);
-
-/**
- * gsc_popup_set_filter_text:
- * @self: The #GscPopup
- * @text: The filter text
- *
- * Sets the filter text. This function refilter the completion proposals
- *
- */
-void
-gsc_popup_set_filter_text(GscPopup *self,
-			  const gchar* text);
-
-const gchar* 
-gsc_popup_get_filter_text(GscPopup *self);
 
 /**
  * gsc_popup_set_key:
