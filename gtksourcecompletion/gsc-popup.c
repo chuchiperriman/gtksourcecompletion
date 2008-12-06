@@ -326,10 +326,6 @@ gsc_popup_show_or_update(GtkWidget *widget)
 	
 	/*Only show the popup, the positions is set before this function*/
 	GscPopup *self = GSC_POPUP(widget);
-	/*
-	gtk_window_set_transient_for(GTK_WINDOW(self),
-		parent);
-	*/
 	
 	_update_pages_visibility(self);
 	

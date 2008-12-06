@@ -1,7 +1,8 @@
 2008-12-06  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c: 
-	Cleaning up the code
+	 - Cleaning up the code
+	 - Added custom widget functionality.
 	* gtksourcecompletion/gsc-manager.c:
 	* gtksourcecompletion/gsc-manager.h:
 	* gtksourcecompletion/gsc-popup.c:

@@ -94,6 +94,8 @@ gsc_info_set_adjust_width(GscInfo* self,
 			  gboolean adjust,
 			  gint max_width);
 
+void gsc_info_set_custom(GscInfo* self, GtkWidget *custom_widget);
+
 G_END_DECLS
 
 #endif

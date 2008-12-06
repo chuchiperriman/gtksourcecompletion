@@ -238,6 +238,11 @@ create_info()
 	gsc_info_set_adjust_height(info,TRUE,-1);
 	gsc_info_set_adjust_width(info,TRUE,-1);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
+	GtkWidget *custom = gtk_text_view_new();
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom));
+	gtk_text_buffer_set_text(buffer,"asdasdfasdfad",-1);
+	gsc_info_set_custom(info, custom);
+	g_object_unref(custom);
 	return info;
 }
 
