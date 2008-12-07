@@ -145,16 +145,6 @@ _popup_proposal_select_cb(GtkWidget *popup,
 }
 
 static void
-_popup_display_info_cb(GtkWidget *popup,
-		      GscProposal *proposal,
-		      gpointer user_data)
-{
-	GscManager *self = GSC_MANAGER(user_data);
-	const gchar *info = gsc_proposal_get_info(proposal);
-	gsc_popup_set_current_info(self->priv->popup,(gchar*)info);
-}
-
-static void
 _popup_hide_cb(GtkWidget *widget,
 	       gpointer user_data)
 {
@@ -335,11 +325,6 @@ gsc_manager_init (GscManager *completion)
 	g_signal_connect(completion->priv->popup, 
 			 "proposal-selected",
 			 G_CALLBACK(_popup_proposal_select_cb),
-			 (gpointer) completion);
-			 
-	g_signal_connect(completion->priv->popup, 
-			 "display-info",
-			 G_CALLBACK(_popup_display_info_cb),
 			 (gpointer) completion);
 	
 	g_signal_connect(completion->priv->popup, 
@@ -788,7 +773,7 @@ gsc_manager_get_active_trigger(GscManager *completion)
 
 void
 gsc_manager_set_current_info(GscManager *self,
-					     gchar *info)
+			     gchar *info)
 {
 	gsc_popup_set_current_info(self->priv->popup,info);
 }

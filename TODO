@@ -13,16 +13,18 @@ GscInfo:
 [ ] Add movement functions (center screen, parent, mouse pointer etc.)
 [X] Implement adjust height (adjust window height to the content)
 [X] Implement adjust width (adjust window width to the content)
-[ ] Add bottom bar with extend buttom
+[X] Add bottom bar with extend buttom
 [X] Implement set_info_type with sort or extended
 [X] Add signal info-type-changed
-[ ] Add custom widget functionality
+[X] Add custom widget functionality
 
 GscPopup:
 ---------------
-[ ] Change the "display-info" signal and use a proposal function like apply
-[ ] Clean all filter and options features. 
+[X] Change the "display-info" signal. We must emit the signal but call to 
+    gsc_proposal_get_info by default (any connected function can return TRUE 
+    and we don't call to gsc_proposal_get_info)
+[X] Clean all filter and options features. 
 
 Bugs
 ---------------
-[ ] Fix focus problems on gnome (not in xfce)
+[X] Fix focus problems on gnome (not in xfce)

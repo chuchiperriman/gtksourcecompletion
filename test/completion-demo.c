@@ -59,6 +59,16 @@ void
 info_type_changed_cb(GscInfo *info, GscInfoType type, gpointer user_data)
 {
 	g_debug("type changed");
+	if (type == GSC_INFO_TYPE_EXTENDED)
+	{
+		gsc_info_set_markup(info,
+				    "tipo extended");
+	}
+	else
+	{
+		gsc_info_set_markup(info,
+				    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
+	}
 }
 
 gboolean query_tooltip_cb (GtkWidget  *widget,
@@ -134,15 +144,51 @@ key_press(GtkWidget   *widget,
 		else
 		{
 			if (cambio)
-				gsc_info_set_info_type(info,GSC_INFO_VIEW_SORT);
+				gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
 			else
-				gsc_info_set_info_type(info,GSC_INFO_VIEW_EXTENDED);
+				gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
 			cambio = !cambio;
+			/*
 			gsc_info_set_markup(info,
 					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
+			*/
+					    
+			GtkTextView *custom_view = GTK_TEXT_VIEW(gsc_info_get_custom(info));
+			GtkTextBuffer *custom_buffer = gtk_text_view_get_buffer(custom_view);
+			gtk_text_buffer_set_text(custom_buffer, gsc_gsv_get_text(GTK_TEXT_VIEW(view)),-1);
 			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
+			
 		}
+	}
+	else if (event->keyval == GDK_F5)
+	{
+		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
+		{
+			gtk_widget_hide(GTK_WIDGET(info));
+		}
+		else
+		{
+			if (cambio)
+				gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
+			else
+				gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
+			cambio = !cambio;
+			gsc_info_set_custom(info,NULL);
+			gsc_info_set_markup(info,
+					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
+			
+			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
+			gtk_widget_show(GTK_WIDGET(info));
+			
+		}
+	}
+	else if (event->keyval == GDK_F6)
+	{
+		if (gsc_info_get_info_type(info) == GSC_INFO_TYPE_SHORT)
+			gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
+		else
+			gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
 	}
 	
 	return FALSE;
@@ -242,6 +288,7 @@ create_info()
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom));
 	gtk_text_buffer_set_text(buffer,"asdasdfasdfad",-1);
 	gsc_info_set_custom(info, custom);
+	//gsc_info_set_bottom_bar_visible(info,FALSE);
 	g_object_unref(custom);
 	return info;
 }

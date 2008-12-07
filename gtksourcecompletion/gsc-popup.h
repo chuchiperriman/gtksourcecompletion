@@ -52,8 +52,8 @@ struct _GscPopupClass
 {
 	GtkWindowClass parent_class;
   
-	void (* proposal_selected)(GscPopup *popup,
-				   GscProposal *proposal);
+	void     (* proposal_selected)(GscPopup *popup, GscProposal *proposal);
+	gboolean (*display_info)      (GscPopup *popup, GscProposal *proposal);
 };
 
 struct _GscPopup

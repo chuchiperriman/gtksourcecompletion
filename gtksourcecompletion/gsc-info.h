@@ -39,8 +39,8 @@ typedef struct _GscInfoClass GscInfoClass;
 typedef struct _GscInfo GscInfo;
 
 typedef enum{
-	GSC_INFO_VIEW_SORT,
-	GSC_INFO_VIEW_EXTENDED
+	GSC_INFO_TYPE_SHORT,
+	GSC_INFO_TYPE_EXTENDED
 } GscInfoType;
 
 struct _GscInfoClass
@@ -72,6 +72,8 @@ void
 gsc_info_set_info_type(GscInfo* self,
 		       GscInfoType type);
 
+GscInfoType gsc_info_get_info_type(GscInfo* self);
+
 /**
  * gsc_info_set_adjust_height:
  * @self: The #GscInfo
@@ -95,6 +97,10 @@ gsc_info_set_adjust_width(GscInfo* self,
 			  gint max_width);
 
 void gsc_info_set_custom(GscInfo* self, GtkWidget *custom_widget);
+
+GtkWidget *gsc_info_get_custom(GscInfo* self);
+
+void gsc_info_set_bottom_bar_visible(GscInfo* self, gboolean visible);
 
 G_END_DECLS
 

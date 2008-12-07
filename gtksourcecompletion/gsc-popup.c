@@ -24,6 +24,7 @@
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
 #include "gsc-info.h"
+#include "gsc-marshal.h"
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
@@ -127,7 +128,8 @@ _show_completion_info(GscPopup *self)
 	GscProposal *proposal = NULL;
 	if (gsc_popup_get_selected_proposal(self,&proposal))
 	{
-		g_signal_emit_by_name (self, "display-info",proposal);
+		gboolean ret = TRUE;
+		g_signal_emit_by_name (self, "display-info",proposal,&ret);
 	}
 	gint y, x, sw, sh;
 	gtk_window_get_position(GTK_WINDOW(self),&x,&y);
@@ -221,6 +223,18 @@ _update_pages_visibility(GscPopup *self)
 		gtk_widget_hide(self->priv->next_page_icon);
 	
 	
+}
+
+static gboolean
+gsc_popup_display_info_default(GscPopup *self,
+			       GscProposal *proposal)
+{
+	if (proposal)
+	{
+		const gchar *info = gsc_proposal_get_info(proposal);
+		gsc_popup_set_current_info(self,(gchar*)info);
+	}
+	return FALSE;
 }
 
 gboolean
@@ -406,6 +420,7 @@ gsc_popup_class_init (GscPopupClass *klass)
 	widget_class->show = gsc_popup_show_or_update;
 	widget_class->hide = gsc_popup_hide;
 	widget_class->realize = gsc_popup_realize;
+	klass->display_info = gsc_popup_display_info_default;
 	
 	/**
 	 * GscPopup::proposal-selected:
@@ -436,12 +451,12 @@ gsc_popup_class_init (GscPopupClass *klass)
 	popup_signals[DISPLAY_INFO] =
 		g_signal_new ("display-info",
 			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      0,
-			      NULL, 
+			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+			      G_STRUCT_OFFSET (GscPopupClass, display_info),
+			      g_signal_accumulator_true_handled, 
 			      NULL,
-			      g_cclosure_marshal_VOID__POINTER, 
-			      G_TYPE_NONE,
+			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
+			      G_TYPE_BOOLEAN,
 			      1,
 			      GTK_TYPE_POINTER);
 }
@@ -535,12 +550,6 @@ gsc_popup_init (GscPopup *self)
 
 	/*Info window*/
 	self->priv->info_window = GTK_WIDGET(gsc_info_new());
-	/*
-	g_object_set(self->priv->info_window, 
-			     "can-focus", FALSE,
-			     "accept-focus", FALSE,
-			      NULL);
-	*/
 	/* Connect signals */
 	
 	g_signal_connect(completion_tree, 
