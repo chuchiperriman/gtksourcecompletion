@@ -49,16 +49,6 @@ enum
 	PROP_ICON
 };
 
-/* Signals */
-enum
-{
-	APPLY,
-	DISPLAY_INFO,
-	LAST_SIGNAL
-};
-
-static guint signals[LAST_SIGNAL] = { 0 };
-
 static gboolean
 gsc_proposal_apply_default (GscProposal *self,
 			    GtkTextView *view)
@@ -209,28 +199,6 @@ gsc_proposal_class_init (GscProposalClass *klass)
 							      _("Icon to be shown for this proposal"),
 							      _("Icon to be shown for this proposal"),
 							      G_PARAM_READWRITE));
-	
-	/* Proposal Signals */
-	/**
-	 * GscProposal::apply:
-	 * @proposal: The proposal who emits the signal
-	 * @view: The #GtkTextView where the proposal must be applied
-	 *
-	 * The ::apply signal is emitted when the proposal has been selected
-	 * and must to be applied.
-	 *
-	 **/
-	signals [APPLY] =
-		g_signal_new ("apply",
-			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
-			      G_STRUCT_OFFSET (GscProposalClass, apply),
-			      g_signal_accumulator_true_handled,
-			      NULL,
-			      gtksourcecompletion_marshal_BOOLEAN__POINTER,
-			      G_TYPE_BOOLEAN,
-			      1,
-			      GTK_TYPE_POINTER);
 }
 
 /**
@@ -241,7 +209,7 @@ gsc_proposal_class_init (GscProposalClass *klass)
  *
  * This function creates a new #GscProposal. By default, when the user selects 
  * the proposal, the proposal label will be inserted into the GtkTextView.
- * You can connect to apply and disply-info signals to overwrite the default functions.
+ * You can overwrite the apply and disply-info functions to overwrite the default.
  *
  * Returns: A new #GscProposal
  */
@@ -343,14 +311,14 @@ gsc_proposal_get_page_name (GscProposal *self)
  * The completion calls this function when the user wants to see the proposal info.
  * You can overwrite this function if you need to change the default mechanism.
  *
- * Returns: The proposal info markup asigned for this proposal.
+ * Returns: The proposal info markup asigned for this proposal or NULL;
  */
 const gchar* 
 gsc_proposal_get_info (GscProposal *self)
 {
 	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
 
-	return self->priv->info;
+	return GSC_PROPOSAL_GET_CLASS(self)->get_info (self);
 }
 
 /**
@@ -358,22 +326,17 @@ gsc_proposal_get_info (GscProposal *self)
  * @proposal: a #GscProposal
  * @view: The #GtkTextView
  * 
- * The completion calls this function when the user selects the proposal. This 
- * function emits the "apply" signal. The default handler insert the proposal 
- * label into the view. You can overwrite this signal.
+ * The completion calls this function when the user selects the proposal. 
+ * The default handler insert the proposal label into the view. 
+ * You can overwrite this function.
  *
- */
-/*
- * FIXME: why the proposal has to emit a signal when it is selected?
- * the GtkTreeSelection should be in charge of this.
  */
 void
 gsc_proposal_apply (GscProposal *self,
 		    GtkTextView *view)
 {
 	g_return_if_fail (GSC_IS_PROPOSAL (self));
-
-	gboolean ret = TRUE;
-	g_signal_emit_by_name (self, "apply", view, &ret);
+	
+	GSC_PROPOSAL_GET_CLASS(self)->apply (self, view);
 }
 
