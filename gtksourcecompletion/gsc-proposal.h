@@ -34,113 +34,46 @@ G_BEGIN_DECLS
 #define GSC_IS_PROPOSAL_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_PROPOSAL))
 #define GSC_PROPOSAL_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_PROPOSAL, GscProposalClass))
 
-#define GSC_PROPOSAL_DEFAULT_PAGE "Default"
-#define GSC_PROPOSAL_DEFAULT_PRIORITY 10
-
 typedef struct _GscProposalPrivate GscProposalPrivate;
 typedef struct _GscProposalClass GscProposalClass;
 typedef struct _GscProposal GscProposal;
+
+struct _GscProposal
+{
+	GObject parent_instance;
+	
+	GscProposalPrivate *priv;
+};
 
 struct _GscProposalClass
 {
 	GObjectClass parent_class;
 	
-	gboolean (*apply) (GscProposal *proposal,
-			   GtkTextView *view);
+	gboolean     (*apply)    (GscProposal *proposal,
+				  GtkTextView *view);
 	const gchar* (*get_info) (GscProposal *proposal);
 };
 
-struct _GscProposal
-{
-	GObject parent_instance;
-	GscProposalPrivate *priv;
-};
+GType			 gsc_proposal_get_type		(void) G_GNUC_CONST;
 
-GType 
-gsc_proposal_get_type (void) G_GNUC_CONST;
+GscProposal		*gsc_proposal_new		(const gchar *label,
+							 const gchar *info,
+							 const GdkPixbuf *icon);
 
-/**
- * gsc_proposal_new:
- * @label: Item label that will be shown in the completion popup. 
- * We copy this string
- * @info: Item info markup that will be shown when the user select to view the item info.
- * We copy this string
- * @icon: Item icon that will be shown in the completion popup
- *
- * This function creates a new proposal. By default, when the user selects the proposal, the 
- * proposal label will be inserted into the GtkTextView. You can connect to apply
- * and disply-info signals to overwrite the default functions
- *
- * Returns The new GscProposal
- */
-GscProposal*
-gsc_proposal_new(const gchar *label,
-		const gchar *info,
-		const GdkPixbuf *icon);
+const gchar		*gsc_proposal_get_label		(GscProposal *proposal);
 
-/**
- * gsc_proposal_get_label:
- * @proposal: The GscProposal
- *
- * Returns The proposal label that will be shown into the popup
- */
-const gchar*
-gsc_proposal_get_label(GscProposal *proposal);
+const GdkPixbuf		*gsc_proposal_get_icon		(GscProposal *proposal);
 
-/**
- * gsc_proposal_get_icon:
- * @proposal: The GscProposal
- *
- * Returns the icon of this proposal that will be shown into the popup
- */
-const GdkPixbuf*
-gsc_proposal_get_icon(GscProposal *proposal);
 
-/**
- * gsc_proposal_set_page_name:
- * @proposal: The GscProposal
- * @page_name: The page name where this proposal will be shown. If NULL the 
- * default page will be used.
- *
- */
-void
-gsc_proposal_set_page_name(GscProposal *self,
-			   const gchar *page_name);
-					     
-/**
- * gsc_proposal_get_page_name:
- * @proposal: The GscProposal
- *
- * Returns the page name where the proposal will be placed.
- */
-const gchar*
-gsc_proposal_get_page_name(GscProposal *proposal);
+void			 gsc_proposal_set_page_name	(GscProposal *self,
+							 const gchar *page_name);
 
-/**
- * gsc_proposal_get_info:
- * @proposal: The GscProposal
- *
- * Returns The proposal info markup asigned for this proposal.
- * The completion calls this function when the user want to view the proposal info.
- * You can overwrite this function if you need to change the default mechanism
- *
- */
-const gchar* 
-gsc_proposal_get_info(GscProposal *proposal);
+const gchar		*gsc_proposal_get_page_name	(GscProposal *proposal);
 
-/**
- * gsc_proposal_apply:
- * @proposal: The #GscProposal
- * @view: The #GtkTextView
- * 
- * The completion calls this function when the user selects the proposal. This 
- * function emits the "apply" signal. The default handler insert the proposal 
- * label into the view. You can overwrite this signal.
- *
- */
-void
-gsc_proposal_apply(GscProposal *proposal,
-		   GtkTextView *view);
+const gchar		*gsc_proposal_get_info		(GscProposal *proposal);
+
+void			 gsc_proposal_apply		(GscProposal *proposal,
+							 GtkTextView *view);
 
 G_END_DECLS
 

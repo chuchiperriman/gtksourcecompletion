@@ -1,5 +1,11 @@
 2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-proposal.c:
+	* gtksourcecompletion/gsc-proposal.h:
+	Use the right coding style.
+
+2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-popup.c:
 	* gtksourcecompletion/gsc-popup.h:
 	Use the right coding style.

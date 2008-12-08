@@ -24,46 +24,52 @@
 #include "gsc-marshal.h"
 #include "gsc-i18n.h"
 
-/* Signals */
-enum {
-	APPLY,
-	DISPLAY_INFO,
-	LAST_SIGNAL
-};
+#define GSC_PROPOSAL_DEFAULT_PAGE _("Default")
+#define GSC_PROPOSAL_DEFAULT_PRIORITY 10
 
-/* Properties */
-enum {
-	PROP_0,
-	PROP_LABEL,
-	PROP_INFO,
-	PROP_ICON
-};
+#define GSC_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), \
+					 GSC_TYPE_PROPOSAL, GscProposalPrivate))
+
+G_DEFINE_TYPE(GscProposal, gsc_proposal, G_TYPE_OBJECT);
 
 struct _GscProposalPrivate
 {
 	gchar *label;
 	gchar *info;
 	const GdkPixbuf *icon;
-	const gchar *page_name;
+	gchar *page_name;
 };
 
-static GObjectClass* parent_class = NULL;
+/* Properties */
+enum
+{
+	PROP_0,
+	PROP_LABEL,
+	PROP_INFO,
+	PROP_ICON
+};
 
-#define GSC_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_PROPOSAL, GscProposalPrivate))
+/* Signals */
+enum
+{
+	APPLY,
+	DISPLAY_INFO,
+	LAST_SIGNAL
+};
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static gboolean
-gsc_proposal_apply_default(GscProposal *self,
-			   GtkTextView *view)
+gsc_proposal_apply_default (GscProposal *self,
+			    GtkTextView *view)
 {
-	gsc_replace_actual_word(view,
-				self->priv->label);
+	gsc_replace_actual_word (view,
+				 self->priv->label);
 	return FALSE;
 }
 
 static const gchar*
-gsc_proposal_get_info_default(GscProposal *self)
+gsc_proposal_get_info_default (GscProposal *self)
 {
 	return self->priv->info;
 }
@@ -71,49 +77,51 @@ gsc_proposal_get_info_default(GscProposal *self)
 static void
 gsc_proposal_init (GscProposal *self)
 {
-	self->priv = GSC_PROPOSAL_GET_PRIVATE(self);
+	self->priv = GSC_PROPOSAL_GET_PRIVATE (self);
 	
 	self->priv->label = NULL;
 	self->priv->info = NULL;
 	self->priv->icon = NULL;
-	self->priv->page_name = GSC_PROPOSAL_DEFAULT_PAGE;
+	self->priv->page_name = g_strdup (GSC_PROPOSAL_DEFAULT_PAGE);
 }
 
 static void
 gsc_proposal_finalize (GObject *object)
 {
-	GscProposal *self = GSC_PROPOSAL(object);
-	g_free(self->priv->label);
-	g_free(self->priv->info);
+	GscProposal *self = GSC_PROPOSAL (object);
 	
-	G_OBJECT_CLASS (parent_class)->finalize (object);
+	g_free (self->priv->label);
+	g_free (self->priv->info);
+	g_free (self->priv->page_name);
+	
+	G_OBJECT_CLASS (gsc_proposal_parent_class)->finalize (object);
 }
 
 static void
 gsc_proposal_get_property (GObject    *object,
-				    guint       prop_id,
-				    GValue     *value,
-				    GParamSpec *pspec)
+			   guint       prop_id,
+			   GValue     *value,
+			   GParamSpec *pspec)
 {
 	GscProposal *self;
 
 	g_return_if_fail (GSC_IS_PROPOSAL (object));
 
-	self = GSC_PROPOSAL(object);
+	self = GSC_PROPOSAL (object);
 
 	switch (prop_id)
 	{
 			
 		case PROP_LABEL:
-			g_value_set_string(value,self->priv->label);
+			g_value_set_string (value,self->priv->label);
 			break;
 		case PROP_INFO:
-			g_value_set_string(value,
-					   self->priv->info);
+			g_value_set_string (value,
+					    self->priv->info);
 			break;
 		case PROP_ICON:
-			g_value_set_pointer(value,
-					   (gpointer)self->priv->icon);
+			g_value_set_pointer (value,
+					     (gpointer)self->priv->icon);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -123,26 +131,26 @@ gsc_proposal_get_property (GObject    *object,
 
 static void
 gsc_proposal_set_property (GObject      *object,
-					    guint         prop_id,
-					    const GValue *value,
-					    GParamSpec   *pspec)
+			   guint         prop_id,
+			   const GValue *value,
+			   GParamSpec   *pspec)
 {
 	GscProposal *self;
 
 	g_return_if_fail (GSC_IS_PROPOSAL (object));
 
-	self = GSC_PROPOSAL(object);
+	self = GSC_PROPOSAL (object);
 
 	switch (prop_id)
 	{
 		case PROP_LABEL:
-			self->priv->label = g_value_dup_string(value);
+			self->priv->label = g_value_dup_string (value);
 			break;
 		case PROP_INFO:
-			self->priv->info = g_value_dup_string(value);
+			self->priv->info = g_value_dup_string (value);
 			break;
 		case PROP_ICON:
-			self->priv->icon = (GdkPixbuf*)g_value_get_pointer(value);
+			self->priv->icon = (GdkPixbuf*)g_value_get_pointer (value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -154,13 +162,12 @@ static void
 gsc_proposal_class_init (GscProposalClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-	parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
 
 	object_class->get_property = gsc_proposal_get_property;
 	object_class->set_property = gsc_proposal_set_property;
 	object_class->finalize = gsc_proposal_finalize;
 
-	g_type_class_add_private (object_class, sizeof(GscProposalPrivate));
+	g_type_class_add_private (object_class, sizeof (GscProposalPrivate));
 	
 	klass->apply = gsc_proposal_apply_default;
 	klass->get_info = gsc_proposal_get_info_default;
@@ -226,82 +233,146 @@ gsc_proposal_class_init (GscProposalClass *klass)
 			      GTK_TYPE_POINTER);
 }
 
-GType
-gsc_proposal_get_type (void)
-{
-	static GType our_type = 0;
-
-	if(our_type == 0)
-	{
-		static const GTypeInfo our_info =
-		{
-			sizeof (GscProposalClass), /* class_size */
-			(GBaseInitFunc) NULL, /* base_init */
-			(GBaseFinalizeFunc) NULL, /* base_finalize */
-			(GClassInitFunc) gsc_proposal_class_init, /* class_init */
-			(GClassFinalizeFunc) NULL, /* class_finalize */
-			NULL /* class_data */,
-			sizeof (GscProposal), /* instance_size */
-			0, /* n_preallocs */
-			(GInstanceInitFunc) gsc_proposal_init, /* instance_init */
-			NULL /* value_table */  
-		};
-		our_type = g_type_register_static (G_TYPE_OBJECT, "GscProposal",
-		                                   &our_info, 0);
-	}
-
-	return our_type;
-}
-
+/**
+ * gsc_proposal_new:
+ * @label: Item label that will be shown in the completion popup. 
+ * @info: Item info markup that will be shown when the user select to view the item info.
+ * @icon: Item icon that will be shown in the completion popup
+ *
+ * This function creates a new #GscProposal. By default, when the user selects 
+ * the proposal, the proposal label will be inserted into the GtkTextView.
+ * You can connect to apply and disply-info signals to overwrite the default functions.
+ *
+ * Returns: A new #GscProposal
+ */
 GscProposal*
-gsc_proposal_new(const gchar *label,
-		 const gchar *info,
-		 const GdkPixbuf *icon)
+gsc_proposal_new (const gchar *label,
+		  const gchar *info,
+		  const GdkPixbuf *icon)
 {
-	GscProposal *self = 
-		GSC_PROPOSAL(g_object_new (GSC_TYPE_PROPOSAL, NULL));
-	self->priv->label = g_strdup(label);
-	self->priv->info = g_strdup(info);
+	GscProposal *self;
+	
+	self = GSC_PROPOSAL (g_object_new (GSC_TYPE_PROPOSAL, NULL));
+	
+	self->priv->label = g_strdup (label);
+	self->priv->info = g_strdup (info);
+	/*
+	 * FIXME: shouldn't we ref the pixbuf?
+	 */
 	self->priv->icon = icon;
-		
+	
 	return self;
 }
 
+/**
+ * gsc_proposal_get_label:
+ * @proposal: a #GscProposal
+ *
+ * Returns: The proposal label that will be shown into the popup
+ */
 const gchar*
-gsc_proposal_get_label(GscProposal *self)
+gsc_proposal_get_label (GscProposal *self)
 {
+	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	
 	return self->priv->label;
 }
 
+/**
+ * gsc_proposal_get_icon:
+ * @proposal: a #GscProposal
+ *
+ * Gets the icon of this @proposal that will be shown into the popup.
+ *
+ * Returns: the icon of this @proposal that will be shown into the popup
+ */
 const GdkPixbuf*
-gsc_proposal_get_icon(GscProposal *self)
+gsc_proposal_get_icon (GscProposal *self)
 {
+	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+
 	return self->priv->icon;
 }
 
+/**
+ * gsc_proposal_set_page_name:
+ * @proposal: a #GscProposal
+ * @page_name: The name for the page
+ *
+ * Sets the name of the page where this proposal will be shown.
+ * If @page_name is %NULL the default page will be used.
+ */
 void
-gsc_proposal_set_page_name(GscProposal *self,
-					     const gchar *page_name)
+gsc_proposal_set_page_name (GscProposal *self,
+			    const gchar *page_name)
 {
-	self->priv->page_name = page_name;
+	g_return_if_fail (GSC_IS_PROPOSAL (self));
+
+	g_free (self->priv->page_name);
+	
+	if (page_name == NULL)
+	{
+		self->priv->page_name = g_strdup (GSC_PROPOSAL_DEFAULT_PAGE);
+	}
+	else
+	{
+		self->priv->page_name = g_strdup (page_name);
+	}
 }
 
+/**
+ * gsc_proposal_get_page_name:
+ * @proposal: a #GscProposal
+ *
+ * Gets the page name where the @proposal will be placed.
+ *
+ * Returns: the page name where the @proposal will be placed.
+ */
 const gchar*
-gsc_proposal_get_page_name(GscProposal *self)
+gsc_proposal_get_page_name (GscProposal *self)
 {
+	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	
 	return self->priv->page_name;
 }
 
+/**
+ * gsc_proposal_get_info:
+ * @proposal: a #GscProposal
+ *
+ * The completion calls this function when the user wants to see the proposal info.
+ * You can overwrite this function if you need to change the default mechanism.
+ *
+ * Returns: The proposal info markup asigned for this proposal.
+ */
 const gchar* 
-gsc_proposal_get_info(GscProposal *self)
+gsc_proposal_get_info (GscProposal *self)
 {
+	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+
 	return self->priv->info;
 }
 
+/**
+ * gsc_proposal_apply:
+ * @proposal: a #GscProposal
+ * @view: The #GtkTextView
+ * 
+ * The completion calls this function when the user selects the proposal. This 
+ * function emits the "apply" signal. The default handler insert the proposal 
+ * label into the view. You can overwrite this signal.
+ *
+ */
+/*
+ * FIXME: why the proposal has to emit a signal when it is selected?
+ * the GtkTreeSelection should be in charge of this.
+ */
 void
-gsc_proposal_apply(GscProposal *self,
-		   GtkTextView *view)
+gsc_proposal_apply (GscProposal *self,
+		    GtkTextView *view)
 {
+	g_return_if_fail (GSC_IS_PROPOSAL (self));
+
 	gboolean ret = TRUE;
 	g_signal_emit_by_name (self, "apply", view, &ret);
 }
