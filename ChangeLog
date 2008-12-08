@@ -1,5 +1,10 @@
 2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-manager.c:
+	Now hides the popup when you press Escape.
+
+2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-trigger-customkey.c:
 	* gtksourcecompletion/gsc-trigger-customkey.c:
 	Use the right coding style.

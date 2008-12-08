@@ -513,7 +513,7 @@ gsc_manager_manage_key (GscManager *self,
  	{
 		case GDK_Escape:
 		{
-			gtk_widget_hide (GTK_WIDGET (self));
+			gtk_widget_hide (GTK_WIDGET (self->priv->popup));
 			catched = TRUE;
 			ret = TRUE;
 			break;
