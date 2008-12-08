@@ -1,4 +1,4 @@
-TODO (last update: 2008-12-08)
+TODO (last update: 2008-12-09)
 =================================
 
 [X] Try to separe GscPopup and GtkTextView. Remove the GtkTextView dependency 
@@ -12,8 +12,9 @@ TODO (last update: 2008-12-08)
 [ ] Support to set the focus on the popup and info windows.
 [ ] Clean FIXME on trigger-autowords.
 [X] Delete "apply" signal from GscProposal.
-[ ] Remove all g_object_set_property. Use g_object_set instead
-[ ] In gsc-manager use self instead of completion
+[X] Remove all g_object_set_property. Use g_object_set instead
+[X] In gsc-manager use self instead of completion
+[ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
 
 GscInfo:
 ----------------
@@ -38,3 +39,4 @@ GscPopup:
 Bugs
 ---------------
 [X] Fix focus problems on gnome (not in xfce)
+

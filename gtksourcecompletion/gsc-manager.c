@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gtksourcecompletion.c
+ *  gsc-manager.c
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -85,6 +85,9 @@ static GObjectClass* parent_class = NULL;
  * We save a map with a GtkTextView and his GscManager. If you 
  * call twice to gsc_proposal_new, the second time it returns
  * the previous created GscManager, not creates a new one
+ *
+ * FIXME We will remove this functions when we will integrate 
+ * Gsc in GtkSourceView
  */
 
 static GHashTable *completion_map = NULL;
@@ -120,15 +123,15 @@ _prov_list_free(gpointer prov_list)
 }
 
 static void
-end_completion (GscManager *completion)
+end_completion (GscManager *self)
 {
-	if (GTK_WIDGET_VISIBLE(completion->priv->popup))
+	if (GTK_WIDGET_VISIBLE(self->priv->popup))
 	{
-		gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
+		gtk_widget_hide(GTK_WIDGET(self->priv->popup));
 	}
 	else
 	{
-		GList *providers = completion->priv->providers;
+		GList *providers = self->priv->providers;
 		do
 		{
 			GscProvider *provider =  GSC_PROVIDER(providers->data);
@@ -136,7 +139,7 @@ end_completion (GscManager *completion)
 			
 		}while((providers = g_list_next(providers)) != NULL);
 	
-		completion->priv->active_trigger = NULL;
+		self->priv->active_trigger = NULL;
 	}
 }
 
@@ -145,9 +148,9 @@ _popup_proposal_select_cb(GtkWidget *popup,
 		      GscProposal *proposal,
 		      gpointer user_data)
 {
-	GscManager *completion = GSC_MANAGER(user_data);
-	gsc_proposal_apply(proposal,completion->priv->text_view);
-	end_completion (completion);
+	GscManager *self = GSC_MANAGER(user_data);
+	gsc_proposal_apply(proposal,self->priv->text_view);
+	end_completion (self);
 }
 
 static void
@@ -162,8 +165,8 @@ static void
 view_destroy_event_cb(GtkWidget *widget,
 		      gpointer user_data)
 {
-	GscManager *completion = GSC_MANAGER(user_data);
-	g_object_unref(completion);
+	GscManager *self = GSC_MANAGER(user_data);
+	g_object_unref(self);
 }
 
 static gboolean
@@ -171,9 +174,9 @@ view_focus_out_event_cb(GtkWidget *widget,
 			GdkEventFocus *event,
 			gpointer user_data)
 {
-	GscManager *completion = GSC_MANAGER(user_data);
-	if (gsc_manager_is_visible(completion) && GTK_WIDGET_HAS_FOCUS(completion->priv->popup))
-		end_completion(completion);
+	GscManager *self = GSC_MANAGER(user_data);
+	if (gsc_manager_is_visible(self) && GTK_WIDGET_HAS_FOCUS(self->priv->popup))
+		end_completion(self);
 	return FALSE;
 }
 
@@ -182,9 +185,9 @@ view_button_press_event_cb(GtkWidget *widget,
 			   GdkEventButton *event,
 			   gpointer user_data)
 {
-	GscManager *completion = GSC_MANAGER(user_data);
-	if (gsc_manager_is_visible(completion))
-		end_completion(completion);
+	GscManager *self = GSC_MANAGER(user_data);
+	if (gsc_manager_is_visible(self))
+		end_completion(self);
 	return FALSE;
 }
 
@@ -290,7 +293,7 @@ gsc_manager_get_property (GObject    *object,
 }
 
 static void
-gsc_manager_init (GscManager *completion)
+gsc_manager_init (GscManager *self)
 {
 	if (!lib_initialized)
 	{
@@ -299,54 +302,54 @@ gsc_manager_init (GscManager *completion)
 		lib_initialized = TRUE;
 	}
 	gint i;
-	completion->priv = GSC_MANAGER_GET_PRIVATE(completion);
+	self->priv = GSC_MANAGER_GET_PRIVATE(self);
 	
-	completion->priv->active = FALSE;
-	completion->priv->providers = NULL;
-	completion->priv->triggers = NULL;
-	completion->priv->popup = NULL;
-	completion->priv->active_trigger = NULL;
-	completion->priv->trig_prov = g_hash_table_new_full(g_str_hash,
+	self->priv->active = FALSE;
+	self->priv->providers = NULL;
+	self->priv->triggers = NULL;
+	self->priv->popup = NULL;
+	self->priv->active_trigger = NULL;
+	self->priv->trig_prov = g_hash_table_new_full(g_str_hash,
 							    g_str_equal,
 							    g_free,
 							    (GDestroyNotify)_prov_list_free);
 
-	gsc_manager_set_key (completion, KEYS_INFO,DEFAULT_INFO_KEYS);
-	gsc_manager_set_key (completion, KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
-	gsc_manager_set_key (completion, KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
+	gsc_manager_set_key (self, KEYS_INFO,DEFAULT_INFO_KEYS);
+	gsc_manager_set_key (self, KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
+	gsc_manager_set_key (self, KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
 
-	completion->priv->popup = GSC_POPUP(gsc_popup_new());
+	self->priv->popup = GSC_POPUP(gsc_popup_new());
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
-		completion->priv->internal_signal_ids[i] = 0;
+		self->priv->internal_signal_ids[i] = 0;
 	}
 	
-	g_signal_connect(completion->priv->popup, 
+	g_signal_connect(self->priv->popup, 
 			 "proposal-selected",
 			 G_CALLBACK(_popup_proposal_select_cb),
-			 (gpointer) completion);
+			 (gpointer) self);
 	
-	g_signal_connect(completion->priv->popup, 
+	g_signal_connect(self->priv->popup, 
 			 "hide",
 			 G_CALLBACK(_popup_hide_cb),
-			 (gpointer) completion);
+			 (gpointer) self);
 }
 
 static void
 gsc_manager_finalize (GObject *object)
 {
-	GscManager *completion = GSC_MANAGER(object);
-	if (completion->priv->active)
-		gsc_manager_deactivate(completion);
+	GscManager *self = GSC_MANAGER(object);
+	if (self->priv->active)
+		gsc_manager_deactivate(self);
 	
-	gtk_widget_destroy(GTK_WIDGET(completion->priv->popup));
+	gtk_widget_destroy(GTK_WIDGET(self->priv->popup));
 
-	free_provider_list(completion->priv->providers);
-	free_trigger_list(completion->priv->triggers);
-	g_hash_table_destroy(completion->priv->trig_prov);
+	free_provider_list(self->priv->providers);
+	free_trigger_list(self->priv->triggers);
+	g_hash_table_destroy(self->priv->trig_prov);
 
-	completion_control_remove_completion(completion->priv->text_view);
+	completion_control_remove_completion(self->priv->text_view);
 
 }
 
@@ -434,18 +437,18 @@ gsc_manager_new (GtkTextView *view)
 {
 	g_assert(view!=NULL);
 	
-	GscManager *completion = completion_control_get_completion(view);
-	if (completion !=NULL)
+	GscManager *self = completion_control_get_completion(view);
+	if (self !=NULL)
 	{
-		return completion;
+		return self;
 	}
 
-	completion = GSC_MANAGER (g_object_new (GSC_TYPE_MANAGER, NULL));
-	completion->priv->text_view = view;
+	self = GSC_MANAGER (g_object_new (GSC_TYPE_MANAGER, NULL));
+	self->priv->text_view = view;
 	
-	completion_control_add_completion(view,completion);
+	completion_control_add_completion(view,self);
 	
-	return completion;
+	return self;
 }
 
 /**
@@ -594,50 +597,50 @@ gsc_manager_manage_key (GscManager *self,
 }
 
 gboolean
-gsc_manager_register_provider(GscManager *completion,
+gsc_manager_register_provider(GscManager *self,
 					GscProvider *provider,
 					const gchar *trigger_name)
 {
     
-	GscTrigger *trigger = gsc_manager_get_trigger(completion,trigger_name);
+	GscTrigger *trigger = gsc_manager_get_trigger(self,trigger_name);
 	if (trigger==NULL) return FALSE;
-	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	ProviderList *pl = g_hash_table_lookup(self->priv->trig_prov,trigger_name);
 	g_assert(pl!=NULL);
 	pl->prov_list = g_list_append(pl->prov_list,provider);
 	GscProvider *prov = gsc_manager_get_provider(
-			completion,gsc_provider_get_name(provider));
+			self,gsc_provider_get_name(provider));
 	if (prov!=NULL) return FALSE;
-	completion->priv->providers = g_list_append(completion->priv->providers,provider);
+	self->priv->providers = g_list_append(self->priv->providers,provider);
 	g_object_ref(provider);
     
 	return TRUE;
 }
 
 gboolean
-gsc_manager_unregister_provider(GscManager *completion,
+gsc_manager_unregister_provider(GscManager *self,
 					GscProvider *provider,
 					const gchar *trigger_name)
 {
-	g_return_val_if_fail(g_list_find(completion->priv->providers, provider) != NULL,FALSE);
-	GscTrigger *trigger = gsc_manager_get_trigger(completion,trigger_name);
+	g_return_val_if_fail(g_list_find(self->priv->providers, provider) != NULL,FALSE);
+	GscTrigger *trigger = gsc_manager_get_trigger(self,trigger_name);
 	if (trigger==NULL) return FALSE;
-	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	ProviderList *pl = g_hash_table_lookup(self->priv->trig_prov,trigger_name);
 	g_assert(pl!=NULL);
 	pl->prov_list = g_list_remove(pl->prov_list,provider);
 	
-	completion->priv->providers = g_list_remove(completion->priv->providers, provider);
+	self->priv->providers = g_list_remove(self->priv->providers, provider);
 	g_object_unref(provider);
 	return TRUE;
 }
 
 GtkTextView*
-gsc_manager_get_view(GscManager *completion)
+gsc_manager_get_view(GscManager *self)
 {
-	return completion->priv->text_view;
+	return self->priv->text_view;
 }
 
 void
-gsc_manager_trigger_event(GscManager *completion, 
+gsc_manager_trigger_event(GscManager *self, 
 				    const gchar *trigger_name,
 				    gpointer event_data)
 {
@@ -650,26 +653,26 @@ gsc_manager_trigger_event(GscManager *completion,
 	gint proposals = 0;
 	GscProposal *last_proposal = NULL;
 
-	trigger = gsc_manager_get_trigger(completion,trigger_name);
+	trigger = gsc_manager_get_trigger(self,trigger_name);
 	g_return_if_fail(trigger!=NULL);
 	
-	if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+	if (!GTK_WIDGET_HAS_FOCUS(self->priv->text_view))
 		return;
 		
 	/*
 	 * If the completion is visble and there is a trigger active, you cannot
 	 * raise a different trigger until the current trigger finish
 	 */
-	if (gsc_manager_is_visible(completion) && completion->priv->active_trigger != trigger)
+	if (gsc_manager_is_visible(self) && self->priv->active_trigger != trigger)
 	{
 		return;
 	}
 	
-	gsc_popup_clear(completion->priv->popup);
+	gsc_popup_clear(self->priv->popup);
 	
-	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	ProviderList *pl = g_hash_table_lookup(self->priv->trig_prov,trigger_name);
 	if (pl==NULL) return;
-	/*providers_list = completion->priv->providers;*/
+	/*providers_list = self->priv->providers;*/
 	providers_list = pl->prov_list;
 	
 	if (providers_list != NULL)
@@ -698,7 +701,7 @@ gsc_manager_trigger_event(GscManager *completion,
 			do
 			{
 				last_proposal = (GscProposal*)data_list->data;
-				gsc_popup_add_data(completion->priv->popup,
+				gsc_popup_add_data(self->priv->popup,
 						   last_proposal);
 				++proposals;
 				
@@ -707,38 +710,38 @@ gsc_manager_trigger_event(GscManager *completion,
 			/* If there are not proposals, we don't show the popup */
 			if (proposals > 0)
 			{
-				if (!GTK_WIDGET_HAS_FOCUS(completion->priv->text_view))
+				if (!GTK_WIDGET_HAS_FOCUS(self->priv->text_view))
 					return;
 
 				gint x, y;
-				gsc_get_window_position_in_cursor(GTK_WINDOW(completion->priv->popup),completion->priv->text_view,&x,&y);
-				gtk_window_move(GTK_WINDOW(completion->priv->popup), x, y);
-				gsc_popup_show_or_update(GTK_WIDGET(completion->priv->popup));
+				gsc_get_window_position_in_cursor(GTK_WINDOW(self->priv->popup),self->priv->text_view,&x,&y);
+				gtk_window_move(GTK_WINDOW(self->priv->popup), x, y);
+				gsc_popup_show_or_update(GTK_WIDGET(self->priv->popup));
 
 				/*Set the focus to the View, not the completion popup*/
-				GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(completion->priv->text_view),GTK_TYPE_WINDOW));
+				GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self->priv->text_view),GTK_TYPE_WINDOW));
 				gtk_window_present(win);
-				gtk_widget_grab_focus(GTK_WIDGET(completion->priv->text_view));
+				gtk_widget_grab_focus(GTK_WIDGET(self->priv->text_view));
 
-				completion->priv->active_trigger = trigger;
+				self->priv->active_trigger = trigger;
 			}
-			else if (GTK_WIDGET_VISIBLE(completion->priv->popup))
-				end_completion (completion);
+			else if (GTK_WIDGET_VISIBLE(self->priv->popup))
+				end_completion (self);
 		}
-		else if (gsc_manager_is_visible(completion))
-			end_completion (completion);
+		else if (gsc_manager_is_visible(self))
+			end_completion (self);
 	}
 	else
 	{
-		if (gsc_manager_is_visible(completion))
-			end_completion (completion);
+		if (gsc_manager_is_visible(self))
+			end_completion (self);
 	}
 }
 
 gboolean
-gsc_manager_is_visible(GscManager *completion)
+gsc_manager_is_visible(GscManager *self)
 {
-	return GTK_WIDGET_VISIBLE(completion->priv->popup);
+	return GTK_WIDGET_VISIBLE(self->priv->popup);
 }
 
 GscManager*
@@ -748,10 +751,10 @@ gsc_manager_get_from_view(GtkTextView *view)
 }
 
 GscProvider*
-gsc_manager_get_provider(GscManager *completion,
+gsc_manager_get_provider(GscManager *self,
 				   const gchar* provider_name)
 {
-	GList *plist = completion->priv->providers;
+	GList *plist = self->priv->providers;
 	GscProvider *provider;	
 	if (plist != NULL)
 	{
@@ -768,21 +771,21 @@ gsc_manager_get_provider(GscManager *completion,
 }
 
 void
-gsc_manager_register_trigger(GscManager *completion,
+gsc_manager_register_trigger(GscManager *self,
 					GscTrigger *trigger)
 {
     const gchar* trigger_name = gsc_trigger_get_name(trigger);
-	ProviderList *pl = g_hash_table_lookup(completion->priv->trig_prov,trigger_name);
+	ProviderList *pl = g_hash_table_lookup(self->priv->trig_prov,trigger_name);
     /*Only register the trigger if it has not been registered yet*/
     if (pl==NULL)
     {
-    	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
+    	self->priv->triggers = g_list_append(self->priv->triggers,trigger);
     	g_object_ref(trigger);
     	const gchar *tn = gsc_trigger_get_name(trigger);
         ProviderList *pl = g_malloc0(sizeof(ProviderList));
         pl->prov_list = NULL;
-    	g_hash_table_insert(completion->priv->trig_prov,g_strdup(tn),pl);
-    	if (completion->priv->active)
+    	g_hash_table_insert(self->priv->trig_prov,g_strdup(tn),pl);
+    	if (self->priv->active)
     	{
     		gsc_trigger_activate(trigger);
     	}
@@ -790,25 +793,25 @@ gsc_manager_register_trigger(GscManager *completion,
 }
 
 void
-gsc_manager_unregister_trigger(GscManager *completion,
+gsc_manager_unregister_trigger(GscManager *self,
 					 GscTrigger *trigger)
 {
-	g_return_if_fail(g_list_find(completion->priv->triggers, trigger) != NULL);
-	completion->priv->triggers = g_list_remove(completion->priv->triggers, trigger);
-	if (completion->priv->active)
+	g_return_if_fail(g_list_find(self->priv->triggers, trigger) != NULL);
+	self->priv->triggers = g_list_remove(self->priv->triggers, trigger);
+	if (self->priv->active)
 	{
 		gsc_trigger_deactivate(trigger);
 	}
-	g_hash_table_remove(completion->priv->trig_prov,
+	g_hash_table_remove(self->priv->trig_prov,
 			    gsc_trigger_get_name(trigger));
 	g_object_unref(trigger);
 }
 
 GscTrigger*
-gsc_manager_get_trigger(GscManager *completion,
+gsc_manager_get_trigger(GscManager *self,
 				  const gchar* trigger_name)
 {
-	GList *plist = completion->priv->triggers;
+	GList *plist = self->priv->triggers;
 	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
@@ -825,31 +828,31 @@ gsc_manager_get_trigger(GscManager *completion,
 }
 
 void
-gsc_manager_activate(GscManager *completion)
+gsc_manager_activate(GscManager *self)
 {
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
-			g_signal_connect(completion->priv->text_view,
+	self->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
+			g_signal_connect(self->priv->text_view,
 					 "key-press-event",
 					 G_CALLBACK(view_key_press_event_cb),
-					 (gpointer) completion);
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
-			g_signal_connect(completion->priv->text_view,
+					 (gpointer) self);
+	self->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
+			g_signal_connect(self->priv->text_view,
 					 "destroy",
 					 G_CALLBACK(view_destroy_event_cb),
-					 (gpointer)completion);
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
-			g_signal_connect(completion->priv->text_view,
+					 (gpointer)self);
+	self->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
+			g_signal_connect(self->priv->text_view,
 					 "focus-out-event",
 					 G_CALLBACK(view_focus_out_event_cb),
-					 (gpointer)completion);
-	completion->priv->internal_signal_ids[IS_GTK_TEXT_BUTTON_PRESS] = 
-			g_signal_connect(completion->priv->text_view,
+					 (gpointer)self);
+	self->priv->internal_signal_ids[IS_GTK_TEXT_BUTTON_PRESS] = 
+			g_signal_connect(self->priv->text_view,
 					 "button-press-event",
 					 G_CALLBACK(view_button_press_event_cb),
-					 (gpointer)completion);
+					 (gpointer)self);
 
 	/* We activate the triggers*/
-	GList *plist = completion->priv->triggers;
+	GList *plist = self->priv->triggers;
 	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
@@ -861,25 +864,25 @@ gsc_manager_activate(GscManager *completion)
 		}while((plist = g_list_next(plist)) != NULL);
 	}	
 	
-	completion->priv->active = TRUE;
+	self->priv->active = TRUE;
 }
 
 void
-gsc_manager_deactivate(GscManager *completion)
+gsc_manager_deactivate(GscManager *self)
 {
 	gint i;
 	for (i=0;i<IS_LAST_SIGNAL;i++)
 	{
-		if (g_signal_handler_is_connected(completion->priv->text_view, 
-						  completion->priv->internal_signal_ids[i]))
+		if (g_signal_handler_is_connected(self->priv->text_view, 
+						  self->priv->internal_signal_ids[i]))
 		{
-			g_signal_handler_disconnect (completion->priv->text_view,
-				completion->priv->internal_signal_ids[i]);
+			g_signal_handler_disconnect (self->priv->text_view,
+				self->priv->internal_signal_ids[i]);
 		}
-		completion->priv->internal_signal_ids[i] = 0;
+		self->priv->internal_signal_ids[i] = 0;
 	}
 	
-	GList *plist = completion->priv->triggers;
+	GList *plist = self->priv->triggers;
 	GscTrigger *trigger;	
 	if (plist != NULL)
 	{
@@ -891,22 +894,22 @@ gsc_manager_deactivate(GscManager *completion)
 		}while((plist = g_list_next(plist)) != NULL);
 	}	
 	
-	completion->priv->active = FALSE;
+	self->priv->active = FALSE;
 }
 
 void
-gsc_manager_finish_completion(GscManager *completion)
+gsc_manager_finish_completion(GscManager *self)
 {
-	if (gsc_manager_is_visible(completion))
+	if (gsc_manager_is_visible(self))
 	{
-		end_completion(completion);
+		end_completion(self);
 	}
 }
 
 GscTrigger*
-gsc_manager_get_active_trigger(GscManager *completion)
+gsc_manager_get_active_trigger(GscManager *self)
 {
-	return completion->priv->active_trigger;
+	return self->priv->active_trigger;
 }
 
 void

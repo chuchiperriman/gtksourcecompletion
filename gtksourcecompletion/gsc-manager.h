@@ -94,27 +94,27 @@ gsc_manager_new (GtkTextView *view);
 
 /**
  * gsc_manager_get_view:
- * @completion: the #GscManager
+ * @self: the #GscManager
  *
  * Returns: The internal #GtkTextView of this completion.
  * 
  **/
 GtkTextView* 
-gsc_manager_get_view(GscManager *completion);
+gsc_manager_get_view(GscManager *self);
 
 /**
  * gsc_manager_is_visible:
- * @completion: The #GscManager
+ * @self: The #GscManager
  *
  * Returns TRUE if the completion popup is visible.
  *
  */
 gboolean
-gsc_manager_is_visible(GscManager *completion);
+gsc_manager_is_visible(GscManager *self);
 
 /**
  * gsc_manager_register_provider:
- * @completion: the #GscManager
+ * @self: the #GscManager
  * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to register this provider
  *
@@ -128,13 +128,13 @@ gsc_manager_is_visible(GscManager *completion);
  *
  **/
 gboolean
-gsc_manager_register_provider(GscManager *completion, 
-					GscProvider *provider,
-					const gchar *trigger_name);
+gsc_manager_register_provider (GscManager *self,
+			       GscProvider *provider,
+			       const gchar *trigger_name);
 
 /**
  * gsc_manager_unregister_provider:
- * @completion: the #GscManager
+ * @self: the #GscManager
  * @provider: The #GscProvider.
  * @trigger_name: The trigger name what you want to unregister this provider
  *
@@ -145,13 +145,13 @@ gsc_manager_register_provider(GscManager *completion,
  * 
  **/
 gboolean
-gsc_manager_unregister_provider(GscManager *completion,
+gsc_manager_unregister_provider(GscManager *self,
 					  GscProvider *provider,
 					  const gchar *trigger_name);
 
 /**
  * gsc_manager_get_provider:
- * @completion: The #GscManager
+ * @self: The #GscManager
  * @provider_name: Provider's name that you are looking for.
  *
  * Returns The provider if the completion has this provider registered or 
@@ -159,12 +159,12 @@ gsc_manager_unregister_provider(GscManager *completion,
  *
  */
 GscProvider*
-gsc_manager_get_provider(GscManager *completion,
+gsc_manager_get_provider(GscManager *self,
 				   const gchar* provider_name);
 
 /**
  * gsc_manager_register_trigger:
- * @completion: The #GscManager
+ * @self: The #GscManager
  * @trigger: The trigger to register
  *
  * This function register a completion trigger. If the completion is actived
@@ -172,12 +172,12 @@ gsc_manager_get_provider(GscManager *completion,
  * object
  */
 void
-gsc_manager_register_trigger(GscManager *completion,
+gsc_manager_register_trigger(GscManager *self,
 			     GscTrigger *trigger);
 
 /**
  * gsc_manager_unregister_trigger:
- * @completion: The #GscManager
+ * @self: The #GscManager
  * @trigger: The trigger to unregister
  *
  * This function unregister a completion trigger. If the completion is actived
@@ -185,12 +185,12 @@ gsc_manager_register_trigger(GscManager *completion,
  * object
  */																
 void
-gsc_manager_unregister_trigger(GscManager *completion,
+gsc_manager_unregister_trigger(GscManager *self,
 				GscTrigger *trigger);
 
 /**
  * gsc_manager_get_trigger:
- * @completion: The #GscManager
+ * @self: The #GscManager
  * @trigger_name: The trigger name to get
  *
  * This function return the trigger with this name.
@@ -199,13 +199,13 @@ gsc_manager_unregister_trigger(GscManager *completion,
  *
  */
 GscTrigger*
-gsc_manager_get_trigger(GscManager *completion,
+gsc_manager_get_trigger(GscManager *self,
 			const gchar* trigger_name);
 
 
 /**
  * gsc_manager_get_active_trigger:
- * @completion: The #GscManager
+ * @self: The #GscManager
  *
  * This function return the active trigger. The active trigger is the last
  * trigger raised if the completion is active. If the completion is not visible then
@@ -215,40 +215,40 @@ gsc_manager_get_trigger(GscManager *completion,
  *
  */
 GscTrigger*
-gsc_manager_get_active_trigger(GscManager *completion);
+gsc_manager_get_active_trigger(GscManager *self);
 
 /**
  * gsc_manager_activate:
- * @completion: The #GscManager
+ * @self: The #GscManager
  *
  * This function activate the completion mechanism. The completion connects 
  * all signals and activate all registered triggers.
  */
 void
-gsc_manager_activate(GscManager *completion);
+gsc_manager_activate(GscManager *self);
 
 /**
  * gsc_manager_deactivate:
- * @completion: The #GscManager
+ * @self: The #GscManager
  *
  * This function deactivate the completion mechanism. The completion disconnect
  * all signals and deactivate all registered triggers.
  */
 void
-gsc_manager_deactivate(GscManager *completion);
+gsc_manager_deactivate(GscManager *self);
 
 /**
  * gsc_manager_finish_completion:
- * @completion: The #GscManager
+ * @self: The #GscManager
  *
  * This function finish the completion if it is active (visible).
  */
 void
-gsc_manager_finish_completion(GscManager *completion);
+gsc_manager_finish_completion(GscManager *self);
 
 /**
  * gsc_manager_trigger_event:
- * @completion: the #GscManager
+ * @self: the #GscManager
  * @trigger_name: The event name to raise
  * @event_data: This object will be passed to the providers to give them some special information of the event
  *
@@ -257,7 +257,7 @@ gsc_manager_finish_completion(GscManager *completion);
  * 
  **/
 void 
-gsc_manager_trigger_event(GscManager *completion, 
+gsc_manager_trigger_event(GscManager *self,
 			  const gchar *trigger_name, 
 			  gpointer event_data);
 
@@ -280,7 +280,7 @@ void		 gsc_manager_set_key			(GscManager *self,
 gchar 		*gsc_manager_get_key			(GscManager *self,
 							 KeysType type);
 
-gboolean	 gsc_manager_manage_key		(GscManager *self,
+gboolean	 gsc_manager_manage_key			(GscManager *self,
 							 GdkEventKey *event);
 
 G_END_DECLS
