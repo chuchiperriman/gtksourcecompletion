@@ -483,7 +483,7 @@ gsc_popup_init (GscPopup *self)
 GtkWidget*
 gsc_popup_new ()
 {
-	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() ,
+	GscPopup *self = GSC_POPUP (g_object_new (GSC_TYPE_POPUP,
 				    "type", GTK_WINDOW_POPUP,
 				    NULL));
 	return GTK_WIDGET (self);

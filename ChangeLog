@@ -1,5 +1,10 @@
 2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-popup.c:
+	Use the define instead of call get_type directly.
+
+2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-manager.c:
 	Now hides the popup when you press Escape.
 
