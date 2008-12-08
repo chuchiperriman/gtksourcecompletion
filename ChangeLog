@@ -1,3 +1,9 @@
+2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-trigger-customkey.c:
+	* gtksourcecompletion/gsc-trigger-customkey.c:
+	Use the right coding style.
+
 2008-12-08  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-popup.c

@@ -39,49 +39,26 @@ typedef struct _GscTriggerCustomkey GscTriggerCustomkey;
 typedef struct _GscTriggerCustomkeyClass GscTriggerCustomkeyClass;
 typedef struct _GscTriggerCustomkeyPrivate GscTriggerCustomkeyPrivate;
 
-struct _GscTriggerCustomkey {
+struct _GscTriggerCustomkey
+{
 	GObject parent;
+	
 	GscTriggerCustomkeyPrivate *priv;	
 };
 
-struct _GscTriggerCustomkeyClass {
+struct _GscTriggerCustomkeyClass
+{
 	GObjectClass parent;
 };
 
-/**
- * gsc_trigger_customkey_new:
- * @completion: The #GscManager
- * @trigger_name: The trigger name wich will be user the we trigger the event.
- * @keys: The string representation of the keys that we will
- * use to activate the event. You can get this 
- * string with #gtk_accelerator_name
- *
- * This is a generic trigger. You tell the name and the key and the trigger
- * will be triggered when the user press this key (or keys)
- *
- * Returns The new #GscTriggerCustomkey
- *
- */
-GscTriggerCustomkey* 
-gsc_trigger_customkey_new(GscManager *completion,
-			  const gchar* trigger_name, 
-			  const gchar* keys);
+GType			 gsc_trigger_customkey_get_type	(void) G_GNUC_CONST;
 
-/**
- * gsc_trigger_customkey_set_keys:
- * @self: The #GscTriggerCustomkey 
- * @keys: The string representation of the keys that we will
- * use to activate the user request event. You can get this 
- * string with #gtk_accelerator_name
- *
- * Assign the keys that we will use to activate the user request event
- */
-void
-gsc_trigger_customkey_set_keys(GscTriggerCustomkey * self, 
-				 const gchar* keys);
+GscTriggerCustomkey	*gsc_trigger_customkey_new	(GscManager *completion,
+							 const gchar *trigger_name,
+							 const gchar *keys);
 
-GType 
-gsc_trigger_customkey_get_type ();
+void			 gsc_trigger_customkey_set_keys	(GscTriggerCustomkey *self,
+							 const gchar *keys);
 
 G_END_DECLS
 
