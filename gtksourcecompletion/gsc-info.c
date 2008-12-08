@@ -327,7 +327,6 @@ gsc_info_set_custom(GscInfo* self,
 		}
 		else
 		{
-			//gtk_container_remove (GTK_CONTAINER (self->priv->box), self->priv->info_scroll);
 			gtk_widget_hide(self->priv->info_scroll);
 		}
 		
@@ -343,7 +342,6 @@ gsc_info_set_custom(GscInfo* self,
 			gtk_container_remove (GTK_CONTAINER (self->priv->box), self->priv->custom_widget);
 			g_object_unref(self->priv->custom_widget);
 			self->priv->custom_widget = NULL;
-			//gtk_container_add (GTK_CONTAINER (self->priv->box), self->priv->info_scroll);
 			gtk_widget_show(self->priv->info_scroll);
 		}
 		

@@ -115,7 +115,6 @@ _prov_list_free(gpointer prov_list)
 static void
 end_completion (GscManager *completion)
 {
-	
 	if (GTK_WIDGET_VISIBLE(completion->priv->popup))
 	{
 		gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
@@ -167,9 +166,7 @@ view_focus_out_event_cb(GtkWidget *widget,
 {
 	GscManager *completion = GSC_MANAGER(user_data);
 	if (gsc_manager_is_visible(completion) && GTK_WIDGET_HAS_FOCUS(completion->priv->popup))
-	{
 		end_completion(completion);
-	}
 	return FALSE;
 }
 
@@ -180,9 +177,7 @@ view_button_press_event_cb(GtkWidget *widget,
 {
 	GscManager *completion = GSC_MANAGER(user_data);
 	if (gsc_manager_is_visible(completion))
-	{
 		end_completion(completion);
-	}
 	return FALSE;
 }
 
@@ -200,7 +195,6 @@ free_provider_list(gpointer list)
 		}while((temp = g_list_next(temp)) != NULL);
 		g_list_free(start);
 	}
-	
 }
 
 static void
@@ -217,7 +211,6 @@ free_trigger_list(gpointer list)
 		}while((temp = g_list_next(temp)) != NULL);
 		g_list_free(start);
 	}
-	
 }
 
 static gboolean
@@ -238,9 +231,7 @@ gsc_manager_set_property (GObject      *object,
 				    GParamSpec   *pspec)
 {
 	GscManager *self;
-
 	g_return_if_fail (GSC_IS_MANAGER (object));
-
 	self = GSC_MANAGER(object);
 
 	switch (prop_id)
@@ -267,9 +258,7 @@ gsc_manager_get_property (GObject    *object,
 				    GParamSpec *pspec)
 {
 	GscManager *self;
-
 	g_return_if_fail (GSC_IS_MANAGER (object));
-
 	self = GSC_MANAGER(object);
 
 	switch (prop_id)
@@ -331,7 +320,6 @@ gsc_manager_init (GscManager *completion)
 			 "hide",
 			 G_CALLBACK(_popup_hide_cb),
 			 (gpointer) completion);
-
 }
 
 static void
@@ -339,9 +327,7 @@ gsc_manager_finalize (GObject *object)
 {
 	GscManager *completion = GSC_MANAGER(object);
 	if (completion->priv->active)
-	{
 		gsc_manager_deactivate(completion);
-	}
 	
 	gtk_widget_destroy(GTK_WIDGET(completion->priv->popup));
 
@@ -520,7 +506,6 @@ gsc_manager_trigger_event(GscManager *completion,
 	 */
 	if (gsc_manager_is_visible(completion) && completion->priv->active_trigger != trigger)
 	{
-		g_debug("no");
 		return;
 	}
 	
@@ -623,7 +608,6 @@ gsc_manager_get_provider(GscManager *completion,
 			}
 		}while((plist = g_list_next(plist)) != NULL);
 	}
-
 	return NULL;
 }
 
@@ -636,7 +620,6 @@ gsc_manager_register_trigger(GscManager *completion,
     /*Only register the trigger if it has not been registered yet*/
     if (pl==NULL)
     {
-
     	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
     	g_object_ref(trigger);
     	const gchar *tn = gsc_trigger_get_name(trigger);
@@ -682,7 +665,6 @@ gsc_manager_get_trigger(GscManager *completion,
 			}
 		}while((plist = g_list_next(plist)) != NULL);
 	}
-
 	return FALSE;
 }
 

@@ -41,7 +41,6 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _GscTreePriv
 {
-	GtkWidget *tree_view;
 	gboolean destroy_has_run;
 	GtkListStore *list_store;
 	GtkTreeModelFilter *model_filter;
@@ -85,7 +84,7 @@ _selection_changed_cd(GtkTreeSelection *treeselection,
 }
 
 
-G_DEFINE_TYPE(GscTree, gsc_tree, GTK_TYPE_SCROLLED_WINDOW);
+G_DEFINE_TYPE(GscTree, gsc_tree, GTK_TYPE_TREE_VIEW);
 
 static gboolean
 _filter_by_name_func (GtkTreeModel *model,
@@ -181,22 +180,12 @@ gsc_tree_init (GscTree *self)
 	self->priv->destroy_has_run = FALSE;
 	self->priv->current_filter = NULL;
 	self->priv->active_filter = FALSE;
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(self),
-					GTK_POLICY_AUTOMATIC,
-					GTK_POLICY_AUTOMATIC);
-	
-	gtk_scrolled_window_set_hadjustment(GTK_SCROLLED_WINDOW(self),NULL);
-	gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(self),NULL);
 
-	self->priv->tree_view = gtk_tree_view_new();
-	GValue val = {0,};
-	g_value_init(&val,G_TYPE_BOOLEAN);
-	g_value_set_boolean(&val,FALSE);
-	g_object_set_property(G_OBJECT(self->priv->tree_view),"can-focus",&val);
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(self->priv->tree_view),FALSE);
+	g_object_set(self,
+		     "can-focus",FALSE,
+		     NULL);
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(self),FALSE);
 	
-	gtk_container_add(GTK_CONTAINER(self),self->priv->tree_view);
-
 	/* Create the Tree */
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
@@ -215,8 +204,8 @@ gsc_tree_init (GscTree *self)
 	gtk_tree_view_column_pack_start (column, renderer, FALSE);
 	gtk_tree_view_column_set_attributes (column,renderer,"text",COL_NAME,NULL);
 
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->tree_view), column_pixbuf);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self->priv->tree_view), column);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(self), column_pixbuf);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(self), column);
 	
 	/* Create the model */
 	self->priv->list_store = gtk_list_store_new (4,
@@ -235,18 +224,17 @@ gsc_tree_init (GscTree *self)
 						self,
 						NULL);
 
-	gtk_tree_view_set_model(GTK_TREE_VIEW(self->priv->tree_view),
+	gtk_tree_view_set_model(GTK_TREE_VIEW(self),
 				model);
 	
 	
 	/* Connect signals */
-	
-	g_signal_connect(self->priv->tree_view, 
+	g_signal_connect(self, 
 			"row-activated",
 			G_CALLBACK(_tree_row_activated_cb),
 			(gpointer) self);
 					
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
 	g_signal_connect(selection, 
 			"changed",
 			G_CALLBACK(_selection_changed_cd),
@@ -260,10 +248,10 @@ gsc_tree_get_selected_proposal(GscTree *self,
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 	GValue value_proposal = {0,};
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
 	if (gtk_tree_selection_get_selected(selection,NULL, &iter))
 	{
-		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
+		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
 		gtk_tree_model_get_value(model,&iter,COL_DATA,&value_proposal);
 		*proposal = (GscProposal*)g_value_get_pointer(&value_proposal);
 		
@@ -325,18 +313,18 @@ gsc_tree_select_first(GscTree *self)
 	if (!GTK_WIDGET_VISIBLE(self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
 
 	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
 		return FALSE;
 
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
 		
 	if (gtk_tree_model_get_iter_first(model, &iter))
 	{
 		gtk_tree_selection_select_iter(selection, &iter);
 		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
 						   path, 
 						   NULL, 
 						   FALSE, 
@@ -364,8 +352,8 @@ gsc_tree_select_last(GscTree *self)
 	if (!GTK_WIDGET_VISIBLE(self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
 	
 	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
 		return FALSE;
@@ -377,7 +365,7 @@ gsc_tree_select_last(GscTree *self)
 	
 		gtk_tree_selection_select_iter(selection, &iter);
 		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
 					     path, 
 					     NULL, 
 					     FALSE, 
@@ -401,7 +389,7 @@ gsc_tree_select_previous(GscTree *self,
 	if (!GTK_WIDGET_VISIBLE(self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
 	
 	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
 		return FALSE;
@@ -416,7 +404,7 @@ gsc_tree_select_previous(GscTree *self,
 		if (gtk_tree_model_get_iter(model, &iter, path))
 		{
 			gtk_tree_selection_select_iter(selection, &iter);
-			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
+			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
 						     path, 
 						     NULL, 
 						     FALSE, 
@@ -444,7 +432,7 @@ gsc_tree_select_next(GscTree *self,
 	if (!GTK_WIDGET_VISIBLE(self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->priv->tree_view));
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
 	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
 		return FALSE;
 	
@@ -459,7 +447,7 @@ gsc_tree_select_next(GscTree *self,
 		}
 		gtk_tree_selection_select_iter(selection, &iter);
 		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self->priv->tree_view), 
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
 					     path, 
 					     NULL, 
 					     FALSE, 
@@ -477,18 +465,16 @@ gsc_tree_select_next(GscTree *self,
 GtkWidget*
 gsc_tree_new()
 {
-	GscTree *self = GSC_TREE (g_object_new (gsc_tree_get_type() , NULL));
+	GscTree *self = GSC_TREE (g_object_new (GSC_TYPE_TREE , NULL));
 	return GTK_WIDGET(self);
 }
 
 gint 
 gsc_tree_get_num_proposals(GscTree *self)
 {
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->priv->tree_view));
+	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
 	return gtk_tree_model_iter_n_children(model, NULL);
 }
-
-
 
 void
 gsc_tree_filter(GscTree *self, const gchar* filter)

@@ -356,10 +356,8 @@ static void
 gsc_popup_hide(GtkWidget *widget)
 {
 	GscPopup *self = GSC_POPUP(widget);
-	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->hide (widget);
 	gtk_widget_hide(self->priv->info_window);
-
 }
 
 static void
@@ -385,26 +383,20 @@ static void
 gsc_popup_finalize (GObject *object)
 {
 	GscPopup *self = GSC_POPUP(object);
-	
 	g_hash_table_destroy(self->priv->trees);
-	
 	G_OBJECT_CLASS (gsc_popup_parent_class)->finalize (object);
-	
 }
 
 static void
 gsc_popup_destroy (GtkObject *object)
 {
 	GscPopup *self = GSC_POPUP(object);
-	
 	if (!self->priv->destroy_has_run)
 	{
 		gsc_popup_clear(self);
 		self->priv->destroy_has_run = TRUE;
 	}
-	
 	GTK_OBJECT_CLASS (gsc_popup_parent_class)->destroy (object);
-	
 }
 
 static void
@@ -571,15 +563,14 @@ gsc_popup_init (GscPopup *self)
 			"delete-event",
 			G_CALLBACK(gsc_popup_delete_event_cb),
 			NULL);
-	
 }
 
 GtkWidget*
 gsc_popup_new ()
 {
 	GscPopup *self = GSC_POPUP ( g_object_new (gsc_popup_get_type() ,
-					"type", GTK_WINDOW_POPUP,
-					NULL));
+				     "type", GTK_WINDOW_POPUP,
+				     NULL));
 	return GTK_WIDGET(self);
 }
 
@@ -589,7 +580,6 @@ gsc_popup_add_data(GscPopup *self,
 {
 	GscTree *tree = _get_tree_by_name(self,
 					  gsc_proposal_get_page_name(data));
-	
 	gsc_tree_add_data(tree,data);
 }
 
@@ -728,17 +718,13 @@ gsc_popup_page_previous(GscPopup *self)
 
 void
 gsc_popup_set_current_info(GscPopup *self,
-					     gchar *info)
+			   gchar *info)
 {
 	if (info!=NULL)
-	{
 		gsc_info_set_markup(GSC_INFO(self->priv->info_window),info);
-	}
 	else
-	{
 		gsc_info_set_markup(GSC_INFO(self->priv->info_window),
 				     _("There is no info for the current proposal"));
-	}
 }
 
 gint
@@ -811,6 +797,7 @@ gsc_popup_bottom_bar_get_visible(GscPopup *self)
 {
 	return GTK_WIDGET_VISIBLE(self->priv->bottom_bar);
 }
+
 
 
 
