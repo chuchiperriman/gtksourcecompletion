@@ -1,3 +1,11 @@
+2008-12-08  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-popup.c
+	* gtksourcecompletion/gsc-popup.h:
+	* gtksourcecompletion/gsc-manager.c:
+	* gtksourcecompletion/gsc-manager.h:
+	Moved gsc_popup_manage_key from gsc-popup to gsc-manager.
+
 2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-proposal.c:

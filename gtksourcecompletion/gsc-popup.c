@@ -43,17 +43,6 @@ enum
 
 static guint popup_signals[LAST_SIGNAL] = { 0 };
 
-/* Keys */
-#define DEFAULT_INFO_KEYS "<Control>i"
-#define DEFAULT_PAGE_NEXT_KEYS "Right"
-#define DEFAULT_PAGE_PREV_KEYS "Left"
-
-typedef struct 
-{
-	guint key;
-	GdkModifierType mods;
-} KeyDef;
-
 struct _GscPopupPriv
 {
 	GtkWidget *info_window;
@@ -65,8 +54,6 @@ struct _GscPopupPriv
 	
 	GHashTable *trees;
 	gboolean destroy_has_run;
-	
-	KeyDef keys[KEYS_LAST];
 };
 
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
@@ -309,7 +296,6 @@ gsc_popup_destroy (GtkObject *object)
 		gsc_popup_clear (self);
 		self->priv->destroy_has_run = TRUE;
 	}
-	
 	GTK_OBJECT_CLASS (gsc_popup_parent_class)->destroy (object);
 }
 
@@ -388,10 +374,6 @@ gsc_popup_init (GscPopup *self)
 				     WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
 	
-	gsc_popup_set_key (self, KEYS_INFO,DEFAULT_INFO_KEYS);
-	gsc_popup_set_key (self, KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
-	gsc_popup_set_key (self, KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
-
 	completion_tree = gsc_tree_new();
 	g_object_set (G_OBJECT (completion_tree), "can-focus",
 		      FALSE, NULL);
@@ -638,6 +620,19 @@ gsc_popup_get_selected_proposal (GscPopup *self,
 					       proposal);
 }
 
+gboolean
+gsc_popup_select_current_proposal (GscPopup *self)
+{
+	gboolean selected = FALSE;
+	GscProposal *prop = NULL;
+	if (gsc_popup_get_selected_proposal (self, &prop))
+	{
+		g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED], 0, prop);
+		selected = TRUE;
+	}
+	return selected;
+}
+
 /**
  * gsc_popup_has_proposals:
  * @self: The #GscPopup
@@ -854,159 +849,6 @@ _filter_changed_cb (GtkEntry *entry,
 */
 
 /**
- * gsc_popup_set_key:
- * @self: The #GscPopup
- * @type: Key what you want to set
- * @keys: Keys to be assigned to the key type
- *
- * Sets the keys for the key type. By example you can set the info keys 
- * by passing KEYS_INFO type and "<control>i" keys.
- *
- */
-void
-gsc_popup_set_key (GscPopup *self,
-		   KeysType type,
-		   const gchar* keys)
-{
-	guint key;
-	GdkModifierType mods;
-	
-	g_return_if_fail (GSC_IS_POPUP (self));
-	
-	gtk_accelerator_parse (keys, &key, &mods);
-	g_return_if_fail (key != 0);
-	
-	self->priv->keys[type].key = key;
-	self->priv->keys[type].mods = mods;
-}
-
-/**
- * gsc_popup_get_key:
- * @self: The #GscPopup
- * @type: The key type what you want to get
- *
- * Returns: New allocated string representation with #gtk_accelerator_name
- */
-gchar *
-gsc_popup_get_key (GscPopup *self,
-		   KeysType type)
-{
-	g_return_val_if_fail (GSC_IS_POPUP (self), NULL);
-
-	return gtk_accelerator_name (self->priv->keys[type].key,
-				     self->priv->keys[type].mods);
-}
-
-/**
- * gsc_popup_manage_key:
- * @self: The #GscPopup
- * @event: Key event to be managed
- *
- * Manage the event keys. If it is Return, it will select the current proposal, 
- * if it is a Down key then selects the next proposal etc.
- *
- * Returns: TRUE if the key has been used.
- */
-gboolean
-gsc_popup_manage_key (GscPopup *self,
-		      GdkEventKey *event)
-{
-	gboolean catched = FALSE;
-	gboolean ret = FALSE;
-	
-	switch (event->keyval)
- 	{
-		case GDK_Escape:
-		{
-			gsc_popup_hide (GTK_WIDGET (self));
-			catched = TRUE;
-			ret = TRUE;
-			break;
-		}
- 		case GDK_Down:
-		{
-			ret = gsc_popup_select_next (self, 1);
-			catched = TRUE;
-			break;
-		}
-		case GDK_Page_Down:
-		{
-			ret = gsc_popup_select_next (self, 5);
-			catched = TRUE;
-			break;
-		}
-		case GDK_Up:
-		{
-			ret = gsc_popup_select_previous (self, 1);
-			if (!ret)
-				ret = gsc_popup_select_first (self);
-			catched = TRUE;
-			break;
-		}
-		case GDK_Page_Up:
-		{
-			ret = gsc_popup_select_previous (self, 5);
-			catched = TRUE;
-			break;
-		}
-		case GDK_Home:
-		{
-			ret = gsc_popup_select_first (self);
-			catched = TRUE;
-			break;
-		}
-		case GDK_End:
-		{
-			ret = gsc_popup_select_last (self);
-			catched = TRUE;
-			break;
-		}
-		case GDK_Return:
-		case GDK_Tab:
-		{
-			GscProposal *prop = NULL;
-			if (gsc_popup_get_selected_proposal (self, &prop))
-			{
-				g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED], 0, prop);
-				gsc_popup_hide (GTK_WIDGET (self));
-			}
-			else
-			{
-				gsc_popup_hide (GTK_WIDGET (self));
-			}
-			ret = TRUE;
-			catched = TRUE;
-			break;
-		}
-	}
-	if (!catched)
-	{
-		if (gsc_compare_keys (self->priv->keys[KEYS_INFO].key,
-				      self->priv->keys[KEYS_INFO].mods,
-				      event))
-		{
-			gsc_popup_toggle_proposal_info (self);
-			ret = TRUE;
-		}
-		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_NEXT].key,
-					   self->priv->keys[KEYS_PAGE_NEXT].mods,
-					   event))
-		{
-			gsc_popup_page_next (self);
-			ret = TRUE;
-		}
-		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_PREV].key,
-					   self->priv->keys[KEYS_PAGE_PREV].mods,
-					   event))
-		{
-			gsc_popup_page_previous (self);
-			ret = TRUE;
-		}
-	}
-	return ret;
-}
-
-/**
  * gsc_popup_show_or_update:
  * @widget: The #GscPopup
  *
@@ -1053,3 +895,5 @@ gsc_popup_bottom_bar_get_visible (GscPopup *self)
 
 	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
 }
+
+

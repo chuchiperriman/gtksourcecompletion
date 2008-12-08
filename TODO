@@ -1,4 +1,4 @@
-TODO (last update: 2008-11-25)
+TODO (last update: 2008-12-08)
 =================================
 
 [X] Try to separe GscPopup and GtkTextView. Remove the GtkTextView dependency 
@@ -7,6 +7,13 @@ TODO (last update: 2008-11-25)
 [X] New popup filter type: Hidden filter. The filter will be hidden but 
     programmativally you can change the current filter.
 [X] Add function to hide the bottom bar
+[X] Move gsc_popup_manage_key function to gsc-manager
+[X] Change gsc-tree to extend from GtkTreeView instead of GtkScrolledWindow
+[ ] Support to set the focus on the popup and info windows.
+[ ] Clean FIXME on trigger-autowords.
+[ ] Delete "apply" signal from GscProposal.
+[ ] Remove all g_object_set_property. Use g_object_set instead
+[ ] In gsc-manager use self instead of completion
 
 GscInfo:
 ----------------
@@ -24,6 +31,9 @@ GscPopup:
     gsc_proposal_get_info by default (any connected function can return TRUE 
     and we don't call to gsc_proposal_get_info)
 [X] Clean all filter and options features. 
+[ ] Do we must to set the GscTree inside a ScrolledWindow?
+[ ] GscTree inherit from GtkTreeView now. We must to delete select_first, 
+    select_next etc functions and use GtkTreeView functions directly.
 
 Bugs
 ---------------

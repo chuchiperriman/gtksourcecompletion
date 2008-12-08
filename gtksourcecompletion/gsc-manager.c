@@ -49,6 +49,12 @@ enum {
 	PROP_PREV_PAGE_KEYS
 };
 
+typedef struct 
+{
+	guint key;
+	GdkModifierType mods;
+} KeyDef;
+
 struct _GscManagerPrivate
 {
 	GtkTextView *text_view;
@@ -60,6 +66,7 @@ struct _GscManagerPrivate
 	gulong internal_signal_ids[IS_LAST_SIGNAL];
 	gboolean active;
 	GscTrigger *active_trigger;
+	KeyDef keys[KEYS_LAST];
 };
 
 #define GSC_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_MANAGER, GscManagerPrivate))
@@ -115,7 +122,6 @@ _prov_list_free(gpointer prov_list)
 static void
 end_completion (GscManager *completion)
 {
-	
 	if (GTK_WIDGET_VISIBLE(completion->priv->popup))
 	{
 		gtk_widget_hide(GTK_WIDGET(completion->priv->popup));
@@ -167,9 +173,7 @@ view_focus_out_event_cb(GtkWidget *widget,
 {
 	GscManager *completion = GSC_MANAGER(user_data);
 	if (gsc_manager_is_visible(completion) && GTK_WIDGET_HAS_FOCUS(completion->priv->popup))
-	{
 		end_completion(completion);
-	}
 	return FALSE;
 }
 
@@ -180,9 +184,7 @@ view_button_press_event_cb(GtkWidget *widget,
 {
 	GscManager *completion = GSC_MANAGER(user_data);
 	if (gsc_manager_is_visible(completion))
-	{
 		end_completion(completion);
-	}
 	return FALSE;
 }
 
@@ -200,7 +202,6 @@ free_provider_list(gpointer list)
 		}while((temp = g_list_next(temp)) != NULL);
 		g_list_free(start);
 	}
-	
 }
 
 static void
@@ -217,7 +218,6 @@ free_trigger_list(gpointer list)
 		}while((temp = g_list_next(temp)) != NULL);
 		g_list_free(start);
 	}
-	
 }
 
 static gboolean
@@ -227,7 +227,7 @@ view_key_press_event_cb(GtkWidget *view,
 {
 	GscManager *self = GSC_MANAGER(user_data);
 	if (gsc_manager_is_visible(self))
-		return gsc_popup_manage_key(self->priv->popup,event);
+		return gsc_manager_manage_key(self,event);
 	return FALSE;
 }
 
@@ -238,21 +238,19 @@ gsc_manager_set_property (GObject      *object,
 				    GParamSpec   *pspec)
 {
 	GscManager *self;
-
 	g_return_if_fail (GSC_IS_MANAGER (object));
-
 	self = GSC_MANAGER(object);
 
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
-			gsc_popup_set_key(self->priv->popup,KEYS_INFO,g_value_get_string(value));
+			gsc_manager_set_key(self,KEYS_INFO,g_value_get_string(value));
 			break;
 		case PROP_NEXT_PAGE_KEYS:
-			gsc_popup_set_key(self->priv->popup,KEYS_PAGE_NEXT,g_value_get_string(value));
+			gsc_manager_set_key(self,KEYS_PAGE_NEXT,g_value_get_string(value));
 			break;
 		case PROP_PREV_PAGE_KEYS:
-			gsc_popup_set_key(self->priv->popup,KEYS_PAGE_PREV,g_value_get_string(value));
+			gsc_manager_set_key(self,KEYS_PAGE_PREV,g_value_get_string(value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -267,24 +265,22 @@ gsc_manager_get_property (GObject    *object,
 				    GParamSpec *pspec)
 {
 	GscManager *self;
-
 	g_return_if_fail (GSC_IS_MANAGER (object));
-
 	self = GSC_MANAGER(object);
 
 	switch (prop_id)
 	{
 		case PROP_INFO_KEYS:
 			g_value_set_string(value,
-					   gsc_popup_get_key(self->priv->popup,KEYS_INFO));
+					   gsc_manager_get_key(self,KEYS_INFO));
 			break;
 		case PROP_NEXT_PAGE_KEYS:
 			g_value_set_string(value,
-					   gsc_popup_get_key(self->priv->popup,KEYS_PAGE_NEXT));
+					   gsc_manager_get_key(self,KEYS_PAGE_NEXT));
 			break;
 		case PROP_PREV_PAGE_KEYS:
 			g_value_set_string(value,
-					   gsc_popup_get_key(self->priv->popup,KEYS_PAGE_PREV));
+					   gsc_manager_get_key(self,KEYS_PAGE_PREV));
 			break;
 
 		default:
@@ -315,6 +311,10 @@ gsc_manager_init (GscManager *completion)
 							    g_free,
 							    (GDestroyNotify)_prov_list_free);
 
+	gsc_manager_set_key (completion, KEYS_INFO,DEFAULT_INFO_KEYS);
+	gsc_manager_set_key (completion, KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
+	gsc_manager_set_key (completion, KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
+
 	completion->priv->popup = GSC_POPUP(gsc_popup_new());
 	
 	for (i=0;i<IS_LAST_SIGNAL;i++)
@@ -331,7 +331,6 @@ gsc_manager_init (GscManager *completion)
 			 "hide",
 			 G_CALLBACK(_popup_hide_cb),
 			 (gpointer) completion);
-
 }
 
 static void
@@ -339,9 +338,7 @@ gsc_manager_finalize (GObject *object)
 {
 	GscManager *completion = GSC_MANAGER(object);
 	if (completion->priv->active)
-	{
 		gsc_manager_deactivate(completion);
-	}
 	
 	gtk_widget_destroy(GTK_WIDGET(completion->priv->popup));
 
@@ -451,6 +448,151 @@ gsc_manager_new (GtkTextView *view)
 	return completion;
 }
 
+/**
+ * gsc_manager_set_key:
+ * @self: The #GscManager
+ * @type: Key what you want to set
+ * @keys: Keys to be assigned to the key type
+ *
+ * Sets the keys for the key type. By example you can set the info keys 
+ * by passing KEYS_INFO type and "<control>i" keys.
+ *
+ */
+void
+gsc_manager_set_key (GscManager *self,
+		     KeysType type,
+		     const gchar* keys)
+{
+	guint key;
+	GdkModifierType mods;
+	
+	g_return_if_fail (GSC_IS_MANAGER (self));
+	
+	gtk_accelerator_parse (keys, &key, &mods);
+	g_return_if_fail (key != 0);
+	
+	self->priv->keys[type].key = key;
+	self->priv->keys[type].mods = mods;
+}
+
+/**
+ * gsc_manager_get_key:
+ * @self: The #GscManager
+ * @type: The key type what you want to get
+ *
+ * Returns: New allocated string representation with #gtk_accelerator_name
+ */
+gchar *
+gsc_manager_get_key (GscManager *self,
+		     KeysType type)
+{
+	g_return_val_if_fail (GSC_IS_MANAGER (self), NULL);
+
+	return gtk_accelerator_name (self->priv->keys[type].key,
+				     self->priv->keys[type].mods);
+}
+
+/**
+ * gsc_manager_manage_key:
+ * @self: The #GscManager
+ * @event: Key event to be managed
+ *
+ * Manage the event keys. If it is Return, it will select the current proposal, 
+ * if it is a Down key then selects the next proposal etc.
+ *
+ * Returns: TRUE if the key has been used.
+ */
+gboolean
+gsc_manager_manage_key (GscManager *self,
+		        GdkEventKey *event)
+{
+	gboolean catched = FALSE;
+	gboolean ret = FALSE;
+	
+	switch (event->keyval)
+ 	{
+		case GDK_Escape:
+		{
+			gtk_widget_hide (GTK_WIDGET (self));
+			catched = TRUE;
+			ret = TRUE;
+			break;
+		}
+ 		case GDK_Down:
+		{
+			ret = gsc_popup_select_next (self->priv->popup, 1);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Down:
+		{
+			ret = gsc_popup_select_next (self->priv->popup, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Up:
+		{
+			ret = gsc_popup_select_previous (self->priv->popup, 1);
+			if (!ret)
+				ret = gsc_popup_select_first (self->priv->popup);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Up:
+		{
+			ret = gsc_popup_select_previous (self->priv->popup, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Home:
+		{
+			ret = gsc_popup_select_first (self->priv->popup);
+			catched = TRUE;
+			break;
+		}
+		case GDK_End:
+		{
+			ret = gsc_popup_select_last (self->priv->popup);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Return:
+		case GDK_Tab:
+		{
+			gsc_popup_select_current_proposal(self->priv->popup);
+			gtk_widget_hide (GTK_WIDGET (self->priv->popup));
+			ret = TRUE;
+			catched = TRUE;
+			break;
+		}
+	}
+	if (!catched)
+	{
+		if (gsc_compare_keys (self->priv->keys[KEYS_INFO].key,
+				      self->priv->keys[KEYS_INFO].mods,
+				      event))
+		{
+			gsc_popup_toggle_proposal_info (self->priv->popup);
+			ret = TRUE;
+		}
+		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_NEXT].key,
+					   self->priv->keys[KEYS_PAGE_NEXT].mods,
+					   event))
+		{
+			gsc_popup_page_next (self->priv->popup);
+			ret = TRUE;
+		}
+		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_PREV].key,
+					   self->priv->keys[KEYS_PAGE_PREV].mods,
+					   event))
+		{
+			gsc_popup_page_previous (self->priv->popup);
+			ret = TRUE;
+		}
+	}
+	return ret;
+}
+
 gboolean
 gsc_manager_register_provider(GscManager *completion,
 					GscProvider *provider,
@@ -520,7 +662,6 @@ gsc_manager_trigger_event(GscManager *completion,
 	 */
 	if (gsc_manager_is_visible(completion) && completion->priv->active_trigger != trigger)
 	{
-		g_debug("no");
 		return;
 	}
 	
@@ -623,7 +764,6 @@ gsc_manager_get_provider(GscManager *completion,
 			}
 		}while((plist = g_list_next(plist)) != NULL);
 	}
-
 	return NULL;
 }
 
@@ -636,7 +776,6 @@ gsc_manager_register_trigger(GscManager *completion,
     /*Only register the trigger if it has not been registered yet*/
     if (pl==NULL)
     {
-
     	completion->priv->triggers = g_list_append(completion->priv->triggers,trigger);
     	g_object_ref(trigger);
     	const gchar *tn = gsc_trigger_get_name(trigger);
@@ -682,7 +821,6 @@ gsc_manager_get_trigger(GscManager *completion,
 			}
 		}while((plist = g_list_next(plist)) != NULL);
 	}
-
 	return FALSE;
 }
 

@@ -42,7 +42,7 @@ typedef struct _GscTreeClass GscTreeClass;
 
 struct _GscTreeClass
 {
-	GtkScrolledWindowClass parent_class;
+	GtkTreeViewClass parent_class;
 	void (* proposal_selected)(GscTree *tree,
 			       GscProposal *proposal);
 	void (* selection_changed)(GscTree *tree,

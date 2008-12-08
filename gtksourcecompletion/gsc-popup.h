@@ -88,6 +88,8 @@ gboolean	 gsc_popup_select_next			(GscPopup *self,
 gboolean	 gsc_popup_get_selected_proposal	(GscPopup *self,
 							 GscProposal **proposal);
 
+gboolean	 gsc_popup_select_current_proposal	(GscPopup *self);
+
 gboolean	 gsc_popup_has_proposals		(GscPopup *self);
 
 void		 gsc_popup_toggle_proposal_info		(GscPopup *self);
@@ -100,16 +102,6 @@ void		 gsc_popup_set_current_info		(GscPopup *self,
 							 const gchar *info);
 
 gint		 gsc_popup_get_num_active_pages		(GscPopup *self);
-
-void		 gsc_popup_set_key			(GscPopup *self,
-							 KeysType type,
-							 const gchar* keys);
-
-gchar 		*gsc_popup_get_key			(GscPopup *self,
-							 KeysType type);
-
-gboolean	 gsc_popup_manage_key			(GscPopup *self,
-							 GdkEventKey *event);
 
 void		 gsc_popup_show_or_update		(GtkWidget *widget);
 

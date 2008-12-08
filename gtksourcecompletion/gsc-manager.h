@@ -273,6 +273,16 @@ void
 gsc_manager_set_current_info(GscManager *self,
 			     gchar *info);
 
+void		 gsc_manager_set_key			(GscManager *self,
+							 KeysType type,
+							 const gchar* keys);
+
+gchar 		*gsc_manager_get_key			(GscManager *self,
+							 KeysType type);
+
+gboolean	 gsc_manager_manage_key		(GscManager *self,
+							 GdkEventKey *event);
+
 G_END_DECLS
 
 #endif /* _GSC_H_ */
