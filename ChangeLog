@@ -1,5 +1,12 @@
 2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-manager.c:
+	* gtksourcecompletion/gsc-manager.h:
+	* gtksourcecompletion/gsc-info.c:
+	Use the rigth coding style.
+
+2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-proposal.c:
 	* gtksourcecompletion/gsc-info.c:
 	* gtksourcecompletion/gsc-info.h:

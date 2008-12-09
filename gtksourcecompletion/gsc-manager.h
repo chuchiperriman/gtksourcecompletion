@@ -31,34 +31,37 @@
 
 G_BEGIN_DECLS
 
+/*
+ * FIXME: And this here?
+ */
 #define USER_REQUEST_TRIGGER_NAME "user-request"
 
 #define GSC_TYPE_MANAGER             (gsc_manager_get_type ())
 #define GSC_MANAGER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MANAGER, GscManager))
-#define GSC_MANAGER_CLASS(klass)             (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))
+#define GSC_MANAGER_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MANAGER, GscManagerClass))
 #define GSC_IS_MANAGER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_MANAGER))
 #define GSC_IS_MANAGER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_MANAGER))
 #define GSC_MANAGER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MANAGER, GscManagerClass))
 
 typedef struct _GscManagerPrivate GscManagerPrivate;
 
-typedef struct _GscManagerClass GscManagerClass;
 typedef struct _GscManager GscManager;
+
+struct _GscManager
+{
+	GObject parent_instance;
+	
+	GscManagerPrivate *priv;
+};
+
+typedef struct _GscManagerClass GscManagerClass;
 
 struct _GscManagerClass
 {
 	GObjectClass parent_class;
 };
 
-struct _GscManager
-{
-	GObject parent_instance;
-	GscManagerPrivate *priv;
-};
-
-
-GType 
-gsc_manager_get_type (void) G_GNUC_CONST;
+GType		 gsc_manager_get_type			 (void) G_GNUC_CONST;
 
 
 /* ********************* Control Functions ******************** */
@@ -68,210 +71,50 @@ gsc_manager_get_type (void) G_GNUC_CONST;
  * GscManagers and the GtkTextView.
  */
 
-/**
- * gsc_manager_get_from_view:
- * @view: the GtkSourceView
- *
- * Returns NULL if the GtkTextView haven't got an associated GscManager
- * or the GscManager of this GtkTextView
- * 
- **/
-GscManager*
-gsc_manager_get_from_view(GtkTextView *view);
+GscManager	*gsc_manager_get_from_view		(GtkTextView *view);
 
 /* ************************************************************* */
 
-/**
- * gsc_manager_new:
- * @view: a #GtkSourceView.
- *
- * Creates a new #GscManager asociated to a GtkSourceView
- *
- * Returns: value: A new #GscManager
- **/
-GscManager* 
-gsc_manager_new (GtkTextView *view);
+GscManager	*gsc_manager_new			(GtkTextView *view);
 
-/**
- * gsc_manager_get_view:
- * @self: the #GscManager
- *
- * Returns: The internal #GtkTextView of this completion.
- * 
- **/
-GtkTextView* 
-gsc_manager_get_view(GscManager *self);
+GtkTextView	*gsc_manager_get_view			(GscManager *self);
 
-/**
- * gsc_manager_is_visible:
- * @self: The #GscManager
- *
- * Returns TRUE if the completion popup is visible.
- *
- */
-gboolean
-gsc_manager_is_visible(GscManager *self);
+gboolean	 gsc_manager_is_visible			(GscManager *self);
 
-/**
- * gsc_manager_register_provider:
- * @self: the #GscManager
- * @provider: The #GscProvider.
- * @trigger_name: The trigger name what you want to register this provider
- *
- * This function register the provider into the completion and reference it. When 
- * an event is raised, completion call to the provider to get the data. When the user
- * select a proposal, it call the provider to tell it this action and the provider do
- * that it want (normally inserts some text)
- * 
- * Returns TRUE if it was registered or FALSE if not (because it has been already registered,
- * or the trigger don't exists)
- *
- **/
-gboolean
-gsc_manager_register_provider (GscManager *self,
-			       GscProvider *provider,
-			       const gchar *trigger_name);
+gboolean	 gsc_manager_register_provider		(GscManager *self,
+							 GscProvider *provider,
+							 const gchar *trigger_name);
 
-/**
- * gsc_manager_unregister_provider:
- * @self: the #GscManager
- * @provider: The #GscProvider.
- * @trigger_name: The trigger name what you want to unregister this provider
- *
- * This function unregister the provider.
- * 
- * Returns TRUE if it was unregistered or FALSE if not (because it doesn't exists,
- * or the trigger don't exists)
- * 
- **/
-gboolean
-gsc_manager_unregister_provider(GscManager *self,
-					  GscProvider *provider,
-					  const gchar *trigger_name);
+gboolean	 gsc_manager_unregister_provider	(GscManager *self,
+							 GscProvider *provider,
+							 const gchar *trigger_name);
 
-/**
- * gsc_manager_get_provider:
- * @self: The #GscManager
- * @provider_name: Provider's name that you are looking for.
- *
- * Returns The provider if the completion has this provider registered or 
- * NULL if not.
- *
- */
-GscProvider*
-gsc_manager_get_provider(GscManager *self,
-				   const gchar* provider_name);
+GscProvider	*gsc_manager_get_provider		(GscManager *self,
+							 const gchar* provider_name);
 
-/**
- * gsc_manager_register_trigger:
- * @self: The #GscManager
- * @trigger: The trigger to register
- *
- * This function register a completion trigger. If the completion is actived
- * then this method activate the trigger. This function reference the trigger
- * object
- */
-void
-gsc_manager_register_trigger(GscManager *self,
-			     GscTrigger *trigger);
+void		 gsc_manager_register_trigger		(GscManager *self,
+							 GscTrigger *trigger);
 
-/**
- * gsc_manager_unregister_trigger:
- * @self: The #GscManager
- * @trigger: The trigger to unregister
- *
- * This function unregister a completion trigger. If the completion is actived
- * then this method deactivate the trigger. This function reference the trigger
- * object
- */																
-void
-gsc_manager_unregister_trigger(GscManager *self,
-				GscTrigger *trigger);
+void		 gsc_manager_unregister_trigger		(GscManager *self,
+							 GscTrigger *trigger);
 
-/**
- * gsc_manager_get_trigger:
- * @self: The #GscManager
- * @trigger_name: The trigger name to get
- *
- * This function return the trigger with this name.
- *
- * Returns The trigger or NULL if not exists
- *
- */
-GscTrigger*
-gsc_manager_get_trigger(GscManager *self,
-			const gchar* trigger_name);
+GscTrigger	*gsc_manager_get_trigger		(GscManager *self,
+							 const gchar* trigger_name);
 
+GscTrigger	*gsc_manager_get_active_trigger		(GscManager *self);
 
-/**
- * gsc_manager_get_active_trigger:
- * @self: The #GscManager
- *
- * This function return the active trigger. The active trigger is the last
- * trigger raised if the completion is active. If the completion is not visible then
- * there is no an active trigger.
- *
- * Returns The trigger or NULL if completion is not active
- *
- */
-GscTrigger*
-gsc_manager_get_active_trigger(GscManager *self);
+void		 gsc_manager_activate			(GscManager *self);
 
-/**
- * gsc_manager_activate:
- * @self: The #GscManager
- *
- * This function activate the completion mechanism. The completion connects 
- * all signals and activate all registered triggers.
- */
-void
-gsc_manager_activate(GscManager *self);
+void		 gsc_manager_deactivate			(GscManager *self);
 
-/**
- * gsc_manager_deactivate:
- * @self: The #GscManager
- *
- * This function deactivate the completion mechanism. The completion disconnect
- * all signals and deactivate all registered triggers.
- */
-void
-gsc_manager_deactivate(GscManager *self);
+void		 gsc_manager_finish_completion		(GscManager *self);
 
-/**
- * gsc_manager_finish_completion:
- * @self: The #GscManager
- *
- * This function finish the completion if it is active (visible).
- */
-void
-gsc_manager_finish_completion(GscManager *self);
+void		 gsc_manager_trigger_event		(GscManager *self,
+							 const gchar *trigger_name, 
+							 gpointer event_data);
 
-/**
- * gsc_manager_trigger_event:
- * @self: the #GscManager
- * @trigger_name: The event name to raise
- * @event_data: This object will be passed to the providers to give them some special information of the event
- *
- * Calling this function, the completion call to all providers to get data and, if 
- * they return data, it shows the completion to the user. 
- * 
- **/
-void 
-gsc_manager_trigger_event(GscManager *self,
-			  const gchar *trigger_name, 
-			  gpointer event_data);
-
-/**
- * gsc_manager_set_current_info:
- * @self: The #GscManager
- * @info: Info markup to be shown into for current proposal.
- *
- * You can use this function when a GscProposal emit the 
- * display-info signal to set the current info.
- */
-void
-gsc_manager_set_current_info(GscManager *self,
-			     gchar *info);
+void		 gsc_manager_set_current_info		(GscManager *self,
+							 gchar *info);
 
 void		 gsc_manager_set_key			(GscManager *self,
 							 KeysType type,

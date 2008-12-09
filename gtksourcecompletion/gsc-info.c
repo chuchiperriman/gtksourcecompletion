@@ -211,7 +211,7 @@ gsc_info_finalize (GObject *object)
 {
 	/*GscInfo *self = GSC_INFO(object);*/
 	
-	G_OBJECT_CLASS (parent_class)->finalize (object);
+	G_OBJECT_CLASS (gsc_info_parent_class)->finalize (object);
 }
 
 static void
