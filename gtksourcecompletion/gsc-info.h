@@ -35,72 +35,60 @@ G_BEGIN_DECLS
 #define GSC_INFO_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_INFO, GscInfoClass))
 
 typedef struct _GscInfoPrivate GscInfoPrivate;
-typedef struct _GscInfoClass GscInfoClass;
+
 typedef struct _GscInfo GscInfo;
 
-typedef enum{
-	GSC_INFO_TYPE_SHORT,
-	GSC_INFO_TYPE_EXTENDED
-} GscInfoType;
+struct _GscInfo
+{
+	GtkWindow parent;
+	
+	GscInfoPrivate *priv;
+};
+
+typedef struct _GscInfoClass GscInfoClass;
 
 struct _GscInfoClass
 {
 	GtkWindowClass parent_class;
 };
 
-struct _GscInfo
+typedef enum
 {
-	GtkWindow parent;
-	GscInfoPrivate *priv;
-};
+	GSC_INFO_TYPE_SHORT,
+	GSC_INFO_TYPE_EXTENDED
+} GscInfoType;
 
-GType 
-gsc_info_get_type (void) G_GNUC_CONST;
+GType		 gsc_info_get_type			(void) G_GNUC_CONST;
 
-GscInfo*
-gsc_info_new(void);
+GscInfo		*gsc_info_new				(void);
 
-void
-gsc_info_move_to_cursor(GscInfo* self,
-			GtkTextView *view);
+void		 gsc_info_move_to_cursor		(GscInfo* self,
+							 GtkTextView *view);
 
-void
-gsc_info_set_markup(GscInfo* self,
-		    const gchar* markup);
+void		 gsc_info_set_markup			(GscInfo* self,
+							 const gchar* markup);
 
-void
-gsc_info_set_info_type(GscInfo* self,
-		       GscInfoType type);
+void		 gsc_info_set_info_type			(GscInfo* self,
+							 GscInfoType type);
 
-GscInfoType gsc_info_get_info_type(GscInfo* self);
+GscInfoType	 gsc_info_get_info_type			(GscInfo* self);
 
-/**
- * gsc_info_set_adjust_height:
- * @self: The #GscInfo
- * @adjust: TRUE to adjust height to content, FALSE to fixed height
- * @max_height: if adjust = TRUE, set the max height. -1 to preserve the 
- * current value
- *
- * TRUE adjust height to the content. If the content is only a line, the info
- * will be small and if there are a lot of lines, the info will be large to the 
- * max_height
- *
- */
-void
-gsc_info_set_adjust_height(GscInfo* self,
-			   gboolean adjust,
-			   gint max_height);
 
-void
-gsc_info_set_adjust_width(GscInfo* self,
-			  gboolean adjust,
-			  gint max_width);
+void		 gsc_info_set_adjust_height		(GscInfo* self,
+							 gboolean adjust,
+							 gint max_height);
 
-void gsc_info_set_custom(GscInfo* self, GtkWidget *custom_widget);
+void		 gsc_info_set_adjust_width		(GscInfo* self,
+							 gboolean adjust,
+							 gint max_width);
 
-GtkWidget *gsc_info_get_custom(GscInfo* self);
+void		 gsc_info_set_custom			(GscInfo* self,
+							 GtkWidget *custom_widget);
 
-void gsc_info_set_bottom_bar_visible(GscInfo* self, gboolean visible);
+GtkWidget	*gsc_info_get_custom			(GscInfo* self);
+
+void		 gsc_info_set_bottom_bar_visible	(GscInfo* self,
+							 gboolean visible);
 
 G_END_DECLS
 

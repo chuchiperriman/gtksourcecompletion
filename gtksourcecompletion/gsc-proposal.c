@@ -318,7 +318,7 @@ gsc_proposal_get_info (GscProposal *self)
 {
 	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
 
-	return GSC_PROPOSAL_GET_CLASS(self)->get_info (self);
+	return GSC_PROPOSAL_GET_CLASS (self)->get_info (self);
 }
 
 /**
@@ -337,6 +337,6 @@ gsc_proposal_apply (GscProposal *self,
 {
 	g_return_if_fail (GSC_IS_PROPOSAL (self));
 	
-	GSC_PROPOSAL_GET_CLASS(self)->apply (self, view);
+	GSC_PROPOSAL_GET_CLASS (self)->apply (self, view);
 }
 

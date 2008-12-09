@@ -1,3 +1,10 @@
+2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-proposal.c:
+	* gtksourcecompletion/gsc-info.c:
+	* gtksourcecompletion/gsc-info.h:
+	Use the right coding style.
+
 2008-12-09  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-proposal.c:
@@ -6,7 +13,6 @@
 	* gtksourcecompletion/gsc-manager.c:
 	* gtksourcecompletion/gsc-manager.h:
 	Use "self" instead of "completion"
-
 
 2008-12-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
