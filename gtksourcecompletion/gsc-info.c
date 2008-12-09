@@ -96,7 +96,7 @@ show (GtkWidget *widget)
 	
 	adjust_resize (self);
 	/*
-	TODO Set short by default or set the button depending on GscInfoType?
+	Set short by default or set the button depending on GscInfoType?
 	*/
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
 				      FALSE);
@@ -302,10 +302,12 @@ gsc_info_set_adjust_height (GscInfo* self,
 {
 	g_return_if_fail  (GSC_IS_INFO (self));
 
-	/*TODO Control if max_height > screen height*/
 	self->priv->adjust_height = adjust;
+	
 	if (max_height > 0)
+	{
 		self->priv->max_height = max_height;
+	}
 }
 
 void
@@ -314,11 +316,13 @@ gsc_info_set_adjust_width (GscInfo* self,
 			   gint max_width)
 {
 	g_return_if_fail  (GSC_IS_INFO (self));
-
-	/*TODO Control if max_width > screen width*/
+	
 	self->priv->adjust_width = adjust;
+	
 	if (max_width > 0)
+	{
 		self->priv->max_width = max_width;
+	}
 }
 
 void

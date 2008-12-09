@@ -26,7 +26,9 @@ gio_test_LDADD = 	\
 	$(PACKAGE_LIBS)
 
 completion_demo_SOURCES = 		\
-	completion-demo.c
+	completion-demo.c		\
+	gsc-provider-test.h		\
+	gsc-provider-test.c
 
 completion_demo_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\

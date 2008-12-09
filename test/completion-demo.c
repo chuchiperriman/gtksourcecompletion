@@ -41,6 +41,8 @@
 #include <gtksourcecompletion/gsc-info.h>
 #include <gtksourcecompletion/gsc-utils.h>
 
+#include "gsc-provider-test.h"
+
 
 static GtkWidget *view;
 static GscManager *comp;
@@ -253,8 +255,12 @@ static void
 create_completion(void)
 {
 	GscDocumentwordsProvider *prov = gsc_documentwords_provider_new(GTK_TEXT_VIEW(view));
+
 	GscProviderFile *prov_file = gsc_provider_file_new(GTK_TEXT_VIEW(view));
 	gsc_provider_file_set_file(prov_file,"/tmp/main.c");
+	
+	GscProviderTest *prov_test = gsc_provider_test_new(GTK_TEXT_VIEW(view));
+	
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
 	comp = gsc_manager_new(GTK_TEXT_VIEW(view));
 	set_custom_keys(comp);
@@ -265,6 +271,7 @@ create_completion(void)
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));
 	
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),gsc_trigger_get_name (GSC_TRIGGER (ac_trigger)));
+	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_test),gsc_trigger_get_name (GSC_TRIGGER (ac_trigger)));
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),"User Request Trigger");
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_file),"User Request Trigger");
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
@@ -281,8 +288,8 @@ create_info()
 	info = gsc_info_new();
 	GtkRequisition req = {100,100};
 	gtk_widget_size_request(GTK_WIDGET(info),&req);
-	gsc_info_set_adjust_height(info,TRUE,-1);
-	gsc_info_set_adjust_width(info,TRUE,-1);
+	gsc_info_set_adjust_height(info,TRUE,100000);
+	gsc_info_set_adjust_width(info,TRUE,100000);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
 	GtkWidget *custom = gtk_text_view_new();
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom));
