@@ -136,6 +136,7 @@ end_completion (GscManager *self)
 	else
 	{
 		GList *providers = self->priv->providers;
+		
 		do 
 		{
 			GscProvider *provider =  GSC_PROVIDER (providers->data);
@@ -336,9 +337,9 @@ gsc_manager_init (GscManager *self)
 						       g_free,
 						       (GDestroyNotify)prov_list_free);
 
-	gsc_manager_set_key (self, KEYS_INFO,DEFAULT_INFO_KEYS);
-	gsc_manager_set_key (self, KEYS_PAGE_NEXT,DEFAULT_PAGE_NEXT_KEYS);
-	gsc_manager_set_key (self, KEYS_PAGE_PREV,DEFAULT_PAGE_PREV_KEYS);
+	gsc_manager_set_key (self, KEYS_INFO, DEFAULT_INFO_KEYS);
+	gsc_manager_set_key (self, KEYS_PAGE_NEXT, DEFAULT_PAGE_NEXT_KEYS);
+	gsc_manager_set_key (self, KEYS_PAGE_PREV, DEFAULT_PAGE_PREV_KEYS);
 
 	self->priv->popup = GSC_POPUP (gsc_popup_new ());
 	
@@ -567,7 +568,7 @@ gsc_manager_manage_key (GscManager *self,
 		case GDK_Return:
 		case GDK_Tab:
 		{
-			gsc_popup_select_current_proposal(self->priv->popup);
+			gsc_popup_select_current_proposal (self->priv->popup);
 			gtk_widget_hide (GTK_WIDGET (self->priv->popup));
 			ret = TRUE;
 			catched = TRUE;
@@ -756,73 +757,79 @@ gsc_manager_trigger_event (GscManager *self,
 	/*providers_list = self->priv->providers;*/
 	providers_list = pl->prov_list;
 	
-	if (providers_list != NULL)
-	{
-		/*Getting the data...*/
-		do
-		{
-			provider =  GSC_PROVIDER (providers_list->data);
-			data_list = gsc_provider_get_proposals (provider, trigger);
-			if (data_list != NULL)
-			{
-				original_list = data_list;
-				do
-				{
-					final_list = g_list_append (final_list,
-								    data_list->data);
-				}while ((data_list = g_list_next (data_list)) != NULL);
-				
-				g_list_free (original_list);
-			}
-		}while ((providers_list = g_list_next (providers_list)) != NULL);
-		
-		if (final_list != NULL)
-		{
-			data_list = final_list;
-			/* Insert the data into the model */
-			do
-			{
-				last_proposal = GSC_PROPOSAL (data_list->data);
-				gsc_popup_add_data (self->priv->popup,
-						    last_proposal);
-				++proposals;
-			}while ((data_list = g_list_next (data_list)) != NULL);
-			
-			g_list_free (final_list);
-			/* If there are not proposals, we don't show the popup */
-			if (proposals > 0)
-			{
-				gint x, y;
-				GtkWindow *win;
-				
-				if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
-					return;
-
-				gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
-								   self->priv->text_view,
-								   &x, &y);
-				gtk_window_move (GTK_WINDOW (self->priv->popup),
-						 x, y);
-				gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
-
-				/*Set the focus to the View, not the completion popup*/
-				win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
-						  GTK_TYPE_WINDOW));
-				gtk_window_present (win);
-				gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
-
-				self->priv->active_trigger = trigger;
-			}
-			else if (GTK_WIDGET_VISIBLE (self->priv->popup))
-				 end_completion (self);
-		}
-		else if (gsc_manager_is_visible (self))
-			 end_completion (self);
-	}
-	else
+	if (providers_list == NULL)
 	{
 		if (gsc_manager_is_visible (self))
 			end_completion (self);
+		
+		return;
+	}
+	
+	/*Getting the data...*/
+	do
+	{
+		provider =  GSC_PROVIDER (providers_list->data);
+		data_list = gsc_provider_get_proposals (provider, trigger);
+		
+		if (data_list != NULL)
+		{
+			original_list = data_list;
+			do
+			{
+				final_list = g_list_append (final_list,
+							    data_list->data);
+			}while ((data_list = g_list_next (data_list)) != NULL);
+			
+			g_list_free (original_list);
+		}
+	}while ((providers_list = g_list_next (providers_list)) != NULL);
+	
+	if (final_list != NULL)
+	{
+		data_list = final_list;
+		/* Insert the data into the model */
+		do
+		{
+			last_proposal = GSC_PROPOSAL (data_list->data);
+			
+			gsc_popup_add_data (self->priv->popup,
+					    last_proposal);
+			++proposals;
+		}while ((data_list = g_list_next (data_list)) != NULL);
+		
+		g_list_free (final_list);
+		/* If there are not proposals, we don't show the popup */
+		if (proposals > 0)
+		{
+			gint x, y;
+			GtkWindow *win;
+			
+			if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
+				return;
+
+			gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
+							   self->priv->text_view,
+							   &x, &y);
+			gtk_window_move (GTK_WINDOW (self->priv->popup),
+					 x, y);
+			gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
+
+			/*Set the focus to the View, not the completion popup*/
+			win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
+					  GTK_TYPE_WINDOW));
+			gtk_window_present (win);
+			gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
+
+			self->priv->active_trigger = trigger;
+		}
+		else if (GTK_WIDGET_VISIBLE (self->priv->popup))
+		{
+			end_completion (self);
+		}
+	}
+	else if (gsc_manager_is_visible (self))
+	{
+		end_completion (self);
 	}
 }
 
@@ -830,8 +837,7 @@ gsc_manager_trigger_event (GscManager *self,
  * gsc_manager_is_visible:
  * @self: The #GscManager
  *
- * Returns TRUE if the completion popup is visible.
- *
+ * Returns: %TRUE if the completion popup is visible.
  */
 gboolean
 gsc_manager_is_visible (GscManager *self)
@@ -845,9 +851,8 @@ gsc_manager_is_visible (GscManager *self)
  * gsc_manager_get_from_view:
  * @view: the GtkSourceView
  *
- * Returns NULL if the GtkTextView haven't got an associated GscManager
+ * Returns: %NULL if the GtkTextView haven't got an associated GscManager
  * or the GscManager of this GtkTextView
- * 
  **/
 GscManager *
 gsc_manager_get_from_view (GtkTextView *view)
@@ -860,9 +865,8 @@ gsc_manager_get_from_view (GtkTextView *view)
  * @self: The #GscManager
  * @provider_name: Provider's name that you are looking for.
  *
- * Returns The provider if the completion has this provider registered or 
+ * Returns: The provider if the completion has this provider registered or 
  * NULL if not.
- *
  */
 GscProvider *
 gsc_manager_get_provider (GscManager *self,
@@ -973,7 +977,7 @@ gsc_manager_unregister_trigger (GscManager *self,
  *
  * This function return the trigger with this name.
  *
- * Returns The trigger or NULL if not exists
+ * Returns: The trigger or NULL if not exists
  *
  */
 GscTrigger*
@@ -992,6 +996,7 @@ gsc_manager_get_trigger (GscManager *self,
 		do
 		{
 			trigger =  GSC_TRIGGER (plist->data);
+			
 			if (strcmp (gsc_trigger_get_name (trigger),
 				    trigger_name) == 0)
 			{
@@ -1047,8 +1052,8 @@ gsc_manager_activate (GscManager *self)
 		do
 		{
 			trigger =  GSC_TRIGGER (plist->data);
+			
 			gsc_trigger_activate (trigger);
-
 		}while ((plist = g_list_next (plist)) != NULL);
 	}	
 	
@@ -1089,8 +1094,8 @@ gsc_manager_deactivate (GscManager *self)
 		do
 		{
 			trigger =  GSC_TRIGGER (plist->data);
+			
 			gsc_trigger_deactivate (trigger);
-
 		}while ((plist = g_list_next (plist)) != NULL);
 	}
 	
@@ -1122,7 +1127,7 @@ gsc_manager_finish_completion (GscManager *self)
  * trigger raised if the completion is active. If the completion is not visible then
  * there is no an active trigger.
  *
- * Returns The trigger or NULL if completion is not active
+ * Returns: The trigger or NULL if completion is not active
  */
 GscTrigger*
 gsc_manager_get_active_trigger (GscManager *self)

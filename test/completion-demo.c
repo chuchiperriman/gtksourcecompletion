@@ -264,7 +264,7 @@ create_completion(void)
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));
 	
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER_AUTOWORDS_NAME);
+	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),gsc_trigger_get_name (GSC_TRIGGER (ac_trigger)));
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),"User Request Trigger");
 	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_file),"User Request Trigger");
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);

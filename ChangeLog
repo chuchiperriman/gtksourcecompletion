@@ -1,6 +1,14 @@
 2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:
+	* gtksourcecompletion/gsc-trigger-autowords.c:
+	* gtksourcecompletion/gsc-trigger-autowords.h:
+	* test/completion-demo.c:
+	Improve a bit more the style.
+
+2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
 	* gtksourcecompletion/gsc-manager.h:
 	* gtksourcecompletion/gsc-info.c:
 	Use the rigth coding style.
