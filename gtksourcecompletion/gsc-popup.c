@@ -134,7 +134,7 @@ get_tree_by_name (GscPopup *self, const gchar* tree_name)
 		GtkWidget *completion_tree;
 		GtkWidget *label;
 		
-		completion_tree = gsc_tree_new();
+		completion_tree = gsc_tree_new ();
 		
 		g_hash_table_insert (self->priv->trees,
 				     (gpointer)tree_name,
@@ -154,12 +154,12 @@ get_tree_by_name (GscPopup *self, const gchar* tree_name)
 		g_signal_connect (completion_tree, 
 				  "proposal-selected",
 				  G_CALLBACK (proposal_selected_cb),
-				  (gpointer) self);
+				  self);
 						
 		g_signal_connect (completion_tree, 
 				  "selection-changed",
 				  G_CALLBACK (selection_changed_cd),
-				  (gpointer) self);
+				  self);
 	}
 
 	return tree;
@@ -375,12 +375,15 @@ gsc_popup_init (GscPopup *self)
 	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
 	
 	completion_tree = gsc_tree_new();
+	gtk_widget_show (completion_tree);
 	g_object_set (G_OBJECT (completion_tree), "can-focus",
 		      FALSE, NULL);
 	
 	g_hash_table_insert (self->priv->trees, DEFAULT_PAGE, completion_tree);
 	
+	/*Notebook*/
 	self->priv->notebook = gtk_notebook_new ();
+	gtk_widget_show (self->priv->notebook);
 	g_object_set (G_OBJECT (self->priv->notebook), "can-focus",
 		      FALSE, NULL);
 	gtk_notebook_set_show_tabs (GTK_NOTEBOOK (self->priv->notebook), FALSE);
@@ -388,15 +391,18 @@ gsc_popup_init (GscPopup *self)
 				      FALSE);
 
 	default_label = gtk_label_new (DEFAULT_PAGE);
+	gtk_widget_show (default_label);
 	gtk_notebook_append_page (GTK_NOTEBOOK (self->priv->notebook),
 				  GTK_WIDGET (completion_tree),
 				  default_label);
 	/*Icon list*/
 	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
 					      GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_widget_show (info_icon);
 	gtk_widget_set_tooltip_text (info_icon, _("Show Proposal Info"));
 	
 	info_button = gtk_toggle_button_new ();
+	gtk_widget_show (info_button);
 	g_object_set (G_OBJECT (info_button), "can-focus", FALSE, NULL);
 	
 	self->priv->info_button = info_button;
@@ -408,67 +414,55 @@ gsc_popup_init (GscPopup *self)
 			  self);
 
 	self->priv->bottom_bar = gtk_hbox_new (FALSE, 1);
-	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar),
-			    info_button,
-			    FALSE,
-			    FALSE,
-			    0);
+	gtk_widget_show (self->priv->bottom_bar);
+	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar), info_button,
+			    FALSE, FALSE, 0);
 
 	/*Next page icon*/
 	self->priv->next_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
 							       GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_widget_show (self->priv->next_page_icon);
 	gtk_box_pack_end (GTK_BOX (self->priv->bottom_bar),
 			  self->priv->next_page_icon,
-			  FALSE,
-			  FALSE,
-			  1);
+			  FALSE, FALSE, 1);
 	/*Page label*/
 	self->priv->tab_label = gtk_label_new (DEFAULT_PAGE);
+	gtk_widget_show (self->priv->tab_label);
 	gtk_box_pack_end (GTK_BOX (self->priv->bottom_bar),
 			  self->priv->tab_label,
-			  FALSE,
-			  TRUE,
-			  10);
+			  FALSE, TRUE, 10);
 	
+	/*Main vbox*/
 	vbox = gtk_vbox_new (FALSE, 1);
-			   
-	gtk_box_pack_start (GTK_BOX (vbox),
-			    self->priv->notebook,
-			    TRUE,
-			    TRUE,
-			    0);
+	gtk_widget_show (vbox);
+	gtk_box_pack_start (GTK_BOX (vbox), self->priv->notebook,
+			    TRUE, TRUE, 0);
 
-	gtk_box_pack_end (GTK_BOX (vbox),
-			  self->priv->bottom_bar,
-			  FALSE,
-			  FALSE,
-			  0);
+	gtk_box_pack_end (GTK_BOX (vbox), self->priv->bottom_bar,
+			  FALSE, FALSE, 0);
 
 	gtk_container_add (GTK_CONTAINER (self), vbox);
-	/*
-	 * FIXME: use show instead of show_all
-	 */
-	gtk_widget_show_all (vbox);
 
 	/*Info window*/
 	self->priv->info_window = GTK_WIDGET (gsc_info_new ());
-	gsc_info_set_bottom_bar_visible (GSC_INFO (self->priv->info_window), FALSE);
+	gsc_info_set_bottom_bar_visible (GSC_INFO (self->priv->info_window),
+					 FALSE);
+
 	/* Connect signals */
-	
 	g_signal_connect (completion_tree,
 			  "proposal-selected",
 			  G_CALLBACK (proposal_selected_cb),
-			  (gpointer) self);
+			  self);
 
 	g_signal_connect (completion_tree, 
 			  "selection-changed",
 			  G_CALLBACK (selection_changed_cd),
-			  (gpointer) self);
+			  self);
 			
 	g_signal_connect (self->priv->notebook, 
 			  "switch-page",
 			  G_CALLBACK (switch_page_cb),
-			  (gpointer) self);
+			  self);
 			
 	g_signal_connect (self,
 			  "delete-event",
