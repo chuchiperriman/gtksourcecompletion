@@ -1,11 +1,17 @@
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
-	* gsc-popup.c:
+	* gtksourcecompletion/gsc-info.c:
+	Do not use show_all(), use show instead.
+	Make it look like a GtkTooltip.
+
+2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-popup.c:
 	Fix some coding style.
 
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
-	* gsc-popup.c:
+	* gtksourcecompletion/gsc-popup.c:
 	Do not use show_all(), use show instead.
 
 2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>

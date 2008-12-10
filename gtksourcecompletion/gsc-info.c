@@ -136,7 +136,6 @@ static void
 gsc_info_init (GscInfo *self)
 {
 	GtkWidget *info_icon;
-	GtkWidget *info_button;
 	
 	self->priv = GSC_INFO_GET_PRIVATE (self);
 	self->priv->adjust_height = FALSE;
@@ -145,65 +144,65 @@ gsc_info_init (GscInfo *self)
 	self->priv->max_width = WINDOW_WIDTH;
 	self->priv->custom_widget = NULL;
 	
+	/*
+	 * Make it look like a tooltip
+	 */
+	gtk_widget_set_name (GTK_WIDGET (self), "gtk-tooltip");
+	gtk_widget_ensure_style (GTK_WIDGET (self));
+	
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
 	gtk_window_set_decorated (GTK_WINDOW(self), FALSE);
 	gtk_window_set_default_size (GTK_WINDOW (self),
-				     WINDOW_WIDTH,WINDOW_HEIGHT);
-	gtk_container_set_border_width (GTK_CONTAINER (self), 1);
+				     WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	self->priv->info_scroll = gtk_scrolled_window_new (NULL, NULL);
+	gtk_widget_show (self->priv->info_scroll);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 
 	self->priv->label = gtk_label_new (NULL);
-	    
+	gtk_widget_show (self->priv->label);
+
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					       self->priv->label);
 	
 	/*Bottom bar*/
 	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
 					      GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_widget_show (info_icon);
 	gtk_widget_set_tooltip_text (info_icon, _("Toggle info view"));
 	
-	info_button = gtk_toggle_button_new ();
-	g_object_set (G_OBJECT (info_button), "can-focus", FALSE, NULL);
+	self->priv->info_button = gtk_toggle_button_new ();
+	gtk_widget_show (self->priv->info_button);
+	g_object_set (G_OBJECT (self->priv->info_button),
+		      "can-focus", FALSE, NULL);
 	
-	self->priv->info_button = info_button;
-	gtk_button_set_focus_on_click (GTK_BUTTON (info_button), FALSE);
-	gtk_container_add (GTK_CONTAINER (info_button), info_icon);
-	g_signal_connect (G_OBJECT (info_button),
+	gtk_button_set_focus_on_click (GTK_BUTTON (self->priv->info_button),
+				       FALSE);
+	gtk_container_add (GTK_CONTAINER (self->priv->info_button), info_icon);
+	g_signal_connect (G_OBJECT (self->priv->info_button),
 			  "toggled",
 			  G_CALLBACK (info_toggled_cb),
 			  self);
 
 	self->priv->bottom_bar = gtk_hbox_new (FALSE, 1);
 	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar),
-			    info_button,
-			    FALSE,
-			    FALSE,
-			    0);
+			    self->priv->info_button,
+			    FALSE, FALSE, 0);
 	
 	self->priv->box = gtk_vbox_new (FALSE, 1);
+	gtk_widget_show (self->priv->box);
 	gtk_box_pack_start (GTK_BOX (self->priv->box),
 			    self->priv->info_scroll,
-			    TRUE,
-			    TRUE,
-			    0);
+			    TRUE, TRUE, 0);
 
 	gtk_box_pack_end (GTK_BOX (self->priv->box),
 			  self->priv->bottom_bar,
-			  FALSE,
-			  FALSE,
-			  0);
+			  FALSE, FALSE, 0);
 	
 	gtk_container_add (GTK_CONTAINER (self), self->priv->box);
-	
-	/*
-	 * FIXME: Add show instead of show_all
-	 */
-	gtk_widget_show_all (self->priv->box);
 }
 
 static void
