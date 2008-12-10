@@ -240,7 +240,7 @@ gsc_popup_display_info_default (GscPopup *self,
 		const gchar *info;
 		
 		info = gsc_proposal_get_info (proposal);
-		gsc_popup_set_current_info (self, (gchar*)info);
+		gsc_popup_set_current_info (self, info);
 	}
 	return FALSE;
 }
@@ -264,6 +264,7 @@ gsc_popup_realize (GtkWidget *widget)
 	gtk_widget_set_size_request (GTK_WIDGET (self),
 				     WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_resizable (GTK_WINDOW (self), TRUE);
+	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->realize (widget);
 }
 
@@ -521,7 +522,7 @@ gsc_popup_clear (GscPopup *self)
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 	
-	pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
+	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
 	
 	for(i = 0; i < pages; i++)
 	{
@@ -622,7 +623,8 @@ gsc_popup_select_current_proposal (GscPopup *self)
 	GscProposal *prop = NULL;
 	if (gsc_popup_get_selected_proposal (self, &prop))
 	{
-		g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED], 0, prop);
+		g_signal_emit (G_OBJECT (self), popup_signals[ITEM_SELECTED],
+			       0, prop);
 		selected = TRUE;
 	}
 	return selected;
@@ -796,7 +798,7 @@ gsc_popup_set_current_info (GscPopup *self,
  * gsc_popup_get_num_active_pages:
  * @self: The #GscPopup
  *
- * Returns The number of active pages (pages with proposals)
+ * Returns: The number of active pages (pages with proposals)
  */
 gint
 gsc_popup_get_num_active_pages (GscPopup *self)

@@ -1,6 +1,11 @@
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gsc-popup.c:
+	Fix some coding style.
+
+2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gsc-popup.c:
 	Do not use show_all(), use show instead.
 
 2008-12-09  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
