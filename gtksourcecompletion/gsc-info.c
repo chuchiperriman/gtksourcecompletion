@@ -111,6 +111,7 @@ hide (GtkWidget *widget)
 	GscInfo *self = GSC_INFO (widget);
 	
 	gtk_label_set_label (GTK_LABEL (self->priv->label), "");
+	
 	GTK_WIDGET_CLASS (gsc_info_parent_class)->hide (GTK_WIDGET (self));
 }
 
@@ -250,9 +251,9 @@ gsc_info_class_init (GscInfoClass *klass)
 GscInfo*
 gsc_info_new (void)
 {
-	GscInfo *self = GSC_INFO(g_object_new (GSC_TYPE_INFO,
-					       "type", GTK_WINDOW_POPUP,
-					       NULL));
+	GscInfo *self = GSC_INFO (g_object_new (GSC_TYPE_INFO,
+					        "type", GTK_WINDOW_POPUP,
+					        NULL));
 	return self;
 }
 

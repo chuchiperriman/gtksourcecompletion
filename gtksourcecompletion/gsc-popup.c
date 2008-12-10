@@ -52,6 +52,10 @@ struct _GscPopupPriv
 	GtkWidget *next_page_icon;
 	GtkWidget *bottom_bar;
 	
+	/*
+	 * FIXME: Nacho: Why a hastable? We are not going to manage a lot of trees
+	 * I think that with a GList we can handle this
+	 */
 	GHashTable *trees;
 	gboolean destroy_has_run;
 };
@@ -122,7 +126,8 @@ selection_changed_cd (GscTree *tree,
 }
 
 static GscTree*
-get_tree_by_name (GscPopup *self, const gchar* tree_name)
+get_tree_by_name (GscPopup *self,
+		  const gchar* tree_name)
 {
 	GscTree *tree;
 	
@@ -252,7 +257,6 @@ gsc_popup_hide (GtkWidget *widget)
 	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->hide (widget);
 	gtk_widget_hide (self->priv->info_window);
-
 }
 
 static void
@@ -260,9 +264,9 @@ gsc_popup_realize (GtkWidget *widget)
 {
 	GscPopup *self = GSC_POPUP (widget);
 	
-	gtk_container_set_border_width (GTK_CONTAINER(self), 1);
+	gtk_container_set_border_width (GTK_CONTAINER (self), 1);
 	gtk_widget_set_size_request (GTK_WIDGET (self),
-				     WINDOW_WIDTH,WINDOW_HEIGHT);
+				     WINDOW_WIDTH, WINDOW_HEIGHT);
 	gtk_window_set_resizable (GTK_WINDOW (self), TRUE);
 	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->realize (widget);
@@ -307,7 +311,7 @@ gsc_popup_class_init (GscPopupClass *klass)
 	GtkObjectClass *gtkobject_class = GTK_OBJECT_CLASS (klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 	
-	g_type_class_add_private (klass, sizeof(GscPopupPriv));
+	g_type_class_add_private (klass, sizeof (GscPopupPriv));
 	
 	object_class->finalize = gsc_popup_finalize;
 	gtkobject_class->destroy = gsc_popup_destroy;
@@ -375,7 +379,7 @@ gsc_popup_init (GscPopup *self)
 				     WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
 	
-	completion_tree = gsc_tree_new();
+	completion_tree = gsc_tree_new ();
 	gtk_widget_show (completion_tree);
 	g_object_set (G_OBJECT (completion_tree), "can-focus",
 		      FALSE, NULL);

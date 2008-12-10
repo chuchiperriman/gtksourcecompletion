@@ -33,6 +33,9 @@ static gboolean lib_initialized = FALSE;
 
 #define GSC_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_MANAGER, GscManagerPrivate))
 
+/*
+ * FIXME: I do not like this names. Maybe without the IS_GET_TEXT prefix?
+ */
 /* Internal signals */
 enum
 {
@@ -73,6 +76,10 @@ struct _GscManagerPrivate
 
 G_DEFINE_TYPE(GscManager, gsc_manager, G_TYPE_OBJECT);
 
+/*
+ * FIXME: Nacho: why this can't go directly in the hash?
+ * do we really need a hash for this?
+ */
 struct _ProviderList
 {
 	GList *prov_list;
@@ -784,50 +791,51 @@ gsc_manager_trigger_event (GscManager *self,
 		}
 	}while ((providers_list = g_list_next (providers_list)) != NULL);
 	
-	if (final_list != NULL)
+	if (final_list == NULL)
 	{
-		data_list = final_list;
-		/* Insert the data into the model */
-		do
-		{
-			last_proposal = GSC_PROPOSAL (data_list->data);
-			
-			gsc_popup_add_data (self->priv->popup,
-					    last_proposal);
-			++proposals;
-		}while ((data_list = g_list_next (data_list)) != NULL);
-		
-		g_list_free (final_list);
-		/* If there are not proposals, we don't show the popup */
-		if (proposals > 0)
-		{
-			gint x, y;
-			GtkWindow *win;
-			
-			if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
-				return;
-
-			gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
-							   self->priv->text_view,
-							   &x, &y);
-			gtk_window_move (GTK_WINDOW (self->priv->popup),
-					 x, y);
-			gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
-
-			/*Set the focus to the View, not the completion popup*/
-			win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
-					  GTK_TYPE_WINDOW));
-			gtk_window_present (win);
-			gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
-
-			self->priv->active_trigger = trigger;
-		}
-		else if (GTK_WIDGET_VISIBLE (self->priv->popup))
-		{
+		if (gsc_manager_is_visible (self))
 			end_completion (self);
-		}
+			
+		return;
 	}
-	else if (gsc_manager_is_visible (self))
+	
+	data_list = final_list;
+	/* Insert the data into the model */
+	do
+	{
+		last_proposal = GSC_PROPOSAL (data_list->data);
+		
+		gsc_popup_add_data (self->priv->popup,
+				    last_proposal);
+		++proposals;
+	}while ((data_list = g_list_next (data_list)) != NULL);
+	
+	g_list_free (final_list);
+	/* If there are not proposals, we don't show the popup */
+	if (proposals > 0)
+	{
+		gint x, y;
+		GtkWindow *win;
+		
+		if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
+			return;
+
+		gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
+						   self->priv->text_view,
+						   &x, &y);
+		gtk_window_move (GTK_WINDOW (self->priv->popup),
+				 x, y);
+		gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
+
+		/*Set the focus to the View, not the completion popup*/
+		win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
+				  GTK_TYPE_WINDOW));
+		gtk_window_present (win);
+		gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
+
+		self->priv->active_trigger = trigger;
+	}
+	else if (GTK_WIDGET_VISIBLE (self->priv->popup))
 	{
 		end_completion (self);
 	}

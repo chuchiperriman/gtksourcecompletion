@@ -1,6 +1,13 @@
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c:
+	* gtksourcecompletion/gsc-popup.c:
+	* gtksourcecompletion/gsc-manager.c:
+	Fixed a few more the coding style and added several FIXMEs.
+
+2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-info.c:
 	Do not use show_all(), use show instead.
 	Make it look like a GtkTooltip.
 
