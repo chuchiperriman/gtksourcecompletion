@@ -19,10 +19,6 @@
 
 #include "gsc-tree.h"
 
-#define COL_PIXBUF 0
-#define COL_NAME 1
-#define COL_DATA 2
-
 #define GSC_TREE_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
 					 GSC_TYPE_TREE,                    \
 					 GscTreePriv))
@@ -37,14 +33,24 @@ enum
 	LAST_SIGNAL
 };
 
+enum
+{
+	COLUMN_PIXBUF,
+	COLUMN_NAME,
+	COLUMN_DATA,
+	N_COLUMNS
+};
+
 static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _GscTreePriv
 {
 	gboolean destroy_has_run;
+	
 	GtkListStore *list_store;
 	GtkTreeModelFilter *model_filter;
-	const gchar* current_filter;
+	
+	gchar* current_filter;
 	gboolean active_filter;
 };
 
@@ -65,7 +71,7 @@ _tree_row_activated_cb (GtkTreeView *tree_view,
 	model = gtk_tree_view_get_model(tree_view);
 	
 	gtk_tree_model_get_iter(model,&iter,path);
-	gtk_tree_model_get_value(model,&iter,COL_DATA,&value_name);
+	gtk_tree_model_get_value(model,&iter,COLUMN_DATA,&value_name);
 	data = (GscProposal*)g_value_get_pointer(&value_name);
 	
 	g_signal_emit (G_OBJECT (self), signals[ITEM_SELECTED], 0, data);
@@ -84,34 +90,32 @@ _selection_changed_cd(GtkTreeSelection *treeselection,
 }
 
 
-G_DEFINE_TYPE(GscTree, gsc_tree, GTK_TYPE_TREE_VIEW);
+G_DEFINE_TYPE (GscTree, gsc_tree, GTK_TYPE_TREE_VIEW);
 
 static gboolean
-_filter_by_name_func (GtkTreeModel *model,
-			GtkTreeIter *iter,
-			gpointer data)
+filter_by_name_func (GtkTreeModel *model,
+		     GtkTreeIter *iter,
+		     gpointer user_data)
 {
-	
-	GscTree *self = GSC_TREE(data);
+	GscTree *self = GSC_TREE (user_data);
+	const gchar *current_name;
+
 	if (!self->priv->active_filter)
 		return TRUE;
-		
-	const gchar* filter = self->priv->current_filter;
-	if (filter == NULL)
+
+	if (self->priv->current_filter == NULL)
 		return TRUE;
-		
-	GValue current_name_value = {0,};
-	gtk_tree_model_get_value(model,
-				iter,
-				1,
-				&current_name_value);
-	const gchar* current_name = g_value_get_string(&current_name_value);
+	
+	gtk_tree_model_get (model,
+			    iter,
+			    COLUMN_NAME,
+			    &current_name,
+			    -1);
 	
 	if (current_name == NULL)
 		return TRUE;
 	
-	gint len_cur = strlen (filter);
-	if (strncmp(filter,current_name,len_cur)==0)
+	if (strcmp (self->priv->current_filter, current_name) == 0)
 	{
 		return TRUE;
 	}
@@ -122,7 +126,9 @@ static void
 gsc_tree_finalize (GObject *object)
 {
 	GscTree *self = GSC_TREE(object);
-	self->priv->current_filter = NULL;
+	
+	g_free (self->priv->current_filter);
+	
 	G_OBJECT_CLASS (gsc_tree_parent_class)->finalize (object);
 }
 
@@ -130,7 +136,8 @@ static void
 gsc_tree_class_init (GscTreeClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	g_type_class_add_private (klass, sizeof(GscTreePriv));
+	
+	g_type_class_add_private (klass, sizeof (GscTreePriv));
 	
 	object_class->finalize = gsc_tree_finalize;
 	
@@ -176,74 +183,73 @@ gsc_tree_class_init (GscTreeClass *klass)
 static void
 gsc_tree_init (GscTree *self)
 {
-	self->priv = GSC_TREE_GET_PRIVATE(self);
-	self->priv->destroy_has_run = FALSE;
-	self->priv->current_filter = NULL;
-	self->priv->active_filter = FALSE;
-
-	g_object_set(self,
-		     "can-focus",FALSE,
-		     NULL);
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(self),FALSE);
-	
-	/* Create the Tree */
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 	GtkCellRenderer* renderer_pixbuf;
 	GtkTreeViewColumn* column_pixbuf;
+	GtkTreeModel *model;
+	GtkTreeSelection *selection;
+
+	self->priv = GSC_TREE_GET_PRIVATE (self);
+	self->priv->destroy_has_run = FALSE;
+	self->priv->current_filter = NULL;
+	self->priv->active_filter = FALSE;
+
+	g_object_set (self, "can-focus", FALSE, NULL);
+	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (self), FALSE);
 	
-	renderer_pixbuf = gtk_cell_renderer_pixbuf_new();
+	/* Create the Tree */
+	renderer_pixbuf = gtk_cell_renderer_pixbuf_new ();
 	column_pixbuf = gtk_tree_view_column_new_with_attributes ("Pixbuf",
 								  renderer_pixbuf, 
 								  "pixbuf", 
-								  COL_PIXBUF, 
+								  COLUMN_PIXBUF, 
 								  NULL);
 	
-	column = gtk_tree_view_column_new();
+	column = gtk_tree_view_column_new ();
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_tree_view_column_pack_start (column, renderer, FALSE);
-	gtk_tree_view_column_set_attributes (column,renderer,"text",COL_NAME,NULL);
+	gtk_tree_view_column_set_attributes (column, renderer,
+					     "text", COLUMN_NAME, NULL);
 
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self), column_pixbuf);
-	gtk_tree_view_append_column (GTK_TREE_VIEW(self), column);
+	gtk_tree_view_append_column (GTK_TREE_VIEW (self), column_pixbuf);
+	gtk_tree_view_append_column (GTK_TREE_VIEW (self), column);
 	
 	/* Create the model */
-	self->priv->list_store = gtk_list_store_new (4,
-						       GDK_TYPE_PIXBUF, 
-						       G_TYPE_STRING, 
-						       G_TYPE_POINTER, 
-						       G_TYPE_POINTER);
+	self->priv->list_store = gtk_list_store_new (N_COLUMNS,
+						     GDK_TYPE_PIXBUF, 
+						     G_TYPE_STRING, 
+						     G_TYPE_POINTER);
 	
-	GtkTreeModel *model = gtk_tree_model_filter_new(GTK_TREE_MODEL(self->priv->list_store),
-							NULL);
+	model = gtk_tree_model_filter_new (GTK_TREE_MODEL (self->priv->list_store),
+					   NULL);
 
-	self->priv->model_filter = GTK_TREE_MODEL_FILTER(model);
+	self->priv->model_filter = GTK_TREE_MODEL_FILTER (model);
 	
-	gtk_tree_model_filter_set_visible_func(self->priv->model_filter,
-						_filter_by_name_func,
+	gtk_tree_model_filter_set_visible_func (self->priv->model_filter,
+						filter_by_name_func,
 						self,
 						NULL);
 
-	gtk_tree_view_set_model(GTK_TREE_VIEW(self),
-				model);
-	
+	gtk_tree_view_set_model (GTK_TREE_VIEW (self),
+				 model);
 	
 	/* Connect signals */
-	g_signal_connect(self, 
-			"row-activated",
-			G_CALLBACK(_tree_row_activated_cb),
-			(gpointer) self);
+	g_signal_connect (self, 
+			  "row-activated",
+			  G_CALLBACK (_tree_row_activated_cb),
+			  self);
 					
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
-	g_signal_connect(selection, 
-			"changed",
-			G_CALLBACK(_selection_changed_cd),
-			(gpointer) self);
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
+	g_signal_connect (selection, 
+			  "changed",
+			  G_CALLBACK (_selection_changed_cd),
+			  self);
 }
 
 gboolean
-gsc_tree_get_selected_proposal(GscTree *self,
-				      GscProposal **proposal)
+gsc_tree_get_selected_proposal (GscTree *self,
+				GscProposal **proposal)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -252,7 +258,7 @@ gsc_tree_get_selected_proposal(GscTree *self,
 	if (gtk_tree_selection_get_selected(selection,NULL, &iter))
 	{
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
-		gtk_tree_model_get_value(model,&iter,COL_DATA,&value_proposal);
+		gtk_tree_model_get_value(model,&iter,COLUMN_DATA,&value_proposal);
 		*proposal = (GscProposal*)g_value_get_pointer(&value_proposal);
 		
 		return TRUE;
@@ -266,45 +272,46 @@ void
 gsc_tree_add_data(GscTree *self,
 			     GscProposal* data)
 {
-	g_assert(data != NULL);
-	
 	GtkTreeIter iter;
-	GtkListStore *store = self->priv->list_store;
+
+	g_return_if_fail (GSC_IS_TREE (self));
+
+	g_assert (data != NULL);
 	
-	gtk_list_store_append (store,&iter);
+	gtk_list_store_append (self->priv->list_store, &iter);
 			
-	gtk_list_store_set (store, 
+	gtk_list_store_set (self->priv->list_store, 
 			    &iter,
-			    COL_PIXBUF, gsc_proposal_get_icon(data),
-			    COL_NAME, gsc_proposal_get_label(data),
-			    COL_DATA, data,
+			    COLUMN_PIXBUF, gsc_proposal_get_icon (data),
+			    COLUMN_NAME, gsc_proposal_get_label (data),
+			    COLUMN_DATA, data,
 			    -1);
 }
 
 void
-gsc_tree_clear(GscTree *self)
+gsc_tree_clear (GscTree *self)
 {
-	GtkListStore *store = self->priv->list_store;
-	GtkTreeModel *model = GTK_TREE_MODEL(store);
+	GtkTreeModel *model = GTK_TREE_MODEL (self->priv->list_store);
 	GtkTreeIter iter;
 	GscProposal *data;
 	
-	if (gtk_tree_model_get_iter_first(model,&iter))
+	g_return_if_fail (GSC_IS_TREE (self));
+	
+	if (gtk_tree_model_get_iter_first (model, &iter))
 	{
 		do
 		{
-			GValue value_data = {0,};
-			gtk_tree_model_get_value(model,&iter,COL_DATA,&value_data);
-			data = (GscProposal*)g_value_get_pointer(&value_data);
-			g_object_unref(data);
-		}while(gtk_tree_model_iter_next(model,&iter));
+			gtk_tree_model_get (model, &iter,
+					    COLUMN_DATA, &data, -1);
+			g_object_unref (data);
+		}while (gtk_tree_model_iter_next (model, &iter));
 	}
 	
-	gtk_list_store_clear(store);
+	gtk_list_store_clear (self->priv->list_store);
 }
 
 gboolean
-gsc_tree_select_first(GscTree *self)
+gsc_tree_select_first (GscTree *self)
 {
 	GtkTreeIter iter;
 	GtkTreePath* path;
@@ -463,25 +470,27 @@ gsc_tree_select_next(GscTree *self,
 }
 
 GtkWidget*
-gsc_tree_new()
+gsc_tree_new ()
 {
 	GscTree *self = GSC_TREE (g_object_new (GSC_TYPE_TREE , NULL));
-	return GTK_WIDGET(self);
+	
+	return GTK_WIDGET (self);
 }
 
 gint 
 gsc_tree_get_num_proposals(GscTree *self)
 {
-	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
-	return gtk_tree_model_iter_n_children(model, NULL);
+	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
+	
+	return gtk_tree_model_iter_n_children (model, NULL);
 }
 
 void
-gsc_tree_filter(GscTree *self, const gchar* filter)
+gsc_tree_filter (GscTree *self, const gchar* filter)
 {
 	self->priv->active_filter = TRUE;
-	self->priv->current_filter = filter;
-	gtk_tree_model_filter_refilter(self->priv->model_filter);
+	self->priv->current_filter = g_strdup (filter);
+	gtk_tree_model_filter_refilter (self->priv->model_filter);
 	self->priv->active_filter = FALSE;
 	self->priv->current_filter = NULL;
 	//gsc_tree_select_first(self);

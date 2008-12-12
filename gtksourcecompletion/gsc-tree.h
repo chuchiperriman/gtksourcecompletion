@@ -43,6 +43,7 @@ typedef struct _GscTreeClass GscTreeClass;
 struct _GscTreeClass
 {
 	GtkTreeViewClass parent_class;
+	
 	void (* proposal_selected)(GscTree *tree,
 			       GscProposal *proposal);
 	void (* selection_changed)(GscTree *tree,
@@ -51,7 +52,8 @@ struct _GscTreeClass
 
 struct _GscTree
 {
-	GtkScrolledWindow parent;
+	GtkTreeView parent;
+	
 	GscTreePriv *priv;
 };
 

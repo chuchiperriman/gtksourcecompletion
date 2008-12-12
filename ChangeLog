@@ -1,3 +1,11 @@
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-popup.c:
+	Use a GList instead of a hashmap.
+	
+	* gtksourcecompletion/gsc-tree.c:
+	Cleanup a bit the code.
+
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c:
