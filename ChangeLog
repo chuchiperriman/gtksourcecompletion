@@ -1,5 +1,10 @@
 2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-manager.c:
+	Free the lists in a better way.
+
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-popup.c:
 	Use a GList instead of a hashmap.
 	

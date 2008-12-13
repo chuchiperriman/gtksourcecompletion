@@ -211,42 +211,6 @@ view_button_press_event_cb (GtkWidget *widget,
 	return FALSE;
 }
 
-static void
-free_provider_list (gpointer list)
-{
-	GList *start = (GList*)list;
-	GList *temp = (GList*)list;
-	
-	if (temp != NULL)
-	{
-		do
-		{
-			g_object_unref (G_OBJECT (temp->data));
-			
-		}while ((temp = g_list_next (temp)) != NULL);
-		
-		g_list_free (start);
-	}
-}
-
-static void
-free_trigger_list (gpointer list)
-{
-	GList *start = (GList*)list;
-	GList *temp = (GList*)list;
-	
-	if (temp != NULL)
-	{
-		do
-		{
-			g_object_unref (G_OBJECT (temp->data));
-			
-		}while ((temp = g_list_next (temp)) != NULL);
-		
-		g_list_free (start);
-	}
-}
-
 static gboolean
 view_key_press_event_cb (GtkWidget *view,
 			 GdkEventKey *event, 
@@ -376,11 +340,26 @@ gsc_manager_finalize (GObject *object)
 	
 	gtk_widget_destroy (GTK_WIDGET (self->priv->popup));
 
-	free_provider_list (self->priv->providers);
-	free_trigger_list (self->priv->triggers);
+	if (self->priv->providers != NULL)
+	{
+		g_list_foreach (self->priv->providers, (GFunc) g_object_unref,
+				NULL);
+		g_list_free (self->priv->providers);
+	}
+	
+	if (self->priv->triggers != NULL)
+	{
+		g_list_foreach (self->priv->triggers, (GFunc) g_object_unref,
+				NULL);
+		g_list_free (self->priv->triggers);
+	}
 	g_hash_table_destroy (self->priv->trig_prov);
 
 	completion_control_remove_completion (self->priv->text_view);
+	
+	g_debug ("manager finalize");
+	
+	G_OBJECT_CLASS (gsc_manager_parent_class)->finalize (object);
 }
 
 static void
