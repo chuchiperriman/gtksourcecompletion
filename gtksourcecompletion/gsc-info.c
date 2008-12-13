@@ -66,7 +66,7 @@ adjust_resize (GscInfo *self)
 	gint w, h;
 	
 	current = self->priv->custom_widget ? self->priv->custom_widget : self->priv->label;
-	
+	gtk_widget_realize(current);
 	gtk_widget_size_request (current, &req);
 	
 	if (self->priv->adjust_height)
@@ -82,9 +82,6 @@ adjust_resize (GscInfo *self)
 			: req.width + 30;
 	else
 		w = WINDOW_WIDTH;
-
-	if (w < 1 || h < 1 ) 
-		return;
 		
 	gtk_window_resize (GTK_WINDOW (self), w, h );
 }
@@ -94,7 +91,7 @@ show (GtkWidget *widget)
 {
 	GscInfo *self = GSC_INFO (widget);
 	
-	adjust_resize (self);
+	//adjust_resize (self);
 	/*
 	Set short by default or set the button depending on GscInfoType?
 	*/
@@ -156,6 +153,7 @@ gsc_info_init (GscInfo *self)
 	gtk_window_set_decorated (GTK_WINDOW(self), FALSE);
 	gtk_window_set_default_size (GTK_WINDOW (self),
 				     WINDOW_WIDTH, WINDOW_HEIGHT);
+	gtk_container_set_border_width(GTK_CONTAINER(self),1);
 
 	self->priv->info_scroll = gtk_scrolled_window_new (NULL, NULL);
 	gtk_widget_show (self->priv->info_scroll);
@@ -271,6 +269,7 @@ gsc_info_move_to_cursor (GscInfo* self,
 					   view,
 					   &x,
 					   &y);
+	
 	gtk_window_move (GTK_WINDOW (self), x, y);
 }
 

@@ -80,7 +80,6 @@ gboolean query_tooltip_cb (GtkWidget  *widget,
                                                         GtkTooltip *tooltip,
                                                         gpointer    user_data) 
 {
-	g_debug("showing the tooltip");
   GtkTextIter iter;
   GtkTextView *text_view = GTK_TEXT_VIEW (widget);
 
@@ -176,7 +175,7 @@ key_press(GtkWidget   *widget,
 			else
 				gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
 			cambio = !cambio;
-			gsc_info_set_custom(info,NULL);
+			//gsc_info_set_custom(info,NULL);
 			gsc_info_set_markup(info,
 					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
 			
@@ -294,7 +293,7 @@ create_info()
 	GtkWidget *custom = gtk_text_view_new();
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom));
 	gtk_text_buffer_set_text(buffer,"asdasdfasdfad",-1);
-	gsc_info_set_custom(info, custom);
+	//gsc_info_set_custom(info, custom);
 	//gsc_info_set_bottom_bar_visible(info,FALSE);
 	g_object_unref(custom);
 	return info;

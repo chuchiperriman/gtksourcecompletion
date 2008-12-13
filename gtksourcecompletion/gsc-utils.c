@@ -336,24 +336,79 @@ gsc_get_window_position_center_parent(GtkWindow *window,
 gboolean 
 gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x, gint *y)
 {
-	gint w,h,xtext,ytext;
+	gint w, h, xtext, ytext, ytemp;
 	gint sw = gdk_screen_width();
 	gint sh = gdk_screen_height();
-
+	gboolean resize = FALSE;
+	gboolean up = FALSE;
 	gsc_get_cursor_pos(view,x,y);
+	
 	gtk_window_get_size(window, &w, &h);
-	if (*x+w > sw) *x = sw - w -4;
-	/*If we cannot show it down, we show it up.*/
-	if (*y+h > sh)
+	
+	g_debug("Antes Posicionar x: %d, y: %d, w: %d, h: %d, sw: %d, sh: %d",*x,*y,w,h,sw,sh);	
+	
+	/* Processing x position and width */
+	if (w > (sw - 8))
+	{
+		/* Resize to view all the window */
+		resize = TRUE;
+		w = sw -8;
+	}
+	
+	/* Move position to view all the window */
+	if ((*x + w) > (sw - 4))
+	{
+		*x = sw - w -4;
+	}
+
+	/* Processing y position and height */
+	
+	/* 
+	If we cannot show it down, we show it up and if we cannot show it up, we
+	show the window at the largest position 
+	*/
+	if ((*y + h) > sh)
 	{
 		PangoLayout* layout = 
 			gtk_widget_create_pango_layout(GTK_WIDGET(view), NULL);
 		pango_layout_get_pixel_size(layout,&xtext,&ytext);
-		*y = *y -ytext - h;
+		ytemp = *y - ytext;
+		//*y = *y -ytext - h;
+		/* Cabe arriba? */
+		if ((ytemp - h) >= 4)
+		{
+			*y = ytemp - h;
+			up = TRUE;
+		}
+		else
+		{
+			/* 
+			Si no cabe arriba, lo ponemos donde haya más espacio
+			y redimensionamos la ventana
+			*/
+			if ((sh - *y) > ytemp)
+			{
+				//Abajo
+				h = sh - *y - 4;
+			}
+			else
+			{
+				//arriba
+				*y = 4;
+				h = ytemp -4;
+				up = TRUE;
+			}
+			resize = TRUE;
+		}
 		g_object_unref(layout);
-		return TRUE;
 	}
-	return FALSE;
+	
+	if (resize)
+		gtk_window_resize(window, w, h);
+
+	//g_debug("Posicionar x: %d, y: %d, w: %d, h: %d, sw: %d, sh: %d, resize: %d",*x,*y,w,h,sw,sh, resize);
+	
+	return up;
 }
 
 gboolean
