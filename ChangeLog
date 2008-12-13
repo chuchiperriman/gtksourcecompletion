@@ -1,6 +1,15 @@
 2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:
+	Add some FIXME comments.
+
+	* gtksourcecompletion/gsc-popup.c:
+	Now the active_page is a GscPopupPage instead of a pointer
+	to the list.
+
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
 	Free the lists in a better way.
 
 2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>

@@ -133,6 +133,9 @@ prov_list_free (gpointer prov_list)
 	g_free (pl);
 }
 
+/*
+ * FIXME: Use a for loop
+ */
 static void
 end_completion (GscManager *self)
 {
@@ -855,6 +858,9 @@ gsc_manager_get_from_view (GtkTextView *view)
  * Returns: The provider if the completion has this provider registered or 
  * NULL if not.
  */
+/*
+ * FIXME: Use for loop
+ */
 GscProvider *
 gsc_manager_get_provider (GscManager *self,
 			  const gchar* provider_name)
@@ -967,6 +973,9 @@ gsc_manager_unregister_trigger (GscManager *self,
  * Returns: The trigger or NULL if not exists
  *
  */
+/*
+ * FIXME: Use for loop
+ */
 GscTrigger*
 gsc_manager_get_trigger (GscManager *self,
 			 const gchar* trigger_name)
@@ -1032,6 +1041,9 @@ gsc_manager_activate (GscManager *self)
 					  self);
 
 	/* We activate the triggers*/
+	/*
+	 * FIXME: Use for loop
+	 */
 	plist = self->priv->triggers;
 	
 	if (plist != NULL)
@@ -1074,6 +1086,9 @@ gsc_manager_deactivate (GscManager *self)
 		self->priv->internal_signal_ids[i] = 0;
 	}
 	
+	/*
+	 * FIXME: Use for loop
+	 */
 	plist = self->priv->triggers;
 	
 	if (plist != NULL)

@@ -60,7 +60,7 @@ struct _GscPopupPriv
 	GtkWidget *bottom_bar;
 	
 	GList *pages;
-	GList *active_page;
+	GscPopupPage *active_page;
 	
 	gboolean destroy_has_run;
 };
@@ -70,9 +70,7 @@ G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
 static GscTree*
 get_current_tree (GscPopup *self)
 {
-	GscPopupPage *page = (GscPopupPage *)self->priv->active_page->data;
-	
-	return GSC_TREE (page->view);
+	return GSC_TREE (self->priv->active_page->view);
 }
 
 static void
@@ -215,15 +213,13 @@ switch_page_cb (GtkNotebook *notebook,
 		gpointer user_data)
 {
 	GscPopup *self = GSC_POPUP (user_data);
-	GscPopupPage *page;
 	
 	/* Update the active page */
-	self->priv->active_page = g_list_nth (self->priv->pages, page_num);
-	
-	page = (GscPopupPage *)self->priv->active_page->data;
+	self->priv->active_page = (GscPopupPage *)g_list_nth_data (self->priv->pages,
+								   page_num);
 	
 	gtk_label_set_label (GTK_LABEL (self->priv->tab_label),
-			     page->name);
+			     self->priv->active_page->name);
 
 	return FALSE;
 }
@@ -421,8 +417,7 @@ gsc_popup_init (GscPopup *self)
 				      FALSE);
 				      
 	/* Add default page */
-	gsc_popup_page_new (self, DEFAULT_PAGE);
-	self->priv->active_page = self->priv->pages;
+	self->priv->active_page = gsc_popup_page_new (self, DEFAULT_PAGE);
 	
 	/*Icon list*/
 	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
@@ -697,14 +692,13 @@ gsc_popup_toggle_proposal_info (GscPopup *self)
 void
 gsc_popup_page_next (GscPopup *self)
 {
-	GscPopupPage *popup_page;
 	gint pages;
 	gint page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 
 	pages = g_list_length (self->priv->pages);
-	page = g_list_position (self->priv->pages, self->priv->active_page);
+	page = g_list_index (self->priv->pages, self->priv->active_page);
 	
 	if (page == pages - 1)
 	{
@@ -722,8 +716,7 @@ gsc_popup_page_next (GscPopup *self)
 	 * After setting the page the active_page was updated
 	 * so we can update the tree
 	 */
-	popup_page = (GscPopupPage *)self->priv->active_page->data;
-	gsc_tree_select_first (GSC_TREE (popup_page->view));
+	gsc_tree_select_first (get_current_tree (self));
 	
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
@@ -742,14 +735,13 @@ gsc_popup_page_next (GscPopup *self)
 void
 gsc_popup_page_previous (GscPopup *self)
 {
-	GscPopupPage *popup_page;
 	gint pages;
 	gint page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 	
 	pages = g_list_length (self->priv->pages);
-	page = g_list_position (self->priv->pages, self->priv->active_page);
+	page = g_list_index (self->priv->pages, self->priv->active_page);
 	
 	if (page == 0)
 	{
@@ -767,8 +759,7 @@ gsc_popup_page_previous (GscPopup *self)
 	 * After setting the page the active_page was updated
 	 * so we can update the tree
 	 */
-	popup_page = (GscPopupPage *)self->priv->active_page->data;
-	gsc_tree_select_first (GSC_TREE (popup_page->view));
+	gsc_tree_select_first (get_current_tree (self));
 	
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
