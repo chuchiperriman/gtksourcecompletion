@@ -148,10 +148,13 @@ key_press(GtkWidget   *widget,
 		else
 		{
 			gsc_info_set_custom(info, custom);
+			/*
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom_view));
 			gtk_text_buffer_set_text(buffer,
 						 gsc_gsv_get_text(GTK_TEXT_VIEW(view)),
 						 -1);
+			*/
+			gtk_label_set_text(GTK_LABEL(custom), gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
 			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
 		}
@@ -281,9 +284,10 @@ create_info()
 	gsc_info_set_adjust_height(info,TRUE,100000);
 	gsc_info_set_adjust_width(info,TRUE,100000);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
-	
+	gsc_info_set_bottom_bar_visible(GSC_INFO (info), TRUE);
+	/*
 	custom = gtk_scrolled_window_new (NULL, NULL);
-	g_object_ref(custom);
+	
 	custom_view = gtk_text_view_new();
 	
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (custom),
@@ -291,7 +295,13 @@ create_info()
 					GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (custom),
 					       custom_view);
+	
+	gsc_info_set_bottom_bar_visible(GSC_INFO (info), TRUE);
+	
 	gtk_widget_show (custom_view);
+	*/
+	custom = gtk_label_new("chuchisadfas dfas dfasd fasd asd fasdf asd fad f ad");
+	g_object_ref(custom);
 	gtk_widget_show (custom);
 	
 	return info;

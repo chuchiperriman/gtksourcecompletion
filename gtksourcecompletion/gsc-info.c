@@ -25,6 +25,7 @@
 
 struct _GscInfoPrivate
 {
+	GtkWidget *alignment;
 	GtkWidget *box;
 	GtkWidget *info_scroll;
 	GtkWidget *label;
@@ -66,8 +67,9 @@ adjust_resize (GscInfo *self)
 	gint w, h;
 	
 	current = self->priv->custom_widget ? self->priv->custom_widget : self->priv->label;
-	gtk_widget_size_request (current, &req);
 	
+	gtk_widget_size_request (current, &req);
+	  
 	if (self->priv->adjust_height)
 		h = req.height > self->priv->max_height 
 			? self->priv->max_height 
@@ -83,6 +85,7 @@ adjust_resize (GscInfo *self)
 		w = WINDOW_WIDTH;
 		
 	gtk_window_resize (GTK_WINDOW (self), w, h );
+	
 }
 
 static void
@@ -152,9 +155,18 @@ gsc_info_init (GscInfo *self)
 	gtk_window_set_decorated (GTK_WINDOW(self), FALSE);
 	gtk_window_set_default_size (GTK_WINDOW (self),
 				     WINDOW_WIDTH, WINDOW_HEIGHT);
-	gtk_container_set_border_width(GTK_CONTAINER(self),1);
+
+	self->priv->alignment = gtk_alignment_new (0.5, 0.5, 1.0, 1.0);
+	gtk_alignment_set_padding (GTK_ALIGNMENT (self->priv->alignment),
+				   GTK_WIDGET (self)->style->ythickness,
+				   GTK_WIDGET (self)->style->ythickness,
+				   GTK_WIDGET (self)->style->xthickness,
+				   GTK_WIDGET (self)->style->xthickness);
+	gtk_container_add (GTK_CONTAINER (self), self->priv->alignment);
+	gtk_widget_show (self->priv->alignment);
 
 	self->priv->info_scroll = gtk_scrolled_window_new (NULL, NULL);
+
 	gtk_widget_show (self->priv->info_scroll);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					GTK_POLICY_AUTOMATIC,
@@ -165,7 +177,7 @@ gsc_info_init (GscInfo *self)
 
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					       self->priv->label);
-	
+
 	/*Bottom bar*/
 	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
 					      GTK_ICON_SIZE_SMALL_TOOLBAR);
@@ -186,11 +198,13 @@ gsc_info_init (GscInfo *self)
 			  self);
 
 	self->priv->bottom_bar = gtk_hbox_new (FALSE, 1);
+
 	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar),
 			    self->priv->info_button,
 			    FALSE, FALSE, 0);
 	
 	self->priv->box = gtk_vbox_new (FALSE, 1);
+	
 	gtk_widget_show (self->priv->box);
 	gtk_box_pack_start (GTK_BOX (self->priv->box),
 			    self->priv->info_scroll,
@@ -200,7 +214,8 @@ gsc_info_init (GscInfo *self)
 			  self->priv->bottom_bar,
 			  FALSE, FALSE, 0);
 	
-	gtk_container_add (GTK_CONTAINER (self), self->priv->box);
+	gtk_container_add (GTK_CONTAINER (self->priv->alignment), 
+			   self->priv->box);
 }
 
 static void
