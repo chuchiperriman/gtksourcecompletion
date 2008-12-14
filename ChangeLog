@@ -9,6 +9,28 @@
 	Added GtkAdjustment to adjust custom widget.
 	Cleaned some g_debug.
 
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
+	Add some FIXME comments.
+
+	* gtksourcecompletion/gsc-popup.c:
+	Now the active_page is a GscPopupPage instead of a pointer
+	to the list.
+
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
+	Free the lists in a better way.
+
+2008-12-13  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-popup.c:
+	Use a GList instead of a hashmap.
+	
+	* gtksourcecompletion/gsc-tree.c:
+	Cleanup a bit the code.
+
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c:

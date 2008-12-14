@@ -25,6 +25,7 @@
 #include "gsc-utils.h"
 #include "gsc-info.h"
 #include "gsc-marshal.h"
+#include <string.h>
 
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
@@ -43,6 +44,12 @@ enum
 
 static guint popup_signals[LAST_SIGNAL] = { 0 };
 
+typedef struct _GscPopupPage
+{
+	gchar *name;
+	GtkWidget *view;
+} GscPopupPage;
+
 struct _GscPopupPriv
 {
 	GtkWidget *info_window;
@@ -53,11 +60,9 @@ struct _GscPopupPriv
 	GtkWidget *prev_page_button;
 	GtkWidget *bottom_bar;
 	
-	/*
-	 * FIXME: Nacho: Why a hastable? We are not going to manage a lot of trees
-	 * I think that with a GList we can handle this
-	 */
-	GHashTable *trees;
+	GList *pages;
+	GscPopupPage *active_page;
+	
 	gboolean destroy_has_run;
 };
 
@@ -66,15 +71,7 @@ G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
 static GscTree*
 get_current_tree (GscPopup *self)
 {
-	gint page;
-	GscTree *tree;
-	
-	page = gtk_notebook_get_current_page (GTK_NOTEBOOK (self->priv->notebook));
-	
-	tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-						    page));
-	
-	return tree;
+	return GSC_TREE (self->priv->active_page->view);
 }
 
 static void
@@ -126,49 +123,72 @@ selection_changed_cd (GscTree *tree,
 	}
 }
 
+static GscPopupPage *
+gsc_popup_page_new (GscPopup *self,
+		    const gchar *tree_name)
+{
+	/*Creates the new trees*/
+	GscPopupPage *page;
+	GtkWidget *label;
+	GtkWidget *sw;
+	
+	page = g_slice_new (GscPopupPage);
+	
+	page->name = g_strdup (tree_name);
+	
+	page->view = gsc_tree_new ();
+	gtk_widget_show (page->view);
+	g_object_set (G_OBJECT (page->view), "can-focus",
+		      FALSE, NULL);
+	
+	self->priv->pages = g_list_append (self->priv->pages,
+					   page);
+	
+	sw = gtk_scrolled_window_new (NULL, NULL);
+	gtk_widget_show (sw);
+	
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+					GTK_POLICY_AUTOMATIC,
+					GTK_POLICY_AUTOMATIC);
+	
+	gtk_container_add (GTK_CONTAINER (sw), page->view);
+	
+	label = gtk_label_new (tree_name);
+	
+	gtk_notebook_append_page (GTK_NOTEBOOK (self->priv->notebook),
+				  sw, label);
+	
+	g_signal_connect (page->view,
+			  "proposal-selected",
+			  G_CALLBACK (proposal_selected_cb),
+			  self);
+	
+	g_signal_connect (page->view,
+			  "selection-changed",
+			  G_CALLBACK (selection_changed_cd),
+			  self);
+	
+	return page;
+}
+
 static GscTree*
 get_tree_by_name (GscPopup *self,
 		  const gchar* tree_name)
 {
-	GscTree *tree;
+	GscPopupPage *page;
+	GList *l;
 	
-	tree = GSC_TREE (g_hash_table_lookup (self->priv->trees, tree_name));
-		
-	if (tree == NULL)
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
-		/*Creates the new trees*/
-		GtkWidget *completion_tree;
-		GtkWidget *label;
-		
-		completion_tree = gsc_tree_new ();
-		
-		g_hash_table_insert (self->priv->trees,
-				     (gpointer)tree_name,
-				     completion_tree);
-		
-		label = gtk_label_new (tree_name);
-		
-		gtk_notebook_append_page (GTK_NOTEBOOK (self->priv->notebook),
-					  GTK_WIDGET (completion_tree), label);
-		tree = GSC_TREE (completion_tree);
-		
-		/*
-		 * FIXME: Why a show_all ? Should be a show
-		 */
-		gtk_widget_show_all (completion_tree);
-		
-		g_signal_connect (completion_tree, 
-				  "proposal-selected",
-				  G_CALLBACK (proposal_selected_cb),
-				  self);
-						
-		g_signal_connect (completion_tree, 
-				  "selection-changed",
-				  G_CALLBACK (selection_changed_cd),
-				  self);
+		page = (GscPopupPage *)l->data;
+	
+		if (strcmp (page->name, tree_name) == 0)
+			return GSC_TREE (page->view);
 	}
+	
+	page = gsc_popup_page_new (self, tree_name);
 
-	return tree;
+	return GSC_TREE (page->view);
 }
 
 static void
@@ -207,18 +227,18 @@ prev_page_cb (GtkWidget *widget,
 
 static gboolean
 switch_page_cb (GtkNotebook *notebook, 
-		GtkNotebookPage *page,
+		GtkNotebookPage *n_page,
 		gint page_num, 
 		gpointer user_data)
 {
 	GscPopup *self = GSC_POPUP (user_data);
-	GtkWidget *tree;
-	const gchar* label_text;
 	
-	tree = gtk_notebook_get_nth_page (notebook, page_num);
-	label_text = gtk_notebook_get_tab_label_text (notebook, tree);
+	/* Update the active page */
+	self->priv->active_page = (GscPopupPage *)g_list_nth_data (self->priv->pages,
+								   page_num);
 	
-	gtk_label_set_label (GTK_LABEL (self->priv->tab_label), label_text);
+	gtk_label_set_label (GTK_LABEL (self->priv->tab_label),
+			     self->priv->active_page->name);
 
 	return FALSE;
 }
@@ -226,26 +246,24 @@ switch_page_cb (GtkNotebook *notebook,
 static void
 update_pages_visibility (GscPopup *self)
 {
-	GscTree *tree;
-	gint pages;
-	guint i;
+	GList *l;
 	guint num_pages_with_data = 0;
-	gboolean first_set = FALSE;
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	
-	for (i = 0; i < pages; i++)
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
-		tree= GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							   i));
-		if (gsc_tree_get_num_proposals (tree) > 0)
+		GscPopupPage *page = (GscPopupPage *)l->data;
+		
+		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
 		{
-			if (!first_set)
+			/*
+			 * FIXME: Is this really needed?
+			 */
+			/*if (!first_set)
 			{
 				gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
 							       i);
 				first_set = TRUE;
-			}
+			}*/
 			num_pages_with_data++;
 		}
 	}
@@ -307,11 +325,24 @@ gsc_popup_delete_event_cb (GtkWidget *widget,
 }
 
 static void
+free_page (gpointer data,
+	   gpointer user_data)
+{
+	GscPopupPage *page = (GscPopupPage *)data;
+	
+	g_free (page->name);
+	g_slice_free (GscPopupPage, page);
+}
+
+static void
 gsc_popup_finalize (GObject *object)
 {
 	GscPopup *self = GSC_POPUP (object);
 	
-	g_hash_table_destroy (self->priv->trees);
+	g_list_foreach (self->priv->pages, (GFunc) free_page, NULL);
+	g_list_free (self->priv->pages);
+	
+	g_debug ("popup finalize");
 	
 	G_OBJECT_CLASS (gsc_popup_parent_class)->finalize (object);
 }
@@ -387,8 +418,6 @@ gsc_popup_class_init (GscPopupClass *klass)
 static void
 gsc_popup_init (GscPopup *self)
 {
-	GtkWidget *completion_tree;
-	GtkWidget *default_label;
 	GtkWidget *info_icon;
 	GtkWidget *info_button;
 	GtkWidget *next_page_icon;
@@ -397,7 +426,6 @@ gsc_popup_init (GscPopup *self)
 
 	self->priv = GSC_POPUP_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
-	self->priv->trees = g_hash_table_new (g_str_hash, g_str_equal);
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -405,13 +433,6 @@ gsc_popup_init (GscPopup *self)
 	gtk_widget_set_size_request (GTK_WIDGET (self),
 				     WINDOW_WIDTH,WINDOW_HEIGHT);
 	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
-	
-	completion_tree = gsc_tree_new ();
-	gtk_widget_show (completion_tree);
-	g_object_set (G_OBJECT (completion_tree), "can-focus",
-		      FALSE, NULL);
-	
-	g_hash_table_insert (self->priv->trees, DEFAULT_PAGE, completion_tree);
 	
 	/*Notebook*/
 	self->priv->notebook = gtk_notebook_new ();
@@ -421,12 +442,10 @@ gsc_popup_init (GscPopup *self)
 	gtk_notebook_set_show_tabs (GTK_NOTEBOOK (self->priv->notebook), FALSE);
 	gtk_notebook_set_show_border (GTK_NOTEBOOK (self->priv->notebook),
 				      FALSE);
-
-	default_label = gtk_label_new (DEFAULT_PAGE);
-	gtk_widget_show (default_label);
-	gtk_notebook_append_page (GTK_NOTEBOOK (self->priv->notebook),
-				  GTK_WIDGET (completion_tree),
-				  default_label);
+				      
+	/* Add default page */
+	self->priv->active_page = gsc_popup_page_new (self, DEFAULT_PAGE);
+	
 	/*Icon list*/
 	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
 					      GTK_ICON_SIZE_SMALL_TOOLBAR);
@@ -519,15 +538,6 @@ gsc_popup_init (GscPopup *self)
 					 FALSE);
 
 	/* Connect signals */
-	g_signal_connect (completion_tree,
-			  "proposal-selected",
-			  G_CALLBACK (proposal_selected_cb),
-			  self);
-
-	g_signal_connect (completion_tree, 
-			  "selection-changed",
-			  G_CALLBACK (selection_changed_cd),
-			  self);
 			
 	g_signal_connect (self->priv->notebook, 
 			  "switch-page",
@@ -585,19 +595,15 @@ gsc_popup_add_data (GscPopup *self,
 void
 gsc_popup_clear (GscPopup *self)
 {
-	GscTree *tree;
-	gint pages;
-	guint i;
+	GList *l;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	
-	for(i = 0; i < pages; i++)
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
-		tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							    i));
-		gsc_tree_clear (tree);
+		GscPopupPage *page = (GscPopupPage *)l->data;
+		
+		gsc_tree_clear (GSC_TREE (page->view));
 	}
 }
 
@@ -708,19 +714,15 @@ gsc_popup_select_current_proposal (GscPopup *self)
 gboolean
 gsc_popup_has_proposals (GscPopup *self)
 {
-	GscTree *tree;
-	gint pages;
-	guint i;	
+	GList *l;
 	
 	g_return_val_if_fail (GSC_IS_POPUP (self), FALSE);
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	
-	for(i = 0; i < pages; i++)
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
-		tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							    i));
-		if (gsc_tree_get_num_proposals (tree) > 0)
+		GscPopupPage *page = (GscPopupPage *)l->data;
+		
+		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
 			return TRUE;
 	}
 	return FALSE;
@@ -755,41 +757,35 @@ gsc_popup_toggle_proposal_info (GscPopup *self)
 void
 gsc_popup_page_next (GscPopup *self)
 {
-	GscTree *tree;
 	gint pages;
 	gint page;
-	gint original_page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
+
+	pages = g_list_length (self->priv->pages);
+	page = g_list_index (self->priv->pages, self->priv->active_page);
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	page = gtk_notebook_get_current_page (GTK_NOTEBOOK (self->priv->notebook));
-	original_page = page;
-	
-	do
+	if (page == pages - 1)
+	{
+		page = 0;
+	}
+	else
 	{
 		page++;
-		if (page == pages)
-			page = 0;
-		
-		tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							    page));
-		if (gsc_tree_get_num_proposals (tree) > 0)
-		{
-			gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
-						       page);
-			gsc_tree_select_first (tree);
-			break;
-		}
+	}
+
+	gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
+				       page);
 	
-	}while (page != original_page);
+	/*
+	 * After setting the page the active_page was updated
+	 * so we can update the tree
+	 */
+	gsc_tree_select_first (get_current_tree (self));
 	
-	if (page != original_page)
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
-		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-		{
-			show_completion_info (self);
-		}
+		show_completion_info (self);
 	}
 }
 
@@ -804,40 +800,35 @@ gsc_popup_page_next (GscPopup *self)
 void
 gsc_popup_page_previous (GscPopup *self)
 {
-	GscTree *tree;
 	gint pages;
 	gint page;
-	gint original_page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	page = gtk_notebook_get_current_page (GTK_NOTEBOOK (self->priv->notebook));
-	original_page = page;
+	pages = g_list_length (self->priv->pages);
+	page = g_list_index (self->priv->pages, self->priv->active_page);
 	
-	do
+	if (page == 0)
+	{
+		page = pages - 1;
+	}
+	else
 	{
 		page--;
-		if (page < 0)
-			page = pages -1;
+	}
 	
-		tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							    page));	
-		if (gsc_tree_get_num_proposals (tree) > 0)
-		{
-			gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
-						       page);
-			gsc_tree_select_first (tree);
-			break;
-		}
-	}while (page != original_page);
+	gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
+				       page);
 	
-	if (page != original_page)
+	/*
+	 * After setting the page the active_page was updated
+	 * so we can update the tree
+	 */
+	gsc_tree_select_first (get_current_tree (self));
+	
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
-		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-		{
-			show_completion_info (self);
-		}
+		show_completion_info (self);
 	}
 }
 
@@ -872,24 +863,21 @@ gsc_popup_set_current_info (GscPopup *self,
 gint
 gsc_popup_get_num_active_pages (GscPopup *self)
 {
-	GscTree *tree;
-	gint pages;
-	guint i;
+	GList *l;
 	guint num_pages_with_data = 0;
 	
 	g_return_val_if_fail (GSC_IS_POPUP (self), 0);
 	
-	pages = gtk_notebook_get_n_pages (GTK_NOTEBOOK (self->priv->notebook));
-	
-	for (i = 0; i < pages; i++)
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
-		tree = GSC_TREE (gtk_notebook_get_nth_page (GTK_NOTEBOOK (self->priv->notebook),
-							    i));
-		if (gsc_tree_get_num_proposals (tree) > 0)
+		GscPopupPage *page = (GscPopupPage *)l->data;
+		
+		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
 		{
-			++num_pages_with_data;
+			num_pages_with_data++;
 		}
 	}
+	
 	return num_pages_with_data;
 }
 
