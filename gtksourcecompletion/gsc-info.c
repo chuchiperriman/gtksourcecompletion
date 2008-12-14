@@ -93,7 +93,6 @@ show (GtkWidget *widget)
 {
 	GscInfo *self = GSC_INFO (widget);
 	
-	//adjust_resize (self);
 	/*
 	Set short by default or set the button depending on GscInfoType?
 	*/
@@ -430,5 +429,12 @@ gsc_info_get_info_type (GscInfo* self)
 
 	return self->priv->type;
 }
+
+GtkWidget*
+gsc_info_get_bottom_bar (GscInfo* self)
+{
+	return self->priv->bottom_bar;
+}
+
 
 

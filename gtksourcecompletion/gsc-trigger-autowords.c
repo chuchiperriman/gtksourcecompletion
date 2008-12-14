@@ -103,8 +103,6 @@ autocompletion_raise_event (gpointer event)
 		g_free (self->priv->actual_word);
 		self->priv->actual_word = word;
 		
-		g_debug ("auto");
-		
 		gsc_manager_trigger_event (self->priv->completion,
 					   GSC_TRIGGER_AUTOWORDS_NAME,
 					   self);

@@ -3,6 +3,7 @@
 	* gtksourcecompletion/gsc-info.c:
 	Better position/size control.
 	Added GtkAdjustment to adjust custom widget
+	Cleaned some g_debug
 
 2008-12-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

@@ -60,6 +60,12 @@ destroy_cb(GtkObject *object,gpointer   user_data)
 }
 
 void
+dev_button_cn (GtkButton *button, gpointer user_data)
+{
+	g_debug("Open devhelp");
+}
+
+void
 info_type_changed_cb(GscInfo *info, GscInfoType type, gpointer user_data)
 {
 	g_debug("type changed");
@@ -285,6 +291,22 @@ create_info()
 	gsc_info_set_adjust_width(info,TRUE,100000);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
 	gsc_info_set_bottom_bar_visible(GSC_INFO (info), TRUE);
+	
+	/* Adds a custom button */
+	GtkWidget *dev_button = gtk_button_new_with_label ("DevHelp");
+	GtkWidget *bottom_bar = gsc_info_get_bottom_bar(info);
+	
+	g_signal_connect (G_OBJECT (dev_button),
+			  "clicked",
+			  G_CALLBACK (dev_button_cn),
+			  NULL);
+
+	gtk_widget_show(dev_button);
+	
+	gtk_box_pack_start (GTK_BOX (bottom_bar),
+			    dev_button,
+			    FALSE, FALSE, 0);
+	
 	/*
 	custom = gtk_scrolled_window_new (NULL, NULL);
 	

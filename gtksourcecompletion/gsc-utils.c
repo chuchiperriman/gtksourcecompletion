@@ -68,7 +68,7 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 	while ((no_doc_start = gtk_text_iter_backward_char(start_iter)) == TRUE)
 	{
 		ch = gtk_text_iter_get_char(start_iter);
-		//TODO Do better
+		/* TODO Do better */
 		if (gsc_char_is_separator(ch))
 		{
 			found = TRUE;
@@ -345,8 +345,6 @@ gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x,
 	
 	gtk_window_get_size(window, &w, &h);
 	
-	g_debug("Antes Posicionar x: %d, y: %d, w: %d, h: %d, sw: %d, sh: %d",*x,*y,w,h,sw,sh);	
-	
 	/* Processing x position and width */
 	if (w > (sw - 8))
 	{
@@ -373,7 +371,6 @@ gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x,
 			gtk_widget_create_pango_layout(GTK_WIDGET(view), NULL);
 		pango_layout_get_pixel_size(layout,&xtext,&ytext);
 		ytemp = *y - ytext;
-		//*y = *y -ytext - h;
 		/* Cabe arriba? */
 		if ((ytemp - h) >= 4)
 		{
@@ -388,12 +385,10 @@ gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x,
 			*/
 			if ((sh - *y) > ytemp)
 			{
-				//Abajo
 				h = sh - *y - 4;
 			}
 			else
 			{
-				//arriba
 				*y = 4;
 				h = ytemp -4;
 				up = TRUE;
@@ -406,8 +401,6 @@ gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x,
 	if (resize)
 		gtk_window_resize(window, w, h);
 
-	//g_debug("Posicionar x: %d, y: %d, w: %d, h: %d, sw: %d, sh: %d, resize: %d",*x,*y,w,h,sw,sh, resize);
-	
 	return up;
 }
 

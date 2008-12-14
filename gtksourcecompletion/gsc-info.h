@@ -90,6 +90,8 @@ GtkWidget	*gsc_info_get_custom			(GscInfo* self);
 void		 gsc_info_set_bottom_bar_visible	(GscInfo* self,
 							 gboolean visible);
 
+GtkWidget	*gsc_info_get_bottom_bar		(GscInfo* self);
+
 G_END_DECLS
 
 #endif

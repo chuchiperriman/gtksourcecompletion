@@ -1,4 +1,4 @@
-TODO (last update: 2008-12-09)
+TODO (last update: 2008-12-14)
 =================================
 
 [X] Try to separe GscPopup and GtkTextView. Remove the GtkTextView dependency 
@@ -25,7 +25,7 @@ GscInfo:
 [X] Implement set_info_type with sort or extended
 [X] Add signal info-type-changed
 [X] Add custom widget functionality
-[ ] When show the info, check the position and width and, if it is out of 
+[X] When show the info, check the position and width and, if it is out of 
     screen, resize the info window.
 
 GscPopup:
@@ -35,8 +35,6 @@ GscPopup:
     and we don't call to gsc_proposal_get_info)
 [X] Clean all filter and options features. 
 [ ] Do we must to set the GscTree inside a ScrolledWindow?
-[ ] GscTree inherit from GtkTreeView now. We must to delete select_first, 
-    select_next etc functions and use GtkTreeView functions directly.
 [ ] Add previous and next page buttons.
 
 Bugs
