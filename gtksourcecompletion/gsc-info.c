@@ -66,7 +66,6 @@ adjust_resize (GscInfo *self)
 	gint w, h;
 	
 	current = self->priv->custom_widget ? self->priv->custom_widget : self->priv->label;
-	gtk_widget_realize(current);
 	gtk_widget_size_request (current, &req);
 	
 	if (self->priv->adjust_height)

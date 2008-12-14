@@ -48,6 +48,8 @@ static GtkWidget *view;
 static GscManager *comp;
 static GscInfo *info;
 static gboolean cambio = FALSE;
+static GtkWidget *custom = NULL;
+static GtkWidget *custom_view = NULL;
 
 static const gboolean change_keys = FALSE;
 
@@ -138,58 +140,47 @@ key_press(GtkWidget   *widget,
 	}
 	else if (event->keyval == GDK_F4)
 	{
+		/* Usage with custom widget */
 		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
 		{
 			gtk_widget_hide(GTK_WIDGET(info));
 		}
 		else
 		{
-			if (cambio)
-				gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
-			else
-				gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
-			cambio = !cambio;
-			/*
-			gsc_info_set_markup(info,
-					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
-			*/
-					    
-			GtkTextView *custom_view = GTK_TEXT_VIEW(gsc_info_get_custom(info));
-			GtkTextBuffer *custom_buffer = gtk_text_view_get_buffer(custom_view);
-			gtk_text_buffer_set_text(custom_buffer, gsc_gsv_get_text(GTK_TEXT_VIEW(view)),-1);
+			gsc_info_set_custom(info, custom);
+			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom_view));
+			gtk_text_buffer_set_text(buffer,
+						 gsc_gsv_get_text(GTK_TEXT_VIEW(view)),
+						 -1);
 			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
-			
 		}
 	}
 	else if (event->keyval == GDK_F5)
 	{
+		gsc_info_set_custom(info, NULL);
+		/* Normal info usage with the default widget*/
 		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
 		{
 			gtk_widget_hide(GTK_WIDGET(info));
 		}
 		else
 		{
-			if (cambio)
-				gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
-			else
-				gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
-			cambio = !cambio;
-			//gsc_info_set_custom(info,NULL);
 			gsc_info_set_markup(info,
 					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
 			
 			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
-			
 		}
 	}
 	else if (event->keyval == GDK_F6)
 	{
+		/* Change the info type */
 		if (gsc_info_get_info_type(info) == GSC_INFO_TYPE_SHORT)
 			gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
 		else
 			gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
+		
 	}
 	
 	return FALSE;
@@ -290,12 +281,19 @@ create_info()
 	gsc_info_set_adjust_height(info,TRUE,100000);
 	gsc_info_set_adjust_width(info,TRUE,100000);
 	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
-	GtkWidget *custom = gtk_text_view_new();
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom));
-	gtk_text_buffer_set_text(buffer,"asdasdfasdfad",-1);
-	//gsc_info_set_custom(info, custom);
-	//gsc_info_set_bottom_bar_visible(info,FALSE);
-	g_object_unref(custom);
+	
+	custom = gtk_scrolled_window_new (NULL, NULL);
+	g_object_ref(custom);
+	custom_view = gtk_text_view_new();
+	
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (custom),
+					GTK_POLICY_AUTOMATIC,
+					GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (custom),
+					       custom_view);
+	gtk_widget_show (custom_view);
+	gtk_widget_show (custom);
+	
 	return info;
 }
 
