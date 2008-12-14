@@ -522,6 +522,7 @@ gsc_manager_manage_key (GscManager *self,
 {
 	gboolean catched = FALSE;
 	gboolean ret = FALSE;
+	gboolean selected = FALSE;
 	
 	g_return_val_if_fail (GSC_IS_MANAGER (self), FALSE);
 	
@@ -575,10 +576,13 @@ gsc_manager_manage_key (GscManager *self,
 		case GDK_Return:
 		case GDK_Tab:
 		{
-			gsc_popup_select_current_proposal (self->priv->popup);
+			selected = gsc_popup_select_current_proposal (self->priv->popup);
 			gtk_widget_hide (GTK_WIDGET (self->priv->popup));
-			ret = TRUE;
 			catched = TRUE;
+			if (selected)
+				ret = TRUE;
+			else
+				ret = FALSE;
 			break;
 		}
 	}

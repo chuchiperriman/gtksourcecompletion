@@ -925,7 +925,7 @@ _filter_changed_cb (GtkEntry *entry,
 void
 gsc_popup_show_or_update (GtkWidget *widget)
 {
-	/*TODO This function called only if the widget has not been shown previously*/
+	/*TODO This function is called only if the widget has not been shown previously*/
 	
 	/*Only show the popup, the positions is set before this function*/
 	GscPopup *self = GSC_POPUP (widget);
@@ -938,8 +938,6 @@ gsc_popup_show_or_update (GtkWidget *widget)
 					      FALSE);
 		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);
 	}
-	
-	gsc_tree_select_first (get_current_tree (self));
 }
 
 void

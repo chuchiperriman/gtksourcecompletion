@@ -19,6 +19,7 @@ TODO (last update: 2008-12-14)
 GscInfo:
 ----------------
 [ ] Add movement functions (center screen, parent, mouse pointer etc.)
+    Do we need that?
 [X] Implement adjust height (adjust window height to the content)
 [X] Implement adjust width (adjust window width to the content)
 [X] Add bottom bar with extend buttom
@@ -36,7 +37,7 @@ GscPopup:
 [X] Clean all filter and options features. 
 [ ] Do we must to set the GscTree inside a ScrolledWindow?
 [X] Add previous and next page buttons.
-[ ] When the popup is shown, do not select any proposal
+[X] When the popup is shown, do not select any proposal
 
 Bugs
 ---------------

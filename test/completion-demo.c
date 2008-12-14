@@ -191,6 +191,15 @@ key_press(GtkWidget   *widget,
 			gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
 		
 	}
+	else if (event->keyval == GDK_F6)
+	{
+		/* Filter the proposals starting by "ccc" */
+		/*
+		FIXME We will implement this when Nacho finish to integrate
+		gsc-tree into gsc-popup
+		*/
+		
+	}
 	
 	return FALSE;
 }
