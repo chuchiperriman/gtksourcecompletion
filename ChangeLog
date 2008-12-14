@@ -1,5 +1,7 @@
 2008-12-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
-
+	
+	* gtksourcecompletion/gsc-popup.c:
+	Added next and previous buttons
 	* gtksourcecompletion/gsc-info.c:
 	Better position/size control.
 	Added GtkAdjustment to adjust custom widget

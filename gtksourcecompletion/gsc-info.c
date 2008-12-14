@@ -433,6 +433,7 @@ gsc_info_get_info_type (GscInfo* self)
 GtkWidget*
 gsc_info_get_bottom_bar (GscInfo* self)
 {
+	/* FIXME Do we must to do this public? */
 	return self->priv->bottom_bar;
 }
 

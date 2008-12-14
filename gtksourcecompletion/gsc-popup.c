@@ -49,7 +49,8 @@ struct _GscPopupPriv
 	GtkWidget *info_button;
 	GtkWidget *notebook;
 	GtkWidget *tab_label;
-	GtkWidget *next_page_icon;
+	GtkWidget *next_page_button;
+	GtkWidget *prev_page_button;
 	GtkWidget *bottom_bar;
 	
 	/*
@@ -186,6 +187,24 @@ info_toggled_cb (GtkToggleButton *widget,
 	}
 }
 
+static void
+next_page_cb (GtkWidget *widget,
+	      gpointer user_data)
+{
+	GscPopup *self = GSC_POPUP (user_data);
+	
+	gsc_popup_page_next (self);
+}
+
+static void
+prev_page_cb (GtkWidget *widget,
+	      gpointer user_data)
+{
+	GscPopup *self = GSC_POPUP (user_data);
+	
+	gsc_popup_page_previous (self);
+}
+
 static gboolean
 switch_page_cb (GtkNotebook *notebook, 
 		GtkNotebookPage *page,
@@ -231,9 +250,15 @@ update_pages_visibility (GscPopup *self)
 		}
 	}
 	if (num_pages_with_data > 1)
-		gtk_widget_show (self->priv->next_page_icon);
+	{
+		gtk_widget_show (self->priv->next_page_button);
+		gtk_widget_show (self->priv->prev_page_button);
+	}
 	else
-		gtk_widget_hide (self->priv->next_page_icon);
+	{
+		gtk_widget_hide (self->priv->next_page_button);
+		gtk_widget_hide (self->priv->prev_page_button);
+	}
 }
 
 static gboolean
@@ -366,6 +391,8 @@ gsc_popup_init (GscPopup *self)
 	GtkWidget *default_label;
 	GtkWidget *info_icon;
 	GtkWidget *info_button;
+	GtkWidget *next_page_icon;
+	GtkWidget *prev_page_icon;
 	GtkWidget *vbox;
 
 	self->priv = GSC_POPUP_GET_PRIVATE (self);
@@ -423,12 +450,50 @@ gsc_popup_init (GscPopup *self)
 	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar), info_button,
 			    FALSE, FALSE, 0);
 
-	/*Next page icon*/
-	self->priv->next_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
-							       GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_show (self->priv->next_page_icon);
+	/*Next/Previous page buttons*/
+	
+	next_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
+						   GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_widget_show(next_page_icon);
+	prev_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_BACK,
+						   GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_widget_show(prev_page_icon);
+	
+	self->priv->next_page_button = gtk_button_new ();
+	gtk_widget_show (self->priv->next_page_button);
+	g_object_set (G_OBJECT (self->priv->next_page_button),
+		      "can-focus", FALSE,
+		      "focus-on-click", FALSE,
+		      NULL);
+	gtk_widget_set_tooltip_text (self->priv->next_page_button,
+				     _("Next page"));
+	gtk_container_add (GTK_CONTAINER (self->priv->next_page_button),
+			   next_page_icon);
+	g_signal_connect (G_OBJECT (self->priv->next_page_button),
+			  "clicked",
+			  G_CALLBACK (next_page_cb),
+			  self);
+	
+	self->priv->prev_page_button = gtk_button_new ();
+	gtk_widget_show (self->priv->prev_page_button);
+	g_object_set (G_OBJECT (self->priv->prev_page_button),
+		      "can-focus", FALSE,
+		      "focus-on-click", FALSE,
+		      NULL);
+	gtk_widget_set_tooltip_text (self->priv->prev_page_button,
+				     _("Previous page"));
+	gtk_container_add (GTK_CONTAINER (self->priv->prev_page_button),
+			   prev_page_icon);
+	g_signal_connect (G_OBJECT (self->priv->prev_page_button),
+			  "clicked",
+			  G_CALLBACK (prev_page_cb),
+			  self);
+
 	gtk_box_pack_end (GTK_BOX (self->priv->bottom_bar),
-			  self->priv->next_page_icon,
+			  self->priv->next_page_button,
+			  FALSE, FALSE, 1);
+	gtk_box_pack_end (GTK_BOX (self->priv->bottom_bar),
+			  self->priv->prev_page_button,
 			  FALSE, FALSE, 1);
 	/*Page label*/
 	self->priv->tab_label = gtk_label_new (DEFAULT_PAGE);

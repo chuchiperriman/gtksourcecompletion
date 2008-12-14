@@ -76,10 +76,10 @@ gsc_provider_test_real_get_proposals (GscProvider* base,
 				NULL);
 	gsc_proposal_set_page_name(prop,"Page 2");
 	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal 3,2",
-				"Info proposal 3,2",
+	prop = gsc_proposal_new("Proposal 3,3",
+				"Info proposal 3,3",
 				NULL);
-	gsc_proposal_set_page_name(prop,"Page 2");
+	gsc_proposal_set_page_name(prop,"Page 3");
 	list = g_list_append (list, prop);
 	return list;
 }

@@ -35,7 +35,8 @@ GscPopup:
     and we don't call to gsc_proposal_get_info)
 [X] Clean all filter and options features. 
 [ ] Do we must to set the GscTree inside a ScrolledWindow?
-[ ] Add previous and next page buttons.
+[X] Add previous and next page buttons.
+[ ] When the popup is shown, do not select any proposal
 
 Bugs
 ---------------
