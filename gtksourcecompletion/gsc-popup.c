@@ -758,34 +758,46 @@ void
 gsc_popup_page_next (GscPopup *self)
 {
 	gint pages;
+	gint current_page;
 	gint page;
+	GscPopupPage *popup_page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 
 	pages = g_list_length (self->priv->pages);
-	page = g_list_index (self->priv->pages, self->priv->active_page);
+	current_page = g_list_index (self->priv->pages, self->priv->active_page);
+	page = current_page;
 	
-	if (page == pages - 1)
+	do
 	{
-		page = 0;
+		if (page == pages - 1)
+		{
+			page = 0;
+		}
+		else
+		{
+			page++;
+		}
+		popup_page = (GscPopupPage *)g_list_nth_data (self->priv->pages, page);
 	}
-	else
-	{
-		page++;
-	}
+	while (gsc_tree_get_num_proposals (GSC_TREE (popup_page->view)) == 0 &&
+	       page != current_page);
 
-	gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
-				       page);
-	
-	/*
-	 * After setting the page the active_page was updated
-	 * so we can update the tree
-	 */
-	gsc_tree_select_first (get_current_tree (self));
-	
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+	if (page != current_page)
 	{
-		show_completion_info (self);
+		gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
+					       page);
+	
+		/*
+		 * After setting the page the active_page was updated
+		 * so we can update the tree
+		 */
+		gsc_tree_select_first (get_current_tree (self));
+	
+		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+		{
+			show_completion_info (self);
+		}
 	}
 }
 
@@ -801,34 +813,46 @@ void
 gsc_popup_page_previous (GscPopup *self)
 {
 	gint pages;
+	gint current_page;
 	gint page;
+	GscPopupPage *popup_page;
 	
 	g_return_if_fail (GSC_IS_POPUP (self));
 	
 	pages = g_list_length (self->priv->pages);
-	page = g_list_index (self->priv->pages, self->priv->active_page);
+	current_page = g_list_index (self->priv->pages, self->priv->active_page);
+	page = current_page;
 	
-	if (page == 0)
+	do
 	{
-		page = pages - 1;
+		if (page == 0)
+		{
+			page = pages - 1;
+		}
+		else
+		{
+			page--;
+		}
+	popup_page = (GscPopupPage *)g_list_nth_data (self->priv->pages, page);
 	}
-	else
+	while (gsc_tree_get_num_proposals (GSC_TREE (popup_page->view)) == 0 &&
+	       page != current_page);
+	
+	if (page != current_page)
 	{
-		page--;
-	}
+		gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
+					       page);
 	
-	gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
-				       page);
+		/*
+		 * After setting the page the active_page was updated
+		 * so we can update the tree
+		 */
+		gsc_tree_select_first (get_current_tree (self));
 	
-	/*
-	 * After setting the page the active_page was updated
-	 * so we can update the tree
-	 */
-	gsc_tree_select_first (get_current_tree (self));
-	
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-	{
-		show_completion_info (self);
+		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+		{
+			show_completion_info (self);
+		}
 	}
 }
 
@@ -922,6 +946,9 @@ gsc_popup_show_or_update (GtkWidget *widget)
 	
 	if (!GTK_WIDGET_VISIBLE (self))
 	{
+		gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
+					       0);
+
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
 					      FALSE);
 		GTK_WIDGET_CLASS (gsc_popup_parent_class)->show (widget);

@@ -38,7 +38,7 @@ GscPopup:
 [ ] Do we must to set the GscTree inside a ScrolledWindow?
 [X] Add previous and next page buttons.
 [X] When the popup is shown, do not select any proposal
-[ ] Bug showing pages because we must not show a page if it has not proposals
+[X] Bug showing pages because we must not show a page if it has not proposals
 
 Bugs
 ---------------
