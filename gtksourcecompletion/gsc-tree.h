@@ -36,9 +36,17 @@ G_BEGIN_DECLS
 #define GSC_TREE_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_TREE, GscTreeClass))
 
 typedef struct _GscTreePriv GscTreePriv;
-typedef struct _GscTree GscTree;
-typedef struct _GscTreeClass GscTreeClass;
 
+typedef struct _GscTree GscTree;
+
+struct _GscTree
+{
+	GtkTreeView parent;
+	
+	GscTreePriv *priv;
+};
+
+typedef struct _GscTreeClass GscTreeClass;
 
 struct _GscTreeClass
 {
@@ -50,143 +58,32 @@ struct _GscTreeClass
 				   GscProposal *proposal);
 };
 
-struct _GscTree
-{
-	GtkTreeView parent;
-	
-	GscTreePriv *priv;
-};
+GType		 gsc_tree_get_type			(void) G_GNUC_CONST;
 
-GType 
-gsc_tree_get_type (void) G_GNUC_CONST;
+GtkWidget	*gsc_tree_new				(void);
 
-/**
- * gsc_tree_new:
- *
- * Create a new GscTree
- *
- * Returns the new #GscTree
- *
- */
-GtkWidget*
-gsc_tree_new();
+gboolean	 gsc_tree_get_selected_proposal		(GscTree *self,
+							 GscProposal **proposal);
 
-/**
- * gsc_tree_get_selected_proposal:
- * @self: The #GscTree
- * @proposal: A reference of a proposal. This function sets the pointer to the selected proposal.
- *
- * @Returns TRUE if there is an proposal selected
- *
- */
-gboolean
-gsc_tree_get_selected_proposal(GscTree *self,
-				      GscProposal **proposal);
-/**
- * gsc_tree_select_first:
- * @self: The #GscTree
- *
- * This functions selects the first proposal on the tree
- *
- * Returns TRUE if there is an proposal and it has been selected
- */
-gboolean
-gsc_tree_select_first(GscTree *self);
+void		 gsc_tree_add_data			(GscTree *self,
+							 GscProposal* data);
 
-/**
- * gsc_tree_select_last:
- * @self: The #GscTree
- *
- * This functions selects the last proposal on the tree
- *
- * Returns TRUE if there is an proposal and it has been selected
- */
-gboolean 
-gsc_tree_select_last(GscTree *self);
+void		 gsc_tree_clear				(GscTree *self);
 
-/**
- * gsc_tree_select_previous:
- * @self: The #GscTree
- * @rows: the number of the previous proposals to select
- *
- * This functions selects the rows number of proposals before the current.
- *
- * Returns TRUE if there is an proposal and it has been selected. If rows=5 but the tree
- * only have 3 proposals, it returns true too.
- */
-gboolean
-gsc_tree_select_previous(GscTree *self, 
-				    gint rows);
+gboolean	 gsc_tree_select_first			(GscTree *self);
 
-/**
- * gsc_tree_select_next:
- * @self: The #GscTree
- * @rows: the number of the next proposals to select
- *
- * This functions selects the rows number of proposals after the current.
- *
- * Returns TRUE if there is an proposal and it has been selected. If rows=5 but the tree
- * only have 3 proposals, it returns true too.
- */
-gboolean
-gsc_tree_select_next(GscTree *self, 
-				gint rows);
+gboolean	 gsc_tree_select_last			(GscTree *self);
 
-/**
- * gsc_tree_get_selected_proposal:
- * @self: the #GscTree
- * @proposal: Sets the ponter to the selected proposal.
- *
- * Sets the param proposal to the selected proposal if there is an proposal selected.
- *
- * Returns TRUE if there is an proposal selected
- */
-gboolean
-gsc_tree_get_selected_proposal(GscTree *self,
-				      GscProposal **proposal);
-				      
-/**
- * gsc_tree_clear:
- * @self: the #GscTree
- *
- * Clear the tree model and free the proposals 
- */
-void
-gsc_tree_clear(GscTree *self);
+gboolean	 gsc_tree_select_previous		(GscTree *self, 
+							 gint rows);
 
-/**
- * gsc_tree_add_data:
- * @self: The #GscTree
- * @data: the proposal to add to the tree
- *
- * Adds a new proposal into the tree
- *
- */
-void
-gsc_tree_add_data(GscTree *self,
-		GscProposal* data);
+gboolean	 gsc_tree_select_next			(GscTree *self, 
+							 gint rows);
 
-/**
- * gsc_tree_get_num_proposals:
- * @self: The #GscTree
- *
- * Returns The proposals number of this tree.
- */
-gint 
-gsc_tree_get_num_proposals(GscTree *self);
+gint		 gsc_tree_get_num_proposals		(GscTree *self);
 
-/**
- * gsc_tree_filter:
- * @self: The #GscTree
- * @filter: The filter to be applied.
- *
- * This function filter the proposals in the current tree. This function
- * filter the proposals by name (proposals stating by "filter")
- *
- **/
-void
-gsc_tree_filter(GscTree *self, const gchar* filter);
-
+void		 gsc_tree_filter			(GscTree *self,
+							 const gchar* filter);
 
 G_END_DECLS
 #endif

@@ -247,30 +247,63 @@ gsc_tree_init (GscTree *self)
 			  self);
 }
 
+/**
+ * gsc_tree_new:
+ *
+ * Creates a new GscTree
+ *
+ * Returns: the new #GscTree
+ */
+GtkWidget*
+gsc_tree_new ()
+{
+	GscTree *self = GSC_TREE (g_object_new (GSC_TYPE_TREE , NULL));
+	
+	return GTK_WIDGET (self);
+}
+
+/**
+ * gsc_tree_get_selected_proposal:
+ * @self: the #GscTree
+ * @proposal: Sets the ponter to the selected proposal.
+ *
+ * Sets the param proposal to the selected proposal if there is an proposal selected.
+ *
+ * Returns: %TRUE if there is a proposal selected
+ */
 gboolean
 gsc_tree_get_selected_proposal (GscTree *self,
 				GscProposal **proposal)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	GValue value_proposal = {0,};
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
-	if (gtk_tree_selection_get_selected(selection,NULL, &iter))
+	GtkTreeSelection *selection;
+	
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
+	
+	if (gtk_tree_selection_get_selected (selection, NULL, &iter))
 	{
-		model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
-		gtk_tree_model_get_value(model,&iter,COLUMN_DATA,&value_proposal);
-		*proposal = (GscProposal*)g_value_get_pointer(&value_proposal);
+		model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
+		
+		gtk_tree_model_get (model, &iter,
+				    COLUMN_DATA, *proposal);
 		
 		return TRUE;
 	}
 	
 	return FALSE;
-	
 }
 
+/**
+ * gsc_tree_add_data:
+ * @self: The #GscTree
+ * @data: the proposal to add to the tree
+ *
+ * Adds a new proposal into the tree
+ */
 void
-gsc_tree_add_data(GscTree *self,
-			     GscProposal* data)
+gsc_tree_add_data (GscTree *self,
+		   GscProposal* data)
 {
 	GtkTreeIter iter;
 
@@ -288,6 +321,12 @@ gsc_tree_add_data(GscTree *self,
 			    -1);
 }
 
+/**
+ * gsc_tree_clear:
+ * @self: the #GscTree
+ *
+ * Clears the tree model and free the proposals 
+ */
 void
 gsc_tree_clear (GscTree *self)
 {
@@ -310,6 +349,14 @@ gsc_tree_clear (GscTree *self)
 	gtk_list_store_clear (self->priv->list_store);
 }
 
+/**
+ * gsc_tree_select_first:
+ * @self: The #GscTree
+ *
+ * This functions selects the first proposal on the tree
+ *
+ * Returns: %TRUE if there is an proposal and it has been selected
+ */
 gboolean
 gsc_tree_select_first (GscTree *self)
 {
@@ -317,38 +364,46 @@ gsc_tree_select_first (GscTree *self)
 	GtkTreePath* path;
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
-	if (!GTK_WIDGET_VISIBLE(self))
+	
+	if (!GTK_WIDGET_VISIBLE (self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
 
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
+	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
+	model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
 		
-	if (gtk_tree_model_get_iter_first(model, &iter))
+	if (gtk_tree_model_get_iter_first (model, &iter))
 	{
-		gtk_tree_selection_select_iter(selection, &iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
-						   path, 
-						   NULL, 
-						   FALSE, 
-						   0, 
-						   0);
-		gtk_tree_path_free(path);
+		gtk_tree_selection_select_iter (selection, &iter);
+		path = gtk_tree_model_get_path (model, &iter);
+		gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (self),
+					      path, 
+					      NULL, 
+					      FALSE, 
+					      0, 
+					      0);
+		gtk_tree_path_free (path);
 		return TRUE;
 	}
 	else
 	{
 		return FALSE;
 	}
-	
 }
 
+/**
+ * gsc_tree_select_last:
+ * @self: The #GscTree
+ *
+ * This functions selects the last proposal on the tree
+ *
+ * Returns: %TRUE if there is an proposal and it has been selected
+ */
 gboolean 
-gsc_tree_select_last(GscTree *self)
+gsc_tree_select_last (GscTree *self)
 {
 	GtkTreeIter iter;
 	GtkTreeModel* model;
@@ -356,144 +411,174 @@ gsc_tree_select_last(GscTree *self)
 	GtkTreePath* path;
 	gint children;
 	
-	if (!GTK_WIDGET_VISIBLE(self))
+	if (!GTK_WIDGET_VISIBLE (self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(self));
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
+	model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
 	
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
+	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 	
-	children = gtk_tree_model_iter_n_children(model, NULL);
+	children = gtk_tree_model_iter_n_children (model, NULL);
 	if (children > 0)
 	{
-		gtk_tree_model_iter_nth_child(model, &iter, NULL, children - 1);
+		gtk_tree_model_iter_nth_child (model, &iter,
+					       NULL, children - 1);
 	
-		gtk_tree_selection_select_iter(selection, &iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
-					     path, 
-					     NULL, 
-					     FALSE, 
-					     0, 
-					     0);
-		gtk_tree_path_free(path);
+		gtk_tree_selection_select_iter (selection, &iter);
+		path = gtk_tree_model_get_path (model, &iter);
+		gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (self),
+					      path, 
+					      NULL, 
+					      FALSE, 
+					      0, 
+					      0);
+		gtk_tree_path_free (path);
 		return TRUE;
 	}
 	return FALSE;
 }
 
+/**
+ * gsc_tree_select_previous:
+ * @self: The #GscTree
+ * @rows: the number of the previous proposals to select
+ *
+ * This functions selects the rows number of proposals before the current.
+ *
+ * Returns: %TRUE if there is an proposal and it has been selected. If rows=5 but the tree
+ * only have 3 proposals, it returns true too.
+ */
 gboolean
-gsc_tree_select_previous(GscTree *self, 
-				    gint rows)
+gsc_tree_select_previous (GscTree *self, 
+			  gint rows)
 {
 	GtkTreeIter iter;
 	GtkTreePath* path;
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	if (!GTK_WIDGET_VISIBLE(self))
+	if (!GTK_WIDGET_VISIBLE (self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
 	
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
+	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter))
+	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
 		gint i;
-		path = gtk_tree_model_get_path(model, &iter);
+		
+		path = gtk_tree_model_get_path (model, &iter);
+		
 		for (i=0; i  < rows; i++)
-			gtk_tree_path_prev(path);
+			gtk_tree_path_prev (path);
 		
 		if (gtk_tree_model_get_iter(model, &iter, path))
 		{
-			gtk_tree_selection_select_iter(selection, &iter);
-			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
-						     path, 
-						     NULL, 
-						     FALSE, 
-						     0, 
-						     0);
+			gtk_tree_selection_select_iter (selection, &iter);
+			gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(self),
+						      path, 
+						      NULL, 
+						      FALSE, 
+						      0, 
+						      0);
 		}
-		gtk_tree_path_free(path);
+		gtk_tree_path_free (path);
 	}
 	else
 	{
-		return gsc_tree_select_first(self);
+		return gsc_tree_select_first (self);
 	}
 	
 	return TRUE;
 }
 
+/**
+ * gsc_tree_select_next:
+ * @self: The #GscTree
+ * @rows: the number of the next proposals to select
+ *
+ * This functions selects the rows number of proposals after the current.
+ *
+ * Returns: %TRUE if there is an proposal and it has been selected. If rows=5 but the tree
+ * only have 3 proposals, it returns true too.
+ */
 gboolean
-gsc_tree_select_next(GscTree *self, 
-				gint rows)
+gsc_tree_select_next (GscTree *self, 
+		      gint rows)
 {
 	GtkTreeIter iter;
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	if (!GTK_WIDGET_VISIBLE(self))
+	if (!GTK_WIDGET_VISIBLE (self))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self));
-	if (gtk_tree_selection_get_mode(selection) == GTK_SELECTION_NONE)
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
+	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter))
+	if (gtk_tree_selection_get_selected (selection, &model, &iter))
 	{
-		gint i;
 		GtkTreePath* path;
+		gint i;
+		
 		for (i = 0; i < rows; i++)
 		{
-			if (!gtk_tree_model_iter_next(model, &iter))
-				return gsc_tree_select_last(self);
+			if (!gtk_tree_model_iter_next (model, &iter))
+				return gsc_tree_select_last (self);
 		}
-		gtk_tree_selection_select_iter(selection, &iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(self),
-					     path, 
-					     NULL, 
-					     FALSE, 
-					     0, 
-					     0);
-		gtk_tree_path_free(path);
+		gtk_tree_selection_select_iter (selection, &iter);
+		path = gtk_tree_model_get_path (model, &iter);
+		gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (self),
+					      path, 
+					      NULL, 
+					      FALSE, 
+					      0, 
+					      0);
+		gtk_tree_path_free (path);
 	}
 	else
 	{
-		return gsc_tree_select_first(self);
+		return gsc_tree_select_first (self);
 	}
 	return TRUE;
 }
 
-GtkWidget*
-gsc_tree_new ()
-{
-	GscTree *self = GSC_TREE (g_object_new (GSC_TYPE_TREE , NULL));
-	
-	return GTK_WIDGET (self);
-}
-
+/**
+ * gsc_tree_get_num_proposals:
+ * @self: The #GscTree
+ *
+ * Returns: The proposals number of this tree.
+ */
 gint 
-gsc_tree_get_num_proposals(GscTree *self)
+gsc_tree_get_num_proposals (GscTree *self)
 {
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
 	
 	return gtk_tree_model_iter_n_children (model, NULL);
 }
 
+/**
+ * gsc_tree_filter:
+ * @self: The #GscTree
+ * @filter: The filter to be applied.
+ *
+ * This function filter the proposals in the current tree. This function
+ * filter the proposals by name (proposals stating by "filter")
+ */
 void
-gsc_tree_filter (GscTree *self, const gchar* filter)
+gsc_tree_filter (GscTree *self,
+		 const gchar* filter)
 {
 	self->priv->active_filter = TRUE;
 	self->priv->current_filter = g_strdup (filter);
 	gtk_tree_model_filter_refilter (self->priv->model_filter);
 	self->priv->active_filter = FALSE;
 	self->priv->current_filter = NULL;
-	//gsc_tree_select_first(self);
 }
 
 
