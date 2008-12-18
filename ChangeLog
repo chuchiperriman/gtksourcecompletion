@@ -1,5 +1,10 @@
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* Makefile.am:
+	Added test as subdir.
+
+2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-manager.c:
 	A few style changes.
 

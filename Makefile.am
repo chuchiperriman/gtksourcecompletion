@@ -1,4 +1,4 @@
-SUBDIRS = gtksourcecompletion pixmaps docs po 
+SUBDIRS = gtksourcecompletion test pixmaps docs po 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gtksourcecompletion-1.0.pc
