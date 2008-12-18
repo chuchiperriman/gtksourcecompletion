@@ -304,7 +304,7 @@ gsc_tree_clear (GscTree *self)
 			gtk_tree_model_get (model, &iter,
 					    COLUMN_DATA, &data, -1);
 			g_object_unref (data);
-		}while (gtk_tree_model_iter_next (model, &iter));
+		} while (gtk_tree_model_iter_next (model, &iter));
 	}
 	
 	gtk_list_store_clear (self->priv->list_store);

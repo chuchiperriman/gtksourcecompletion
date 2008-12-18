@@ -152,7 +152,7 @@ end_completion (GscManager *self)
 			GscProvider *provider =  GSC_PROVIDER (providers->data);
 			gsc_provider_finish (provider);
 			
-		}while ((providers = g_list_next (providers)) != NULL);
+		} while ((providers = g_list_next (providers)) != NULL);
 	
 		self->priv->active_trigger = NULL;
 	}
@@ -771,11 +771,11 @@ gsc_manager_trigger_event (GscManager *self,
 			{
 				final_list = g_list_append (final_list,
 							    data_list->data);
-			}while ((data_list = g_list_next (data_list)) != NULL);
+			} while ((data_list = g_list_next (data_list)) != NULL);
 			
 			g_list_free (original_list);
 		}
-	}while ((providers_list = g_list_next (providers_list)) != NULL);
+	} while ((providers_list = g_list_next (providers_list)) != NULL);
 	
 	if (final_list == NULL)
 	{
@@ -794,7 +794,7 @@ gsc_manager_trigger_event (GscManager *self,
 		gsc_popup_add_data (self->priv->popup,
 				    last_proposal);
 		++proposals;
-	}while ((data_list = g_list_next (data_list)) != NULL);
+	} while ((data_list = g_list_next (data_list)) != NULL);
 	
 	g_list_free (final_list);
 	/* If there are not proposals, we don't show the popup */
@@ -885,7 +885,7 @@ gsc_manager_get_provider (GscManager *self,
 			{
 				return provider;
 			}
-		}while ((plist = g_list_next (plist)) != NULL);
+		} while ((plist = g_list_next (plist)) != NULL);
 	}
 	
 	return NULL;
@@ -1002,7 +1002,7 @@ gsc_manager_get_trigger (GscManager *self,
 			{
 				return trigger;
 			}
-		}while ((plist = g_list_next (plist)) != NULL);
+		} while ((plist = g_list_next (plist)) != NULL);
 	}
 	
 	return FALSE;
@@ -1057,7 +1057,7 @@ gsc_manager_activate (GscManager *self)
 			trigger =  GSC_TRIGGER (plist->data);
 			
 			gsc_trigger_activate (trigger);
-		}while ((plist = g_list_next (plist)) != NULL);
+		} while ((plist = g_list_next (plist)) != NULL);
 	}	
 	
 	self->priv->active = TRUE;
@@ -1102,7 +1102,7 @@ gsc_manager_deactivate (GscManager *self)
 			trigger =  GSC_TRIGGER (plist->data);
 			
 			gsc_trigger_deactivate (trigger);
-		}while ((plist = g_list_next (plist)) != NULL);
+		} while ((plist = g_list_next (plist)) != NULL);
 	}
 	
 	self->priv->active = FALSE;

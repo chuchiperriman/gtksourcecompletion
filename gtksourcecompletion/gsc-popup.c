@@ -833,7 +833,8 @@ gsc_popup_page_previous (GscPopup *self)
 		{
 			page--;
 		}
-	popup_page = (GscPopupPage *)g_list_nth_data (self->priv->pages, page);
+		popup_page = (GscPopupPage *)g_list_nth_data (self->priv->pages,
+							      page);
 	}
 	while (gsc_tree_get_num_proposals (GSC_TREE (popup_page->view)) == 0 &&
 	       page != current_page);

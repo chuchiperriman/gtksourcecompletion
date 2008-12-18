@@ -29,7 +29,7 @@
  * Returns: The trigger's name
  */
 const gchar*
-gsc_trigger_get_name(GscTrigger *self)
+gsc_trigger_get_name (GscTrigger *self)
 {
 	g_return_val_if_fail (GSC_IS_TRIGGER (self), NULL);
 	return GSC_TRIGGER_GET_INTERFACE (self)->get_name (self);
