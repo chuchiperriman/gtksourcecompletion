@@ -25,14 +25,6 @@
 					 
 #include <string.h>
 
-/* Signals */
-enum
-{
-	ITEM_SELECTED,
-	SELECTION_CHANGED,
-	LAST_SIGNAL
-};
-
 enum
 {
 	COLUMN_PIXBUF,
@@ -40,8 +32,6 @@ enum
 	COLUMN_DATA,
 	N_COLUMNS
 };
-
-static guint signals[LAST_SIGNAL] = { 0 };
 
 struct _GscTreePriv
 {
@@ -53,42 +43,6 @@ struct _GscTreePriv
 	gchar* current_filter;
 	gboolean active_filter;
 };
-
-static void
-_tree_row_activated_cb (GtkTreeView *tree_view,
-			GtkTreePath *path,
-			GtkTreeViewColumn *column,
-			gpointer user_data)
-{
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-	GscProposal *data;
-	GscTree *self;
-	GValue value_name = {0,};
-	
-	self = GSC_TREE(user_data);
-	
-	model = gtk_tree_view_get_model(tree_view);
-	
-	gtk_tree_model_get_iter(model,&iter,path);
-	gtk_tree_model_get_value(model,&iter,COLUMN_DATA,&value_name);
-	data = (GscProposal*)g_value_get_pointer(&value_name);
-	
-	g_signal_emit (G_OBJECT (self), signals[ITEM_SELECTED], 0, data);
-}
-
-static void 
-_selection_changed_cd(GtkTreeSelection *treeselection,
-		      gpointer user_data)
-{
-	GscProposal *proposal;
-	GscTree *self = GSC_TREE(user_data);
-	if (gsc_tree_get_selected_proposal(self,&proposal))
-	{
-		g_signal_emit (G_OBJECT (self), signals[SELECTION_CHANGED], 0, proposal);
-	}
-}
-
 
 G_DEFINE_TYPE (GscTree, gsc_tree, GTK_TYPE_TREE_VIEW);
 
@@ -140,44 +94,6 @@ gsc_tree_class_init (GscTreeClass *klass)
 	g_type_class_add_private (klass, sizeof (GscTreePriv));
 	
 	object_class->finalize = gsc_tree_finalize;
-	
-	/**
-	 * GscTree::proposal-selected:
-	 * @gsctree: the object which received the signal.
-	 * @proposal: The #GscProposal selected
-	 *
-	 * Emits when the user selects a proposal of this tree.
-	 **/
-	signals[ITEM_SELECTED] =
-		g_signal_new ("proposal-selected",
-			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      G_STRUCT_OFFSET (GscTreeClass, proposal_selected),
-			      NULL, 
-			      NULL,
-			      g_cclosure_marshal_VOID__POINTER, 
-			      G_TYPE_NONE,
-			      1,
-			      GTK_TYPE_POINTER);
-	
-	/**
-	 * GscTree::selection-changed:
-	 * @gsctree: the object which received the signal.
-	 * @proposal: The current #GscProposal in the tree
-	 *
-	 * Emits when the user change the current proposal
-	 **/		      
-	signals[SELECTION_CHANGED] =
-		g_signal_new ("selection-changed",
-			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      G_STRUCT_OFFSET (GscTreeClass, proposal_selected),
-			      NULL, 
-			      NULL,
-			      g_cclosure_marshal_VOID__POINTER, 
-			      G_TYPE_NONE,
-			      1,
-			      GTK_TYPE_POINTER);
 }
 
 static void
@@ -188,7 +104,6 @@ gsc_tree_init (GscTree *self)
 	GtkCellRenderer* renderer_pixbuf;
 	GtkTreeViewColumn* column_pixbuf;
 	GtkTreeModel *model;
-	GtkTreeSelection *selection;
 
 	self->priv = GSC_TREE_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
@@ -233,18 +148,6 @@ gsc_tree_init (GscTree *self)
 
 	gtk_tree_view_set_model (GTK_TREE_VIEW (self),
 				 model);
-	
-	/* Connect signals */
-	g_signal_connect (self, 
-			  "row-activated",
-			  G_CALLBACK (_tree_row_activated_cb),
-			  self);
-					
-	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
-	g_signal_connect (selection, 
-			  "changed",
-			  G_CALLBACK (_selection_changed_cd),
-			  self);
 }
 
 /**
@@ -286,7 +189,8 @@ gsc_tree_get_selected_proposal (GscTree *self,
 		model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
 		
 		gtk_tree_model_get (model, &iter,
-				    COLUMN_DATA, *proposal);
+				    COLUMN_DATA,
+				    proposal, -1);
 		
 		return TRUE;
 	}
@@ -303,7 +207,7 @@ gsc_tree_get_selected_proposal (GscTree *self,
  */
 void
 gsc_tree_add_data (GscTree *self,
-		   GscProposal* data)
+		   GscProposal *data)
 {
 	GtkTreeIter iter;
 

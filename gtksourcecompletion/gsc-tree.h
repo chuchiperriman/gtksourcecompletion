@@ -51,11 +51,6 @@ typedef struct _GscTreeClass GscTreeClass;
 struct _GscTreeClass
 {
 	GtkTreeViewClass parent_class;
-	
-	void (* proposal_selected)(GscTree *tree,
-			       GscProposal *proposal);
-	void (* selection_changed)(GscTree *tree,
-				   GscProposal *proposal);
 };
 
 GType		 gsc_tree_get_type			(void) G_GNUC_CONST;

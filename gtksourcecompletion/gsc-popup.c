@@ -102,21 +102,26 @@ show_completion_info (GscPopup *self)
 }
 
 static void
-proposal_selected_cb (GscTree *tree, 
-		      GscProposal *proposal,
-		      gpointer user_data)
+row_activated_cb (GtkTreeView *tree_view,
+		  GtkTreePath *path,
+		  GtkTreeViewColumn *column,
+		  gpointer user_data)
 {
+	GtkTreeModel *model;
+	GscProposal *proposal;
+	
+	model = gtk_tree_view_get_model (tree_view);
+	
+	gsc_tree_get_selected_proposal (GSC_TREE (tree_view), &proposal);
+
 	g_signal_emit (G_OBJECT (user_data), popup_signals[ITEM_SELECTED],
 		       0, proposal);
 }
 
 static void 
-selection_changed_cd (GscTree *tree, 
-		      GscProposal *proposal,
-		      gpointer user_data)
+selection_changed_cd (GtkTreeSelection *selection, 
+		      GscPopup *self)
 {
-	GscPopup *self = GSC_POPUP (user_data);
-
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
 		show_completion_info (self);
@@ -131,6 +136,7 @@ gsc_popup_page_new (GscPopup *self,
 	GscPopupPage *page;
 	GtkWidget *label;
 	GtkWidget *sw;
+	GtkTreeSelection *selection;
 	
 	page = g_slice_new (GscPopupPage);
 	
@@ -159,12 +165,13 @@ gsc_popup_page_new (GscPopup *self,
 				  sw, label);
 	
 	g_signal_connect (page->view,
-			  "proposal-selected",
-			  G_CALLBACK (proposal_selected_cb),
+			  "row-activated",
+			  G_CALLBACK (row_activated_cb),
 			  self);
 	
-	g_signal_connect (page->view,
-			  "selection-changed",
+	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (page->view));
+	g_signal_connect (selection,
+			  "changed",
 			  G_CALLBACK (selection_changed_cd),
 			  self);
 	
