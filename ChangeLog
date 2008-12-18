@@ -1,6 +1,11 @@
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:
+	A few style changes.
+
+2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
 	Use for loop instead of do while.
 
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>

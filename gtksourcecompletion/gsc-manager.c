@@ -114,7 +114,7 @@ static void
 completion_control_add_completion (GtkTextView *view,
 				   GscManager *comp)
 {
-	g_hash_table_insert (completion_map, view,comp);
+	g_hash_table_insert (completion_map, view, comp);
 }
 
 static void 
@@ -257,7 +257,7 @@ gsc_manager_get_property (GObject    *object,
 			  GValue     *value,
 			  GParamSpec *pspec)
 {
-	GscManager *self = GSC_MANAGER(object);
+	GscManager *self = GSC_MANAGER (object);
 	
 	g_return_if_fail (GSC_IS_MANAGER (object));
 
@@ -452,7 +452,7 @@ gsc_manager_new (GtkTextView *view)
 void
 gsc_manager_set_key (GscManager *self,
 		     KeysType type,
-		     const gchar* keys)
+		     const gchar *keys)
 {
 	guint key;
 	GdkModifierType mods;
@@ -601,7 +601,7 @@ gsc_manager_manage_key (GscManager *self,
  * select a proposal, it call the provider to tell it this action and the provider do
  * that it want (normally inserts some text)
  * 
- * Returns TRUE if it was registered or FALSE if not (because it has been already registered,
+ * Returns: %TRUE if it was registered or %FALSE if not (because it has been already registered,
  * or the trigger don't exists)
  *
  **/
@@ -625,7 +625,7 @@ gsc_manager_register_provider (GscManager *self,
 	
 	pl->prov_list = g_list_append (pl->prov_list, provider);
 	
-	prov = gsc_manager_get_provider(self, gsc_provider_get_name (provider));
+	prov = gsc_manager_get_provider (self, gsc_provider_get_name (provider));
 	if (prov != NULL)
 		return FALSE;
 	
@@ -859,7 +859,7 @@ gsc_manager_get_from_view (GtkTextView *view)
  */
 GscProvider *
 gsc_manager_get_provider (GscManager *self,
-			  const gchar* provider_name)
+			  const gchar *provider_name)
 {
 	GscProvider *provider;
 	GList *l;
@@ -967,7 +967,7 @@ gsc_manager_unregister_trigger (GscManager *self,
  */
 GscTrigger*
 gsc_manager_get_trigger (GscManager *self,
-			 const gchar* trigger_name)
+			 const gchar *trigger_name)
 {
 	GscTrigger *trigger;
 	GList *l;
