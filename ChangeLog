@@ -1,5 +1,10 @@
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-manager.c:
+	Use for loop instead of do while.
+
+2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-tree.c:
 	* gtksourcecompletion/gsc-tree.h:
 	* gtksourcecompletion/gsc-popup.h:

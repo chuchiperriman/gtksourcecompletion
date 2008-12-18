@@ -133,9 +133,6 @@ prov_list_free (gpointer prov_list)
 	g_free (pl);
 }
 
-/*
- * FIXME: Use a for loop
- */
 static void
 end_completion (GscManager *self)
 {
@@ -145,15 +142,13 @@ end_completion (GscManager *self)
 	}
 	else
 	{
-		GList *providers = self->priv->providers;
+		GList *l;
 		
-		do 
+		for (l = self->priv->providers; l != NULL; l = g_list_next (l))
 		{
-			GscProvider *provider =  GSC_PROVIDER (providers->data);
-			gsc_provider_finish (provider);
-			
-		} while ((providers = g_list_next (providers)) != NULL);
-	
+			gsc_provider_finish (GSC_PROVIDER (l->data));
+		}
+		
 		self->priv->active_trigger = NULL;
 	}
 }
@@ -860,32 +855,26 @@ gsc_manager_get_from_view (GtkTextView *view)
  * @provider_name: Provider's name that you are looking for.
  *
  * Returns: The provider if the completion has this provider registered or 
- * NULL if not.
- */
-/*
- * FIXME: Use for loop
+ * %NULL if not.
  */
 GscProvider *
 gsc_manager_get_provider (GscManager *self,
 			  const gchar* provider_name)
 {
-	GList *plist = self->priv->providers;
 	GscProvider *provider;
+	GList *l;
 	
 	g_return_val_if_fail (GSC_IS_MANAGER (self), NULL);
 	
-	if (plist != NULL)
+	for (l = self->priv->providers; l != NULL; l = g_list_next (l))
 	{
-		do
+		provider =  GSC_PROVIDER (plist->data);
+		
+		if (strcmp (gsc_provider_get_name (provider),
+			    provider_name) == 0)
 		{
-			provider =  GSC_PROVIDER (plist->data);
-			
-			if (strcmp (gsc_provider_get_name (provider),
-				    provider_name) == 0)
-			{
-				return provider;
-			}
-		} while ((plist = g_list_next (plist)) != NULL);
+			return provider;
+		}
 	}
 	
 	return NULL;
@@ -970,39 +959,30 @@ gsc_manager_unregister_trigger (GscManager *self,
 /**
  * gsc_manager_get_trigger:
  * @self: The #GscManager
- * @trigger_name: The trigger name to get
+ * @trigger_name: The trigger name
  *
- * This function return the trigger with this name.
+ * This function returns the trigger with @trigger_name name.
  *
- * Returns: The trigger or NULL if not exists
- *
- */
-/*
- * FIXME: Use for loop
+ * Returns: The trigger or %NULL if it does not exists
  */
 GscTrigger*
 gsc_manager_get_trigger (GscManager *self,
 			 const gchar* trigger_name)
 {
-	GList *plist;
 	GscTrigger *trigger;
+	GList *l;
 	
 	g_return_val_if_fail (GSC_IS_MANAGER (self), FALSE);
 	
-	plist = self->priv->triggers;
-	
-	if (plist != NULL)
+	for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
 	{
-		do
+		trigger =  GSC_TRIGGER (l->data);
+		
+		if (strcmp (gsc_trigger_get_name (trigger),
+			    trigger_name) == 0)
 		{
-			trigger =  GSC_TRIGGER (plist->data);
-			
-			if (strcmp (gsc_trigger_get_name (trigger),
-				    trigger_name) == 0)
-			{
-				return trigger;
-			}
-		} while ((plist = g_list_next (plist)) != NULL);
+			return trigger;
+		}
 	}
 	
 	return FALSE;
@@ -1044,21 +1024,13 @@ gsc_manager_activate (GscManager *self)
 					  G_CALLBACK (view_button_press_event_cb),
 					  self);
 
-	/* We activate the triggers*/
-	/*
-	 * FIXME: Use for loop
-	 */
-	plist = self->priv->triggers;
-	
-	if (plist != NULL)
+	/* We activate the triggers */
+	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
 	{
-		do
-		{
-			trigger =  GSC_TRIGGER (plist->data);
-			
-			gsc_trigger_activate (trigger);
-		} while ((plist = g_list_next (plist)) != NULL);
-	}	
+		trigger =  GSC_TRIGGER (plist->data);
+		
+		gsc_trigger_activate (trigger);
+	}
 	
 	self->priv->active = TRUE;
 }
@@ -1090,19 +1062,11 @@ gsc_manager_deactivate (GscManager *self)
 		self->priv->internal_signal_ids[i] = 0;
 	}
 	
-	/*
-	 * FIXME: Use for loop
-	 */
-	plist = self->priv->triggers;
-	
-	if (plist != NULL)
+	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
 	{
-		do
-		{
-			trigger =  GSC_TRIGGER (plist->data);
-			
-			gsc_trigger_deactivate (trigger);
-		} while ((plist = g_list_next (plist)) != NULL);
+		trigger =  GSC_TRIGGER (plist->data);
+		
+		gsc_trigger_deactivate (trigger);
 	}
 	
 	self->priv->active = FALSE;
