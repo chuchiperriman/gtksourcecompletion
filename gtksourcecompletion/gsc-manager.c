@@ -868,7 +868,7 @@ gsc_manager_get_provider (GscManager *self,
 	
 	for (l = self->priv->providers; l != NULL; l = g_list_next (l))
 	{
-		provider =  GSC_PROVIDER (plist->data);
+		provider =  GSC_PROVIDER (l->data);
 		
 		if (strcmp (gsc_provider_get_name (provider),
 			    provider_name) == 0)
