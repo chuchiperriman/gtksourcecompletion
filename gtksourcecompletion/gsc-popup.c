@@ -250,11 +250,13 @@ switch_page_cb (GtkNotebook *notebook,
 	return FALSE;
 }
 
-static void
+static gboolean
 update_pages_visibility (GscPopup *self)
 {
 	GList *l;
+	gboolean first_set = FALSE;
 	guint num_pages_with_data = 0;
+	gint i = 0;
 	
 	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
@@ -262,17 +264,16 @@ update_pages_visibility (GscPopup *self)
 		
 		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
 		{
-			/*
-			 * FIXME: Is this really needed?
-			 */
-			/*if (!first_set)
+			/*Selects the first page with data*/
+			if (!first_set)
 			{
 				gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
 							       i);
 				first_set = TRUE;
-			}*/
+			}
 			num_pages_with_data++;
 		}
+		i++;
 	}
 	if (num_pages_with_data > 1)
 	{
@@ -284,6 +285,8 @@ update_pages_visibility (GscPopup *self)
 		gtk_widget_hide (self->priv->next_page_button);
 		gtk_widget_hide (self->priv->prev_page_button);
 	}
+	
+	return num_pages_with_data > 1;
 }
 
 static gboolean
@@ -943,17 +946,15 @@ _filter_changed_cb (GtkEntry *entry,
 void
 gsc_popup_show_or_update (GtkWidget *widget)
 {
-	/*TODO This function is called only if the widget has not been shown previously*/
+	gboolean data;
 	
 	/*Only show the popup, the positions is set before this function*/
 	GscPopup *self = GSC_POPUP (widget);
 	
-	update_pages_visibility (self);
+	data = update_pages_visibility (self);
 	
-	if (!GTK_WIDGET_VISIBLE (self))
+	if (data && !GTK_WIDGET_VISIBLE (self))
 	{
-		gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
-					       0);
 
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
 					      FALSE);
