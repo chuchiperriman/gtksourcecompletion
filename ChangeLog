@@ -5,6 +5,8 @@
 	Better resize control showing and hiding the scroll bars by hand.
 	* gsc-popup.c: 
 	Selects the first page with data
+	* gsc-trigger-autowords.c:
+	Added delay and min-len as properties
 
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

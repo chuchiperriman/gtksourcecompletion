@@ -254,6 +254,10 @@ create_completion(void)
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
+	g_object_set (ac_trigger,
+		      "delay", 500,
+		      "min-len", 4,
+		      NULL);
 	
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));

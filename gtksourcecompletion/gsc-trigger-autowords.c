@@ -21,12 +21,10 @@
 #include <gtksourceview/gtksourceview.h>
 #include "gsc-utils.h"
 #include "gsc-trigger-autowords.h"
+#include "gsc-i18n.h"
 
-/*
- * FIXME: This should be properties
- */
-#define MIN_LEN 3
-#define AUTOCOMPLETION_DELAY 200
+#define DEFAULT_MIN_LEN (3)
+#define DEFAULT_DELAY (200)
 
 #define GSC_TRIGGER_AUTOWORDS_NAME "GscTriggerAutowords"
 
@@ -53,12 +51,15 @@ struct _GscTriggerAutowordsPrivate
 	
 	guint source_id;
 	guint delay;
+	guint min_len;
 	gint text_offset;
 };
 
 enum
 {
-	GSC_TRIGGER_AUTOWORDS_DUMMY_PROPERTY,
+	PROP_0,
+	PROP_MIN_LEN,
+	PROP_DELAY
 };
 
 static void	 gsc_trigger_autowords_iface_init	(GscTriggerIface *iface);
@@ -98,7 +99,7 @@ autocompletion_raise_event (gpointer event)
 	
 	word = gsc_get_last_word_and_iter (self->priv->view,
 					   NULL, NULL);
-	if (strlen (word) >= MIN_LEN)
+	if (strlen (word) >= self->priv->min_len)
 	{
 		g_free (self->priv->actual_word);
 		self->priv->actual_word = word;
@@ -231,6 +232,24 @@ gsc_trigger_autowords_get_property (GObject *object,
 				    GValue *value,
 				    GParamSpec *pspec)
 {
+	g_return_if_fail (GSC_IS_TRIGGER_AUTOWORDS (object));
+
+	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
+
+	switch (property_id)
+	{
+		case PROP_DELAY:
+			g_value_set_int (value,
+					 self->priv->delay);
+			break;
+		case PROP_MIN_LEN:
+			g_value_set_int (value,
+					 self->priv->min_len);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
 }
 
 
@@ -240,6 +259,22 @@ gsc_trigger_autowords_set_property (GObject *object,
 				    const GValue *value,
 				    GParamSpec *pspec)
 {
+	g_return_if_fail (GSC_IS_TRIGGER_AUTOWORDS (object));
+
+	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
+
+	switch (property_id)
+	{
+		case PROP_DELAY:
+			self->priv->delay = g_value_get_int (value);
+			break;
+		case PROP_MIN_LEN:
+			self->priv->min_len = g_value_get_int (value);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
 }
 
 static void 
@@ -249,17 +284,18 @@ gsc_trigger_autowords_init (GscTriggerAutowords *self)
 	
 	self->priv->actual_word = NULL;
 	self->priv->source_id = 0;
-	self->priv->delay = AUTOCOMPLETION_DELAY;
+	self->priv->delay = DEFAULT_DELAY;
+	self->priv->min_len = DEFAULT_MIN_LEN;
 }
 
 static void 
 gsc_trigger_autowords_finalize(GObject *object)
 {
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
-	
+
 	g_free (self->priv->actual_word);
 	//FIXME: Remove the source in case is not 0
-	
+
 	G_OBJECT_CLASS (gsc_trigger_autowords_parent_class)->finalize (object);
 }
 
@@ -267,12 +303,41 @@ static void
 gsc_trigger_autowords_class_init (GscTriggerAutowordsClass * klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	
+
 	g_type_class_add_private (klass, sizeof (GscTriggerAutowordsPrivate));
 
 	object_class->get_property = gsc_trigger_autowords_get_property;
 	object_class->set_property = gsc_trigger_autowords_set_property;
 	object_class->finalize     = gsc_trigger_autowords_finalize;
+	
+	/**
+	 * GscManager:delay:
+	 *
+	 * Sets the delay between the key pressed and the trigger event
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_DELAY,
+					 g_param_spec_int ("delay",
+							   _("Delay between the key pressed and the trigger event"),
+							   _("Delay between the key pressed and the trigger event"),
+							   0,
+							   10000,
+							   DEFAULT_DELAY,
+							   G_PARAM_READWRITE));
+	/**
+	 * GscManager:min-len:
+	 *
+	 * Sets the minimum word length to be autocompleted
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_MIN_LEN,
+					 g_param_spec_int ("min-len",
+							   _("Minimum word length to be autocompleted"),
+							   _("Minimum word length to be autocompleted"),
+							   0,
+							   100,
+							   DEFAULT_MIN_LEN,
+							   G_PARAM_READWRITE));
 }
 
 static void 
@@ -325,3 +390,4 @@ gsc_trigger_autowords_set_delay (GscTriggerAutowords* trigger,
 
 	trigger->priv->delay = delay;
 }
+
