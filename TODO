@@ -35,7 +35,7 @@ GscPopup:
     gsc_proposal_get_info by default (any connected function can return TRUE 
     and we don't call to gsc_proposal_get_info)
 [X] Clean all filter and options features. 
-[ ] Do we must to set the GscTree inside a ScrolledWindow?
+[X] Do we must to set the GscTree inside a ScrolledWindow?
 [X] Add previous and next page buttons.
 [X] When the popup is shown, do not select any proposal
 [X] Bug showing pages because we must not show a page if it has not proposals

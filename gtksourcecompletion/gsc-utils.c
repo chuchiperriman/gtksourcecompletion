@@ -334,7 +334,7 @@ gsc_get_window_position_center_parent(GtkWindow *window,
 }
 
 gboolean 
-gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x, gint *y)
+gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x, gint *y, gboolean *resized)
 {
 	gint w, h, xtext, ytext, ytemp;
 	gint sw = gdk_screen_width();
@@ -401,6 +401,9 @@ gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x,
 	if (resize)
 		gtk_window_resize(window, w, h);
 
+	if (resized != NULL)
+		*resized = resize;
+	
 	return up;
 }
 

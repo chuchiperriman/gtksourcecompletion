@@ -52,12 +52,6 @@ struct _GscInfoClass
 	GtkWindowClass parent_class;
 };
 
-typedef enum
-{
-	GSC_INFO_TYPE_SHORT,
-	GSC_INFO_TYPE_EXTENDED
-} GscInfoType;
-
 GType		 gsc_info_get_type			(void) G_GNUC_CONST;
 
 GscInfo		*gsc_info_new				(void);
@@ -67,12 +61,6 @@ void		 gsc_info_move_to_cursor		(GscInfo* self,
 
 void		 gsc_info_set_markup			(GscInfo* self,
 							 const gchar* markup);
-
-void		 gsc_info_set_info_type			(GscInfo* self,
-							 GscInfoType type);
-
-GscInfoType	 gsc_info_get_info_type			(GscInfo* self);
-
 
 void		 gsc_info_set_adjust_height		(GscInfo* self,
 							 gboolean adjust,
@@ -86,11 +74,6 @@ void		 gsc_info_set_custom			(GscInfo* self,
 							 GtkWidget *custom_widget);
 
 GtkWidget	*gsc_info_get_custom			(GscInfo* self);
-
-void		 gsc_info_set_bottom_bar_visible	(GscInfo* self,
-							 gboolean visible);
-
-GtkWidget	*gsc_info_get_bottom_bar		(GscInfo* self);
 
 G_END_DECLS
 

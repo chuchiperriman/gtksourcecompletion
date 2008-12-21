@@ -803,7 +803,7 @@ gsc_manager_trigger_event (GscManager *self,
 
 		gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
 						   self->priv->text_view,
-						   &x, &y);
+						   &x, &y, NULL);
 		gtk_window_move (GTK_WINDOW (self->priv->popup),
 				 x, y);
 		gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));

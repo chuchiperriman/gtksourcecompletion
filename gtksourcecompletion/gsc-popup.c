@@ -541,8 +541,6 @@ gsc_popup_init (GscPopup *self)
 
 	/*Info window*/
 	self->priv->info_window = GTK_WIDGET (gsc_info_new ());
-	gsc_info_set_bottom_bar_visible (GSC_INFO (self->priv->info_window),
-					 FALSE);
 
 	/* Connect signals */
 			
