@@ -48,6 +48,7 @@ static GtkWidget *view;
 static GscManager *comp;
 static GscInfo *info;
 static gboolean cambio = FALSE;
+static gboolean cambio_tool = FALSE;
 static GtkWidget *custom = NULL;
 static GtkWidget *custom_view = NULL;
 
@@ -63,22 +64,6 @@ void
 dev_button_cn (GtkButton *button, gpointer user_data)
 {
 	g_debug("Open devhelp");
-}
-
-void
-info_type_changed_cb(GscInfo *info, GscInfoType type, gpointer user_data)
-{
-	g_debug("type changed");
-	if (type == GSC_INFO_TYPE_EXTENDED)
-	{
-		gsc_info_set_markup(info,
-				    "tipo extended");
-	}
-	else
-	{
-		gsc_info_set_markup(info,
-				    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
-	}
 }
 
 gboolean query_tooltip_cb (GtkWidget  *widget,
@@ -121,7 +106,13 @@ gboolean query_tooltip_cb (GtkWidget  *widget,
 	}
 	
   if (tool != NULL){
-    gtk_tooltip_set_text (tooltip, tool);
+    //gtk_tooltip_set_text (tooltip, tool);
+    if (cambio_tool)
+	    gtk_tooltip_set_text (tooltip, "aaaaaa");
+    else 
+    	gtk_tooltip_set_text (tooltip, tool);
+    	
+    cambio_tool = !cambio_tool;
    }
   else
    return FALSE;
@@ -135,8 +126,6 @@ key_press(GtkWidget   *widget,
 	GdkEventKey *event,
 	gpointer     user_data)
 {
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
-
 	if (event->keyval == GDK_F3)
 	{
 		g_debug("Show tooltip");
@@ -181,15 +170,6 @@ key_press(GtkWidget   *widget,
 			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
 		}
-	}
-	else if (event->keyval == GDK_F6)
-	{
-		/* Change the info type */
-		if (gsc_info_get_info_type(info) == GSC_INFO_TYPE_SHORT)
-			gsc_info_set_info_type(info,GSC_INFO_TYPE_EXTENDED);
-		else
-			gsc_info_set_info_type(info,GSC_INFO_TYPE_SHORT);
-		
 	}
 	else if (event->keyval == GDK_F6)
 	{
@@ -274,6 +254,10 @@ create_completion(void)
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
+	g_object_set (ac_trigger,
+		      "delay", 500,
+		      "min-len", 4,
+		      NULL);
 	
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
 	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));
@@ -298,23 +282,6 @@ create_info()
 	gtk_widget_size_request(GTK_WIDGET(info),&req);
 	gsc_info_set_adjust_height(info,TRUE,100000);
 	gsc_info_set_adjust_width(info,TRUE,100000);
-	g_signal_connect(info,"info-type-changed",G_CALLBACK(info_type_changed_cb),NULL);
-	gsc_info_set_bottom_bar_visible(GSC_INFO (info), TRUE);
-	
-	/* Adds a custom button */
-	GtkWidget *dev_button = gtk_button_new_with_label ("DevHelp");
-	GtkWidget *bottom_bar = gsc_info_get_bottom_bar(info);
-	
-	g_signal_connect (G_OBJECT (dev_button),
-			  "clicked",
-			  G_CALLBACK (dev_button_cn),
-			  NULL);
-
-	gtk_widget_show(dev_button);
-	
-	gtk_box_pack_start (GTK_BOX (bottom_bar),
-			    dev_button,
-			    FALSE, FALSE, 0);
 	
 	/*
 	custom = gtk_scrolled_window_new (NULL, NULL);

@@ -1,3 +1,13 @@
+2008-12-21  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gsc-info.[ch]:
+	Removed bottom bar and GscInfoType to simplify the info window.
+	Better resize control showing and hiding the scroll bars by hand.
+	* gsc-popup.c: 
+	Selects the first page with data
+	* gsc-trigger-autowords.c:
+	Added delay and min-len as properties
+
 2008-12-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:

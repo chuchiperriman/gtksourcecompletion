@@ -173,7 +173,8 @@ gboolean
 gsc_get_window_position_in_cursor(GtkWindow *window,
 				  GtkTextView *view,
 				  gint *x,
-				  gint *y);
+				  gint *y,
+				  gboolean *resized);
 
 /**
  * gsc_get_window_position_center_screen:

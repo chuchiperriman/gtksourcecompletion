@@ -25,30 +25,16 @@
 
 struct _GscInfoPrivate
 {
-	GtkWidget *alignment;
 	GtkWidget *box;
 	GtkWidget *info_scroll;
 	GtkWidget *label;
-	GtkWidget *bottom_bar;
-	GtkWidget *info_button;
+	GtkWidget *custom_widget;
 	
-	GscInfoType type;
 	gboolean adjust_height;
 	gboolean adjust_width;
 	gint max_height;
 	gint max_width;
-	
-	GtkWidget *custom_widget;
 };
-
-/* Signals */
-enum
-{
-	INFO_TYPE_CHANGED,
-	LAST_SIGNAL
-};
-
-static guint signals[LAST_SIGNAL] = { 0 };
 
 /*Type definition*/
 G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
@@ -59,46 +45,70 @@ G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
 
 
 static void
-adjust_resize (GscInfo *self)
+get_max_size (GscInfo *self, GtkWidget *widget, gint *w, gint *h)
 {
-	/*TODO Control the "+30" for the scrollbars*/
-	GtkWidget *current;
 	GtkRequisition req;
-	gint w, h;
 	
-	current = self->priv->custom_widget ? self->priv->custom_widget : self->priv->label;
-	
-	gtk_widget_size_request (current, &req);
-	  
+	gtk_widget_size_request (widget, &req);
+
 	if (self->priv->adjust_height)
-		h = req.height > self->priv->max_height 
-			? self->priv->max_height 
-			: req.height + 30;
+	{
+		if (req.height > self->priv->max_height)
+		{
+			*h = self->priv->max_height;
+		}
+		else
+		{
+			*h = req.height;
+		}
+	}
 	else
-		h = WINDOW_HEIGHT;
+	{
+		*h = WINDOW_HEIGHT;
+	}
 	
 	if (self->priv->adjust_width)
-		w = req.width > self->priv->max_width 
-			? self->priv->max_width
-			: req.width + 30;
+	{
+		if (req.width > self->priv->max_width)
+		{
+			*w = self->priv->max_width;
+		}
+		else
+		{
+			*w = req.width;
+		}
+	}
 	else
-		w = WINDOW_WIDTH;
-		
-	gtk_window_resize (GTK_WINDOW (self), w, h );
+	{
+		*w = WINDOW_WIDTH;
+	}
+}
+
+static void
+adjust_resize (GscInfo *self)
+{
+	gint w, h;
 	
+	if (!self->priv->custom_widget)
+	{
+		/* Default widget */
+		get_max_size (self, self->priv->label, &w, &h);
+		w = w + 5 + GTK_WIDGET (self->priv->info_scroll)->style->ythickness * 2;
+		h = h + 5 + GTK_WIDGET (self->priv->info_scroll)->style->xthickness * 2;
+	}
+	else
+	{
+		/* Custom widget */
+		get_max_size (self, self->priv->custom_widget, &w, &h);
+	}
+	
+	gtk_window_resize (GTK_WINDOW (self), w, h );
 }
 
 static void
 show (GtkWidget *widget)
 {
 	GscInfo *self = GSC_INFO (widget);
-	
-	/*
-	Set short by default or set the button depending on GscInfoType?
-	*/
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-				      FALSE);
-	gsc_info_set_info_type (self, GSC_INFO_TYPE_SHORT);
 	
 	GTK_WIDGET_CLASS (gsc_info_parent_class)->show (GTK_WIDGET (self));
 }
@@ -114,28 +124,8 @@ hide (GtkWidget *widget)
 }
 
 static void
-info_toggled_cb (GtkToggleButton *widget,
-		 gpointer user_data)
-{
-	GscInfo *self = GSC_INFO (user_data);
-	
-	if (gtk_toggle_button_get_active (widget))
-	{
-		gsc_info_set_info_type (self,
-					GSC_INFO_TYPE_EXTENDED);
-	}
-	else
-	{
-		gsc_info_set_info_type (self,
-					GSC_INFO_TYPE_SHORT);
-	}
-}
-
-static void
 gsc_info_init (GscInfo *self)
 {
-	GtkWidget *info_icon;
-	
 	self->priv = GSC_INFO_GET_PRIVATE (self);
 	self->priv->adjust_height = FALSE;
 	self->priv->adjust_width = FALSE;
@@ -155,21 +145,12 @@ gsc_info_init (GscInfo *self)
 	gtk_window_set_default_size (GTK_WINDOW (self),
 				     WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	self->priv->alignment = gtk_alignment_new (0.5, 0.5, 1.0, 1.0);
-	gtk_alignment_set_padding (GTK_ALIGNMENT (self->priv->alignment),
-				   GTK_WIDGET (self)->style->ythickness,
-				   GTK_WIDGET (self)->style->ythickness,
-				   GTK_WIDGET (self)->style->xthickness,
-				   GTK_WIDGET (self)->style->xthickness);
-	gtk_container_add (GTK_CONTAINER (self), self->priv->alignment);
-	gtk_widget_show (self->priv->alignment);
-
 	self->priv->info_scroll = gtk_scrolled_window_new (NULL, NULL);
 
-	gtk_widget_show (self->priv->info_scroll);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
+	gtk_widget_show (self->priv->info_scroll);
 
 	self->priv->label = gtk_label_new (NULL);
 	gtk_widget_show (self->priv->label);
@@ -177,43 +158,14 @@ gsc_info_init (GscInfo *self)
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 					       self->priv->label);
 
-	/*Bottom bar*/
-	info_icon = gtk_image_new_from_stock (GTK_STOCK_INFO,
-					      GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_show (info_icon);
-	gtk_widget_set_tooltip_text (info_icon, _("Toggle info view"));
-	
-	self->priv->info_button = gtk_toggle_button_new ();
-	gtk_widget_show (self->priv->info_button);
-	g_object_set (G_OBJECT (self->priv->info_button),
-		      "can-focus", FALSE, NULL);
-	
-	gtk_button_set_focus_on_click (GTK_BUTTON (self->priv->info_button),
-				       FALSE);
-	gtk_container_add (GTK_CONTAINER (self->priv->info_button), info_icon);
-	g_signal_connect (G_OBJECT (self->priv->info_button),
-			  "toggled",
-			  G_CALLBACK (info_toggled_cb),
-			  self);
-
-	self->priv->bottom_bar = gtk_hbox_new (FALSE, 1);
-
-	gtk_box_pack_start (GTK_BOX (self->priv->bottom_bar),
-			    self->priv->info_button,
-			    FALSE, FALSE, 0);
-	
 	self->priv->box = gtk_vbox_new (FALSE, 1);
 	
 	gtk_widget_show (self->priv->box);
 	gtk_box_pack_start (GTK_BOX (self->priv->box),
 			    self->priv->info_scroll,
 			    TRUE, TRUE, 0);
-
-	gtk_box_pack_end (GTK_BOX (self->priv->box),
-			  self->priv->bottom_bar,
-			  FALSE, FALSE, 0);
 	
-	gtk_container_add (GTK_CONTAINER (self->priv->alignment), 
+	gtk_container_add (GTK_CONTAINER (self), 
 			   self->priv->box);
 }
 
@@ -237,25 +189,6 @@ gsc_info_class_init (GscInfoClass *klass)
 	widget_class->show = show;
 	widget_class->hide = hide;
 	
-	/**
-	 * GscInfo::info-type-changed:
-	 * @popup: The #GscPopup who emits the signal
-	 * @type: The new #GscInfoType
-	 *
-	 * When the info type change 
-	 *
-	 **/
-	signals[INFO_TYPE_CHANGED] =
-		g_signal_new ("info-type-changed",
-			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			      0,
-			      NULL, 
-			      NULL,
-			      g_cclosure_marshal_VOID__ENUM, 
-			      G_TYPE_NONE,
-			      1,
-			      GTK_TYPE_INT);
 }
 
 
@@ -273,6 +206,7 @@ gsc_info_move_to_cursor (GscInfo* self,
 			 GtkTextView *view)
 {
 	int x,y;
+	gboolean resized = FALSE;
 	
 	g_return_if_fail  (GSC_IS_INFO (self));
 
@@ -281,8 +215,20 @@ gsc_info_move_to_cursor (GscInfo* self,
 	gsc_get_window_position_in_cursor (GTK_WINDOW (self),
 					   view,
 					   &x,
-					   &y);
-	
+					   &y,
+					   &resized);
+	if (resized)
+	{
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(self->priv->info_scroll),
+						GTK_POLICY_ALWAYS,
+						GTK_POLICY_ALWAYS);
+	}
+	else
+	{
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(self->priv->info_scroll),
+						GTK_POLICY_NEVER,
+						GTK_POLICY_NEVER);
+	}
 	gtk_window_move (GTK_WINDOW (self), x, y);
 }
 
@@ -338,38 +284,6 @@ gsc_info_set_adjust_width (GscInfo* self,
 }
 
 void
-gsc_info_set_info_type (GscInfo* self,
-		        GscInfoType type)
-{
-	g_return_if_fail  (GSC_IS_INFO (self));
-
-	if (self->priv->type != type)
-	{
-		if (type == GSC_INFO_TYPE_SHORT)
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-						      FALSE);
-		else
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-						      TRUE);
-		
-		g_signal_emit (G_OBJECT (self), signals[INFO_TYPE_CHANGED], 0, type);
-		self->priv->type = type;
-	}
-}
-
-void
-gsc_info_set_bottom_bar_visible (GscInfo* self,
-				 gboolean visible)
-{
-	g_return_if_fail  (GSC_IS_INFO (self));
-
-	if (visible)
-		gtk_widget_show (self->priv->bottom_bar);
-	else
-		gtk_widget_hide (self->priv->bottom_bar);
-}
-
-void
 gsc_info_set_custom (GscInfo* self,
 		     GtkWidget *custom_widget)
 {
@@ -420,21 +334,6 @@ gsc_info_get_custom (GscInfo* self)
 	g_return_val_if_fail (GSC_IS_INFO (self), NULL);
 
 	return self->priv->custom_widget;
-}
-
-GscInfoType
-gsc_info_get_info_type (GscInfo* self)
-{
-	g_return_val_if_fail (GSC_IS_INFO (self), 0);
-
-	return self->priv->type;
-}
-
-GtkWidget*
-gsc_info_get_bottom_bar (GscInfo* self)
-{
-	/* FIXME Do we must to do this public? */
-	return self->priv->bottom_bar;
 }
 
 
