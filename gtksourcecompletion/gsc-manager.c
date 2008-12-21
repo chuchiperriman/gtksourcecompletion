@@ -64,13 +64,16 @@ struct _GscManagerPrivate
 {
 	GtkTextView *text_view;
 	GscPopup *popup;
+	
 	GList *triggers;
+	GscTrigger *active_trigger;
 	/*Providers of the triggers*/
 	GHashTable *trig_prov;
 	GList *providers;
+	
 	gulong internal_signal_ids[LAST_SIGNAL];
 	gboolean active;
-	GscTrigger *active_trigger;
+	
 	KeyDef keys[KEYS_LAST];
 };
 
@@ -80,12 +83,11 @@ G_DEFINE_TYPE(GscManager, gsc_manager, G_TYPE_OBJECT);
  * FIXME: Nacho: why this can't go directly in the hash?
  * do we really need a hash for this?
  */
+typedef struct _ProviderList ProviderList;
 struct _ProviderList
 {
 	GList *prov_list;
 };
-typedef struct _ProviderList ProviderList;
-
 
 /* **************** GtkTextView-GscManager Control *********** */
 
@@ -130,7 +132,7 @@ prov_list_free (gpointer prov_list)
 	ProviderList *pl = (ProviderList*)prov_list;
 	
 	g_list_free (pl->prov_list);
-	g_free (pl);
+	g_slice_free (ProviderList, pl);
 }
 
 static void
@@ -905,7 +907,6 @@ gsc_manager_register_trigger (GscManager *self,
 	if (pl == NULL)
 	{
 		const gchar *tn;
-		ProviderList *pl; //FIXME: Another ProviderList with the same name?
 	
 		self->priv->triggers = g_list_append (self->priv->triggers,
 						      trigger);
@@ -913,10 +914,7 @@ gsc_manager_register_trigger (GscManager *self,
 		
 		tn = gsc_trigger_get_name (trigger);
 		
-		/*
-		 * FIXME: I do not like this malloc here either. Maybe g_slice_new ?
-		 */
-		pl = g_malloc0 (sizeof (ProviderList));
+		pl = g_slice_new (ProviderList);
 		
 		pl->prov_list = NULL;
 		

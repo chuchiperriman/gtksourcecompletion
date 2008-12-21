@@ -1,3 +1,8 @@
+2008-12-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.c:
+	Switch to g_slice.
+
 2008-12-18  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* Makefile.am:
