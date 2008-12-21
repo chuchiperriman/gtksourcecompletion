@@ -59,19 +59,15 @@ view_key_press_event_cb (GtkWidget *view,
 {
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (user_data);
 	
-	if (self->priv->completion != NULL)
-	{       
-		guint key = gdk_keyval_to_lower (self->priv->key);
-		
-		if ((event->state & self->priv->mod) ==  self->priv->mod &&
-			gdk_keyval_to_lower (event->keyval) == key)
-		{
-			gsc_manager_trigger_event (self->priv->completion,
-						   self->priv->trigger_name,
-						   NULL);
-			return TRUE;
-		}
-		
+	guint key = gdk_keyval_to_lower (self->priv->key);
+	
+	if ((event->state & self->priv->mod) ==  self->priv->mod &&
+		gdk_keyval_to_lower (event->keyval) == key)
+	{
+		gsc_manager_trigger_event (self->priv->completion,
+					   self->priv->trigger_name,
+					   NULL);
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -131,6 +127,7 @@ gsc_trigger_customkey_finalize(GObject *object)
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (object);
 	
 	g_free (self->priv->trigger_name);
+	g_object_unref (self->priv->completion);
 
 	G_OBJECT_CLASS (gsc_trigger_customkey_parent_class)->finalize (object);
 }
@@ -172,15 +169,16 @@ gsc_trigger_customkey_new (GscManager *completion,
 			   const gchar* trigger_name, 
 			   const gchar* keys)
 {
+
+	g_return_val_if_fail (GSC_IS_MANAGER (completion), NULL);
+	g_return_val_if_fail (trigger_name != NULL, NULL);
+
 	GscTriggerCustomkey *self;
 	
 	self = GSC_TRIGGER_CUSTOMKEY (g_object_new (GSC_TYPE_TRIGGER_CUSTOMKEY,
 				      NULL));
 	
-	/*
-	 * FIXME: add a ref to the completion?
-	 */
-	self->priv->completion = completion;
+	self->priv->completion = g_object_ref (completion);
 	self->priv->trigger_name = g_strdup (trigger_name);
 	gsc_trigger_customkey_set_keys (self, keys);
 	

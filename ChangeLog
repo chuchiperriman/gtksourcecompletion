@@ -9,6 +9,8 @@
 	Added delay and min-len as properties
 	* gsc-proposal.[ch]:
 	ref/unref the icon.
+	* gsc-trigger-customkey.c:
+	ref/unref the completion and does some checks
 
 2008-12-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
