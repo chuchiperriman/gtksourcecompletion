@@ -7,6 +7,8 @@
 	Selects the first page with data
 	* gsc-trigger-autowords.c:
 	Added delay and min-len as properties
+	* gsc-proposal.[ch]:
+	ref/unref the icon.
 
 2008-12-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

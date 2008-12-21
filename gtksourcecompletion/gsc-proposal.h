@@ -58,7 +58,7 @@ GType			 gsc_proposal_get_type		(void) G_GNUC_CONST;
 
 GscProposal		*gsc_proposal_new		(const gchar *label,
 							 const gchar *info,
-							 const GdkPixbuf *icon);
+							 GdkPixbuf *icon);
 
 const gchar		*gsc_proposal_get_label		(GscProposal *proposal);
 

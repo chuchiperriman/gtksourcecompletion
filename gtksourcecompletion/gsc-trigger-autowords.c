@@ -162,7 +162,7 @@ autocompletion_insert_text_cb (GtkTextBuffer *buffer,
 {
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
 	
-	/*TODO see the maximun length of a single UTF-8 character*/
+	/* Prevent "paste" */
 	if (len <= 2)
 	{
 		if (self->priv->source_id != 0)
@@ -293,8 +293,13 @@ gsc_trigger_autowords_finalize(GObject *object)
 {
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
 
+	if (self->priv->source_id != 0)
+	{
+		g_source_remove (self->priv->source_id);
+		self->priv->source_id = 0;
+	}
+
 	g_free (self->priv->actual_word);
-	//FIXME: Remove the source in case is not 0
 
 	G_OBJECT_CLASS (gsc_trigger_autowords_parent_class)->finalize (object);
 }

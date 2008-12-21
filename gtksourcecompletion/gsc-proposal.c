@@ -36,7 +36,7 @@ struct _GscProposalPrivate
 {
 	gchar *label;
 	gchar *info;
-	const GdkPixbuf *icon;
+	GdkPixbuf *icon;
 	gchar *page_name;
 };
 
@@ -83,6 +83,9 @@ gsc_proposal_finalize (GObject *object)
 	g_free (self->priv->label);
 	g_free (self->priv->info);
 	g_free (self->priv->page_name);
+	
+	if (self->priv->icon != NULL)
+		g_object_unref(self->priv->icon);
 	
 	G_OBJECT_CLASS (gsc_proposal_parent_class)->finalize (object);
 }
@@ -140,7 +143,10 @@ gsc_proposal_set_property (GObject      *object,
 			self->priv->info = g_value_dup_string (value);
 			break;
 		case PROP_ICON:
-			self->priv->icon = (GdkPixbuf*)g_value_get_pointer (value);
+			if (self->priv->icon != NULL)
+				g_object_unref (self->priv->icon);
+
+			self->priv->icon = g_object_ref ((GdkPixbuf*)g_value_get_pointer (value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -216,7 +222,7 @@ gsc_proposal_class_init (GscProposalClass *klass)
 GscProposal*
 gsc_proposal_new (const gchar *label,
 		  const gchar *info,
-		  const GdkPixbuf *icon)
+		  GdkPixbuf *icon)
 {
 	GscProposal *self;
 	
@@ -224,10 +230,15 @@ gsc_proposal_new (const gchar *label,
 	
 	self->priv->label = g_strdup (label);
 	self->priv->info = g_strdup (info);
-	/*
-	 * FIXME: shouldn't we ref the pixbuf?
-	 */
-	self->priv->icon = icon;
+	if (icon != NULL)
+	{
+		self->priv->icon = g_object_ref (icon);
+	}
+	else
+	{
+		self->priv->icon = NULL;
+	}
+		
 	
 	return self;
 }
