@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 
 #define GSC_TYPE_PROPOSAL             (gsc_proposal_get_type ())
 #define GSC_PROPOSAL(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROPOSAL, GscProposal))
-#define GSC_PROPOSAL_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_PROPOSAL, GscProposalClass)
+#define GSC_PROPOSAL_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_PROPOSAL, GscProposalClass))
 #define GSC_IS_PROPOSAL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROPOSAL))
 #define GSC_IS_PROPOSAL_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_PROPOSAL))
 #define GSC_PROPOSAL_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_PROPOSAL, GscProposalClass))

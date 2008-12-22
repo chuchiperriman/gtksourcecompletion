@@ -7,6 +7,8 @@
 	* gtksourcecompletion/gsc-trigger-autowords.[ch]:
 	Trigger name is public now to be used when register a provider to this
 	trigger
+	* gtksourcecompletion/gsc-proposal.h:
+	Fixed bug in GSC_PROPOSAL_CLASS
 
 2008-12-21  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
