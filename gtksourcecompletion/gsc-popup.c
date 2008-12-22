@@ -286,7 +286,7 @@ update_pages_visibility (GscPopup *self)
 		gtk_widget_hide (self->priv->prev_page_button);
 	}
 	
-	return num_pages_with_data > 1;
+	return num_pages_with_data > 0;
 }
 
 static gboolean

@@ -26,8 +26,6 @@
 #define DEFAULT_MIN_LEN (3)
 #define DEFAULT_DELAY (200)
 
-#define GSC_TRIGGER_AUTOWORDS_NAME "GscTriggerAutowords"
-
 #define GSC_TRIGGER_AUTOWORDS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
 					      GSC_TYPE_TRIGGER_AUTOWORDS, \
 					      GscTriggerAutowordsPrivate))

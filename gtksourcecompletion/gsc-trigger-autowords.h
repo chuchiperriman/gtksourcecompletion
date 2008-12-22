@@ -32,6 +32,8 @@ G_BEGIN_DECLS
 #define GSC_IS_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_TRIGGER_AUTOWORDS))
 #define GSC_TRIGGER_AUTOWORDS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_TRIGGER_AUTOWORDS, GscTriggerAutowordsClass))
 
+#define GSC_TRIGGER_AUTOWORDS_NAME "GscTriggerAutowords"
+
 typedef struct _GscTriggerAutowordsPrivate GscTriggerAutowordsPrivate;
 
 typedef struct _GscTriggerAutowords GscTriggerAutowords;

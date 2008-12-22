@@ -1,3 +1,13 @@
+2008-12-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* configure.in:
+	Started 0.6.0 version
+	* gtksourcecompletion/gsc-popup.c:
+	Fixed a bug with only one page
+	* gtksourcecompletion/gsc-trigger-autowords.[ch]:
+	Trigger name is public now to be used when register a provider to this
+	trigger
+
 2008-12-21  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gsc-info.[ch]:
