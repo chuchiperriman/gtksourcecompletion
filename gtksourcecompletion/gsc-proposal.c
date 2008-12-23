@@ -118,7 +118,7 @@ gsc_proposal_get_property (GObject    *object,
 					     (gpointer)self->priv->icon);
 			break;
 		case PROP_PAGE_NAME:
-			g_value_set_stringr (value,
+			g_value_set_string (value,
 					     self->priv->page_name);
 			break;
 		default:

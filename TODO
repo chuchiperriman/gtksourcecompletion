@@ -10,7 +10,7 @@ TODO (last update: 2008-12-14)
 [X] Move gsc_popup_manage_key function to gsc-manager
 [X] Change gsc-tree to extend from GtkTreeView instead of GtkScrolledWindow
 [ ] Support to set the focus on the popup and info windows.
-[ ] Clean FIXME on trigger-autowords.
+[X] Clean FIXME on trigger-autowords.
 [X] Delete "apply" signal from GscProposal.
 [X] Remove all g_object_set_property. Use g_object_set instead
 [X] In gsc-manager use self instead of completion

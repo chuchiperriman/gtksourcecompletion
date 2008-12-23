@@ -257,6 +257,7 @@ update_pages_visibility (GscPopup *self)
 	gboolean first_set = FALSE;
 	guint num_pages_with_data = 0;
 	gint i = 0;
+	GtkAdjustment *ad;
 	
 	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
@@ -269,6 +270,10 @@ update_pages_visibility (GscPopup *self)
 			{
 				gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
 							       i);
+				ad = gtk_tree_view_get_vadjustment (GTK_TREE_VIEW (page->view));
+				gtk_adjustment_set_value (ad, 0);
+				ad = gtk_tree_view_get_hadjustment (GTK_TREE_VIEW (page->view));
+				gtk_adjustment_set_value (ad, 0);
 				first_set = TRUE;
 			}
 			num_pages_with_data++;

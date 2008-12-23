@@ -2,6 +2,9 @@
 
 	* gtksourcecompletion/gsc-proposal.c:
 	Added page-name property
+	Fixed bug in the page-name property
+	* gtksourcecompletion/gsc-popup.c:
+	Scroll to the start on show or update
 
 2008-12-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
