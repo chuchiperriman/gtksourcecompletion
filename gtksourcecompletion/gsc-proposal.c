@@ -46,7 +46,8 @@ enum
 	PROP_0,
 	PROP_LABEL,
 	PROP_INFO,
-	PROP_ICON
+	PROP_ICON,
+	PROP_PAGE_NAME
 };
 
 static gboolean
@@ -116,6 +117,10 @@ gsc_proposal_get_property (GObject    *object,
 			g_value_set_pointer (value,
 					     (gpointer)self->priv->icon);
 			break;
+		case PROP_PAGE_NAME:
+			g_value_set_stringr (value,
+					     self->priv->page_name);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -147,6 +152,9 @@ gsc_proposal_set_property (GObject      *object,
 				g_object_unref (self->priv->icon);
 
 			self->priv->icon = g_object_ref ((GdkPixbuf*)g_value_get_pointer (value));
+			break;
+		case PROP_PAGE_NAME:
+			self->priv->page_name = g_value_dup_string (value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -204,6 +212,19 @@ gsc_proposal_class_init (GscProposalClass *klass)
 					 g_param_spec_pointer ("icon",
 							      _("Icon to be shown for this proposal"),
 							      _("Icon to be shown for this proposal"),
+							      G_PARAM_READWRITE));
+
+	/**
+	 * GscProposal:page-name:
+	 *
+	 * Page name for this proposal
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_PAGE_NAME,
+					 g_param_spec_string ("page-name",
+							      _("Page name for this proposal"),
+							      _("Page name for this proposal"),
+							      NULL,
 							      G_PARAM_READWRITE));
 }
 

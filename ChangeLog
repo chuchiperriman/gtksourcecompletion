@@ -1,3 +1,8 @@
+2008-12-23  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-proposal.c:
+	Added page-name property
+
 2008-12-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* configure.in:
