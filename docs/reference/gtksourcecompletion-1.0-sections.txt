@@ -20,7 +20,6 @@ GscTriggerCustomkeyPrivate
 GscTriggerCustomkey
 gsc_trigger_customkey_new
 gsc_trigger_customkey_set_keys
-gsc_trigger_customkey_set_opts
 <SUBSECTION Standard>
 GSC_TRIGGER_CUSTOMKEY
 GSC_IS_TRIGGER_CUSTOMKEY
@@ -32,9 +31,27 @@ GSC_TRIGGER_CUSTOMKEY_GET_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>gsc-provider-file</FILE>
+GSC_PROVIDER_FILE_NAME
+GscProviderFilePrivate
+<TITLE>GscProviderFile</TITLE>
+GscProviderFile
+gsc_provider_file_new
+gsc_provider_file_set_file
+<SUBSECTION Standard>
+GSC_PROVIDER_FILE
+GSC_IS_PROVIDER_FILE
+GSC_TYPE_PROVIDER_FILE
+gsc_provider_file_get_type
+GSC_PROVIDER_FILE_CLASS
+GSC_IS_PROVIDER_FILE_CLASS
+GSC_PROVIDER_FILE_GET_CLASS
+</SECTION>
+
+<SECTION>
 <FILE>gsc-manager</FILE>
+USER_REQUEST_TRIGGER_NAME
 GscManagerPrivate
-GscManagerEventOptions
 <TITLE>GscManager</TITLE>
 GscManager
 gsc_manager_get_from_view
@@ -52,8 +69,10 @@ gsc_manager_activate
 gsc_manager_deactivate
 gsc_manager_finish_completion
 gsc_manager_trigger_event
-gsc_manager_trigger_event_with_opts
 gsc_manager_set_current_info
+gsc_manager_set_key
+gsc_manager_get_key
+gsc_manager_manage_key
 <SUBSECTION Standard>
 GSC_MANAGER
 GSC_IS_MANAGER
@@ -62,6 +81,28 @@ gsc_manager_get_type
 GSC_MANAGER_CLASS
 GSC_IS_MANAGER_CLASS
 GSC_MANAGER_GET_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>gsc-info</FILE>
+GscInfoPrivate
+<TITLE>GscInfo</TITLE>
+GscInfo
+gsc_info_new
+gsc_info_move_to_cursor
+gsc_info_set_markup
+gsc_info_set_adjust_height
+gsc_info_set_adjust_width
+gsc_info_set_custom
+gsc_info_get_custom
+<SUBSECTION Standard>
+GSC_INFO
+GSC_IS_INFO
+GSC_TYPE_INFO
+gsc_info_get_type
+GSC_INFO_CLASS
+GSC_IS_INFO_CLASS
+GSC_INFO_GET_CLASS
 </SECTION>
 
 <SECTION>
@@ -86,8 +127,6 @@ GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS
 
 <SECTION>
 <FILE>gsc-proposal</FILE>
-GSC_PROPOSAL_DEFAULT_PAGE
-GSC_PROPOSAL_DEFAULT_PRIORITY
 GscProposalPrivate
 <TITLE>GscProposal</TITLE>
 GscProposal
@@ -148,12 +187,12 @@ GscTreePriv
 GscTree
 gsc_tree_new
 gsc_tree_get_selected_proposal
+gsc_tree_add_data
+gsc_tree_clear
 gsc_tree_select_first
 gsc_tree_select_last
 gsc_tree_select_previous
 gsc_tree_select_next
-gsc_tree_clear
-gsc_tree_add_data
 gsc_tree_get_num_proposals
 gsc_tree_filter
 <SUBSECTION Standard>
@@ -168,30 +207,29 @@ GSC_TREE_GET_CLASS
 
 <SECTION>
 <FILE>gsc-popup</FILE>
-GscPopupPositionType
-GscPopupFilterType
-GscPopupOptions
+KeysType
 DEFAULT_PAGE
 GscPopupPriv
 <TITLE>GscPopup</TITLE>
 GscPopup
+gsc_popup_new
+gsc_popup_add_data
+gsc_popup_clear
 gsc_popup_select_first
 gsc_popup_select_last
 gsc_popup_select_previous
 gsc_popup_select_next
 gsc_popup_get_selected_proposal
-gsc_popup_new
-gsc_popup_clear
-gsc_popup_add_data
+gsc_popup_select_current_proposal
 gsc_popup_has_proposals
 gsc_popup_toggle_proposal_info
-gsc_popup_refresh
-gsc_popup_refresh_with_opts
 gsc_popup_page_next
 gsc_popup_page_previous
 gsc_popup_set_current_info
 gsc_popup_get_num_active_pages
-gsc_popup_get_filter_widget
+gsc_popup_show_or_update
+gsc_popup_bottom_bar_set_visible
+gsc_popup_bottom_bar_get_visible
 <SUBSECTION Standard>
 GSC_POPUP
 GSC_IS_POPUP
@@ -203,13 +241,56 @@ GSC_POPUP_GET_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>gsc-trigger-dotexample</FILE>
+GSC_TRIGGER_DOTEXAMPLE_NAME
+GscTriggerDotexamplePrivate
+<TITLE>GscTriggerDotexample</TITLE>
+GscTriggerDotexample
+gsc_trigger_dotexample_new
+<SUBSECTION Standard>
+GSC_TRIGGER_DOTEXAMPLE
+GSC_IS_TRIGGER_DOTEXAMPLE
+GSC_TYPE_TRIGGER_DOTEXAMPLE
+gsc_trigger_dotexample_get_type
+GSC_TRIGGER_DOTEXAMPLE_CLASS
+GSC_IS_TRIGGER_DOTEXAMPLE_CLASS
+GSC_TRIGGER_DOTEXAMPLE_GET_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>gsc-provider-test</FILE>
+GSC_PROVIDER_TEST_NAME
+GscProviderTestPrivate
+<TITLE>GscProviderTest</TITLE>
+GscProviderTest
+gsc_provider_test_new
+<SUBSECTION Standard>
+GSC_PROVIDER_TEST
+GSC_IS_PROVIDER_TEST
+GSC_TYPE_PROVIDER_TEST
+gsc_provider_test_get_type
+GSC_PROVIDER_TEST_CLASS
+GSC_IS_PROVIDER_TEST_CLASS
+GSC_PROVIDER_TEST_GET_CLASS
+</SECTION>
+
+<SECTION>
 <FILE>gsc-utils</FILE>
 gsc_get_last_word_and_iter
 gsc_get_last_word
+gsc_get_last_word_cleaned
 gsc_get_cursor_pos
 gsc_gsv_get_text
 gsc_replace_actual_word
 gsc_char_is_separator
 gsc_clear_word
+gsc_compute_line_indentation
+gsc_get_text_with_indent
+gsc_insert_text_with_indent
+gsc_is_valid_word
+gsc_get_window_position_in_cursor
+gsc_get_window_position_center_screen
+gsc_get_window_position_center_parent
+gsc_compare_keys
 </SECTION>
 

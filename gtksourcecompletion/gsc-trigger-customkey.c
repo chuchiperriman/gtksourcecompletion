@@ -36,7 +36,7 @@ enum
 
 struct _GscTriggerCustomkeyPrivate
 {
-	GscManager *completion;
+	GscManager *manager;
 	
 	gulong signals[LAST_SIGNAL];
 	gchar *trigger_name;
@@ -64,7 +64,7 @@ view_key_press_event_cb (GtkWidget *view,
 	if ((event->state & self->priv->mod) ==  self->priv->mod &&
 		gdk_keyval_to_lower (event->keyval) == key)
 	{
-		gsc_manager_trigger_event (self->priv->completion,
+		gsc_manager_trigger_event (self->priv->manager,
 					   self->priv->trigger_name,
 					   NULL);
 		return TRUE;
@@ -86,7 +86,7 @@ gsc_trigger_customkey_real_activate (GscTrigger* base)
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (base);
 	GtkTextView *view;
 
-	view = gsc_manager_get_view (self->priv->completion);
+	view = gsc_manager_get_view (self->priv->manager);
 	g_assert (GTK_IS_TEXT_VIEW (view));
 	
 	self->priv->signals[CKP_GTK_TEXT_VIEW_KP] =  
@@ -105,7 +105,7 @@ gsc_trigger_customkey_real_deactivate (GscTrigger* base)
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (base);
 	GtkTextView *view;
 	
-	view = gsc_manager_get_view (self->priv->completion);
+	view = gsc_manager_get_view (self->priv->manager);
 	
 	g_signal_handler_disconnect (view,
 				     self->priv->signals[CKP_GTK_TEXT_VIEW_KP]);
@@ -127,7 +127,7 @@ gsc_trigger_customkey_finalize(GObject *object)
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (object);
 	
 	g_free (self->priv->trigger_name);
-	g_object_unref (self->priv->completion);
+	g_object_unref (self->priv->manager);
 
 	G_OBJECT_CLASS (gsc_trigger_customkey_parent_class)->finalize (object);
 }
@@ -152,7 +152,7 @@ gsc_trigger_customkey_iface_init (GscTriggerIface * iface)
 
 /**
  * gsc_trigger_customkey_new:
- * @completion: The #GscManager
+ * @manager: The #GscManager
  * @trigger_name: The trigger name wich will be user the we trigger the event.
  * @keys: The string representation of the keys that we will
  * use to activate the event. You can get this 
@@ -165,12 +165,12 @@ gsc_trigger_customkey_iface_init (GscTriggerIface * iface)
  *
  */
 GscTriggerCustomkey* 
-gsc_trigger_customkey_new (GscManager *completion,
+gsc_trigger_customkey_new (GscManager *manager,
 			   const gchar* trigger_name, 
 			   const gchar* keys)
 {
 
-	g_return_val_if_fail (GSC_IS_MANAGER (completion), NULL);
+	g_return_val_if_fail (GSC_IS_MANAGER (manager), NULL);
 	g_return_val_if_fail (trigger_name != NULL, NULL);
 
 	GscTriggerCustomkey *self;
@@ -178,7 +178,7 @@ gsc_trigger_customkey_new (GscManager *completion,
 	self = GSC_TRIGGER_CUSTOMKEY (g_object_new (GSC_TYPE_TRIGGER_CUSTOMKEY,
 				      NULL));
 	
-	self->priv->completion = g_object_ref (completion);
+	self->priv->manager = g_object_ref (manager);
 	self->priv->trigger_name = g_strdup (trigger_name);
 	gsc_trigger_customkey_set_keys (self, keys);
 	

@@ -22,7 +22,7 @@
 
 /**
  * gsc_trigger_get_name:
- * @self: a #GscTrigger
+ * @self: The #GscTrigger
  *
  * The trigger name. By example: "C autocompletion trigger".
  *
@@ -44,7 +44,7 @@ gsc_trigger_get_name_default (GscTrigger *self)
 
 /**
  * gsc_trigger_activate:
- * @self: a #GscTrigger
+ * @self: The #GscTrigger
  *
  * Activate the completion trigger.
  *
@@ -66,7 +66,7 @@ gsc_trigger_activate_default (GscTrigger *self)
 
 /**
  * gsc_trigger_deactivate:
- * @self: a #GscTrigger
+ * @self: The #GscTrigger
  *
  * Deactive the completion trigger
  *
@@ -126,3 +126,5 @@ gsc_trigger_get_type ()
 	}
 	return gsc_trigger_type_id;
 }
+
+

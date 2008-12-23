@@ -191,7 +191,12 @@ gsc_info_class_init (GscInfoClass *klass)
 	
 }
 
-
+/**
+ * gsc_info_new:
+ *
+ * Returns: The new GscInfo.
+ *
+ */
 GscInfo*
 gsc_info_new (void)
 {
@@ -201,6 +206,15 @@ gsc_info_new (void)
 	return self;
 }
 
+/**
+ * gsc_info_move_to_cursor:
+ * @self: The #GscInfo
+ * @view: The current GtkTextView where we want to show the info
+ *
+ * Moves the #GscInfo to under the @view cursor. If it cannot be shown down,
+ * it will be shown up
+ *
+ */
 void
 gsc_info_move_to_cursor (GscInfo* self,
 			 GtkTextView *view)
@@ -232,6 +246,15 @@ gsc_info_move_to_cursor (GscInfo* self,
 	gtk_window_move (GTK_WINDOW (self), x, y);
 }
 
+/**
+ * gsc_info_set_markup:
+ * @self: The #GscInfo
+ * @markup: Text markup to be shown (see <link 
+ * linkend="PangoMarkupFormat">Pango markup format</link>). 
+ *
+ * Sets the text markup to be shown into the GscInfo window.
+ *
+ */
 void
 gsc_info_set_markup (GscInfo* self,
 		     const gchar* markup)
@@ -268,6 +291,18 @@ gsc_info_set_adjust_height (GscInfo* self,
 	}
 }
 
+/**
+ * gsc_info_set_adjust_width:
+ * @self: The #GscInfo
+ * @adjust: TRUE to adjust width to content, FALSE to fixed width
+ * @max_width: if adjust = TRUE, set the max height. -1 to preserve the 
+ * current value
+ *
+ * TRUE adjust width to the content. If the content is only a line, the info
+ * will be small and if there are a lot of lines, the info will be large to the 
+ * max_width
+ *
+ */
 void
 gsc_info_set_adjust_width (GscInfo* self,
 			   gboolean adjust,
@@ -283,6 +318,15 @@ gsc_info_set_adjust_width (GscInfo* self,
 	}
 }
 
+/**
+ * gsc_info_set_custom:
+ * @self: The #GscInfo
+ * @custom_widget: A #GtkWidget
+ *
+ * Replaces the widget packed into the window with custom_widget. By default a
+ * box with a #GtkScrolledWindow and a GtkLabel is embedded in the window.
+ *
+ */
 void
 gsc_info_set_custom (GscInfo* self,
 		     GtkWidget *custom_widget)
@@ -328,6 +372,13 @@ gsc_info_set_custom (GscInfo* self,
 	}
 }
 
+/**
+ * gsc_info_get_custom:
+ * @self: The #GscInfo
+ *
+ * Returns: The custom widget setted or NULL.
+ *
+ */
 GtkWidget*
 gsc_info_get_custom (GscInfo* self)
 {

@@ -266,7 +266,7 @@ gsc_proposal_new (const gchar *label,
 
 /**
  * gsc_proposal_get_label:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  *
  * Returns: The proposal label that will be shown into the popup
  */
@@ -280,7 +280,7 @@ gsc_proposal_get_label (GscProposal *self)
 
 /**
  * gsc_proposal_get_icon:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  *
  * Gets the icon of this @proposal that will be shown into the popup.
  *
@@ -296,7 +296,7 @@ gsc_proposal_get_icon (GscProposal *self)
 
 /**
  * gsc_proposal_set_page_name:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  * @page_name: The name for the page
  *
  * Sets the name of the page where this proposal will be shown.
@@ -322,7 +322,7 @@ gsc_proposal_set_page_name (GscProposal *self,
 
 /**
  * gsc_proposal_get_page_name:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  *
  * Gets the page name where the @proposal will be placed.
  *
@@ -338,7 +338,7 @@ gsc_proposal_get_page_name (GscProposal *self)
 
 /**
  * gsc_proposal_get_info:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  *
  * The completion calls this function when the user wants to see the proposal info.
  * You can overwrite this function if you need to change the default mechanism.
@@ -355,7 +355,7 @@ gsc_proposal_get_info (GscProposal *self)
 
 /**
  * gsc_proposal_apply:
- * @proposal: a #GscProposal
+ * @self: The #GscProposal
  * @view: The #GtkTextView
  * 
  * The completion calls this function when the user selects the proposal. 
@@ -371,4 +371,5 @@ gsc_proposal_apply (GscProposal *self,
 	
 	GSC_PROPOSAL_GET_CLASS (self)->apply (self, view);
 }
+
 

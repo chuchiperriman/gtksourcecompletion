@@ -22,7 +22,7 @@
 
 /**
  * gsc_provider_get_name:
- * @self: a #GscProvider
+ * @self: The #GscProvider
  *
  * The provider name. By example: "Document word completion provider"
  *
@@ -44,7 +44,7 @@ gsc_provider_get_name_default (GscProvider *self)
 
 /**
  * gsc_provider_get_proposals:
- * @self: a #GscProvider
+ * @self: The #GscProvider
  * @trigger: The #GscTrigger that raise the event
  *
  * The completion call this function when an event is raised.
@@ -71,9 +71,10 @@ gsc_provider_get_proposals_default (GscProvider *self,
 
 /**
  * gsc_provider_finish:
- * @self: a #GscProvider
+ * @self: The #GscProvider
  *
- * The completion call this function when it is goint to hide the popup
+ * The completion call this function when it is goint to hide the popup (The 
+ * user selects a proposal or hide the completion popup)
  */
 void 
 gsc_provider_finish (GscProvider* self)
@@ -130,3 +131,5 @@ gsc_provider_get_type ()
 	}
 	return gsc_provider_type_id;
 }
+
+
