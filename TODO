@@ -41,7 +41,7 @@ GscPopup:
 [X] Add previous and next page buttons.
 [X] When the popup is shown, do not select any proposal
 [X] Bug showing pages because we must not show a page if it has not proposals
-[ ] Add autoselection property. If there is only one proposal in one page, the 
+[X] Add autoselection property. If there is only one proposal in one page, the 
     popup (or manager) selects the proposal automatically.
 
 Bugs
