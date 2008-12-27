@@ -47,10 +47,7 @@
 static GtkWidget *view;
 static GscManager *comp;
 static GscInfo *info;
-static gboolean cambio = FALSE;
-static gboolean cambio_tool = FALSE;
 static GtkWidget *custom = NULL;
-static GtkWidget *custom_view = NULL;
 
 static const gboolean change_keys = FALSE;
 
@@ -60,80 +57,12 @@ destroy_cb(GtkObject *object,gpointer   user_data)
 	gtk_main_quit ();
 }
 
-void
-dev_button_cn (GtkButton *button, gpointer user_data)
-{
-	g_debug("Open devhelp");
-}
-
-gboolean query_tooltip_cb (GtkWidget  *widget,
-                                                        gint        x,
-                                                        gint        y,
-                                                        gboolean    keyboard_mode,
-                                                        GtkTooltip *tooltip,
-                                                        gpointer    user_data) 
-{
-  GtkTextIter iter;
-  GtkTextView *text_view = GTK_TEXT_VIEW (widget);
-
-  if (keyboard_mode)
-    {
-    	g_debug("keyboard_mode true");
-      gint offset;
-
-      g_object_get (text_view->buffer, "cursor-position", &offset, NULL);
-      gtk_text_buffer_get_iter_at_offset (text_view->buffer, &iter, offset);
-    }
-  else
-    {
-      gint bx, by, trailing;
-
-      gtk_text_view_window_to_buffer_coords (text_view, GTK_TEXT_WINDOW_TEXT,
-					     x, y, &bx, &by);
-      gtk_text_view_get_iter_at_position (text_view, &iter, &trailing, bx, by);
-    }
-
-	GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
-	GtkTextIter end_iter = iter;
-	if (!gtk_text_iter_forward_char(&end_iter))
-		return FALSE;
-	gchar* tool = gtk_text_buffer_get_text(buffer,&iter, &end_iter,FALSE);
-	
-	gchar *oldtool = gtk_widget_get_tooltip_text(widget);
-	if (oldtool != NULL && g_strcmp0(oldtool,tool) != 0)
-	{
-		tool = NULL;
-	}
-	
-  if (tool != NULL){
-    //gtk_tooltip_set_text (tooltip, tool);
-    if (cambio_tool)
-	    gtk_tooltip_set_text (tooltip, "aaaaaa");
-    else 
-    	gtk_tooltip_set_text (tooltip, tool);
-    	
-    cambio_tool = !cambio_tool;
-   }
-  else
-   return FALSE;
-
-  return TRUE;
-
-}
-
 static gboolean
 key_press(GtkWidget   *widget,
 	GdkEventKey *event,
 	gpointer     user_data)
 {
-	if (event->keyval == GDK_F3)
-	{
-		g_debug("Show tooltip");
-		//gtk_widget_set_tooltip_text(view,"holaaaaaaaaaaaaa");
-		gtk_widget_trigger_tooltip_query(widget);
-		return TRUE;
-	}
-	else if (event->keyval == GDK_F4)
+	if (event->keyval == GDK_F4)
 	{
 		/* Usage with custom widget */
 		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
@@ -213,8 +142,6 @@ create_window (void)
 	
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
 	
-	g_signal_connect(view,"query-tooltip",G_CALLBACK(query_tooltip_cb),NULL);
-	
 	return window;
 }
 
@@ -283,21 +210,6 @@ create_info()
 	gsc_info_set_adjust_height(info,TRUE,100000);
 	gsc_info_set_adjust_width(info,TRUE,100000);
 	
-	/*
-	custom = gtk_scrolled_window_new (NULL, NULL);
-	
-	custom_view = gtk_text_view_new();
-	
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (custom),
-					GTK_POLICY_AUTOMATIC,
-					GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (custom),
-					       custom_view);
-	
-	gsc_info_set_bottom_bar_visible(GSC_INFO (info), TRUE);
-	
-	gtk_widget_show (custom_view);
-	*/
 	custom = gtk_label_new("chuchisadfas dfas dfasd fasd asd fasdf asd fad f ad");
 	g_object_ref(custom);
 	gtk_widget_show (custom);

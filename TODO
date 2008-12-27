@@ -15,6 +15,8 @@ TODO (last update: 2008-12-14)
 [X] Remove all g_object_set_property. Use g_object_set instead
 [X] In gsc-manager use self instead of completion
 [ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
+[ ] Better key control in triggers because if you configure <control>Return and
+    press control+shift+return, it works but it is wrong.
 
 GscInfo:
 ----------------

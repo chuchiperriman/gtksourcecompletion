@@ -34,8 +34,8 @@ gsc_char_is_separator(const gunichar ch)
 
 gchar*
 gsc_get_last_word_and_iter(GtkTextView *text_view, 
-					GtkTextIter *start_word, 
-					GtkTextIter *end_word)
+			   GtkTextIter *start_word, 
+			   GtkTextIter *end_word)
 {
 	GtkTextMark* insert_mark;
 	GtkTextBuffer* text_buffer;
@@ -68,7 +68,6 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 	while ((no_doc_start = gtk_text_iter_backward_char(start_iter)) == TRUE)
 	{
 		ch = gtk_text_iter_get_char(start_iter);
-		/* TODO Do better */
 		if (gsc_char_is_separator(ch))
 		{
 			found = TRUE;
@@ -92,6 +91,7 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 		else
 		{
 			*start_iter = actual;
+			/*FIXME dup this var?*/
 			text = "";
 		}
 	}
@@ -116,8 +116,8 @@ gsc_get_last_word_cleaned(GtkTextView *view)
 
 void
 gsc_get_cursor_pos(GtkTextView *text_view, 
-				gint *x, 
-				gint *y)
+		   gint *x, 
+		   gint *y)
 {
 	GdkWindow *win;
 	GtkTextMark* insert_mark;
@@ -131,8 +131,8 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 	insert_mark = gtk_text_buffer_get_insert(text_buffer);
 	gtk_text_buffer_get_iter_at_mark(text_buffer,&start,insert_mark);
 	gtk_text_view_get_iter_location(text_view,
-														&start,
-														&location );
+					&start,
+					&location );
 	gtk_text_view_buffer_to_window_coords (text_view,
 						GTK_TEXT_WINDOW_WIDGET,
 						location.x, 
@@ -163,7 +163,7 @@ gsc_gsv_get_text(GtkTextView *text_view)
 
 void
 gsc_replace_actual_word(GtkTextView *text_view, 
-				    const gchar* text)
+			const gchar* text)
 {
 	GtkTextBuffer *buffer;
 	GtkTextIter word_start, word_end;
@@ -173,7 +173,10 @@ gsc_replace_actual_word(GtkTextView *text_view,
 	
 	gsc_get_last_word_and_iter(text_view,&word_start, &word_end);
 
-	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,"temp_replace",&word_start, TRUE);
+	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,
+							"temp_replace",
+							&word_start,
+							TRUE);
 	gtk_text_buffer_delete(buffer,&word_start,&word_end);
 	gtk_text_buffer_get_iter_at_mark(buffer,&word_start,mark);
 	gtk_text_buffer_insert(buffer, &word_start, text,-1);
@@ -201,7 +204,7 @@ gsc_clear_word(const gchar* word)
 
 gchar *
 gsc_compute_line_indentation (GtkTextView *view,
-			     GtkTextIter *cur)
+			      GtkTextIter *cur)
 {
 	GtkTextIter start;
 	GtkTextIter end;
@@ -252,7 +255,9 @@ gsc_get_text_with_indent(const gchar* content,gchar *indent)
 				fin = g_string_new_len(content,i+1);
 			else
 			{
-				fin = g_string_append_len(fin,&content[last_line+1],i - last_line);
+				fin = g_string_append_len(fin,
+							  &content[last_line+1],
+							  i - last_line);
 			}
 			fin = g_string_append(fin,indent);
 			last_line = i;
@@ -264,7 +269,9 @@ gsc_get_text_with_indent(const gchar* content,gchar *indent)
 	{
 		if (last_line < len -1)
 		{
-			fin = g_string_append_len(fin,&content[last_line+1],len - last_line);
+			fin = g_string_append_len(fin,
+						  &content[last_line+1],
+						  len - last_line);
 		}
 		ret = g_string_free(fin,FALSE);
 	}
@@ -334,7 +341,11 @@ gsc_get_window_position_center_parent(GtkWindow *window,
 }
 
 gboolean 
-gsc_get_window_position_in_cursor(GtkWindow *window, GtkTextView *view, gint *x, gint *y, gboolean *resized)
+gsc_get_window_position_in_cursor(GtkWindow *window,
+				  GtkTextView *view,
+				  gint *x,
+				  gint *y,
+				  gboolean *resized)
 {
 	gint w, h, xtext, ytext, ytemp;
 	gint sw = gdk_screen_width();
