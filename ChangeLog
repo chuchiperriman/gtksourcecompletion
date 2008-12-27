@@ -1,3 +1,10 @@
+2008-12-27  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-info.c: 
+	Doing the label selectable
+	* gtksourcecompletion/gsc-popup.[ch]:
+	Added gsc_manager_get_widget to get the popup widget
+
 2008-12-23  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-proposal.c:

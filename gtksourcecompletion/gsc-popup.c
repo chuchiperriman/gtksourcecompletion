@@ -146,7 +146,6 @@ gsc_popup_page_new (GscPopup *self,
 	gtk_widget_show (page->view);
 	g_object_set (G_OBJECT (page->view), "can-focus",
 		      FALSE, NULL);
-	
 	self->priv->pages = g_list_append (self->priv->pages,
 					   page);
 	

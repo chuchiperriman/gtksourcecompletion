@@ -102,6 +102,20 @@ key_press(GtkWidget   *widget,
 	}
 	else if (event->keyval == GDK_F6)
 	{
+		GtkWidget *win = NULL;
+		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
+			win = info;
+		else
+			win = gsc_manager_get_widget (comp);
+			
+		gtk_window_set_modal(GTK_WINDOW (win), TRUE);
+		gtk_window_present_with_time (GTK_WINDOW (win), GDK_CURRENT_TIME);
+		gtk_window_activate_focus (GTK_WINDOW (win));
+		gtk_widget_grab_focus (GTK_WIDGET (win));
+		gtk_window_set_decorated (GTK_WINDOW (win), TRUE);
+	}
+	else if (event->keyval == GDK_F7)
+	{
 		/* Filter the proposals starting by "ccc" */
 		/*
 		FIXME We will implement this when Nacho finish to integrate

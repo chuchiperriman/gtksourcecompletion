@@ -111,6 +111,8 @@ show (GtkWidget *widget)
 	GscInfo *self = GSC_INFO (widget);
 	
 	GTK_WIDGET_CLASS (gsc_info_parent_class)->show (GTK_WIDGET (self));
+	
+	gtk_label_select_region (GTK_LABEL (self->priv->label), 0, 0);
 }
 
 static void
@@ -153,6 +155,7 @@ gsc_info_init (GscInfo *self)
 	gtk_widget_show (self->priv->info_scroll);
 
 	self->priv->label = gtk_label_new (NULL);
+	gtk_label_set_selectable (GTK_LABEL (self->priv->label), TRUE);
 	gtk_widget_show (self->priv->label);
 
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),

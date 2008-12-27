@@ -126,6 +126,8 @@ gchar 		*gsc_manager_get_key			(GscManager *self,
 gboolean	 gsc_manager_manage_key			(GscManager *self,
 							 GdkEventKey *event);
 
+GtkWidget	*gsc_manager_get_widget			(GscManager *self);
+
 G_END_DECLS
 
 #endif /* _GSC_H_ */

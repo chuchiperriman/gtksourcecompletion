@@ -1106,7 +1106,7 @@ gsc_manager_get_active_trigger (GscManager *self)
 }
 
 /*
- * FIXME: Use cont gchar * and allocate the memory
+ * FIXME: Use const gchar * and allocate the memory
  */
 /**
  * gsc_manager_set_current_info:
@@ -1122,4 +1122,14 @@ gsc_manager_set_current_info (GscManager *self,
 {
 	gsc_popup_set_current_info (self->priv->popup, info);
 }
+
+GtkWidget*
+gsc_manager_get_widget (GscManager *self)
+{
+	g_return_val_if_fail (GSC_MANAGER (self), NULL);
+	
+	return GTK_WIDGET (self->priv->popup);
+	
+}
+
 
