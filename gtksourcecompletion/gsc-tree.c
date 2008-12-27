@@ -269,9 +269,6 @@ gsc_tree_select_first (GscTree *self)
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	if (!GTK_WIDGET_VISIBLE (self))
-		return FALSE;
-	
 	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
 
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
@@ -292,10 +289,7 @@ gsc_tree_select_first (GscTree *self)
 		gtk_tree_path_free (path);
 		return TRUE;
 	}
-	else
-	{
-		return FALSE;
-	}
+	return FALSE;
 }
 
 /**

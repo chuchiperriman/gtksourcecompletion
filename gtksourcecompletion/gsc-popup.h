@@ -109,6 +109,8 @@ void		 gsc_popup_bottom_bar_set_visible	(GscPopup *self,
 							 gboolean visible);
 
 gboolean	 gsc_popup_bottom_bar_get_visible	(GscPopup *self);
+
+gboolean	 gsc_popup_autoselect			(GscPopup *self);
 			   
 G_END_DECLS
 

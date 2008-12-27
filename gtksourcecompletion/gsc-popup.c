@@ -62,8 +62,9 @@ struct _GscPopupPriv
 	
 	GList *pages;
 	GscPopupPage *active_page;
-	
+
 	gboolean destroy_has_run;
+
 };
 
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
@@ -985,5 +986,27 @@ gsc_popup_bottom_bar_get_visible (GscPopup *self)
 
 	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
 }
+
+gboolean
+gsc_popup_autoselect (GscPopup *self)
+{
+	GscTree *tree;
+	
+	g_return_val_if_fail (GSC_IS_POPUP (self), FALSE);
+
+	update_pages_visibility (self);	
+	if (gsc_popup_get_num_active_pages (self) == 1)
+	{
+		tree = get_current_tree (self);
+		if (gsc_tree_get_num_proposals (tree) == 1)
+		{
+			gsc_tree_select_first (tree);
+			return gsc_popup_select_current_proposal (self);
+		}
+	}
+	
+	return FALSE;
+}
+
 
 

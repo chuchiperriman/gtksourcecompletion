@@ -4,6 +4,10 @@
 	Doing the label selectable
 	* gtksourcecompletion/gsc-popup.[ch]:
 	Added gsc_manager_get_widget to get the popup widget
+	Added gsc_popup_autoselect to autoselect a proposal if there is only
+	one proposal in one page
+	* gtksourcecompletion/gsc-manager.c:
+	Added "autoselect" property (see gsc_popup_autoselect)
 
 2008-12-23  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 

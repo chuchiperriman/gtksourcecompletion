@@ -51,7 +51,8 @@ enum {
 	PROP_0,
 	PROP_INFO_KEYS,
 	PROP_NEXT_PAGE_KEYS,
-	PROP_PREV_PAGE_KEYS
+	PROP_PREV_PAGE_KEYS,
+	PROP_AUTOSELECT
 };
 
 typedef struct 
@@ -73,6 +74,7 @@ struct _GscManagerPrivate
 	
 	gulong internal_signal_ids[LAST_SIGNAL];
 	gboolean active;
+	gboolean autoselect;
 	
 	KeyDef keys[KEYS_LAST];
 };
@@ -247,6 +249,9 @@ gsc_manager_set_property (GObject      *object,
 			gsc_manager_set_key (self, KEYS_PAGE_PREV,
 					     g_value_get_string (value));
 			break;
+		case PROP_AUTOSELECT:
+			self->priv->autoselect = g_value_get_boolean (value);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -277,7 +282,9 @@ gsc_manager_get_property (GObject    *object,
 			g_value_set_string (value,
 					    gsc_manager_get_key (self, KEYS_PAGE_PREV));
 			break;
-
+		case PROP_AUTOSELECT:
+			g_value_set_boolean (value, self->priv->autoselect);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -302,6 +309,7 @@ gsc_manager_init (GscManager *self)
 	self->priv->providers = NULL;
 	self->priv->triggers = NULL;
 	self->priv->popup = NULL;
+	self->priv->autoselect = FALSE;
 	self->priv->active_trigger = NULL;
 	self->priv->trig_prov = g_hash_table_new_full (g_str_hash,
 						       g_str_equal,
@@ -407,6 +415,18 @@ gsc_manager_class_init (GscManagerClass *klass)
 							      _("Keys to show the previous completion page"),
 							      _("Keys to show the previous completion page"),
 							      DEFAULT_PAGE_PREV_KEYS,
+							      G_PARAM_READWRITE));
+	/**
+	 * GscManager:autoselect:
+	 *
+	 * TRUE to autoselect if there is one proposal in one page.
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_AUTOSELECT,
+					 g_param_spec_boolean ("autoselect",
+							      _("Autoselects the proposal if there is only one"),
+							      _("Autoselects the proposal if there is only one"),
+							      FALSE,
 							      G_PARAM_READWRITE));
 
 	g_type_class_add_private (object_class, sizeof (GscManagerPrivate));
@@ -725,9 +745,6 @@ gsc_manager_trigger_event (GscManager *self,
 	trigger = gsc_manager_get_trigger (self, trigger_name);
 	g_return_if_fail (trigger != NULL);
 	
-	if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
-		return;
-	
 	/*
 	 * If the completion is visble and there is a trigger active, you cannot
 	 * raise a different trigger until the current trigger finish
@@ -798,25 +815,36 @@ gsc_manager_trigger_event (GscManager *self,
 	if (proposals > 0)
 	{
 		gint x, y;
+		gboolean selected = FALSE;
 		GtkWindow *win;
 		
-		if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
-			return;
+		/*If wants autoselect one proposal*/
+		
+		if (self->priv->autoselect)
+		{
+			selected = gsc_popup_autoselect (self->priv->popup);
+		}
 
-		gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
-						   self->priv->text_view,
-						   &x, &y, NULL);
-		gtk_window_move (GTK_WINDOW (self->priv->popup),
-				 x, y);
-		gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
+		if (!selected)
+		{
+			if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
+				return;
+			
+			gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
+							   self->priv->text_view,
+							   &x, &y, NULL);
+			gtk_window_move (GTK_WINDOW (self->priv->popup),
+					 x, y);
+			gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
 
-		/*Set the focus to the View, not the completion popup*/
-		win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
-				  GTK_TYPE_WINDOW));
-		gtk_window_present (win);
-		gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
+			/*Set the focus to the View, not the completion popup*/
+			win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->text_view),
+					  GTK_TYPE_WINDOW));
+			gtk_window_present (win);
+			gtk_widget_grab_focus (GTK_WIDGET (self->priv->text_view));
 
-		self->priv->active_trigger = trigger;
+			self->priv->active_trigger = trigger;
+		}
 	}
 	else if (GTK_WIDGET_VISIBLE (self->priv->popup))
 	{

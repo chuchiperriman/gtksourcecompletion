@@ -192,6 +192,10 @@ create_completion(void)
 	
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
 	comp = gsc_manager_new(GTK_TEXT_VIEW(view));
+	
+	g_object_set (comp,
+		      "autoselect", TRUE,
+		      NULL);
 	set_custom_keys(comp);
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
