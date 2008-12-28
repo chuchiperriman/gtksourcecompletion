@@ -830,6 +830,11 @@ gsc_manager_trigger_event (GscManager *self,
 			if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
 				return;
 			
+			/*
+			 *FIXME Do it supports only cursor position? We can 
+			 *add a new "position-type": cursor, center_screen,
+			 *center_window, custom etc.
+			 */
 			gsc_get_window_position_in_cursor (GTK_WINDOW (self->priv->popup),
 							   self->priv->text_view,
 							   &x, &y, NULL);
@@ -1151,6 +1156,9 @@ gsc_manager_set_current_info (GscManager *self,
 	gsc_popup_set_current_info (self->priv->popup, info);
 }
 
+/*
+ * FIXME rename to get_popup_window ?
+ */
 GtkWidget*
 gsc_manager_get_widget (GscManager *self)
 {

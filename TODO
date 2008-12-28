@@ -43,6 +43,7 @@ GscPopup:
 [X] Bug showing pages because we must not show a page if it has not proposals
 [X] Add autoselection property. If there is only one proposal in one page, the 
     popup (or manager) selects the proposal automatically.
+[ ] When autoselect a proposal, select the new inserted text in the view
 
 Bugs
 ---------------
