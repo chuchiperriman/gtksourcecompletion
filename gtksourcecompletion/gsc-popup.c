@@ -488,10 +488,10 @@ gsc_popup_init (GscPopup *self)
 	
 	next_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD,
 						   GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_show(next_page_icon);
+	gtk_widget_show (next_page_icon);
 	prev_page_icon = gtk_image_new_from_stock (GTK_STOCK_GO_BACK,
 						   GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_widget_show(prev_page_icon);
+	gtk_widget_show (prev_page_icon);
 	
 	self->priv->next_page_button = gtk_button_new ();
 	gtk_widget_show (self->priv->next_page_button);
@@ -994,7 +994,7 @@ gsc_popup_autoselect (GscPopup *self)
 	
 	g_return_val_if_fail (GSC_IS_POPUP (self), FALSE);
 
-	update_pages_visibility (self);	
+	update_pages_visibility (self);
 	if (gsc_popup_get_num_active_pages (self) == 1)
 	{
 		tree = get_current_tree (self);

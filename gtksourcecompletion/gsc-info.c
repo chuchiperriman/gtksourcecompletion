@@ -45,7 +45,10 @@ G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
 
 
 static void
-get_max_size (GscInfo *self, GtkWidget *widget, gint *w, gint *h)
+get_max_size (GscInfo *self,
+	      GtkWidget *widget,
+	      gint *w,
+	      gint *h)
 {
 	GtkRequisition req;
 	
@@ -102,7 +105,7 @@ adjust_resize (GscInfo *self)
 		get_max_size (self, self->priv->custom_widget, &w, &h);
 	}
 	
-	gtk_window_resize (GTK_WINDOW (self), w, h );
+	gtk_window_resize (GTK_WINDOW (self), w, h);
 }
 
 static void
@@ -143,7 +146,7 @@ gsc_info_init (GscInfo *self)
 	
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
-	gtk_window_set_decorated (GTK_WINDOW(self), FALSE);
+	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
 	gtk_window_set_default_size (GTK_WINDOW (self),
 				     WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -186,7 +189,7 @@ gsc_info_class_init (GscInfoClass *klass)
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-	g_type_class_add_private (object_class, sizeof(GscInfoPrivate));
+	g_type_class_add_private (object_class, sizeof (GscInfoPrivate));
 
 	object_class->finalize = gsc_info_finalize;
 	widget_class->show = show;
@@ -236,13 +239,13 @@ gsc_info_move_to_cursor (GscInfo* self,
 					   &resized);
 	if (resized)
 	{
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(self->priv->info_scroll),
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 						GTK_POLICY_ALWAYS,
 						GTK_POLICY_ALWAYS);
 	}
 	else
 	{
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW(self->priv->info_scroll),
+		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
 						GTK_POLICY_NEVER,
 						GTK_POLICY_NEVER);
 	}
