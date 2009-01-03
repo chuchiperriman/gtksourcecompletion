@@ -21,6 +21,7 @@
 #define GSC_POPUP_H
 
 #include <gtk/gtk.h>
+#include "gsc-tree.h"
 #include "gsc-proposal.h"
 
 G_BEGIN_DECLS
@@ -46,6 +47,8 @@ typedef enum {
 #define GSC_POPUP_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_POPUP, GscPopupClass))
 
 #define DEFAULT_PAGE "Default"
+
+typedef GscTreeFilterVisibleFunc GscPopupFilterVisibleFunc;
 
 typedef struct _GscPopupPriv GscPopupPriv;
 typedef struct _GscPopup GscPopup;
@@ -111,7 +114,11 @@ void		 gsc_popup_bottom_bar_set_visible	(GscPopup *self,
 gboolean	 gsc_popup_bottom_bar_get_visible	(GscPopup *self);
 
 gboolean	 gsc_popup_autoselect			(GscPopup *self);
-			   
+
+gboolean	 gsc_popup_filter_visible		(GscPopup *self,
+							 GscPopupFilterVisibleFunc func,
+							 gpointer user_data);
+
 G_END_DECLS
 
 #endif 

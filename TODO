@@ -17,6 +17,7 @@ TODO (last update: 2008-12-14)
 [ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
 [ ] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
+[X] Add filter function to gsc-manager to filter the current proposals
 
 GscInfo:
 ----------------

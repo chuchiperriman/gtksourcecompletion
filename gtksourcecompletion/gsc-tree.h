@@ -35,8 +35,10 @@ G_BEGIN_DECLS
 #define GSC_IS_TREE_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_TREE))
 #define GSC_TREE_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_TREE, GscTreeClass))
 
-typedef struct _GscTreePriv GscTreePriv;
+typedef gboolean (* GscTreeFilterVisibleFunc) (GscProposal *proposal,
+					       gpointer     user_data);
 
+typedef struct _GscTreePriv GscTreePriv;
 typedef struct _GscTree GscTree;
 
 struct _GscTree
@@ -77,8 +79,9 @@ gboolean	 gsc_tree_select_next			(GscTree *self,
 
 gint		 gsc_tree_get_num_proposals		(GscTree *self);
 
-void		 gsc_tree_filter			(GscTree *self,
-							 const gchar* filter);
+void		 gsc_tree_filter_visible		(GscTree *self,
+							 GscTreeFilterVisibleFunc func,
+							 gpointer user_data);
 
 G_END_DECLS
 #endif

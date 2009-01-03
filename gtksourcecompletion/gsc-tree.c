@@ -40,48 +40,44 @@ struct _GscTreePriv
 	GtkListStore *list_store;
 	GtkTreeModelFilter *model_filter;
 	
-	gchar* current_filter;
-	gboolean active_filter;
+	gboolean filter_active;
+	gpointer filter_data;
+	GscTreeFilterVisibleFunc filter_func;
 };
 
 G_DEFINE_TYPE (GscTree, gsc_tree, GTK_TYPE_TREE_VIEW);
 
 static gboolean
-filter_by_name_func (GtkTreeModel *model,
-		     GtkTreeIter *iter,
-		     gpointer user_data)
+filter_func (GtkTreeModel *model,
+	     GtkTreeIter *iter,
+	     gpointer user_data)
 {
-	GscTree *self = GSC_TREE (user_data);
-	const gchar *current_name;
-
-	if (!self->priv->active_filter)
-		return TRUE;
-
-	if (self->priv->current_filter == NULL)
-		return TRUE;
+	GscProposal *proposal = NULL;
+	GscTree *self;
 	
+	self = GSC_TREE (user_data);
+	
+	if (!self->priv->filter_active || !self->priv->filter_func)
+		return TRUE;
+		
 	gtk_tree_model_get (model,
 			    iter,
-			    COLUMN_NAME,
-			    &current_name,
+			    COLUMN_DATA,
+			    &proposal,
 			    -1);
 	
-	if (current_name == NULL)
+	if (proposal == NULL)
 		return TRUE;
 	
-	if (strcmp (self->priv->current_filter, current_name) == 0)
-	{
-		return TRUE;
-	}
-	return FALSE;
+	return self->priv->filter_func (proposal, self->priv->filter_data);
+	
 }
+
 
 static void
 gsc_tree_finalize (GObject *object)
 {
-	GscTree *self = GSC_TREE(object);
-	
-	g_free (self->priv->current_filter);
+	/*GscTree *self = GSC_TREE(object);*/
 	
 	G_OBJECT_CLASS (gsc_tree_parent_class)->finalize (object);
 }
@@ -107,8 +103,9 @@ gsc_tree_init (GscTree *self)
 
 	self->priv = GSC_TREE_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
-	self->priv->current_filter = NULL;
-	self->priv->active_filter = FALSE;
+	self->priv->filter_data = NULL;
+	self->priv->filter_active = FALSE;
+	self->priv->filter_func = NULL;
 
 	g_object_set (self, "can-focus", FALSE, NULL);
 	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (self), FALSE);
@@ -142,7 +139,7 @@ gsc_tree_init (GscTree *self)
 	self->priv->model_filter = GTK_TREE_MODEL_FILTER (model);
 	
 	gtk_tree_model_filter_set_visible_func (self->priv->model_filter,
-						filter_by_name_func,
+						filter_func,
 						self,
 						NULL);
 
@@ -460,23 +457,21 @@ gsc_tree_get_num_proposals (GscTree *self)
 	return gtk_tree_model_iter_n_children (model, NULL);
 }
 
-/**
- * gsc_tree_filter:
- * @self: The #GscTree
- * @filter: The filter to be applied.
- *
- * This function filter the proposals in the current tree. This function
- * filter the proposals by name (proposals stating by "filter")
- */
+
 void
-gsc_tree_filter (GscTree *self,
-		 const gchar* filter)
+gsc_tree_filter_visible (GscTree *self,
+			 GscTreeFilterVisibleFunc func,
+			 gpointer user_data)
 {
-	self->priv->active_filter = TRUE;
-	self->priv->current_filter = g_strdup (filter);
+	self->priv->filter_active = TRUE;
+	self->priv->filter_data = user_data;
+	self->priv->filter_func = func;
 	gtk_tree_model_filter_refilter (self->priv->model_filter);
-	self->priv->active_filter = FALSE;
-	self->priv->current_filter = NULL;
+	self->priv->filter_active = FALSE;
+	self->priv->filter_data = NULL;
+	self->priv->filter_func = NULL;
 }
+
+
 
 

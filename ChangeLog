@@ -1,3 +1,11 @@
+2009-01-03  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-manager[ch]:
+	* gtksourcecompletion/gsc-popup.[ch]:
+	* gtksourcecompletion/gsc-tree.[ch]:
+	Added a filter function to filter the current proposals with a custom
+	function.
+
 2008-12-29  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c:

@@ -43,6 +43,8 @@ G_BEGIN_DECLS
 #define GSC_IS_MANAGER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_MANAGER))
 #define GSC_MANAGER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MANAGER, GscManagerClass))
 
+typedef GscPopupFilterVisibleFunc GscManagerFilterVisibleFunc;
+
 typedef struct _GscManagerPrivate GscManagerPrivate;
 
 typedef struct _GscManager GscManager;
@@ -127,6 +129,10 @@ gboolean	 gsc_manager_manage_key			(GscManager *self,
 							 GdkEventKey *event);
 
 GtkWidget	*gsc_manager_get_widget			(GscManager *self);
+
+void		 gsc_manager_filter_current_proposals	(GscManager *self,
+							 GscManagerFilterVisibleFunc func,
+							 gpointer user_data);
 
 G_END_DECLS
 

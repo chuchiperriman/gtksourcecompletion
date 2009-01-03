@@ -52,6 +52,15 @@ static GtkWidget *entry = NULL;
 
 static const gboolean change_keys = FALSE;
 
+
+static gboolean
+filter_func (GscProposal *proposal,
+	     gpointer user_data)
+{
+	const gchar *label = gsc_proposal_get_label (proposal);
+	return g_str_has_prefix (label, "sp");
+}
+
 static void
 destroy_cb(GtkObject *object,gpointer   user_data)
 {
@@ -81,6 +90,34 @@ send_focus_change (GtkWidget *widget,
  
 	g_object_unref (widget);
 	gdk_event_free (fevent);
+}
+
+static void
+focus_popup_widget (GtkWidget *win, GtkWidget *view)
+{
+	GtkWidget          *toplevel;
+	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (view));
+
+	/*
+	 * Group the window to control the click on the parent
+	 */
+        if (GTK_WINDOW (toplevel)->group)
+                gtk_window_group_add_window (GTK_WINDOW (toplevel)->group,
+                                             GTK_WINDOW (win));
+        else if (GTK_WINDOW (win)->group)
+                gtk_window_group_remove_window (GTK_WINDOW (win)->group,
+                                                GTK_WINDOW (win));
+
+	gtk_window_set_modal(GTK_WINDOW (win), TRUE);
+	
+	gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
+	gtk_widget_realize (win);
+	
+	gtk_window_present_with_time (GTK_WINDOW (win), GDK_CURRENT_TIME);
+	gtk_window_activate_focus (GTK_WINDOW (win));
+	gtk_widget_grab_focus (GTK_WIDGET (win));
+	
+	send_focus_change (win, TRUE);
 }
 
 static void 
@@ -114,12 +151,43 @@ entry_key_press_event_cb (GtkWidget *widget,
 	if (event->keyval == GDK_Escape)
 	{
 		unfocus_popup_widget (GTK_WINDOW (info), view);
-
 	}
 	return FALSE;
 }
 
+static gboolean
+button_press_event_cb (GtkWidget *widget,
+		       GdkEventButton *event,
+		       gpointer user_data)
+{
+	g_debug ("info button");
+	
+	/*
+	 * With the info window grouped, this signal is emited when press on 
+	 * the parent window (the main window)
+	 */
+	GtkWidget          *toplevel;
+	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (info));
+	
+	unfocus_popup_widget (GTK_WINDOW (toplevel), view);
+	
+	return TRUE;
+}
 
+static gboolean
+window_button_press_event_cb (GtkWidget *widget,
+			      GdkEventButton *event,
+			      gpointer user_data)
+{
+	g_debug ("window button");
+	
+	GtkWidget          *toplevel;
+	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (info));
+	
+	unfocus_popup_widget (GTK_WINDOW (toplevel), view);
+	
+	return TRUE;
+}
 
 static gboolean
 key_press(GtkWidget   *widget,
@@ -176,42 +244,17 @@ key_press(GtkWidget   *widget,
 			win = GTK_WIDGET (info);
 		else
 			win = gsc_manager_get_widget (comp);
+			
 		
-		
-		GtkWidget          *toplevel;
-		toplevel = gtk_widget_get_toplevel (GTK_WIDGET (view));
-
-                if (GTK_WINDOW (toplevel)->group)
-                        gtk_window_group_add_window (GTK_WINDOW (toplevel)->group,
-                                                     GTK_WINDOW (win));
-                else if (GTK_WINDOW (win)->group)
-                        gtk_window_group_remove_window (GTK_WINDOW (win)->group,
-                                                        GTK_WINDOW (win));
-
-		gtk_window_set_modal(GTK_WINDOW (win), TRUE);
-		
-		gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (view), FALSE);
-		gtk_widget_realize (win);
-		
-		gtk_window_present_with_time (GTK_WINDOW (win), GDK_CURRENT_TIME);
-		gtk_window_activate_focus (GTK_WINDOW (win));
-		gtk_widget_grab_focus (GTK_WIDGET (win));
-		
-		send_focus_change (win, TRUE);
-		
-		
-		//gtk_window_set_decorated (GTK_WINDOW (win), TRUE);
-		
+		focus_popup_widget (win, view);
 		
 	}
-	else if (event->keyval == GDK_F7)
+	else if (event->keyval == GDK_F9)
 	{
-		/* Filter the proposals starting by "ccc" */
-		/*
-		FIXME We will implement this when Nacho finish to integrate
-		gsc-tree into gsc-popup
-		*/
-		
+		gsc_manager_filter_current_proposals (comp,
+					  filter_func,
+					  NULL);
+		return TRUE;
 	}
 	
 	return FALSE;
@@ -250,6 +293,10 @@ create_window (void)
 	g_signal_connect(view, "key-release-event", G_CALLBACK(key_press), NULL);
 	
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
+	
+	g_signal_connect (view, "button_press_event",
+                          G_CALLBACK (window_button_press_event_cb),
+                          NULL);
 	
 	return window;
 }
@@ -322,6 +369,15 @@ create_info()
 	gtk_widget_size_request(GTK_WIDGET(info),&req);
 	gsc_info_set_adjust_height(info,TRUE,100000);
 	gsc_info_set_adjust_width(info,TRUE,100000);
+
+	GtkWidget          *toplevel;
+	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (view));
+	
+	/*
+	if (GTK_WINDOW (toplevel)->group)
+                gtk_window_group_add_window (GTK_WINDOW (toplevel)->group,
+                                             GTK_WINDOW (info));
+	*/
 	
 	entry = GTK_WIDGET (gtk_entry_new());
 	gtk_entry_set_text (GTK_ENTRY (entry), "chuchisadfas dfas dfasd fasd asd fasdf asd fad f ad");
@@ -329,22 +385,33 @@ create_info()
 	g_signal_connect (entry, "key_press_event",
                           G_CALLBACK (entry_key_press_event_cb),
                           view);
+                          
+	
+                          
 	g_object_ref(entry);
 	gtk_widget_show (entry);
 
-	custom = gtk_frame_new (NULL);
-	gtk_frame_set_shadow_type (GTK_FRAME (custom), GTK_SHADOW_ETCHED_IN);
-	gtk_widget_show (custom);
+	custom = gtk_event_box_new ();
+        
+	GtkWidget *frame = gtk_frame_new (NULL);
+	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
+	gtk_widget_show (frame);
+	
+	gtk_container_add (GTK_CONTAINER (custom),
+			   frame);
  
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
 	gtk_widget_show (vbox);
-	gtk_container_add (GTK_CONTAINER (custom), vbox);
+	gtk_container_add (GTK_CONTAINER (frame), vbox);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox), 3);
- 
+
 	gtk_container_add (GTK_CONTAINER (vbox),
 			   entry);
 
-	
+	gtk_widget_add_events (GTK_WIDGET (info), GDK_BUTTON_PRESS_MASK);
+	g_signal_connect (info, "button_press_event",
+                          G_CALLBACK (button_press_event_cb),
+                          view);
 	return info;
 }
 

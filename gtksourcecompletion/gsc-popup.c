@@ -20,7 +20,6 @@
 
 #include <gdk/gdkkeysyms.h> 
 #include "gsc-popup.h"
-#include "gsc-tree.h"
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
 #include "gsc-info.h"
@@ -64,7 +63,6 @@ struct _GscPopupPriv
 	GscPopupPage *active_page;
 
 	gboolean destroy_has_run;
-
 };
 
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
@@ -919,27 +917,6 @@ gsc_popup_get_num_active_pages (GscPopup *self)
 	return num_pages_with_data;
 }
 
-/* TODO We will need this code to filter the popup content
-
-static void
-_filter_changed_cb (GtkEntry *entry,
-		    gpointer  user_data)
-{
-	GscPopup *self = GSC_POPUP(user_data);
-	
-	gint pages = gtk_notebook_get_n_pages(GTK_NOTEBOOK(self->priv->notebook));
-	guint i;
-	GscTree *tree;
-	for(i=0;i<pages;i++)
-	{
-		tree = GSC_TREE(gtk_notebook_get_nth_page(GTK_NOTEBOOK(self->priv->notebook),i));
-		gsc_tree_filter(tree,
-				gtk_entry_get_text(GTK_ENTRY(self->priv->filter)));
-	}
-	gsc_popup_select_first(self);
-}
-*/
-
 /**
  * gsc_popup_show_or_update:
  * @widget: The #GscPopup
@@ -1006,6 +983,36 @@ gsc_popup_autoselect (GscPopup *self)
 	}
 	
 	return FALSE;
+}
+
+/**
+ * gsc_popup_filter_visible:
+ * @self: The #GscPopup 
+ * @func: function to filter the proposals visibility
+ * @user_data: user data to pass to func
+ *
+ * Returns: TRUE if the popup has visible proposals.
+ */
+gboolean
+gsc_popup_filter_visible (GscPopup *self,
+			  GscPopupFilterVisibleFunc func,
+			  gpointer user_data)
+{
+	GList *l;
+	
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
+	{
+		GscPopupPage *page = (GscPopupPage *)l->data;
+		
+		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
+		{
+			gsc_tree_filter_visible (GSC_TREE (page->view),
+						 (GscTreeFilterVisibleFunc) func,
+						 user_data);
+		}
+	}
+	
+	return update_pages_visibility (self);
 }
 
 

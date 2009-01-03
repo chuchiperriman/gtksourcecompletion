@@ -1140,6 +1140,7 @@ gsc_manager_get_active_trigger (GscManager *self)
 
 /*
  * FIXME: Use const gchar * and allocate the memory
+ * Remove this function. We use gsc_proposal_get_info
  */
 /**
  * gsc_manager_set_current_info:
@@ -1167,5 +1168,32 @@ gsc_manager_get_widget (GscManager *self)
 	return GTK_WIDGET (self->priv->popup);
 	
 }
+
+void
+gsc_manager_filter_current_proposals (GscManager *self,
+				      GscManagerFilterVisibleFunc func,
+				      gpointer user_data)
+{
+	gboolean has_data;
+	
+	g_return_if_fail (GSC_MANAGER (self));
+	g_return_if_fail (func);
+	
+	if (!gsc_manager_is_visible (self))
+		return;
+		
+	has_data = gsc_popup_filter_visible (self->priv->popup,
+					     (GscPopupFilterVisibleFunc) func,
+					     user_data);
+	if (!has_data)
+	{
+		end_completion (self);
+	}
+	else
+	{
+		gsc_popup_select_first(self->priv->popup);
+	}
+}
+
 
 
