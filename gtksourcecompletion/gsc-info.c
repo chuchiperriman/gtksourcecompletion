@@ -277,7 +277,7 @@ gsc_info_set_markup (GscInfo* self,
  * @max_height: if adjust = TRUE, set the max height. -1 to preserve the 
  * current value
  *
- * TRUE adjust height to the content. If the content is only a line, the info
+ * %TRUE adjust height to the content. If the content is only a line, the info
  * will be small and if there are a lot of lines, the info will be large to the 
  * max_height
  *
@@ -304,7 +304,7 @@ gsc_info_set_adjust_height (GscInfo* self,
  * @max_width: if adjust = TRUE, set the max height. -1 to preserve the 
  * current value
  *
- * TRUE adjust width to the content. If the content is only a line, the info
+ * %TRUE adjust width to the content. If the content is only a line, the info
  * will be small and if there are a lot of lines, the info will be large to the 
  * max_width
  *
@@ -330,7 +330,7 @@ gsc_info_set_adjust_width (GscInfo* self,
  * @custom_widget: A #GtkWidget
  *
  * Replaces the widget packed into the window with custom_widget. By default a
- * box with a #GtkScrolledWindow and a GtkLabel is embedded in the window.
+ * box with a #GtkScrolledWindow and a #GtkLabel is embedded in the window.
  *
  */
 void

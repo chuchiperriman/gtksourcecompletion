@@ -9,5 +9,3 @@ gsc_trigger_autowords_get_type
 gsc_provider_get_type
 gsc_tree_get_type
 gsc_popup_get_type
-gsc_trigger_dotexample_get_type
-gsc_provider_test_get_type

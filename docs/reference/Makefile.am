@@ -32,6 +32,10 @@ IGNORE_HFILES =					\
 	system.h			\
 	gsc-i18n.h		\
 	gsc-i18n.c		\
+	gsc-trigger-dotexample.h		\
+	gsc-trigger-dotexample.c		\
+	gsc-provider-test.h			\
+	gsc-provider-test.c			\
 	gsc-marshal.h		
 
 # Extra options to supply to gtkdoc-mkdb

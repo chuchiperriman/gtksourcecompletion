@@ -468,7 +468,7 @@ gsc_manager_new (GtkTextView *view)
  * @keys: Keys to be assigned to the key type
  *
  * Sets the keys for the key type. By example you can set the info keys 
- * by passing KEYS_INFO type and "<control>i" keys.
+ * by passing KEYS_INFO type and "&lt;contro;gt;i" keys.
  *
  */
 void
@@ -1159,6 +1159,7 @@ gsc_manager_set_current_info (GscManager *self,
 
 /*
  * FIXME rename to get_popup_window ?
+ * I think this function will be removed
  */
 GtkWidget*
 gsc_manager_get_widget (GscManager *self)
@@ -1169,6 +1170,17 @@ gsc_manager_get_widget (GscManager *self)
 	
 }
 
+/**
+ * gsc_manager_filter_current_proposals:
+ * @self: the #GscManager
+ * @func: function to filter the proposals visibility
+ * @user_data: user data to pass to func
+ *
+ * This function call to @func for all proposal of all pages. @func must
+ * return %TRUE if the proposal is visible or %FALSE if the completion must to 
+ * hide the proposal.
+ * 
+ **/
 void
 gsc_manager_filter_current_proposals (GscManager *self,
 				      GscManagerFilterVisibleFunc func,

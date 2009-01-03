@@ -18,6 +18,8 @@ TODO (last update: 2008-12-14)
 [ ] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
 [X] Add filter function to gsc-manager to filter the current proposals
+[ ] Rename gsc-documentwords-provider to GscProviderTextViewWords
+[ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
 
 GscInfo:
 ----------------

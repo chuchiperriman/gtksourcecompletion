@@ -51,6 +51,7 @@ GSC_PROVIDER_FILE_GET_CLASS
 <SECTION>
 <FILE>gsc-manager</FILE>
 USER_REQUEST_TRIGGER_NAME
+GscManagerFilterVisibleFunc
 GscManagerPrivate
 <TITLE>GscManager</TITLE>
 GscManager
@@ -73,6 +74,8 @@ gsc_manager_set_current_info
 gsc_manager_set_key
 gsc_manager_get_key
 gsc_manager_manage_key
+gsc_manager_get_widget
+gsc_manager_filter_current_proposals
 <SUBSECTION Standard>
 GSC_MANAGER
 GSC_IS_MANAGER
@@ -182,6 +185,7 @@ gsc_provider_get_type
 
 <SECTION>
 <FILE>gsc-tree</FILE>
+GscTreeFilterVisibleFunc
 GscTreePriv
 <TITLE>GscTree</TITLE>
 GscTree
@@ -194,7 +198,7 @@ gsc_tree_select_last
 gsc_tree_select_previous
 gsc_tree_select_next
 gsc_tree_get_num_proposals
-gsc_tree_filter
+gsc_tree_filter_visible
 <SUBSECTION Standard>
 GSC_TREE
 GSC_IS_TREE
@@ -209,6 +213,7 @@ GSC_TREE_GET_CLASS
 <FILE>gsc-popup</FILE>
 KeysType
 DEFAULT_PAGE
+GscPopupFilterVisibleFunc
 GscPopupPriv
 <TITLE>GscPopup</TITLE>
 GscPopup
@@ -230,6 +235,8 @@ gsc_popup_get_num_active_pages
 gsc_popup_show_or_update
 gsc_popup_bottom_bar_set_visible
 gsc_popup_bottom_bar_get_visible
+gsc_popup_autoselect
+gsc_popup_filter_visible
 <SUBSECTION Standard>
 GSC_POPUP
 GSC_IS_POPUP
@@ -238,40 +245,6 @@ gsc_popup_get_type
 GSC_POPUP_CLASS
 GSC_IS_POPUP_CLASS
 GSC_POPUP_GET_CLASS
-</SECTION>
-
-<SECTION>
-<FILE>gsc-trigger-dotexample</FILE>
-GSC_TRIGGER_DOTEXAMPLE_NAME
-GscTriggerDotexamplePrivate
-<TITLE>GscTriggerDotexample</TITLE>
-GscTriggerDotexample
-gsc_trigger_dotexample_new
-<SUBSECTION Standard>
-GSC_TRIGGER_DOTEXAMPLE
-GSC_IS_TRIGGER_DOTEXAMPLE
-GSC_TYPE_TRIGGER_DOTEXAMPLE
-gsc_trigger_dotexample_get_type
-GSC_TRIGGER_DOTEXAMPLE_CLASS
-GSC_IS_TRIGGER_DOTEXAMPLE_CLASS
-GSC_TRIGGER_DOTEXAMPLE_GET_CLASS
-</SECTION>
-
-<SECTION>
-<FILE>gsc-provider-test</FILE>
-GSC_PROVIDER_TEST_NAME
-GscProviderTestPrivate
-<TITLE>GscProviderTest</TITLE>
-GscProviderTest
-gsc_provider_test_new
-<SUBSECTION Standard>
-GSC_PROVIDER_TEST
-GSC_IS_PROVIDER_TEST
-GSC_TYPE_PROVIDER_TEST
-gsc_provider_test_get_type
-GSC_PROVIDER_TEST_CLASS
-GSC_IS_PROVIDER_TEST_CLASS
-GSC_PROVIDER_TEST_GET_CLASS
 </SECTION>
 
 <SECTION>

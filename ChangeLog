@@ -7,6 +7,8 @@
 	function.
 	* configure.in: 
 	Renamed to configure.ac
+	* docs:
+	Updated API documentation
 
 2008-12-29  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

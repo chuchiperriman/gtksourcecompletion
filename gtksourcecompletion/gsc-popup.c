@@ -670,6 +670,7 @@ gsc_popup_select_previous (GscPopup *self,
 /**
  * gsc_popup_select_next:
  * @self: The #GscPopup
+ * @rows: Selects the next @rows row.
  *
  * See #gsc_tree_select_next
  *
@@ -702,6 +703,15 @@ gsc_popup_get_selected_proposal (GscPopup *self,
 					       proposal);
 }
 
+/**
+ * gsc_popup_select_current_proposal:
+ * @self: The #GscPopup
+ * 
+ * Selects the current selected proposal if there is one selected. This function
+ * emits the ITEM_SELECTED signal.
+ *
+ * Returns: TRUE if a proposal has been selected.
+ */
 gboolean
 gsc_popup_select_current_proposal (GscPopup *self)
 {
@@ -944,6 +954,12 @@ gsc_popup_show_or_update (GtkWidget *widget)
 	}
 }
 
+/**
+ * gsc_popup_bottom_bar_set_visible:
+ * @self: The #GscPopup
+ * @visible: %TRUE if you want to show the bottom bar, %FALSE if not.
+ *
+ */
 void
 gsc_popup_bottom_bar_set_visible (GscPopup *self,
 				  gboolean visible)
@@ -956,6 +972,14 @@ gsc_popup_bottom_bar_set_visible (GscPopup *self,
 		gtk_widget_hide (self->priv->bottom_bar);
 }
 
+/**
+ * gsc_popup_bottom_bar_set_visible:
+ * @self: The #GscPopup
+ *
+ *
+ * Returns: %TRUE if the bottom bar is visible, %FALSE if not.
+ *
+ */
 gboolean
 gsc_popup_bottom_bar_get_visible (GscPopup *self)
 {
@@ -964,6 +988,14 @@ gsc_popup_bottom_bar_get_visible (GscPopup *self)
 	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
 }
 
+/**
+ * gsc_popup_autoselect:
+ * @self: The #GscPopup
+ * 
+ * Selects a proposal if there is only one proposal and one page.
+ *
+ * Returns: %TRUE if a proposal has been selected
+ */
 gboolean
 gsc_popup_autoselect (GscPopup *self)
 {
@@ -991,7 +1023,11 @@ gsc_popup_autoselect (GscPopup *self)
  * @func: function to filter the proposals visibility
  * @user_data: user data to pass to func
  *
- * Returns: TRUE if the popup has visible proposals.
+ * This function call to @func for all proposal of all pages. @func must
+ * return %TRUE if the proposal is visible or %FALSE if the completion must to 
+ * hide the proposal.
+ *
+ * Returns: %TRUE if the popup has visible proposals.
  */
 gboolean
 gsc_popup_filter_visible (GscPopup *self,

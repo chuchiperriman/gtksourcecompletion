@@ -457,7 +457,17 @@ gsc_tree_get_num_proposals (GscTree *self)
 	return gtk_tree_model_iter_n_children (model, NULL);
 }
 
-
+/**
+ * gsc_tree_filter_visible:
+ * @self: The #GscTree
+ * @func: function to filter the proposals visibility
+ * @user_data: user data to pass to func
+ *
+ * This function call to @func for all proposal of all pages. @func must
+ * return %TRUE if the proposal is visible or %FALSE if the completion must to 
+ * hide the proposal.
+ *
+ */
 void
 gsc_tree_filter_visible (GscTree *self,
 			 GscTreeFilterVisibleFunc func,
