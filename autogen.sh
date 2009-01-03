@@ -9,7 +9,7 @@ srcdir=`cd $srcdir && pwd`
 
 PKG_NAME="gtksourcecompletion"
 
-(test -f $srcdir/configure.in \
+(test -f $srcdir/configure.ac \
   && test -f $srcdir/ChangeLog \
   && test -d $srcdir/gtksourcecompletion) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"

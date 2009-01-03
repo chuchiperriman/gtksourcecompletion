@@ -5,6 +5,8 @@
 	* gtksourcecompletion/gsc-tree.[ch]:
 	Added a filter function to filter the current proposals with a custom
 	function.
+	* configure.in: 
+	Renamed to configure.ac
 
 2008-12-29  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
