@@ -65,8 +65,7 @@ view_key_press_event_cb (GtkWidget *view,
 		gdk_keyval_to_lower (event->keyval) == key)
 	{
 		gsc_manager_trigger_event (self->priv->manager,
-					   self->priv->trigger_name,
-					   NULL);
+					   self->priv->trigger_name);
 		return TRUE;
 	}
 	return FALSE;

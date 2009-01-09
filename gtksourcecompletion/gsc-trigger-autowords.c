@@ -103,8 +103,7 @@ autocompletion_raise_event (gpointer event)
 		self->priv->actual_word = word;
 		
 		gsc_manager_trigger_event (self->priv->manager,
-					   GSC_TRIGGER_AUTOWORDS_NAME,
-					   self);
+					   GSC_TRIGGER_AUTOWORDS_NAME);
 	}
 	else
 	{

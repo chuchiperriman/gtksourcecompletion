@@ -111,9 +111,9 @@ void		 gsc_manager_deactivate			(GscManager *self);
 
 void		 gsc_manager_finish_completion		(GscManager *self);
 
+/*FIXME Change to trigger_completion*/
 void		 gsc_manager_trigger_event		(GscManager *self,
-							 const gchar *trigger_name, 
-							 gpointer event_data);
+							 const gchar *trigger_name);
 
 void		 gsc_manager_set_current_info		(GscManager *self,
 							 gchar *info);

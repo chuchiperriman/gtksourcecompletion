@@ -719,7 +719,6 @@ gsc_manager_get_view (GscManager *self)
  * gsc_manager_trigger_event:
  * @self: the #GscManager
  * @trigger_name: The event name to raise
- * @event_data: This object will be passed to the providers to give them some special information of the event
  *
  * Calling this function, the completion call to all providers to get data and, if 
  * they return data, it shows the completion to the user. 
@@ -727,8 +726,7 @@ gsc_manager_get_view (GscManager *self)
  **/
 void
 gsc_manager_trigger_event (GscManager *self, 
-			   const gchar *trigger_name,
-			   gpointer event_data)
+			   const gchar *trigger_name)
 {
 	GList* data_list;
 	GList* original_list;
