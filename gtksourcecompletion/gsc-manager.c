@@ -1199,10 +1199,10 @@ gsc_manager_filter_current_proposals (GscManager *self,
 	{
 		end_completion (self);
 	}
-	else
+	/*else
 	{
 		gsc_popup_select_first(self->priv->popup);
-	}
+	}*/
 }
 
 

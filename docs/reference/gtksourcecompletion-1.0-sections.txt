@@ -248,6 +248,15 @@ GSC_POPUP_GET_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>proposal-template</FILE>
+GscProposal
+<SUBSECTION Standard>
+GSC_PROPOSAL_
+GSC_IS_PROPOSAL_
+GSC_TYPE_PROPOSAL_
+</SECTION>
+
+<SECTION>
 <FILE>gsc-utils</FILE>
 gsc_get_last_word_and_iter
 gsc_get_last_word
