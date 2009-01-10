@@ -24,8 +24,6 @@ AC_PROG_INSTALL
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-AC_CONFIG_MACRO_DIR(m4)
-
 dnl Checks for libraries.
 
 ############i18n support###############
@@ -66,7 +64,6 @@ AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 AC_OUTPUT([
 Makefile
 gtksourcecompletion-1.0.pc
-gtksourcecompletion.lsm
 gtksourcecompletion.spec
 gtksourcecompletion/Makefile
 test/Makefile
