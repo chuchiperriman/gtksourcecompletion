@@ -3,6 +3,30 @@
 	* gtksourcecompletion/gsc-manager.c:
 	Not select the first proposal when filter
 
+2009-01-10  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* acinclude.m4:
+	* config.guess:
+	* config.h.in:
+	* config.sub:
+	* getopt.c:
+	* getopt.h:
+	* getopt1.c:
+	* gpl.texinfo:
+	* gtksourcecompletion.1:
+	* gtksourcecompletion.c:
+	* gtksourcecompletion.lsm.in:
+	* gtksourcecompletion.texinfo:
+	* ignore.list:
+	* intltool-extract.in:
+	* intltool-merge.in:
+	* intltool-update.in
+	* m4/*
+	* xmalloc.c:
+	* xmalloc.h:
+	Removed useless files. Perriman if I screwed something
+	you can always blame me. :)
+
 2009-01-09  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:
