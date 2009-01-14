@@ -1137,25 +1137,6 @@ gsc_manager_get_active_trigger (GscManager *self)
 }
 
 /*
- * FIXME: Use const gchar * and allocate the memory
- * Remove this function. We use gsc_proposal_get_info
- */
-/**
- * gsc_manager_set_current_info:
- * @self: The #GscManager
- * @info: Info markup to be shown into for current proposal.
- *
- * You can use this function when a GscProposal emit the 
- * display-info signal to set the current info.
- */
-void
-gsc_manager_set_current_info (GscManager *self,
-			      gchar *info)
-{
-	gsc_popup_set_current_info (self->priv->popup, info);
-}
-
-/*
  * FIXME rename to get_popup_window ?
  * I think this function will be removed
  */

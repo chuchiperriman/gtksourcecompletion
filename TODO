@@ -20,6 +20,9 @@ TODO (last update: 2008-12-14)
 [X] Add filter function to gsc-manager to filter the current proposals
 [ ] Rename gsc-documentwords-provider to GscProviderTextViewWords
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
+[ ] Add gsc_manager_is_info_visible
+[ ] Add gsc_manager_set_info_visible
+[ ] Set Gsc-Info text position on top-left
 
 GscInfo:
 ----------------

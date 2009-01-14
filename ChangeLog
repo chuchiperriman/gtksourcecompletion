@@ -1,3 +1,11 @@
+2009-01-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-manager[ch]:
+	Removed gsc_manager_set_current_info function
+	Added some FIXME
+	* TODO:
+	Added some tasks
+
 2009-01-10  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:

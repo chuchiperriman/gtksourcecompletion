@@ -81,6 +81,7 @@ GscManager	*gsc_manager_new			(GtkTextView *view);
 
 GtkTextView	*gsc_manager_get_view			(GscManager *self);
 
+/* FIXME Change to is_popup_visible */
 gboolean	 gsc_manager_is_visible			(GscManager *self);
 
 gboolean	 gsc_manager_register_provider		(GscManager *self,
@@ -115,9 +116,6 @@ void		 gsc_manager_finish_completion		(GscManager *self);
 void		 gsc_manager_trigger_event		(GscManager *self,
 							 const gchar *trigger_name);
 
-void		 gsc_manager_set_current_info		(GscManager *self,
-							 gchar *info);
-
 void		 gsc_manager_set_key			(GscManager *self,
 							 KeysType type,
 							 const gchar* keys);
@@ -125,14 +123,17 @@ void		 gsc_manager_set_key			(GscManager *self,
 gchar 		*gsc_manager_get_key			(GscManager *self,
 							 KeysType type);
 
+/*FIXME I think this function will be removed*/
 gboolean	 gsc_manager_manage_key			(GscManager *self,
 							 GdkEventKey *event);
 
+/*FIXME I think this function will be removed but I need it for testing*/
 GtkWidget	*gsc_manager_get_widget			(GscManager *self);
 
 void		 gsc_manager_filter_current_proposals	(GscManager *self,
 							 GscManagerFilterVisibleFunc func,
 							 gpointer user_data);
+
 
 G_END_DECLS
 
