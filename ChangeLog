@@ -2,8 +2,14 @@
 
 	* gtksourcecompletion/gsc-manager.c:
 	Added "completion-finished" and "completion-started" signals.
-	Cleaned some external signals names
-	Fixed focus out bug
+	Cleaned some external signals names.
+	Fixed focus out bug.
+	Added gsc_manager_info_set_visible function to change the info window
+	visibility.
+	Added "info-visible" to get and change the info window visibility
+	* gtksourcecompletion/gsc-popup-priv.h: 
+	Created an external header to be used with the gsc-manager. With this
+	new header is easier and cleaner manage the popup into the manager.
 
 2009-01-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 

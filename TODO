@@ -9,8 +9,10 @@ TODO (last update: 2008-12-14)
 [ ] Rename gsc-documentwords-provider to GscProviderTextViewWords and move out 
     of the library (to the test package and the gedit plugin)
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
-[ ] Add "info-visible" property to get the info popup status or change it
 [ ] Set Gsc-Info text position on middle-left
 [ ] When autoselect a proposal, select the new inserted text in the view
 [ ] Support to change the default info widget 
+[ ] If completion is shown and info window is shown, when the completion popup
+    changes its position, the info window position is not updated
+[X] Add "info-visible" property to get the info popup status or change it
 [X] Close completion when the window lost the focus

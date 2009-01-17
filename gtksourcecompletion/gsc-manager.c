@@ -24,6 +24,7 @@
 #include "gsc-i18n.h"
 #include "gsc-proposal.h"
 #include "gsc-utils.h"
+#include "gsc-popup-priv.h"
 
 static gboolean lib_initialized = FALSE;
 
@@ -192,6 +193,22 @@ popup_hide_cb (GtkWidget *widget,
 }
 
 static void
+info_show_cb (GtkWidget *widget,
+	       gpointer user_data)
+{
+	GscManager *self = GSC_MANAGER (user_data);
+	gsc_manager_info_set_visible (self, TRUE);
+}
+
+static void
+info_hide_cb (GtkWidget *widget,
+	       gpointer user_data)
+{
+	GscManager *self = GSC_MANAGER (user_data);
+	gsc_manager_info_set_visible (self, FALSE);
+}
+
+static void
 view_destroy_event_cb (GtkWidget *widget,
 		       gpointer user_data)
 {
@@ -266,7 +283,10 @@ gsc_manager_set_property (GObject      *object,
 		case PROP_AUTOSELECT:
 			self->priv->autoselect = g_value_get_boolean (value);
 			break;
-		/*FIXME Add info-visible property control*/
+		case PROP_INFO_VISIBLE:
+			gsc_manager_info_set_visible (self,
+						      g_value_get_boolean (value));
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -300,7 +320,10 @@ gsc_manager_get_property (GObject    *object,
 		case PROP_AUTOSELECT:
 			g_value_set_boolean (value, self->priv->autoselect);
 			break;
-		/*FIXME Add info-visible property control*/
+		case PROP_INFO_VISIBLE:
+			g_value_set_boolean (value, 
+					     GTK_WIDGET_VISIBLE (self->priv->popup->priv->info_window));
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -351,6 +374,16 @@ gsc_manager_init (GscManager *self)
 	g_signal_connect (self->priv->popup, 
 			  "hide",
 			  G_CALLBACK (popup_hide_cb),
+			  self);
+	
+	g_signal_connect (self->priv->popup->priv->info_window, 
+			  "hide",
+			  G_CALLBACK (info_hide_cb),
+			  self);
+	
+	g_signal_connect (self->priv->popup->priv->info_window, 
+			  "show",
+			  G_CALLBACK (info_show_cb),
 			  self);
 }
 
@@ -1248,10 +1281,38 @@ gsc_manager_filter_current_proposals (GscManager *self,
 	{
 		end_completion (self);
 	}
-	/*else
+}
+
+/**
+ * gsc_manager_info_set_visible:
+ * @self: the #GscManager
+ * @visible: TRUE if you want to show the info window or FALSE if you want to hide it.
+ *
+ * Show or hide the info window. You can use the "info-visible" property too.
+ * 
+ * Returns: TRUE if the info window state has been changed
+ **/
+gboolean
+gsc_manager_info_set_visible (GscManager *self, gboolean visible)
+{
+	gboolean ret = FALSE;
+	if (GTK_WIDGET_VISIBLE (self->priv->popup))
 	{
-		gsc_popup_select_first(self->priv->popup);
-	}*/
+		if (GTK_WIDGET_VISIBLE (self->priv->popup->priv->info_window) &&
+		    !visible)
+		{
+			_gsc_popup_info_hide (self->priv->popup);
+			ret = TRUE;
+		}
+	
+		if (!GTK_WIDGET_VISIBLE (self->priv->popup->priv->info_window) &&
+		    visible)
+		{
+			_gsc_popup_info_show (self->priv->popup);
+			ret = TRUE;
+		}
+	}
+	return ret;
 }
 
 

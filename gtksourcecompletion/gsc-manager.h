@@ -134,6 +134,8 @@ void		 gsc_manager_filter_current_proposals	(GscManager *self,
 							 GscManagerFilterVisibleFunc func,
 							 gpointer user_data);
 
+gboolean	 gsc_manager_info_set_visible		(GscManager *self,
+							 gboolean visible);
 
 G_END_DECLS
 

@@ -256,6 +256,14 @@ key_press(GtkWidget   *widget,
 					  NULL);
 		return TRUE;
 	}
+	else if (event->keyval == GDK_F10)
+	{
+		//gsc_manager_info_set_visible (comp, TRUE);
+		gboolean vis;
+		g_object_get (comp, "info-visible", &vis, NULL);
+		g_object_set (comp,"info-visible", !vis,NULL);
+		return TRUE;
+	}
 	
 	return FALSE;
 }

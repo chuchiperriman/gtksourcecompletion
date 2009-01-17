@@ -19,11 +19,12 @@
  */
 
 #include <gdk/gdkkeysyms.h> 
-#include "gsc-popup.h"
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
 #include "gsc-info.h"
 #include "gsc-marshal.h"
+#include "gsc-popup.h"
+#include "gsc-popup-priv.h"
 #include <string.h>
 
 #define WINDOW_WIDTH 350
@@ -43,70 +44,12 @@ enum
 
 static guint popup_signals[LAST_SIGNAL] = { 0 };
 
-typedef struct _GscPopupPage
-{
-	gchar *name;
-	GtkWidget *view;
-} GscPopupPage;
-
-struct _GscPopupPriv
-{
-	GtkWidget *info_window;
-	GtkWidget *info_button;
-	GtkWidget *notebook;
-	GtkWidget *tab_label;
-	GtkWidget *next_page_button;
-	GtkWidget *prev_page_button;
-	GtkWidget *bottom_bar;
-	
-	GList *pages;
-	GscPopupPage *active_page;
-
-	gboolean destroy_has_run;
-};
-
 G_DEFINE_TYPE(GscPopup, gsc_popup, GTK_TYPE_WINDOW);
 
 static GscTree*
 get_current_tree (GscPopup *self)
 {
 	return GSC_TREE (self->priv->active_page->view);
-}
-
-static void
-info_show (GscPopup *self)
-{
-	GscProposal *proposal = NULL;
-	gint y, x, sw, sh;
-	
-	if (gsc_popup_get_selected_proposal (self, &proposal))
-	{
-		gboolean ret = TRUE;
-		g_signal_emit_by_name (self, "display-info", proposal, &ret);
-	}
-	
-	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
-	sw = gdk_screen_width ();
-	sh = gdk_screen_height ();
-	x += WINDOW_WIDTH;
-
-	if (x + WINDOW_WIDTH >= sw)
-	{
-		x -= (WINDOW_WIDTH * 2);
-	}
-	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
-	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
-				      gtk_window_get_transient_for (GTK_WINDOW (self)));
-	gtk_widget_show (self->priv->info_window);
-}
-
-static void
-info_hide (GscPopup *self)
-{
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-	{
-		gtk_widget_hide (self->priv->info_window);
-	}
 }
 
 static void
@@ -132,7 +75,7 @@ selection_changed_cd (GtkTreeSelection *selection,
 {
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
-		info_show (self);
+		_gsc_popup_info_show (self);
 	}
 }
 
@@ -213,11 +156,11 @@ info_toggled_cb (GtkToggleButton *widget,
 	
 	if (gtk_toggle_button_get_active (widget))
 	{
-		info_show (self);
+		_gsc_popup_info_show (self);
 	}
 	else
 	{
-		info_hide (self);
+		_gsc_popup_info_hide (self);
 	}
 }
 
@@ -321,7 +264,7 @@ gsc_popup_hide (GtkWidget *widget)
 	GscPopup *self = GSC_POPUP (widget);
 	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->hide (widget);
-	info_hide (self);
+	_gsc_popup_info_hide (self);
 }
 
 static void
@@ -569,6 +512,42 @@ gsc_popup_init (GscPopup *self)
 			  "delete-event",
 			  G_CALLBACK (gsc_popup_delete_event_cb),
 			  NULL);
+}
+
+void
+_gsc_popup_info_show (GscPopup *self)
+{
+	GscProposal *proposal = NULL;
+	gint y, x, sw, sh;
+	
+	if (gsc_popup_get_selected_proposal (self, &proposal))
+	{
+		gboolean ret = TRUE;
+		g_signal_emit_by_name (self, "display-info", proposal, &ret);
+	}
+	
+	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
+	sw = gdk_screen_width ();
+	sh = gdk_screen_height ();
+	x += WINDOW_WIDTH;
+
+	if (x + WINDOW_WIDTH >= sw)
+	{
+		x -= (WINDOW_WIDTH * 2);
+	}
+	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
+	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
+				      gtk_window_get_transient_for (GTK_WINDOW (self)));
+	gtk_widget_show (self->priv->info_window);
+}
+
+void
+_gsc_popup_info_hide (GscPopup *self)
+{
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+	{
+		gtk_widget_hide (self->priv->info_window);
+	}
 }
 
 /**
@@ -827,7 +806,7 @@ gsc_popup_page_next (GscPopup *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			info_show (self);
+			_gsc_popup_info_show (self);
 		}
 	}
 }
@@ -883,7 +862,7 @@ gsc_popup_page_previous (GscPopup *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			info_show (self);
+			_gsc_popup_info_show (self);
 		}
 	}
 }

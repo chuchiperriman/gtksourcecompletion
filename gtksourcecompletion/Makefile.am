@@ -15,39 +15,40 @@ AM_CFLAGS =\
 lib_LTLIBRARIES = \
 	libgtksourcecompletion-1.0.la
 
-BUILT_SOURCES =                         \
-        gsc-marshal.c                 \
+BUILT_SOURCES =		\
+        gsc-marshal.c	\
         gsc-marshal.h
 
 libgtksourcecompletion_headers = 	\
-	gsc-provider.h		\
-	gsc-trigger.h		\
-	gsc-utils.h		\
-	gsc-manager.h				\
+	gsc-provider.h			\
+	gsc-trigger.h			\
+	gsc-utils.h			\
+	gsc-manager.h			\
 	gsc-proposal.h			\
-	gsc-trigger-customkey.h	\
-	gsc-trigger-autowords.h	\
-	gsc-documentwords-provider.h		\
-	gsc-tree.h				\
+	gsc-trigger-customkey.h		\
+	gsc-trigger-autowords.h		\
+	gsc-documentwords-provider.h	\
+	gsc-tree.h			\
 	gsc-i18n.h			\
-	gsc-popup.h		\
-	gsc-info.h		\
+	gsc-popup.h			\
+	gsc-popup-priv.h		\
+	gsc-info.h			\
 	gsc-provider-file.h
 
 libgtksourcecompletion_1_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
 	gsc-manager.c			\
-	gsc-provider.c		\
-	gsc-trigger.c		\
+	gsc-provider.c			\
+	gsc-trigger.c			\
 	gsc-utils.c			\
 	gsc-proposal.c			\
-	gsc-trigger-customkey.c	\
-	gsc-trigger-autowords.c	\
-	gsc-documentwords-provider.c		\
-	gsc-tree.c				\
-	gsc-popup.c				\
-	gsc-info.c				\
-	gsc-provider-file.c			\
+	gsc-trigger-customkey.c		\
+	gsc-trigger-autowords.c		\
+	gsc-documentwords-provider.c	\
+	gsc-tree.c			\
+	gsc-popup.c			\
+	gsc-info.c			\
+	gsc-provider-file.c		\
 	$(libgtksourcecompletion_headers)
 	
 
@@ -70,6 +71,7 @@ INST_H_FILES = \
 	gsc-tree.h			\
 	gsc-i18n.h			\
 	gsc-popup.h			\
+	gsc-popup-priv.h		\
 	gsc-info.h
 
 gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
