@@ -74,7 +74,7 @@ get_current_tree (GscPopup *self)
 }
 
 static void
-show_completion_info (GscPopup *self)
+info_show (GscPopup *self)
 {
 	GscProposal *proposal = NULL;
 	gint y, x, sw, sh;
@@ -101,6 +101,15 @@ show_completion_info (GscPopup *self)
 }
 
 static void
+info_hide (GscPopup *self)
+{
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+	{
+		gtk_widget_hide (self->priv->info_window);
+	}
+}
+
+static void
 row_activated_cb (GtkTreeView *tree_view,
 		  GtkTreePath *path,
 		  GtkTreeViewColumn *column,
@@ -123,7 +132,7 @@ selection_changed_cd (GtkTreeSelection *selection,
 {
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
-		show_completion_info (self);
+		info_show (self);
 	}
 }
 
@@ -204,11 +213,11 @@ info_toggled_cb (GtkToggleButton *widget,
 	
 	if (gtk_toggle_button_get_active (widget))
 	{
-		show_completion_info (self);
+		info_show (self);
 	}
 	else
 	{
-		gtk_widget_hide (self->priv->info_window);
+		info_hide (self);
 	}
 }
 
@@ -312,7 +321,7 @@ gsc_popup_hide (GtkWidget *widget)
 	GscPopup *self = GSC_POPUP (widget);
 	
 	GTK_WIDGET_CLASS (gsc_popup_parent_class)->hide (widget);
-	gtk_widget_hide (self->priv->info_window);
+	info_hide (self);
 }
 
 static void
@@ -408,6 +417,7 @@ gsc_popup_class_init (GscPopupClass *klass)
 			      1,
 			      GTK_TYPE_POINTER);
 	
+	/*FIXME Remove this signal and add toggled-info-visible signals*/
 	/**
 	 * GscPopup::display-info:
 	 * @popup: The #GscPopup who emits the signal
@@ -817,7 +827,7 @@ gsc_popup_page_next (GscPopup *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			show_completion_info (self);
+			info_show (self);
 		}
 	}
 }
@@ -873,7 +883,7 @@ gsc_popup_page_previous (GscPopup *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			show_completion_info (self);
+			info_show (self);
 		}
 	}
 }

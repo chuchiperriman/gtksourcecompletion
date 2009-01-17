@@ -159,6 +159,7 @@ gsc_info_init (GscInfo *self)
 
 	self->priv->label = gtk_label_new (NULL);
 	gtk_label_set_selectable (GTK_LABEL (self->priv->label), TRUE);
+	
 	gtk_widget_show (self->priv->label);
 
 	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),

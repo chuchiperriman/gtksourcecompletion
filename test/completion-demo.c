@@ -323,6 +323,18 @@ set_custom_keys(GscManager *comp)
 }
 
 static void
+comp_started (GscManager *comp, gpointer user_data)
+{
+	g_debug ("Started");
+}
+
+static void
+comp_finished (GscManager *comp, gpointer user_data)
+{
+	g_debug ("finished");
+}
+
+static void
 create_completion(void)
 {
 	GscDocumentwordsProvider *prov = gsc_documentwords_provider_new(GTK_TEXT_VIEW(view));
@@ -339,6 +351,10 @@ create_completion(void)
 		      "autoselect", TRUE,
 		      NULL);
 	set_custom_keys(comp);
+	g_signal_connect(comp,"completion-started",G_CALLBACK(comp_started),NULL);
+	g_signal_connect(comp,"completion-finished",G_CALLBACK(comp_finished),NULL);
+	
+	
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
 	g_object_set (ac_trigger,

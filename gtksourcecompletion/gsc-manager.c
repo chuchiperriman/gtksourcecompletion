@@ -33,18 +33,25 @@ static gboolean lib_initialized = FALSE;
 
 #define GSC_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_MANAGER, GscManagerPrivate))
 
-/*
- * FIXME: I do not like this names. Maybe without the IS_GET_TEXT prefix?
- */
-/* Internal signals */
+/* External signals */
 enum
 {
-	IS_GTK_TEXT_VIEW_KP,
-	IS_GTK_TEXT_DESTROY,
-	IS_GTK_TEXT_FOCUS_OUT,
-	IS_GTK_TEXT_BUTTON_PRESS,
+	TEXT_VIEW_KP,
+	TEXT_VIEW_DESTROY,
+	TEXT_VIEW_FOCUS_OUT,
+	TEXT_VIEW_BUTTON_PRESS,
+	LAST_EXTERNAL_SIGNAL
+};
+
+/* Manager signals */
+enum
+{
+	COMP_STARTED,
+	COMP_FINISHED,
 	LAST_SIGNAL
 };
+
+static guint signals[LAST_SIGNAL] = { 0 };
 
 /* Properties */
 enum {
@@ -52,7 +59,8 @@ enum {
 	PROP_INFO_KEYS,
 	PROP_NEXT_PAGE_KEYS,
 	PROP_PREV_PAGE_KEYS,
-	PROP_AUTOSELECT
+	PROP_AUTOSELECT,
+	PROP_INFO_VISIBLE
 };
 
 typedef struct 
@@ -72,7 +80,7 @@ struct _GscManagerPrivate
 	GHashTable *trig_prov;
 	GList *providers;
 	
-	gulong internal_signal_ids[LAST_SIGNAL];
+	gulong internal_signal_ids[LAST_EXTERNAL_SIGNAL];
 	gboolean active;
 	gboolean autoselect;
 	
@@ -143,6 +151,10 @@ end_completion (GscManager *self)
 	if (GTK_WIDGET_VISIBLE (self->priv->popup))
 	{
 		gtk_widget_hide (GTK_WIDGET (self->priv->popup));
+		/*
+		* We are connected to the hide signal too. Then end_completion 
+		* will be called again but the popup will not be visible
+		*/
 	}
 	else
 	{
@@ -154,6 +166,8 @@ end_completion (GscManager *self)
 		}
 		
 		self->priv->active_trigger = NULL;
+		
+		g_signal_emit (G_OBJECT (self), signals[COMP_FINISHED], 0);
 	}
 }
 
@@ -252,6 +266,7 @@ gsc_manager_set_property (GObject      *object,
 		case PROP_AUTOSELECT:
 			self->priv->autoselect = g_value_get_boolean (value);
 			break;
+		/*FIXME Add info-visible property control*/
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -285,6 +300,7 @@ gsc_manager_get_property (GObject    *object,
 		case PROP_AUTOSELECT:
 			g_value_set_boolean (value, self->priv->autoselect);
 			break;
+		/*FIXME Add info-visible property control*/
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -322,7 +338,7 @@ gsc_manager_init (GscManager *self)
 
 	self->priv->popup = GSC_POPUP (gsc_popup_new ());
 	
-	for (i = 0; i < LAST_SIGNAL; i++)
+	for (i = 0; i < LAST_EXTERNAL_SIGNAL; i++)
 	{
 		self->priv->internal_signal_ids[i] = 0;
 	}
@@ -428,6 +444,55 @@ gsc_manager_class_init (GscManagerClass *klass)
 							      _("Autoselects the proposal if there is only one"),
 							      FALSE,
 							      G_PARAM_READWRITE));
+	/**
+	 * GscManager:info-visible:
+	 *
+	 * You can show the info window by setting the property to TRUE.
+	 * If you read this property you can get the current status of the
+	 * info window.
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_INFO_VISIBLE,
+					 g_param_spec_boolean ("info-visible",
+							      _("Whether the info window is visible"),
+							      _("Whether the info window is visible"),
+							      FALSE,
+							      G_PARAM_READWRITE));
+	
+	/* Signals */
+	/**
+	 * GscManager::completion-started:
+	 * @manager: The #GscManager who emits the signal
+	 *
+	 * When the completion has started
+	 **/
+	signals[COMP_STARTED] =
+		g_signal_new ("completion-started",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+			      0,
+			      NULL, 
+			      NULL,
+			      g_cclosure_marshal_VOID__VOID, 
+			      G_TYPE_NONE,
+			      0);
+	
+	/**
+	 * GscManager::completion-finished:
+	 * @manager: The #GscManager who emits the signal
+	 *
+	 * When the completion has finished
+	 **/
+	signals[COMP_FINISHED] =
+		g_signal_new ("completion-finished",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+			      0,
+			      NULL, 
+			      NULL,
+			      g_cclosure_marshal_VOID__VOID, 
+			      G_TYPE_NONE,
+			      0);
 
 	g_type_class_add_private (object_class, sizeof (GscManagerPrivate));
 }
@@ -838,6 +903,9 @@ gsc_manager_trigger_event (GscManager *self,
 							   &x, &y, NULL);
 			gtk_window_move (GTK_WINDOW (self->priv->popup),
 					 x, y);
+			
+			g_signal_emit (G_OBJECT (self), signals[COMP_STARTED], 0);
+			
 			gsc_popup_show_or_update (GTK_WIDGET (self->priv->popup));
 
 			/*Set the focus to the View, not the completion popup*/
@@ -1032,22 +1100,22 @@ gsc_manager_activate (GscManager *self)
 
 	g_return_if_fail (GSC_MANAGER (self));
 
-	self->priv->internal_signal_ids[IS_GTK_TEXT_VIEW_KP] = 
+	self->priv->internal_signal_ids[TEXT_VIEW_KP] = 
 			g_signal_connect (self->priv->text_view,
 					  "key-press-event",
 					  G_CALLBACK (view_key_press_event_cb),
 					  self);
-	self->priv->internal_signal_ids[IS_GTK_TEXT_DESTROY] = 
+	self->priv->internal_signal_ids[TEXT_VIEW_DESTROY] = 
 			g_signal_connect (self->priv->text_view,
 					  "destroy",
 					  G_CALLBACK (view_destroy_event_cb),
 					  self);
-	self->priv->internal_signal_ids[IS_GTK_TEXT_FOCUS_OUT] = 
+	self->priv->internal_signal_ids[TEXT_VIEW_FOCUS_OUT] = 
 			g_signal_connect (self->priv->text_view,
 					  "focus-out-event",
 					  G_CALLBACK (view_focus_out_event_cb),
 					  self);
-	self->priv->internal_signal_ids[IS_GTK_TEXT_BUTTON_PRESS] = 
+	self->priv->internal_signal_ids[TEXT_VIEW_BUTTON_PRESS] = 
 			g_signal_connect (self->priv->text_view,
 					  "button-press-event",
 					  G_CALLBACK (view_button_press_event_cb),
@@ -1080,7 +1148,7 @@ gsc_manager_deactivate (GscManager *self)
 	
 	g_return_if_fail (GSC_MANAGER (self));
 	
-	for (i = 0; i < LAST_SIGNAL; i++)
+	for (i = 0; i < LAST_EXTERNAL_SIGNAL; i++)
 	{
 		if (g_signal_handler_is_connected (self->priv->text_view, 
 						   self->priv->internal_signal_ids[i]))
