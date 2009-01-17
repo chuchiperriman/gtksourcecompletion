@@ -13,4 +13,4 @@ TODO (last update: 2008-12-14)
 [ ] Set Gsc-Info text position on middle-left
 [ ] When autoselect a proposal, select the new inserted text in the view
 [ ] Support to change the default info widget 
-[ ] Close completion when the window lost the focus
+[X] Close completion when the window lost the focus

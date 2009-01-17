@@ -3,6 +3,7 @@
 	* gtksourcecompletion/gsc-manager.c:
 	Added "completion-finished" and "completion-started" signals.
 	Cleaned some external signals names
+	Fixed focus out bug
 
 2009-01-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 

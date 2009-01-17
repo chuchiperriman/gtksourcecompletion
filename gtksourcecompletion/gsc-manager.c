@@ -208,7 +208,7 @@ view_focus_out_event_cb (GtkWidget *widget,
 	GscManager *self = GSC_MANAGER (user_data);
 	
 	if (gsc_manager_is_visible (self)
-	    && GTK_WIDGET_HAS_FOCUS (self->priv->popup))
+	    && !GTK_WIDGET_HAS_FOCUS (self->priv->popup))
 		end_completion (self);
 	
 	return FALSE;
