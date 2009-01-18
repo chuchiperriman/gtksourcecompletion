@@ -299,6 +299,20 @@ free_page (gpointer data,
 	g_slice_free (GscPopupPage, page);
 }
 
+static gboolean
+gsc_popup_configure_event (GtkWidget *widget,
+			   GdkEventConfigure *event)
+{
+	gboolean ret;
+	GscPopup *self = GSC_POPUP (widget);
+	ret = GTK_WIDGET_CLASS (gsc_popup_parent_class)->configure_event (widget, event);
+	
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window) )
+		_gsc_popup_info_show (self);
+	
+	return ret;
+}
+
 static void
 gsc_popup_finalize (GObject *object)
 {
@@ -339,6 +353,7 @@ gsc_popup_class_init (GscPopupClass *klass)
 	widget_class->show = gsc_popup_show_or_update;
 	widget_class->hide = gsc_popup_hide;
 	widget_class->realize = gsc_popup_realize;
+	widget_class->configure_event = gsc_popup_configure_event;
 	klass->display_info = gsc_popup_display_info_default;
 	
 	/**

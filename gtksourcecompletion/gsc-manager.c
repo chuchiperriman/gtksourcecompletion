@@ -820,9 +820,11 @@ gsc_manager_get_view (GscManager *self)
  *
  * Calling this function, the completion call to all providers to get data and, if 
  * they return data, it shows the completion to the user. 
+ *
+ * Returns: TRUE if the event has been triggered, FALSE if not
  * 
  **/
-void
+gboolean 
 gsc_manager_trigger_event (GscManager *self, 
 			   const gchar *trigger_name)
 {
@@ -836,26 +838,28 @@ gsc_manager_trigger_event (GscManager *self,
 	GscProposal *last_proposal = NULL;
 	ProviderList *pl;
 
-	g_return_if_fail (GSC_IS_MANAGER (self));
+	g_return_val_if_fail (GSC_IS_MANAGER (self), FALSE);
 
 	trigger = gsc_manager_get_trigger (self, trigger_name);
-	g_return_if_fail (trigger != NULL);
+	
+	g_return_val_if_fail (trigger != NULL, FALSE);
 	
 	/*
 	 * If the completion is visble and there is a trigger active, you cannot
-	 * raise a different trigger until the current trigger finish
+	 * raise a different trigger until the current trigger finish o_O
 	 */
 	if (gsc_manager_is_visible (self)
 	    && self->priv->active_trigger != trigger)
 	{
-		return;
+		return FALSE;
 	}
 	
+	/*FIXME End the current completion if there is active*/
 	gsc_popup_clear (self->priv->popup);
 	
 	pl = g_hash_table_lookup (self->priv->trig_prov, trigger_name);
 	if (pl == NULL)
-		return;
+		return FALSE;
 	
 	/*providers_list = self->priv->providers;*/
 	providers_list = pl->prov_list;
@@ -865,7 +869,7 @@ gsc_manager_trigger_event (GscManager *self,
 		if (gsc_manager_is_visible (self))
 			end_completion (self);
 		
-		return;
+		return FALSE;
 	}
 	
 	/*Getting the data...*/
@@ -892,7 +896,7 @@ gsc_manager_trigger_event (GscManager *self,
 		if (gsc_manager_is_visible (self))
 			end_completion (self);
 			
-		return;
+		return FALSE;
 	}
 	
 	data_list = final_list;
@@ -924,7 +928,7 @@ gsc_manager_trigger_event (GscManager *self,
 		if (!selected)
 		{
 			if (!GTK_WIDGET_HAS_FOCUS (self->priv->text_view))
-				return;
+				return FALSE;
 			
 			/*
 			 *FIXME Do it supports only cursor position? We can 
@@ -949,11 +953,15 @@ gsc_manager_trigger_event (GscManager *self,
 
 			self->priv->active_trigger = trigger;
 		}
+		
 	}
 	else if (GTK_WIDGET_VISIBLE (self->priv->popup))
 	{
 		end_completion (self);
+		return FALSE;
 	}
+	
+	return TRUE;
 }
 
 /**

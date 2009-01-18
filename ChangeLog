@@ -1,3 +1,12 @@
+2009-01-18  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-manager.[ch]:
+	gsc_manager_trigger_event returns TRUE if the event has been
+	triggered, FALSE if not.
+	* gtksourcecompletion/gsc-popup.c:
+	Controls if the popup window change its position, update the info
+	window position too.
+
 2009-01-17  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.c:
