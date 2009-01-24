@@ -1,3 +1,8 @@
+2009-01-24  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion: Changed to 2.0 version because we will change a
+	lot of APIs 
+
 2009-01-18  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-manager.[ch]:

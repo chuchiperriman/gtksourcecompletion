@@ -77,11 +77,12 @@ GscManager	*gsc_manager_get_from_view		(GtkTextView *view);
 
 /* ************************************************************* */
 
+/*FIXME Remove*/
 GscManager	*gsc_manager_new			(GtkTextView *view);
 
 GtkTextView	*gsc_manager_get_view			(GscManager *self);
 
-/* FIXME Change to is_popup_visible */
+/*FIXME Remove*/
 gboolean	 gsc_manager_is_visible			(GscManager *self);
 
 gboolean	 gsc_manager_register_provider		(GscManager *self,
@@ -106,8 +107,9 @@ GscTrigger	*gsc_manager_get_trigger		(GscManager *self,
 
 GscTrigger	*gsc_manager_get_active_trigger		(GscManager *self);
 
+/*FIXME Remove (goes to the view)*/
 void		 gsc_manager_activate			(GscManager *self);
-
+/*FIXME Remove (goes to the view)*/
 void		 gsc_manager_deactivate			(GscManager *self);
 
 void		 gsc_manager_finish_completion		(GscManager *self);
@@ -115,25 +117,27 @@ void		 gsc_manager_finish_completion		(GscManager *self);
 /*FIXME Change to trigger_completion*/
 gboolean	 gsc_manager_trigger_event		(GscManager *self,
 							 const gchar *trigger_name);
-
+/*FIXME Remove*/
 void		 gsc_manager_set_key			(GscManager *self,
 							 KeysType type,
 							 const gchar* keys);
-
+/*FIXME Remove*/
 gchar 		*gsc_manager_get_key			(GscManager *self,
 							 KeysType type);
+/*FIXME Adds new function-property "manage-completion-keys"*/
 
-/*FIXME I think this function will be removed*/
+/*FIXME Remove*/
 gboolean	 gsc_manager_manage_key			(GscManager *self,
 							 GdkEventKey *event);
 
-/*FIXME I think this function will be removed but I need it for testing*/
+/*FIXME Remove*/
 GtkWidget	*gsc_manager_get_widget			(GscManager *self);
 
 void		 gsc_manager_filter_current_proposals	(GscManager *self,
 							 GscManagerFilterVisibleFunc func,
 							 gpointer user_data);
 
+/*FIXME Remove*/
 gboolean	 gsc_manager_info_set_visible		(GscManager *self,
 							 gboolean visible);
 

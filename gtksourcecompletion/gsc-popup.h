@@ -73,48 +73,62 @@ GType		 gsc_popup_get_type			(void) G_GNUC_CONST;
 
 GtkWidget	*gsc_popup_new				(void);
 
+/*FIXME Remove*/
 void		 gsc_popup_add_data			(GscPopup *self,
 							 GscProposal *data);
 
+/*FIXME Remove or private*/
 void		 gsc_popup_clear			(GscPopup *self);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_select_first			(GscPopup *self);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_select_last			(GscPopup *self);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_select_previous		(GscPopup *self, 
 							 gint rows);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_select_next			(GscPopup *self, 
 							 gint rows);
 
 gboolean	 gsc_popup_get_selected_proposal	(GscPopup *self,
 							 GscProposal **proposal);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_select_current_proposal	(GscPopup *self);
 
+/*FIXME Remove or private*/
 gboolean	 gsc_popup_has_proposals		(GscPopup *self);
 
+/*FIXME Remove or private*/
 void		 gsc_popup_toggle_proposal_info		(GscPopup *self);
 
+/*FIXME Remove or private*/
 void		 gsc_popup_page_next			(GscPopup *self);
-
+/*FIXME Remove or private*/
 void		 gsc_popup_page_previous		(GscPopup *self);
-
+/*FIXME Remove (you can get the info and set the text)*/
 void		 gsc_popup_set_current_info		(GscPopup *self,
 							 const gchar *info);
-
+/*FIXME Remove*/
 gint		 gsc_popup_get_num_active_pages		(GscPopup *self);
-
+/*FIXME Remove*/
 void		 gsc_popup_show_or_update		(GtkWidget *widget);
 
+/*FIXME Remove*/
 void		 gsc_popup_bottom_bar_set_visible	(GscPopup *self,
 							 gboolean visible);
-
+/*FIXME Remove*/
 gboolean	 gsc_popup_bottom_bar_get_visible	(GscPopup *self);
+
+/*FIXME Add new get_bottom_bar*/
 
 gboolean	 gsc_popup_autoselect			(GscPopup *self);
 
+/*FIXME Change to set_filter_visible_func*/
 gboolean	 gsc_popup_filter_visible		(GscPopup *self,
 							 GscPopupFilterVisibleFunc func,
 							 gpointer user_data);

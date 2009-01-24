@@ -1,13 +1,17 @@
 SUBDIRS = gtksourcecompletion test pixmaps docs po 
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gtksourcecompletion-1.0.pc
+pkgconfig_DATA = gtksourcecompletion-2.0.pc
 
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 
-EXTRA_DIST=intltool-extract.in intltool-merge.in intltool-update.in
+EXTRA_DIST= \
+	intltool-extract.in	\
+	intltool-merge.in	\
+	intltool-update.in	\
+	gtksourcecompletion-2.0.pc.in
 
 DISTCLEANFILES = \
 	intltool-extract \

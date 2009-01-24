@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(gtksourcecompletion,0.6.0)
+AC_INIT(gtksourcecompletion,0.7.0)
 dnl Every other copy of the package version number gets its value from here
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
@@ -29,7 +29,7 @@ dnl Checks for libraries.
 ############i18n support###############
 AC_PROG_INTLTOOL([0.23])
 
-GETTEXT_PACKAGE=gtksourcecompletion
+GETTEXT_PACKAGE=gtksourcecompletion-2.0
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],["Descripcion"])
 
@@ -63,7 +63,7 @@ AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
 AC_OUTPUT([
 Makefile
-gtksourcecompletion-1.0.pc
+gtksourcecompletion-2.0.pc
 gtksourcecompletion.spec
 gtksourcecompletion/Makefile
 test/Makefile
