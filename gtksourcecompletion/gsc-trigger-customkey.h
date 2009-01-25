@@ -24,7 +24,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "gsc-trigger.h"
-#include "gsc-manager.h"
+#include "gsc-completion.h"
 
 G_BEGIN_DECLS
 
@@ -53,7 +53,7 @@ struct _GscTriggerCustomkeyClass
 
 GType			 gsc_trigger_customkey_get_type	(void) G_GNUC_CONST;
 
-GscTriggerCustomkey	*gsc_trigger_customkey_new	(GscManager *completion,
+GscTriggerCustomkey	*gsc_trigger_customkey_new	(GscCompletion *completion,
 							 const gchar *trigger_name,
 							 const gchar *keys);
 

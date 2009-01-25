@@ -1,3 +1,12 @@
+2009-01-25  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.[ch]:
+	Created new GscCompletion object. This will be the main object with
+	all the features of the old GscPopup and the old GscManager with a lot
+	of less functions and an easy use.
+	* gtksourcecompletion/providers:
+	Moved all providers to the test package
+
 2009-01-24  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion: Changed to 2.0 version because we will change a

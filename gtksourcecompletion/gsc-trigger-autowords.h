@@ -21,7 +21,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "gsc-trigger.h"
-#include "gsc-manager.h"
+#include "gsc-completion.h"
 
 G_BEGIN_DECLS
 
@@ -54,7 +54,7 @@ struct _GscTriggerAutowordsClass
 
 GType			 gsc_trigger_autowords_get_type		(void);
 
-GscTriggerAutowords	*gsc_trigger_autowords_new		(GscManager *completion);
+GscTriggerAutowords	*gsc_trigger_autowords_new		(GscCompletion *completion);
 
 void			 gsc_trigger_autowords_set_delay	(GscTriggerAutowords* trigger,
 								 guint delay);

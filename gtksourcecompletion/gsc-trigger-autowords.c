@@ -19,6 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <gtksourceview/gtksourceview.h>
+#include <gdk/gdkkeysyms.h>
 #include "gsc-utils.h"
 #include "gsc-trigger-autowords.h"
 #include "gsc-i18n.h"
@@ -40,7 +41,7 @@ enum
 	
 struct _GscTriggerAutowordsPrivate
 {
-	GscManager* manager;
+	GscCompletion* completion;
 	GtkTextView *view;
 	
 	gulong signals[LAST_SIGNAL];
@@ -102,18 +103,18 @@ autocompletion_raise_event (gpointer event)
 		g_free (self->priv->actual_word);
 		self->priv->actual_word = word;
 		
-		gsc_manager_trigger_event (self->priv->manager,
+		gsc_completion_trigger_event (self->priv->completion,
 					   GSC_TRIGGER_AUTOWORDS_NAME);
 	}
 	else
 	{
 		GscTrigger *active_trigger;
 		
-		active_trigger = gsc_manager_get_active_trigger (self->priv->manager);
+		active_trigger = gsc_completion_get_active_trigger (self->priv->completion);
 		if (active_trigger && strcmp (gsc_trigger_get_name (active_trigger),
 					      GSC_TRIGGER_AUTOWORDS_NAME) == 0)
 		{
-			gsc_manager_finish_completion (self->priv->manager);
+			gsc_completion_finish_completion (self->priv->completion);
 		}
 	}
 	return FALSE;
@@ -130,7 +131,7 @@ autocompletion_key_release_cb (GtkWidget *view,
 	if (GDK_BackSpace == keyval)
 	{
 		/* Only update the completion if the popup is visible */
-		if (gsc_manager_is_visible (self->priv->manager))
+		if (GTK_WIDGET_VISIBLE (self->priv->completion))
 		{
 			if (self->priv->source_id != 0)
 			{
@@ -313,7 +314,7 @@ gsc_trigger_autowords_class_init (GscTriggerAutowordsClass * klass)
 	object_class->finalize     = gsc_trigger_autowords_finalize;
 	
 	/**
-	 * GscManager:delay:
+	 * GscCompletion:delay:
 	 *
 	 * Sets the delay between the key pressed and the trigger event
 	 */
@@ -327,7 +328,7 @@ gsc_trigger_autowords_class_init (GscTriggerAutowordsClass * klass)
 							   DEFAULT_DELAY,
 							   G_PARAM_READWRITE));
 	/**
-	 * GscManager:min-len:
+	 * GscCompletion:min-len:
 	 *
 	 * Sets the minimum word length to be autocompleted
 	 */
@@ -352,21 +353,21 @@ gsc_trigger_autowords_iface_init (GscTriggerIface * iface)
 
 /**
  * gsc_trigger_autowords_new:
- * @manager: The #GscManager where the triggered will be used
+ * @completion: The #GscCompletion where the triggered will be used
  *
  * Returns: A new #GscTriggerAutowords
  */
 GscTriggerAutowords*
-gsc_trigger_autowords_new (GscManager *manager)
+gsc_trigger_autowords_new (GscCompletion *completion)
 {
 	GscTriggerAutowords *self;
 	
-	g_return_val_if_fail (GSC_IS_MANAGER (manager), NULL);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), NULL);
 	
 	self = GSC_TRIGGER_AUTOWORDS (g_object_new (GSC_TYPE_TRIGGER_AUTOWORDS, NULL));
 	
-	self->priv->manager = manager;
-	self->priv->view = gsc_manager_get_view (manager);
+	self->priv->completion = completion;
+	self->priv->view = gsc_completion_get_view (completion);
 	
 	return self;
 }

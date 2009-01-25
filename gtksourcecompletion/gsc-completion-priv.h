@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-popup-priv.h
+ *  gsc-completion-priv.h
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -17,24 +17,30 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GSC_POPUP_PRIV_H
-#define GSC_POPUP_PRIV_H
-
-/*
- * We need this private header to use it into the manager without publish
- * some fields and some functions to the user.
- */
+#ifndef GSC_COMPLETION_PRIV_H
+#define GSC_COMPLETION_PRIV_H
 
 G_BEGIN_DECLS
 
-typedef struct _GscPopupPage
+/* External signals */
+enum
+{
+	TEXT_VIEW_KP,
+	TEXT_VIEW_DESTROY,
+	TEXT_VIEW_FOCUS_OUT,
+	TEXT_VIEW_BUTTON_PRESS,
+	LAST_EXTERNAL_SIGNAL
+};
+
+typedef struct _GscCompletionPage
 {
 	gchar *name;
 	GtkWidget *view;
-} GscPopupPage;
+} GscCompletionPage;
 
-struct _GscPopupPriv
+struct _GscCompletionPriv
 {
+	/* Widget and popup variables*/
 	GtkWidget *info_window;
 	GtkWidget *info_button;
 	GtkWidget *notebook;
@@ -44,13 +50,22 @@ struct _GscPopupPriv
 	GtkWidget *bottom_bar;
 	
 	GList *pages;
-	GscPopupPage *active_page;
-
+	GscCompletionPage *active_page;
 	gboolean destroy_has_run;
+	
+	/* Completion management */
+	GtkTextView *view;
+	GList *triggers;
+	GList *prov_trig;
+	
+	/*TRUE if the completion mechanism is active*/
+	gboolean active;
+	gulong signals_ids[LAST_EXTERNAL_SIGNAL];
+	
 };
 
-void	_gsc_popup_info_hide	(GscPopup *self);
-void	_gsc_popup_info_show	(GscPopup *self);
+void	_gsc_completion_info_hide	(GscCompletion *self);
+void	_gsc_completion_info_show	(GscCompletion *self);
 
 G_END_DECLS
 
