@@ -47,6 +47,8 @@ enum
 {
 	ITEM_SELECTED,
 	DISPLAY_INFO,
+	COMP_STARTED,
+	COMP_FINISHED,
 	LAST_SIGNAL
 };
 
@@ -103,6 +105,34 @@ static GscTree*
 get_current_tree (GscCompletion *self)
 {
 	return GSC_TREE (self->priv->active_page->view);
+}
+
+static void
+end_completion (GscCompletion *self)
+{
+	if (GTK_WIDGET_VISIBLE (self))
+	{
+		gtk_widget_hide (GTK_WIDGET (self));
+		/*
+		* We are connected to the hide signal too. Then end_completion 
+		* will be called again but the popup will not be visible
+		*/
+	}
+	else
+	{
+		/*FIXME search all provider of the active trigger
+		GList *l;
+		
+		for (l = self->priv->providers; l != NULL; l = g_list_next (l))
+		{
+			gsc_provider_finish (GSC_PROVIDER (l->data));
+		}
+		*/
+		
+		self->priv->active_trigger = NULL;
+		
+		g_signal_emit (G_OBJECT (self), signals[COMP_FINISHED], 0);
+	}
 }
 
 static void
@@ -607,6 +637,7 @@ gsc_completion_class_init (GscCompletionClass *klass)
 			      G_TYPE_BOOLEAN,
 			      1,
 			      GTK_TYPE_POINTER);
+	/*FIXME Add the COMP_STARTED and COMP_FINISHED signals*/
 }
 
 static void
@@ -627,6 +658,7 @@ gsc_completion_init (GscCompletion *self)
 
 	self->priv = GSC_COMPLETION_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
+	self->priv->active_trigger = NULL;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -758,7 +790,7 @@ _gsc_completion_info_show (GscCompletion *self)
 	GscProposal *proposal = NULL;
 	gint y, x, sw, sh;
 	
-	if (gsc_completion_get_selected_proposal (self, &proposal))
+	if (gsc_tree_get_selected_proposal (get_current_tree (self), &proposal))
 	{
 		gboolean ret = TRUE;
 		g_signal_emit_by_name (self, "display-info", proposal, &ret);
@@ -803,17 +835,9 @@ gsc_completion_new (GtkTextView *view)
 	return GTK_WIDGET (self);
 }
 
-/**
- * gsc_completion_add_data:
- * @self: The #GscCompletion
- * @data: The #GscProposal to add.
- *
- * The completion frees the proposal when it will be cleaned.
- *
- */
-void
+static void
 gsc_completion_add_data (GscCompletion *self,
-		    GscProposal* data)
+			 GscProposal* data)
 {
 	GscTree *tree;
 	
@@ -892,24 +916,6 @@ gsc_completion_select_next (GscCompletion *self,
 }
 
 /**
- * gsc_completion_get_selected_proposal:
- * @self: The #GscCompletion
- *
- * See #gsc_tree_get_selected_proposal. Not free the proposal!
- *
- * Returns
- */
-gboolean
-gsc_completion_get_selected_proposal (GscCompletion *self,
-				 GscProposal **proposal)
-{
-	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
-
-	return gsc_tree_get_selected_proposal (get_current_tree (self),
-					       proposal);
-}
-
-/**
  * gsc_completion_select_current_proposal:
  * @self: The #GscCompletion
  * 
@@ -923,7 +929,7 @@ gsc_completion_select_current_proposal (GscCompletion *self)
 {
 	gboolean selected = FALSE;
 	GscProposal *prop = NULL;
-	if (gsc_completion_get_selected_proposal (self, &prop))
+	if (gsc_tree_get_selected_proposal (get_current_tree (self), &prop))
 	{
 		g_signal_emit (G_OBJECT (self), signals[ITEM_SELECTED],
 			       0, prop);
@@ -1034,15 +1040,7 @@ gsc_completion_bottom_bar_get_visible (GscCompletion *self)
 	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
 }
 
-/**
- * gsc_completion_autoselect:
- * @self: The #GscCompletion
- * 
- * Selects a proposal if there is only one proposal and one page.
- *
- * Returns: %TRUE if a proposal has been selected
- */
-gboolean
+static gboolean
 gsc_completion_autoselect (GscCompletion *self)
 {
 	GscTree *tree;
@@ -1077,7 +1075,7 @@ gsc_completion_autoselect (GscCompletion *self)
  */
 gboolean
 gsc_completion_filter_visible (GscCompletion *self,
-			  GscCompletionFilterVisibleFunc func,
+			  GscCompletionFilterFunc func,
 			  gpointer user_data)
 {
 	GList *l;
@@ -1251,6 +1249,163 @@ gsc_completion_unregister_provider (GscCompletion *self,
 	}
 		
 	return ret;
+}
+
+/**
+ * gsc_completion_get_active_trigger:
+ * @self: The #GscCompletion
+ *
+ * This function return the active trigger. The active trigger is the last
+ * trigger raised if the completion is active. If the completion is not visible then
+ * there is no an active trigger.
+ *
+ * Returns: The trigger or NULL if completion is not active
+ */
+GscTrigger*
+gsc_completion_get_active_trigger (GscCompletion *self)
+{
+	g_return_val_if_fail (GSC_COMPLETION (self), NULL);
+
+	return self->priv->active_trigger;
+}
+
+/*FIXME Doc*/
+GtkTextView*
+gsc_completion_get_view (GscCompletion *self)
+{
+	g_return_val_if_fail (GSC_COMPLETION (self), NULL);
+	
+	return self->priv->view;
+}
+
+/**
+ * gsc_completion_trigger_event:
+ * @self: the #GscCompletion
+ * @trigger: The trigger who trigger the event
+ *
+ * Calling this function, the completion call to all providers to get data and, if 
+ * they return data, it shows the completion to the user. 
+ *
+ * Returns: %TRUE if the event has been triggered, %FALSE if not
+ * 
+ **/
+gboolean 
+gsc_completion_trigger_event (GscCompletion *self, 
+			      GscTrigger *trigger)
+{
+	GList *l;
+	GList *data_list;
+	GList *final_list = NULL;
+	GscProposal *last_proposal = NULL;
+
+	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
+	g_return_val_if_fail (GSC_IS_TRIGGER (trigger), FALSE);
+	
+	/*
+	 * If the completion is visble and there is a trigger active, you cannot
+	 * raise a different trigger until the current trigger finish o_O
+	 */
+	if (GTK_WIDGET_VISIBLE (self)
+	    && self->priv->active_trigger != trigger)
+	{
+		return FALSE;
+	}
+	
+	/*FIXME End the current completion if there is active*/
+	gsc_completion_clear (self);
+	
+	for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
+	{
+		PTPair *ptp = (PTPair *)l->data;
+		
+		if (ptp->trigger == trigger)
+		{
+			data_list = gsc_provider_get_proposals (ptp->provider, 
+								trigger);
+			if (data_list != NULL)
+			{
+				final_list = g_list_concat (final_list,
+							    data_list);
+			}
+		}
+	}
+	
+	if (final_list == NULL)
+	{
+		if (GTK_WIDGET_VISIBLE (self))
+			end_completion (self);
+	}
+	
+	data_list = final_list;
+	/* Insert the data into the model */
+	do
+	{
+		last_proposal = GSC_PROPOSAL (data_list->data);
+		
+		gsc_completion_add_data (self,
+					 last_proposal);
+	} while ((data_list = g_list_next (data_list)) != NULL);
+	
+	g_list_free (final_list);
+	
+	gint x, y;
+	gboolean selected = FALSE;
+	GtkWindow *win;
+	
+	/*FIXME 
+	if (self->priv->autoselect)
+	{
+		selected = gsc_completion_autoselect (self);
+	}*/
+
+	if (!selected)
+	{
+		if (!GTK_WIDGET_HAS_FOCUS (self->priv->view))
+			return FALSE;
+		
+		/*
+		 *FIXME Do it supports only cursor position? We can 
+		 *add a new "position-type": cursor, center_screen,
+		 *center_window, custom etc.
+		 */
+		gsc_get_window_position_in_cursor (GTK_WINDOW (self),
+						   self->priv->view,
+						   &x, &y, NULL);
+
+		gtk_window_move (GTK_WINDOW (self),
+				 x, y);
+		
+		g_signal_emit (G_OBJECT (self), signals[COMP_STARTED], 0);
+		
+		gsc_completion_show_or_update (GTK_WIDGET (self));
+
+		/*Set the focus to the View, not the completion popup*/
+		win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->view),
+				  GTK_TYPE_WINDOW));
+		gtk_window_present (win);
+		gtk_widget_grab_focus (GTK_WIDGET (self->priv->view));
+
+		self->priv->active_trigger = trigger;
+	}
+	
+	return TRUE;
+}
+
+/**
+ * gsc_completion_finish_completion:
+ * @self: The #GscCompletion
+ *
+ * This function finish the completion if it is active (visible).
+ */
+void
+gsc_completion_finish_completion (GscCompletion *self)
+{
+	g_return_if_fail (GSC_COMPLETION (self));
+
+	if (GTK_WIDGET_VISIBLE (self))
+	{
+		end_completion (self);
+	}
 }
 
 

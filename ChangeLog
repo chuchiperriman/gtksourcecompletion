@@ -1,3 +1,9 @@
+2009-01-27  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.[ch]:
+	Added a lot of new functions to (un)register providers and triggers
+	and the trigger_event and finish completion
+
 2009-01-25  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.[ch]:

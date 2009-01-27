@@ -57,6 +57,7 @@ struct _GscCompletionPriv
 	GtkTextView *view;
 	GList *triggers;
 	GList *prov_trig;
+	GscTrigger *active_trigger;
 	
 	/*TRUE if the completion mechanism is active*/
 	gboolean active;

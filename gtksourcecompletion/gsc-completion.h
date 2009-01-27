@@ -32,16 +32,6 @@ G_BEGIN_DECLS
 #define USER_REQUEST_TRIGGER_NAME "user-request"
 
 /*
- * FIXME: Should be called something like GscCompletionKeysType
- */
-typedef enum {
-	KEYS_INFO,
-	KEYS_PAGE_NEXT,
-	KEYS_PAGE_PREV,
-	KEYS_LAST
-}KeysType;
-
-/*
  * Type checking and casting macros
  */
 #define GSC_TYPE_COMPLETION              (gsc_completion_get_type())
@@ -53,7 +43,7 @@ typedef enum {
 
 #define DEFAULT_PAGE "Default"
 
-typedef GscTreeFilterVisibleFunc GscCompletionFilterVisibleFunc;
+typedef GscTreeFilterVisibleFunc GscCompletionFilterFunc;
 
 typedef struct _GscCompletionPriv GscCompletionPriv;
 typedef struct _GscCompletion GscCompletion;
@@ -89,9 +79,6 @@ GType		 gsc_completion_get_type		(void) G_GNUC_CONST;
 
 GtkWidget	*gsc_completion_new			(GtkTextView *view);
 
-gboolean	 gsc_completion_get_selected_proposal	(GscCompletion *self,
-							 GscProposal **proposal);
-
 GtkTextView	*gsc_completion_get_view		(GscCompletion *self);
 
 gboolean	 gsc_completion_register_provider	(GscCompletion *self,
@@ -110,17 +97,19 @@ gboolean	 gsc_completion_unregister_trigger	(GscCompletion *self,
 
 GscTrigger	*gsc_completion_get_active_trigger	(GscCompletion *self);
 
-void		 gsc_completion_finish_completion	(GscCompletion *self);
-
+/*FIXME Perhaps we need pass a GscEvent object instead the trigger*/
 gboolean	 gsc_completion_trigger_event		(GscCompletion *self,
 							 GscTrigger *trigger);
 
+void		 gsc_completion_finish_completion	(GscCompletion *self);
+
 void		 gsc_completion_filter_proposals	(GscCompletion *self,
-							 GscCompletionFilterVisibleFunc func,
+							 GscCompletionFilterFunc func,
 							 gpointer user_data);
 
 /*FIXME Adds new function-property "manage-completion-keys"*/
 /*FIXME Add new get_bottom_bar*/
+/*FIXME Add new get_info_widget*/
 
 G_END_DECLS
 
