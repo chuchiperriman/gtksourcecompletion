@@ -65,7 +65,7 @@ view_key_press_event_cb (GtkWidget *view,
 		gdk_keyval_to_lower (event->keyval) == key)
 	{
 		gsc_completion_trigger_event (self->priv->completion,
-					   self->priv->trigger_name);
+					      GSC_TRIGGER (self));
 		return TRUE;
 	}
 	return FALSE;

@@ -33,19 +33,19 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
-#include <gtksourcecompletion/gsc-manager.h>
-#include <gtksourcecompletion/gsc-documentwords-provider.h>
+#include <gtksourcecompletion/gsc-completion.h>
 #include <gtksourcecompletion/gsc-trigger-customkey.h>
 #include <gtksourcecompletion/gsc-trigger-autowords.h>
-#include <gtksourcecompletion/gsc-provider-file.h>
 #include <gtksourcecompletion/gsc-info.h>
 #include <gtksourcecompletion/gsc-utils.h>
 
+#include "gsc-documentwords-provider.h"
+#include "gsc-provider-file.h"
 #include "gsc-provider-test.h"
 
 
 static GtkWidget *view;
-static GscManager *comp;
+static GscCompletion *comp;
 static GscInfo *info;
 static GtkWidget *custom = NULL;
 static GtkWidget *entry = NULL;
@@ -243,7 +243,7 @@ key_press(GtkWidget   *widget,
 		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
 			win = GTK_WIDGET (info);
 		else
-			win = gsc_manager_get_widget (comp);
+			win = GTK_WIDGET (comp);
 			
 		
 		focus_popup_widget (win, view);
@@ -251,7 +251,7 @@ key_press(GtkWidget   *widget,
 	}
 	else if (event->keyval == GDK_F9)
 	{
-		gsc_manager_filter_current_proposals (comp,
+		gsc_completion_filter_proposals (comp,
 					  filter_func,
 					  NULL);
 		return TRUE;
@@ -310,7 +310,7 @@ create_window (void)
 }
 
 static void
-set_custom_keys(GscManager *comp)
+set_custom_keys(GscCompletion *comp)
 {
 	if (change_keys)
 	{
@@ -331,13 +331,13 @@ set_custom_keys(GscManager *comp)
 }
 
 static void
-comp_started (GscManager *comp, gpointer user_data)
+comp_started (GscCompletion *comp, gpointer user_data)
 {
 	g_debug ("Started");
 }
 
 static void
-comp_finished (GscManager *comp, gpointer user_data)
+comp_finished (GscCompletion *comp, gpointer user_data)
 {
 	g_debug ("finished");
 }
@@ -353,14 +353,18 @@ create_completion(void)
 	GscProviderTest *prov_test = gsc_provider_test_new(GTK_TEXT_VIEW(view));
 	
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
-	comp = gsc_manager_new(GTK_TEXT_VIEW(view));
+	comp = GSC_COMPLETION(gsc_completion_new(GTK_TEXT_VIEW(view)));
 	
+	/*FIXME
 	g_object_set (comp,
 		      "autoselect", TRUE,
 		      NULL);
+	*/
 	set_custom_keys(comp);
+	/*FIXME
 	g_signal_connect(comp,"completion-started",G_CALLBACK(comp_started),NULL);
 	g_signal_connect(comp,"completion-finished",G_CALLBACK(comp_finished),NULL);
+	*/
 	
 	
 	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
@@ -370,15 +374,15 @@ create_completion(void)
 		      "min-len", 4,
 		      NULL);
 	
-	gsc_manager_register_trigger(comp,GSC_TRIGGER(ur_trigger));
-	gsc_manager_register_trigger(comp,GSC_TRIGGER(ac_trigger));
+	gsc_completion_register_trigger(comp,GSC_TRIGGER(ur_trigger));
+	gsc_completion_register_trigger(comp,GSC_TRIGGER(ac_trigger));
 	
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),gsc_trigger_get_name (GSC_TRIGGER (ac_trigger)));
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_test),gsc_trigger_get_name (GSC_TRIGGER (ac_trigger)));
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov),"User Request Trigger");
-	gsc_manager_register_provider(comp,GSC_PROVIDER(prov_file),"User Request Trigger");
+	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ac_trigger));
+	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_test),GSC_TRIGGER (ac_trigger));
+	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ur_trigger));
+	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_file),GSC_TRIGGER (ur_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_manager_activate(comp);
+	//gsc_manager_activate(comp);
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);

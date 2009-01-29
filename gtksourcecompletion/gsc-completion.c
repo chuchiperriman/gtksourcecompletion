@@ -659,6 +659,9 @@ gsc_completion_init (GscCompletion *self)
 	self->priv = GSC_COMPLETION_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->active_trigger = NULL;
+	
+	/*FIXME add active property or remove this field*/
+	self->priv->active = TRUE;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -1039,7 +1042,7 @@ gsc_completion_bottom_bar_get_visible (GscCompletion *self)
 
 	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
 }
-
+/*FIXME add this in a future
 static gboolean
 gsc_completion_autoselect (GscCompletion *self)
 {
@@ -1060,6 +1063,7 @@ gsc_completion_autoselect (GscCompletion *self)
 	
 	return FALSE;
 }
+*/
 
 /**
  * gsc_completion_filter_visible:
@@ -1156,8 +1160,8 @@ gsc_completion_register_provider (GscCompletion *self,
 	PTPair *ptp;
 	
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
-	g_return_val_if_fail (GSC_IS_PROVIDER (self), FALSE);
-	g_return_val_if_fail (GSC_IS_TRIGGER (self), FALSE);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), FALSE);
+	g_return_val_if_fail (GSC_IS_TRIGGER (trigger), FALSE);
 	g_return_val_if_fail (g_list_find (self->priv->triggers, trigger) != NULL,
 			      FALSE);
 
@@ -1403,6 +1407,47 @@ gsc_completion_finish_completion (GscCompletion *self)
 	g_return_if_fail (GSC_COMPLETION (self));
 
 	if (GTK_WIDGET_VISIBLE (self))
+	{
+		end_completion (self);
+	}
+}
+
+/**
+ * gsc_completion_filter_proposals:
+ * @self: the #GscCompletion
+ * @func: function to filter the proposals visibility
+ * @user_data: user data to pass to func
+ *
+ * This function call to @func for all proposal of all pages. @func must
+ * return %TRUE if the proposal is visible or %FALSE if the completion must to 
+ * hide the proposal.
+ * 
+ **/
+void
+gsc_completion_filter_proposals (GscCompletion *self,
+					 GscCompletionFilterFunc func,
+					 gpointer user_data)
+{
+	GList *l;
+	
+	g_return_if_fail (GSC_COMPLETION (self));
+	g_return_if_fail (func);
+	
+	if (!GTK_WIDGET_VISIBLE (self))
+		return;
+	
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
+	{
+		GscCompletionPage *page = (GscCompletionPage *)l->data;
+		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
+		{
+			gsc_tree_filter_visible (GSC_TREE (page->view),
+             					 (GscTreeFilterVisibleFunc) func,
+             					 user_data);
+		}
+	}
+  
+	if (!update_pages_visibility (self))
 	{
 		end_completion (self);
 	}

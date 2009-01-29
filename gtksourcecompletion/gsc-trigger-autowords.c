@@ -104,7 +104,7 @@ autocompletion_raise_event (gpointer event)
 		self->priv->actual_word = word;
 		
 		gsc_completion_trigger_event (self->priv->completion,
-					   GSC_TRIGGER_AUTOWORDS_NAME);
+					      GSC_TRIGGER (self));
 	}
 	else
 	{

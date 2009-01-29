@@ -1,4 +1,4 @@
-TODO (last update: 2008-12-14)
+TODO
 =================================
 
 [ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
@@ -6,13 +6,15 @@ TODO (last update: 2008-12-14)
 [ ] Support to set the focus on the popup and info windows.
 [ ] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
-[ ] Rename gsc-documentwords-provider to GscProviderTextViewWords and move out 
-    of the library (to the test package and the gedit plugin)
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
 [ ] Set Gsc-Info text position on middle-left
-[ ] When autoselect a proposal, select the new inserted text in the view
 [ ] Support to change the default completion info widget 
-[X] If completion is shown and info window is shown, when the completion popup
-    changes its position, the info window position is not updated
-[X] Add "info-visible" property to get the info popup status or change it
-[X] Close completion when the window lost the focus
+
+New manager TODO
+==================
+
+[ ] Add keys management 
+[ ] Control click on the view
+[ ] Add autoselect feature
+[ ] Remove or add completion-started and completion-finished signals
+[ ] Add display-info-request signal (using gsc_proposal_get_info by default)

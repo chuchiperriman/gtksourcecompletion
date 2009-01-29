@@ -21,7 +21,6 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "gsc-provider.h"
-#include "gsc-manager.h"
 
 G_BEGIN_DECLS
 
