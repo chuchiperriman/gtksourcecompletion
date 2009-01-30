@@ -45,7 +45,7 @@ typedef struct
 /* Signals */
 enum
 {
-	ITEM_SELECTED,
+	PROPOSAL_SELECTED,
 	DISPLAY_INFO,
 	COMP_STARTED,
 	COMP_FINISHED,
@@ -56,12 +56,12 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_TYPE(GscCompletion, gsc_completion, GTK_TYPE_WINDOW);
 
-/* **************** GtkTextView-GscManager Control *********** */
+/* **************** GtkTextView-GscCompletion Control *********** */
 
 /*
- * We save a map with a GtkTextView and his GscManager. If you 
+ * We save a map with a GtkTextView and his GscCompletion. If you 
  * call twice to gsc_proposal_new, the second time it returns
- * the previous created GscManager, not creates a new one
+ * the previous created GscCompletion, not creates a new one
  *
  * FIXME We will remove this functions when we will integrate 
  * Gsc in GtkSourceView
@@ -333,13 +333,15 @@ row_activated_cb (GtkTreeView *tree_view,
 {
 	GtkTreeModel *model;
 	GscProposal *proposal;
+	gboolean ret = TRUE;
 	
 	model = gtk_tree_view_get_model (tree_view);
 	
 	gsc_tree_get_selected_proposal (GSC_TREE (tree_view), &proposal);
-
-	g_signal_emit (G_OBJECT (user_data), signals[ITEM_SELECTED],
-		       0, proposal);
+	
+	
+	g_signal_emit (G_OBJECT (user_data), signals[PROPOSAL_SELECTED],
+		       0, proposal, &ret);
 }
 
 static void 
@@ -475,7 +477,7 @@ switch_page_cb (GtkNotebook *notebook,
 
 static gboolean
 gsc_completion_display_info_default (GscCompletion *self,
-				GscProposal *proposal)
+				     GscProposal *proposal)
 {
 	if (proposal)
 	{
@@ -485,6 +487,15 @@ gsc_completion_display_info_default (GscCompletion *self,
 		gsc_completion_set_current_info (self, info);
 	}
 	return FALSE;
+}
+
+static gboolean
+gsc_completion_proposal_selected_default (GscCompletion *self,
+					  GscProposal *proposal)
+{
+	gsc_proposal_apply (proposal, self->priv->view);
+	end_completion (self);
+	return TRUE;
 }
 
 static void
@@ -598,7 +609,7 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	widget_class->realize = gsc_completion_realize;
 	widget_class->configure_event = gsc_completion_configure_event;
 	klass->display_info = gsc_completion_display_info_default;
-	
+	klass->proposal_selected = gsc_completion_proposal_selected_default;
 	/**
 	 * GscCompletion::proposal-selected:
 	 * @completion: The #GscCompletion who emits the signal
@@ -606,15 +617,15 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	 *
 	 * When the user selects a proposal
 	 **/
-	signals[ITEM_SELECTED] =
+	signals[PROPOSAL_SELECTED] =
 		g_signal_new ("proposal-selected",
 			      G_TYPE_FROM_CLASS (klass),
-			      G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 			      G_STRUCT_OFFSET (GscCompletionClass, proposal_selected),
-			      NULL, 
+			      g_signal_accumulator_true_handled, 
 			      NULL,
-			      g_cclosure_marshal_VOID__POINTER, 
-			      G_TYPE_NONE,
+			      gtksourcecompletion_marshal_BOOLEAN__POINTER, 
+			      G_TYPE_BOOLEAN,
 			      1,
 			      GTK_TYPE_POINTER);
 	
@@ -660,8 +671,7 @@ gsc_completion_init (GscCompletion *self)
 	self->priv->destroy_has_run = FALSE;
 	self->priv->active_trigger = NULL;
 	
-	/*FIXME add active property or remove this field*/
-	self->priv->active = TRUE;
+	self->priv->active = FALSE;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -823,6 +833,57 @@ _gsc_completion_info_hide (GscCompletion *self)
 	}
 }
 
+static void
+view_destroy_event_cb (GtkWidget *widget,
+		       gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	g_object_unref (self);
+}
+
+static gboolean
+view_focus_out_event_cb (GtkWidget *widget,
+			 GdkEventFocus *event,
+			 gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	if (GTK_WIDGET_VISIBLE (self)
+	    && !GTK_WIDGET_HAS_FOCUS (self))
+		end_completion (self);
+	
+	return FALSE;
+}
+
+static gboolean
+view_button_press_event_cb (GtkWidget *widget,
+			    GdkEventButton *event,
+			    gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	if (GTK_WIDGET_VISIBLE (self))
+		end_completion (self);
+
+	return FALSE;
+}
+
+static gboolean
+view_key_press_event_cb (GtkWidget *view,
+			 GdkEventKey *event, 
+			 gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	/*FIXME 
+	if (gsc_manager_is_visible (self))
+		return gsc_manager_manage_key (self, event);
+	*/
+
+	return FALSE;
+}
+
 /**
  * gsc_completion_new:
  *
@@ -923,9 +984,10 @@ gsc_completion_select_next (GscCompletion *self,
  * @self: The #GscCompletion
  * 
  * Selects the current selected proposal if there is one selected. This function
- * emits the ITEM_SELECTED signal.
+ * emits the PROPOSAL_SELECTED signal.
  *
  * Returns: TRUE if a proposal has been selected.
+ * FIXME remove this function 
  */
 gboolean
 gsc_completion_select_current_proposal (GscCompletion *self)
@@ -934,7 +996,7 @@ gsc_completion_select_current_proposal (GscCompletion *self)
 	GscProposal *prop = NULL;
 	if (gsc_tree_get_selected_proposal (get_current_tree (self), &prop))
 	{
-		g_signal_emit (G_OBJECT (self), signals[ITEM_SELECTED],
+		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
 			       0, prop);
 		selected = TRUE;
 	}
@@ -946,6 +1008,7 @@ gsc_completion_select_current_proposal (GscCompletion *self)
  * @self: The #GscCompletion
  *
  * Returns TRUE if the completion has almost one element.
+ * FIXME remove this function 
  */
 gboolean
 gsc_completion_has_proposals (GscCompletion *self)
@@ -1076,6 +1139,7 @@ gsc_completion_autoselect (GscCompletion *self)
  * hide the proposal.
  *
  * Returns: %TRUE if the completion has visible proposals.
+ * FIXME There is a gsc_completion_filter_proposals.
  */
 gboolean
 gsc_completion_filter_visible (GscCompletion *self,
@@ -1268,7 +1332,7 @@ gsc_completion_unregister_provider (GscCompletion *self,
 GscTrigger*
 gsc_completion_get_active_trigger (GscCompletion *self)
 {
-	g_return_val_if_fail (GSC_COMPLETION (self), NULL);
+	g_return_val_if_fail (GSC_IS_COMPLETION (self), NULL);
 
 	return self->priv->active_trigger;
 }
@@ -1404,7 +1468,7 @@ gsc_completion_trigger_event (GscCompletion *self,
 void
 gsc_completion_finish_completion (GscCompletion *self)
 {
-	g_return_if_fail (GSC_COMPLETION (self));
+	g_return_if_fail (GSC_IS_COMPLETION (self));
 
 	if (GTK_WIDGET_VISIBLE (self))
 	{
@@ -1430,7 +1494,7 @@ gsc_completion_filter_proposals (GscCompletion *self,
 {
 	GList *l;
 	
-	g_return_if_fail (GSC_COMPLETION (self));
+	g_return_if_fail (GSC_IS_COMPLETION (self));
 	g_return_if_fail (func);
 	
 	if (!GTK_WIDGET_VISIBLE (self))
@@ -1453,5 +1517,55 @@ gsc_completion_filter_proposals (GscCompletion *self,
 	}
 }
 
+/**
+ * gsc_completion_activate:
+ * @self: The #GscCompletion
+ *
+ * This function activate the completion mechanism. The completion connects 
+ * all signals and activate all registered triggers.
+ */
+void
+gsc_completion_activate (GscCompletion *self)
+{
+	GList *plist;
+	GscTrigger *trigger;
+
+	g_return_if_fail (GSC_IS_COMPLETION (self));
+	
+	if (self->priv->active)
+		return;
+
+	self->priv->signals_ids[TEXT_VIEW_KP] = 
+			g_signal_connect (self->priv->view,
+					  "key-press-event",
+					  G_CALLBACK (view_key_press_event_cb),
+					  self);
+	self->priv->signals_ids[TEXT_VIEW_DESTROY] = 
+			g_signal_connect (self->priv->view,
+					  "destroy",
+					  G_CALLBACK (view_destroy_event_cb),
+					  self);
+	self->priv->signals_ids[TEXT_VIEW_FOCUS_OUT] = 
+			g_signal_connect (self->priv->view,
+					  "focus-out-event",
+					  G_CALLBACK (view_focus_out_event_cb),
+					  self);
+	g_debug("a");
+	self->priv->signals_ids[TEXT_VIEW_BUTTON_PRESS] = 
+			g_signal_connect (self->priv->view,
+					  "button-press-event",
+					  G_CALLBACK (view_button_press_event_cb),
+					  self);
+g_debug("b");
+	/* We activate the triggers */
+	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
+	{
+		trigger =  GSC_TRIGGER (plist->data);
+		
+		gsc_trigger_activate (trigger);
+	}
+	
+	self->priv->active = TRUE;
+}
 
 

@@ -60,7 +60,7 @@ struct _GscCompletionClass
 {
 	GtkWindowClass parent_class;
 
-	void     (* proposal_selected)(GscCompletion *completion, GscProposal *proposal);
+	gboolean (* proposal_selected)(GscCompletion *completion, GscProposal *proposal);
 	gboolean (* display_info)     (GscCompletion *completion, GscProposal *proposal);
 };
 
@@ -106,6 +106,9 @@ void		 gsc_completion_finish_completion	(GscCompletion *self);
 void		 gsc_completion_filter_proposals	(GscCompletion *self,
 							 GscCompletionFilterFunc func,
 							 gpointer user_data);
+
+/*FIXME We will remove this function (goes to -priv.h)*/
+void		 gsc_completion_activate 		(GscCompletion *self);
 
 /*FIXME Adds new function-property "manage-completion-keys"*/
 /*FIXME Add new get_bottom_bar*/
