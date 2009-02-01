@@ -195,23 +195,6 @@ update_pages_visibility (GscCompletion *self)
 }
 
 static void
-gsc_completion_set_current_info (GscCompletion *self,
-			    const gchar *info)
-{
-	g_return_if_fail (GSC_IS_COMPLETION (self));
-
-	if (info != NULL)
-	{
-		gsc_info_set_markup (GSC_INFO (self->priv->info_window), info);
-	}
-	else
-	{
-		gsc_info_set_markup (GSC_INFO (self->priv->info_window),
-				     _("There is no info for the current proposal"));
-	}
-}
-
-static void
 gsc_completion_show_or_update (GtkWidget *widget)
 {
 	gboolean data;
@@ -484,7 +467,16 @@ gsc_completion_display_info_default (GscCompletion *self,
 		const gchar *info;
 		
 		info = gsc_proposal_get_info (proposal);
-		gsc_completion_set_current_info (self, info);
+		
+		if (info != NULL)
+		{
+			gsc_info_set_markup (GSC_INFO (self->priv->info_window), info);
+		}
+		else
+		{
+			gsc_info_set_markup (GSC_INFO (self->priv->info_window),
+					     _("There is no info for the current proposal"));
+		}
 	}
 	return FALSE;
 }
@@ -629,7 +621,10 @@ gsc_completion_class_init (GscCompletionClass *klass)
 			      1,
 			      GTK_TYPE_POINTER);
 	
-	/*FIXME Remove this signal and add toggled-info-visible signals*/
+	/*
+	 * FIXME Currently we are not using this signal. We must to emit it 
+	 * when we need to show the proposal info into the info window
+	 */
 	/**
 	 * GscCompletion::display-info:
 	 * @completion: The #GscCompletion who emits the signal
@@ -980,190 +975,6 @@ gsc_completion_select_next (GscCompletion *self,
 }
 
 /**
- * gsc_completion_select_current_proposal:
- * @self: The #GscCompletion
- * 
- * Selects the current selected proposal if there is one selected. This function
- * emits the PROPOSAL_SELECTED signal.
- *
- * Returns: TRUE if a proposal has been selected.
- * FIXME remove this function 
- */
-gboolean
-gsc_completion_select_current_proposal (GscCompletion *self)
-{
-	gboolean selected = FALSE;
-	GscProposal *prop = NULL;
-	if (gsc_tree_get_selected_proposal (get_current_tree (self), &prop))
-	{
-		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
-			       0, prop);
-		selected = TRUE;
-	}
-	return selected;
-}
-
-/**
- * gsc_completion_has_proposals:
- * @self: The #GscCompletion
- *
- * Returns TRUE if the completion has almost one element.
- * FIXME remove this function 
- */
-gboolean
-gsc_completion_has_proposals (GscCompletion *self)
-{
-	GList *l;
-	
-	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
-	
-	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
-	{
-		GscCompletionPage *page = (GscCompletionPage *)l->data;
-		
-		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
-			return TRUE;
-	}
-	return FALSE;
-}
-
-/**
- * gsc_completion_toggle_proposal_info:
- * @self: The #GscCompletion
- *
- * This toggle the state of the info dialog. If the info is visible
- * then it hide the info dialog. If the dialog is hidden then it 
- * shows the info dialog.
- *
- */
-void
-gsc_completion_toggle_proposal_info (GscCompletion *self)
-{
-	g_return_if_fail (GSC_IS_COMPLETION (self));
-
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-				      !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->priv->info_button)));
-}
-
-/**
- * gsc_completion_get_num_active_pages:
- * @self: The #GscCompletion
- *
- * Returns: The number of active pages (pages with proposals)
- */
-gint
-gsc_completion_get_num_active_pages (GscCompletion *self)
-{
-	GList *l;
-	guint num_pages_with_data = 0;
-	
-	g_return_val_if_fail (GSC_IS_COMPLETION (self), 0);
-	
-	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
-	{
-		GscCompletionPage *page = (GscCompletionPage *)l->data;
-		
-		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
-		{
-			num_pages_with_data++;
-		}
-	}
-	
-	return num_pages_with_data;
-}
-
-/**
- * gsc_completion_bottom_bar_set_visible:
- * @self: The #GscCompletion
- * @visible: %TRUE if you want to show the bottom bar, %FALSE if not.
- *
- */
-void
-gsc_completion_bottom_bar_set_visible (GscCompletion *self,
-				  gboolean visible)
-{
-	g_return_if_fail (GSC_IS_COMPLETION (self));
-
-	if (visible)
-		gtk_widget_show (self->priv->bottom_bar);
-	else
-		gtk_widget_hide (self->priv->bottom_bar);
-}
-
-/**
- * gsc_completion_bottom_bar_set_visible:
- * @self: The #GscCompletion
- *
- *
- * Returns: %TRUE if the bottom bar is visible, %FALSE if not.
- *
- */
-gboolean
-gsc_completion_bottom_bar_get_visible (GscCompletion *self)
-{
-	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
-
-	return GTK_WIDGET_VISIBLE (self->priv->bottom_bar);
-}
-/*FIXME add this in a future
-static gboolean
-gsc_completion_autoselect (GscCompletion *self)
-{
-	GscTree *tree;
-	
-	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
-
-	update_pages_visibility (self);
-	if (gsc_completion_get_num_active_pages (self) == 1)
-	{
-		tree = get_current_tree (self);
-		if (gsc_tree_get_num_proposals (tree) == 1)
-		{
-			gsc_tree_select_first (tree);
-			return gsc_completion_select_current_proposal (self);
-		}
-	}
-	
-	return FALSE;
-}
-*/
-
-/**
- * gsc_completion_filter_visible:
- * @self: The #GscCompletion 
- * @func: function to filter the proposals visibility
- * @user_data: user data to pass to func
- *
- * This function call to @func for all proposal of all pages. @func must
- * return %TRUE if the proposal is visible or %FALSE if the completion must to 
- * hide the proposal.
- *
- * Returns: %TRUE if the completion has visible proposals.
- * FIXME There is a gsc_completion_filter_proposals.
- */
-gboolean
-gsc_completion_filter_visible (GscCompletion *self,
-			  GscCompletionFilterFunc func,
-			  gpointer user_data)
-{
-	GList *l;
-	
-	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
-	{
-		GscCompletionPage *page = (GscCompletionPage *)l->data;
-		
-		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
-		{
-			gsc_tree_filter_visible (GSC_TREE (page->view),
-						 (GscTreeFilterVisibleFunc) func,
-						 user_data);
-		}
-	}
-	
-	return update_pages_visibility (self);
-}
-
-/**
  * gsc_completion_register_trigger:
  * @self: The #GscCompletion
  * @trigger: The trigger to register
@@ -1337,6 +1148,7 @@ gsc_completion_get_active_trigger (GscCompletion *self)
 	return self->priv->active_trigger;
 }
 
+
 /*FIXME Doc*/
 GtkTextView*
 gsc_completion_get_view (GscCompletion *self)
@@ -1420,12 +1232,6 @@ gsc_completion_trigger_event (GscCompletion *self,
 	gboolean selected = FALSE;
 	GtkWindow *win;
 	
-	/*FIXME 
-	if (self->priv->autoselect)
-	{
-		selected = gsc_completion_autoselect (self);
-	}*/
-
 	if (!selected)
 	{
 		if (!GTK_WIDGET_HAS_FOCUS (self->priv->view))
@@ -1550,13 +1356,11 @@ gsc_completion_activate (GscCompletion *self)
 					  "focus-out-event",
 					  G_CALLBACK (view_focus_out_event_cb),
 					  self);
-	g_debug("a");
 	self->priv->signals_ids[TEXT_VIEW_BUTTON_PRESS] = 
 			g_signal_connect (self->priv->view,
 					  "button-press-event",
 					  G_CALLBACK (view_button_press_event_cb),
 					  self);
-g_debug("b");
 	/* We activate the triggers */
 	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
 	{
