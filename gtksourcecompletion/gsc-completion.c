@@ -621,10 +621,6 @@ gsc_completion_class_init (GscCompletionClass *klass)
 			      1,
 			      GTK_TYPE_POINTER);
 	
-	/*
-	 * FIXME Currently we are not using this signal. We must to emit it 
-	 * when we need to show the proposal info into the info window
-	 */
 	/**
 	 * GscCompletion::display-info:
 	 * @completion: The #GscCompletion who emits the signal
