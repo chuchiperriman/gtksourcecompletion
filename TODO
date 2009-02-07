@@ -8,13 +8,10 @@ TODO
     press control+shift+return, it works but it is wrong.
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
 [ ] Set Gsc-Info text position on middle-left
-[ ] Support to change the default completion info widget 
 
 New manager TODO
 ==================
 
-[ ] Add keys management 
-[ ] Control click on the view
 [ ] Add autoselect feature
-[ ] Remove or add completion-started and completion-finished signals
-[ ] Add display-info-request signal (using gsc_proposal_get_info by default)
+[ ] Create a GscView to show what gtksourceview functions we need and show
+    how the new gtksourceview looks.

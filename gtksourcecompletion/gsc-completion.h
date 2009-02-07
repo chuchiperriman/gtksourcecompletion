@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include "gsc-tree.h"
 #include "gsc-provider.h"
+#include "gsc-info.h"
 
 G_BEGIN_DECLS
 
@@ -107,12 +108,16 @@ void		 gsc_completion_filter_proposals	(GscCompletion *self,
 							 GscCompletionFilterFunc func,
 							 gpointer user_data);
 
-/*FIXME We will remove this function (goes to -priv.h)*/
+/*
+ * FIXME We will remove these functions (goes to -priv.h) because the view
+ * will have a "has-completion" property to activate/deactivate completion 
+ */
 void		 gsc_completion_activate 		(GscCompletion *self);
+void		 gsc_completion_deactivate		(GscCompletion *self);
 
-/*FIXME Adds new function-property "manage-completion-keys"*/
-/*FIXME Add new get_bottom_bar*/
-/*FIXME Add new get_info_widget*/
+GtkWidget	*gsc_completion_get_bottom_bar		(GscCompletion *self);
+
+GscInfo		*gsc_completion_get_info_widget		(GscCompletion *self);
 
 G_END_DECLS
 

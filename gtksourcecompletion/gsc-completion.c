@@ -21,7 +21,6 @@
 #include <gdk/gdkkeysyms.h> 
 #include "gsc-i18n.h"
 #include "gsc-utils.h"
-#include "gsc-info.h"
 #include "gsc-marshal.h"
 #include "gsc-completion.h"
 #include "gsc-completion-priv.h"
@@ -47,9 +46,13 @@ enum
 {
 	PROPOSAL_SELECTED,
 	DISPLAY_INFO,
-	COMP_STARTED,
-	COMP_FINISHED,
 	LAST_SIGNAL
+};
+
+enum
+{
+	PROP_0,
+	PROP_MANAGE_KEYS
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -120,18 +123,16 @@ end_completion (GscCompletion *self)
 	}
 	else
 	{
-		/*FIXME search all provider of the active trigger
 		GList *l;
 		
-		for (l = self->priv->providers; l != NULL; l = g_list_next (l))
+		for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
 		{
-			gsc_provider_finish (GSC_PROVIDER (l->data));
+			PTPair *ptp = (PTPair *)l->data;
+			if (ptp->trigger == self->priv->active_trigger)
+				gsc_provider_finish (GSC_PROVIDER (ptp->provider));
 		}
-		*/
 		
 		self->priv->active_trigger = NULL;
-		
-		//FIXME g_signal_emit (G_OBJECT (self), signals[COMP_FINISHED], 0);
 	}
 }
 
@@ -467,7 +468,9 @@ gsc_completion_display_info_default (GscCompletion *self,
 			gsc_info_set_markup (GSC_INFO (self->priv->info_window),
 					     _("There is no info for the current proposal"));
 		}
+		return TRUE;
 	}
+	
 	return FALSE;
 }
 
@@ -540,6 +543,9 @@ gsc_completion_finalize (GObject *object)
 {
 	GscCompletion *self = GSC_COMPLETION (object);
 	
+	if (self->priv->active)
+		gsc_completion_deactivate (self);
+	
 	g_list_foreach (self->priv->pages, (GFunc) free_page, NULL);
 	g_list_free (self->priv->pages);
 	
@@ -575,6 +581,159 @@ gsc_completion_destroy (GtkObject *object)
 	GTK_OBJECT_CLASS (gsc_completion_parent_class)->destroy (object);
 }
 
+static gboolean
+view_key_press_event_cb (GtkWidget *view,
+			 GdkEventKey *event, 
+			 gpointer user_data)
+{
+	gboolean ret = FALSE;
+	GscCompletion *self;
+	
+	g_return_val_if_fail (GSC_IS_COMPLETION (user_data), FALSE);
+	
+	self = GSC_COMPLETION (user_data);
+	
+	if (!GTK_WIDGET_VISIBLE (self))
+		return FALSE;
+	
+	switch (event->keyval)
+ 	{
+		case GDK_Escape:
+		{
+			gtk_widget_hide (GTK_WIDGET (self));
+			ret = TRUE;
+			break;
+		}
+ 		case GDK_Down:
+		{
+			ret = _gsc_completion_select_next (self, 1);
+			break;
+		}
+		case GDK_Page_Down:
+		{
+			ret = _gsc_completion_select_next (self, 5);
+			break;
+		}
+		case GDK_Up:
+		{
+			ret = _gsc_completion_select_previous (self, 1);
+			if (!ret)
+				ret = _gsc_completion_select_first (self);
+			break;
+		}
+		case GDK_Page_Up:
+		{
+			ret = _gsc_completion_select_previous (self, 5);
+			break;
+		}
+		case GDK_Home:
+		{
+			ret = _gsc_completion_select_first (self);
+			break;
+		}
+		case GDK_End:
+		{
+			ret = _gsc_completion_select_last (self);
+			break;
+		}
+		case GDK_Return:
+		case GDK_Tab:
+		{
+			ret = _gsc_completion_select_current_proposal (self);
+			gtk_widget_hide (GTK_WIDGET (self));
+			break;
+		}
+		case GDK_Right:
+		{
+			gsc_completion_page_next (self);
+			ret = TRUE;
+			break;
+		}
+		case GDK_Left:
+		{
+			gsc_completion_page_previous (self);
+			ret = TRUE;
+			break;
+		}
+		case GDK_i:
+		{
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+			{
+				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+					!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->priv->info_button)));
+				ret = TRUE;
+			}
+		}
+	}
+	return ret;
+}
+
+static void
+set_manage_keys (GscCompletion *self)
+{
+	if (self->priv->manage_keys && self->priv->signals_ids[TEXT_VIEW_KP] == 0)
+	{
+		self->priv->signals_ids[TEXT_VIEW_KP] = 
+			g_signal_connect (self->priv->view,
+					  "key-press-event",
+					  G_CALLBACK (view_key_press_event_cb),
+					  self);
+	}
+	
+	if (!self->priv->manage_keys && self->priv->signals_ids[TEXT_VIEW_KP] != 0)
+	{
+		g_signal_handler_disconnect (self->priv->view,
+					     self->priv->signals_ids[TEXT_VIEW_KP]);
+		self->priv->signals_ids[TEXT_VIEW_KP] = 0;
+	}
+}
+
+static void
+gsc_completion_get_property (GObject    *object,
+			     guint       prop_id,
+			     GValue     *value,
+			     GParamSpec *pspec)
+{
+	GscCompletion *self;
+	
+	g_return_if_fail (GSC_IS_COMPLETION (object));
+	
+	self = GSC_COMPLETION (object);
+
+	switch (prop_id)
+	{
+		case PROP_MANAGE_KEYS:
+			g_value_set_boolean (value, self->priv->manage_keys);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
+static void
+gsc_completion_set_property (GObject      *object,
+			     guint         prop_id,
+			     const GValue *value,
+			     GParamSpec   *pspec)
+{
+	GscCompletion *self;
+	g_return_if_fail (GSC_IS_COMPLETION (object));
+	
+	self = GSC_COMPLETION (object);
+
+	switch (prop_id)
+	{
+		case PROP_MANAGE_KEYS:
+			self->priv->manage_keys = g_value_get_boolean (value);
+			set_manage_keys (self);
+			break;
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+			break;
+	}
+}
+
 static void
 gsc_completion_class_init (GscCompletionClass *klass)
 {
@@ -584,6 +743,8 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	
 	g_type_class_add_private (klass, sizeof (GscCompletionPriv));
 	
+	object_class->get_property = gsc_completion_get_property;
+	object_class->set_property = gsc_completion_set_property;
 	object_class->finalize = gsc_completion_finalize;
 	gtkobject_class->destroy = gsc_completion_destroy;
 	widget_class->show = gsc_completion_show_or_update;
@@ -592,6 +753,20 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	widget_class->configure_event = gsc_completion_configure_event;
 	klass->display_info = gsc_completion_display_info_default;
 	klass->proposal_selected = gsc_completion_proposal_selected_default;
+	
+	/**
+	 * GscManager:autoselect:
+	 *
+	 * TRUE to autoselect if there is one proposal in one page.
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_MANAGE_KEYS,
+					 g_param_spec_boolean ("manage-completion-keys",
+							      _("Manage Up, Down etc. keys when the completion is visible"),
+							      _("Manage Up, Down etc. keys when the completion is visible"),
+							      TRUE,
+							      G_PARAM_READWRITE));
+	
 	/**
 	 * GscCompletion::proposal-selected:
 	 * @completion: The #GscCompletion who emits the signal
@@ -629,7 +804,6 @@ gsc_completion_class_init (GscCompletionClass *klass)
 			      G_TYPE_BOOLEAN,
 			      1,
 			      GTK_TYPE_POINTER);
-	/*FIXME Add the COMP_STARTED and COMP_FINISHED signals*/
 }
 
 static void
@@ -651,8 +825,8 @@ gsc_completion_init (GscCompletion *self)
 	self->priv = GSC_COMPLETION_GET_PRIVATE (self);
 	self->priv->destroy_has_run = FALSE;
 	self->priv->active_trigger = NULL;
-	
 	self->priv->active = FALSE;
+	self->priv->manage_keys = TRUE;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -778,42 +952,6 @@ gsc_completion_init (GscCompletion *self)
 	self->priv->prov_trig = NULL;
 }
 
-void
-_gsc_completion_info_show (GscCompletion *self)
-{
-	GscProposal *proposal = NULL;
-	gint y, x, sw, sh;
-	
-	if (gsc_tree_get_selected_proposal (get_current_tree (self), &proposal))
-	{
-		gboolean ret = TRUE;
-		g_signal_emit_by_name (self, "display-info", proposal, &ret);
-	}
-	
-	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
-	sw = gdk_screen_width ();
-	sh = gdk_screen_height ();
-	x += WINDOW_WIDTH;
-
-	if (x + WINDOW_WIDTH >= sw)
-	{
-		x -= (WINDOW_WIDTH * 2);
-	}
-	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
-	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
-				      gtk_window_get_transient_for (GTK_WINDOW (self)));
-	gtk_widget_show (self->priv->info_window);
-}
-
-void
-_gsc_completion_info_hide (GscCompletion *self)
-{
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-	{
-		gtk_widget_hide (self->priv->info_window);
-	}
-}
-
 static void
 view_destroy_event_cb (GtkWidget *widget,
 		       gpointer user_data)
@@ -850,109 +988,6 @@ view_button_press_event_cb (GtkWidget *widget,
 	return FALSE;
 }
 
-static gboolean
-view_key_press_event_cb (GtkWidget *view,
-			 GdkEventKey *event, 
-			 gpointer user_data)
-{
-	gboolean ret = FALSE;
-	GscCompletion *self;
-	
-	g_return_val_if_fail (GSC_IS_COMPLETION (user_data), FALSE);
-	
-	self = GSC_COMPLETION (user_data);
-	
-	if (!GTK_WIDGET_VISIBLE (self))
-		return FALSE;
-	
-	switch (event->keyval)
- 	{
-		case GDK_Escape:
-		{
-			gtk_widget_hide (GTK_WIDGET (self));
-			ret = TRUE;
-			break;
-		}
- 		case GDK_Down:
-		{
-			ret = _gsc_completion_select_next (self, 1);
-			break;
-		}
-		case GDK_Page_Down:
-		{
-			ret = _gsc_completion_select_next (self, 5);
-			break;
-		}
-		case GDK_Up:
-		{
-			ret = _gsc_completion_select_previous (self, 1);
-			if (!ret)
-				ret = _gsc_completion_select_first (self);
-			break;
-		}
-		case GDK_Page_Up:
-		{
-			ret = _gsc_completion_select_previous (self, 5);
-			break;
-		}
-		case GDK_Home:
-		{
-			ret = _gsc_completion_select_first (self);
-			break;
-		}
-		case GDK_End:
-		{
-			ret = _gsc_completion_select_last (self);
-			break;
-		}
-		case GDK_Return:
-		case GDK_Tab:
-		{
-			ret = _gsc_completion_select_current_proposal (self);
-			gtk_widget_hide (GTK_WIDGET (self));
-			break;
-		}
-		case GDK_Right:
-		{
-			gsc_completion_page_next (self);
-			ret = TRUE;
-			break;
-		}
-		case GDK_Left:
-		{
-			gsc_completion_page_previous (self);
-			ret = TRUE;
-			break;
-		}
-		case GDK_i:
-		{
-			if ((event->state & GDK_CONTROL_MASK) != 0)
-			{
-				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-					!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->priv->info_button)));
-				ret = TRUE;
-
-			}
-		}
-	}
-	return ret;
-}
-
-/**
- * gsc_completion_new:
- *
- * Returns The new #GscCompletion
- */
-GtkWidget*
-gsc_completion_new (GtkTextView *view)
-{
-	GscCompletion *self = GSC_COMPLETION (g_object_new (GSC_TYPE_COMPLETION,
-				    "type", GTK_WINDOW_POPUP,
-				    NULL));
-	self->priv->view = view;
-	return GTK_WIDGET (self);
-}
-
 static void
 gsc_completion_add_data (GscCompletion *self,
 			 GscProposal* data)
@@ -964,6 +999,42 @@ gsc_completion_add_data (GscCompletion *self,
 	tree = get_tree_by_name (self, gsc_proposal_get_page_name (data));
 	
 	gsc_tree_add_data (tree, data);
+}
+
+void
+_gsc_completion_info_show (GscCompletion *self)
+{
+	GscProposal *proposal = NULL;
+	gint y, x, sw, sh;
+	
+	if (gsc_tree_get_selected_proposal (get_current_tree (self), &proposal))
+	{
+		gboolean ret = TRUE;
+		g_signal_emit_by_name (self, "display-info", proposal, &ret);
+	}
+	
+	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
+	sw = gdk_screen_width ();
+	sh = gdk_screen_height ();
+	x += WINDOW_WIDTH;
+
+	if (x + WINDOW_WIDTH >= sw)
+	{
+		x -= (WINDOW_WIDTH * 2);
+	}
+	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
+	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
+				      gtk_window_get_transient_for (GTK_WINDOW (self)));
+	gtk_widget_show (self->priv->info_window);
+}
+
+void
+_gsc_completion_info_hide (GscCompletion *self)
+{
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+	{
+		gtk_widget_hide (self->priv->info_window);
+	}
 }
 
 gboolean
@@ -1020,6 +1091,20 @@ _gsc_completion_select_current_proposal (GscCompletion *self)
 	return selected;
 }
 
+/**
+ * gsc_completion_new:
+ *
+ * Returns The new #GscCompletion
+ */
+GtkWidget*
+gsc_completion_new (GtkTextView *view)
+{
+	GscCompletion *self = GSC_COMPLETION (g_object_new (GSC_TYPE_COMPLETION,
+				    "type", GTK_WINDOW_POPUP,
+				    NULL));
+	self->priv->view = view;
+	return GTK_WIDGET (self);
+}
 
 /**
  * gsc_completion_register_trigger:
@@ -1071,7 +1156,7 @@ gsc_completion_register_trigger (GscCompletion *self,
  * that it want (normally inserts some text)
  * 
  * Returns: %TRUE if it was registered or %FALSE if not (because it has been already registered,
- * or the trigger don't exists)
+ * or the trigger doesn't exists)
  *
  **/
 gboolean
@@ -1080,6 +1165,7 @@ gsc_completion_register_provider (GscCompletion *self,
 				  GscTrigger *trigger)
 {
 	PTPair *ptp;
+	GList *l;
 	
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
 	g_return_val_if_fail (GSC_IS_PROVIDER (provider), FALSE);
@@ -1087,7 +1173,14 @@ gsc_completion_register_provider (GscCompletion *self,
 	g_return_val_if_fail (g_list_find (self->priv->triggers, trigger) != NULL,
 			      FALSE);
 
-	/*FIXME Check if the provider-trigger pair has been registered*/
+	/*Check if the provider-trigger pair has been registered*/
+	for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
+	{
+		ptp = (PTPair *)l->data;
+		if (ptp->trigger == trigger && ptp->provider == provider)
+			return FALSE;
+	}
+
 	ptp = g_slice_new (PTPair);
 	ptp->provider = provider;
 	ptp->trigger = trigger;
@@ -1196,7 +1289,12 @@ gsc_completion_get_active_trigger (GscCompletion *self)
 }
 
 
-/*FIXME Doc*/
+/**
+ * gsc_completion_get_view:
+ * @self: The #GscCompletion
+ *
+ * Returns: The view associated with this completion.
+ */
 GtkTextView*
 gsc_completion_get_view (GscCompletion *self)
 {
@@ -1238,7 +1336,7 @@ gsc_completion_trigger_event (GscCompletion *self,
 		return FALSE;
 	}
 	
-	/*FIXME End the current completion if there is active*/
+	end_completion (self);
 	gsc_completion_clear (self);
 	
 	for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
@@ -1295,8 +1393,6 @@ gsc_completion_trigger_event (GscCompletion *self,
 
 		gtk_window_move (GTK_WINDOW (self),
 				 x, y);
-		
-		//FIXME g_signal_emit (G_OBJECT (self), signals[COMP_STARTED], 0);
 		
 		gsc_completion_show_or_update (GTK_WIDGET (self));
 
@@ -1388,11 +1484,6 @@ gsc_completion_activate (GscCompletion *self)
 	if (self->priv->active)
 		return;
 
-	self->priv->signals_ids[TEXT_VIEW_KP] = 
-			g_signal_connect (self->priv->view,
-					  "key-press-event",
-					  G_CALLBACK (view_key_press_event_cb),
-					  self);
 	self->priv->signals_ids[TEXT_VIEW_DESTROY] = 
 			g_signal_connect (self->priv->view,
 					  "destroy",
@@ -1408,6 +1499,9 @@ gsc_completion_activate (GscCompletion *self)
 					  "button-press-event",
 					  G_CALLBACK (view_button_press_event_cb),
 					  self);
+	
+	set_manage_keys (self);
+	
 	/* We activate the triggers */
 	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
 	{
@@ -1417,6 +1511,54 @@ gsc_completion_activate (GscCompletion *self)
 	}
 	
 	self->priv->active = TRUE;
+}
+
+/**
+ * gsc_completion_deactivate:
+ * @self: The #GscCompletion
+ *
+ * This function deactivate the completion mechanism. The completion disconnect
+ * all signals and deactivate all registered triggers.
+ */
+void
+gsc_completion_deactivate (GscCompletion *self)
+{
+	GList *l;
+	GscTrigger *trigger;
+	gint i;
+	
+	g_return_if_fail (GSC_COMPLETION (self));
+	
+	for (i = 0; i < LAST_EXTERNAL_SIGNAL; i++)
+	{
+		if (g_signal_handler_is_connected (self->priv->view, 
+						   self->priv->signals_ids[i]))
+		{
+			g_signal_handler_disconnect (self->priv->view,
+						     self->priv->signals_ids[i]);
+		}
+		self->priv->signals_ids[i] = 0;
+	}
+	
+	for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
+	{
+		trigger =  GSC_TRIGGER (l->data);
+		
+		gsc_trigger_deactivate (trigger);
+	}
+	
+	self->priv->active = FALSE;
+}
+
+GtkWidget*
+gsc_completion_get_bottom_bar (GscCompletion *self)
+{
+	return self->priv->bottom_bar;
+}
+GscInfo*
+gsc_completion_get_info_widget (GscCompletion *self)
+{
+	return GSC_INFO (self->priv->info_window);
 }
 
 

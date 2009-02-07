@@ -4,6 +4,10 @@
 	Added info and page keys control
 	Added movement functions to -priv
 	Added mevement keys control
+	Added gsc_completion_deactivate
+	Added gsc_completion_get_bottom_bar
+	Added gsc_completion_get_info_widget
+	Added "manage-completion-keys" property 
 
 2009-02-02  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
