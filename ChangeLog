@@ -1,6 +1,7 @@
 2009-02-07  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:
+	Added info and page keys control
 	Added movement functions to -priv
 	Added mevement keys control
 

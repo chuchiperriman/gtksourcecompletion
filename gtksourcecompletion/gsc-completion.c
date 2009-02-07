@@ -855,9 +855,7 @@ view_key_press_event_cb (GtkWidget *view,
 			 GdkEventKey *event, 
 			 gpointer user_data)
 {
-	gboolean catched = FALSE;
 	gboolean ret = FALSE;
-	gboolean selected = FALSE;
 	GscCompletion *self;
 	
 	g_return_val_if_fail (GSC_IS_COMPLETION (user_data), FALSE);
@@ -872,20 +870,17 @@ view_key_press_event_cb (GtkWidget *view,
 		case GDK_Escape:
 		{
 			gtk_widget_hide (GTK_WIDGET (self));
-			catched = TRUE;
 			ret = TRUE;
 			break;
 		}
  		case GDK_Down:
 		{
 			ret = _gsc_completion_select_next (self, 1);
-			catched = TRUE;
 			break;
 		}
 		case GDK_Page_Down:
 		{
 			ret = _gsc_completion_select_next (self, 5);
-			catched = TRUE;
 			break;
 		}
 		case GDK_Up:
@@ -893,65 +888,52 @@ view_key_press_event_cb (GtkWidget *view,
 			ret = _gsc_completion_select_previous (self, 1);
 			if (!ret)
 				ret = _gsc_completion_select_first (self);
-			catched = TRUE;
 			break;
 		}
 		case GDK_Page_Up:
 		{
 			ret = _gsc_completion_select_previous (self, 5);
-			catched = TRUE;
 			break;
 		}
 		case GDK_Home:
 		{
 			ret = _gsc_completion_select_first (self);
-			catched = TRUE;
 			break;
 		}
 		case GDK_End:
 		{
 			ret = _gsc_completion_select_last (self);
-			catched = TRUE;
 			break;
 		}
 		case GDK_Return:
 		case GDK_Tab:
 		{
-			selected = _gsc_completion_select_current_proposal (self);
+			ret = _gsc_completion_select_current_proposal (self);
 			gtk_widget_hide (GTK_WIDGET (self));
-			catched = TRUE;
-			if (selected)
-				ret = TRUE;
-			else
-				ret = FALSE;
 			break;
 		}
-	}
-	if (!catched)
-	{
-		/*FIXME 
-		if (gsc_compare_keys (self->priv->keys[KEYS_INFO].key,
-				      self->priv->keys[KEYS_INFO].mods,
-				      event))
+		case GDK_Right:
 		{
-			gsc_popup_toggle_proposal_info (self->priv->popup);
+			gsc_completion_page_next (self);
 			ret = TRUE;
+			break;
 		}
-		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_NEXT].key,
-					   self->priv->keys[KEYS_PAGE_NEXT].mods,
-					   event))
+		case GDK_Left:
 		{
-			gsc_popup_page_next (self->priv->popup);
+			gsc_completion_page_previous (self);
 			ret = TRUE;
+			break;
 		}
-		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_PREV].key,
-					   self->priv->keys[KEYS_PAGE_PREV].mods,
-					   event))
+		case GDK_i:
 		{
-			gsc_popup_page_previous (self->priv->popup);
-			ret = TRUE;
+			if ((event->state & GDK_CONTROL_MASK) != 0)
+			{
+				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+					!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (self->priv->info_button)));
+				ret = TRUE;
+
+			}
 		}
-		*/
 	}
 	return ret;
 }
