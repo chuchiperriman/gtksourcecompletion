@@ -131,7 +131,7 @@ end_completion (GscCompletion *self)
 		
 		self->priv->active_trigger = NULL;
 		
-		g_signal_emit (G_OBJECT (self), signals[COMP_FINISHED], 0);
+		//FIXME g_signal_emit (G_OBJECT (self), signals[COMP_FINISHED], 0);
 	}
 }
 
@@ -251,7 +251,7 @@ gsc_completion_page_next (GscCompletion *self)
 		 * After setting the page the active_page was updated
 		 * so we can update the tree
 		 */
-		gsc_tree_select_first (get_current_tree (self));
+		_gsc_completion_select_first (self);
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
@@ -299,7 +299,7 @@ gsc_completion_page_previous (GscCompletion *self)
 		 * After setting the page the active_page was updated
 		 * so we can update the tree
 		 */
-		gsc_tree_select_first (get_current_tree (self));
+		_gsc_completion_select_first (self);
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
@@ -314,17 +314,7 @@ row_activated_cb (GtkTreeView *tree_view,
 		  GtkTreeViewColumn *column,
 		  gpointer user_data)
 {
-	GtkTreeModel *model;
-	GscProposal *proposal;
-	gboolean ret = TRUE;
-	
-	model = gtk_tree_view_get_model (tree_view);
-	
-	gsc_tree_get_selected_proposal (GSC_TREE (tree_view), &proposal);
-	
-	
-	g_signal_emit (G_OBJECT (user_data), signals[PROPOSAL_SELECTED],
-		       0, proposal, &ret);
+	_gsc_completion_select_current_proposal (GSC_COMPLETION (user_data));
 }
 
 static void 
@@ -865,14 +855,105 @@ view_key_press_event_cb (GtkWidget *view,
 			 GdkEventKey *event, 
 			 gpointer user_data)
 {
-	GscCompletion *self = GSC_COMPLETION (user_data);
+	gboolean catched = FALSE;
+	gboolean ret = FALSE;
+	gboolean selected = FALSE;
+	GscCompletion *self;
 	
-	/*FIXME 
-	if (gsc_manager_is_visible (self))
-		return gsc_manager_manage_key (self, event);
-	*/
-
-	return FALSE;
+	g_return_val_if_fail (GSC_IS_COMPLETION (user_data), FALSE);
+	
+	self = GSC_COMPLETION (user_data);
+	
+	if (!GTK_WIDGET_VISIBLE (self))
+		return FALSE;
+	
+	switch (event->keyval)
+ 	{
+		case GDK_Escape:
+		{
+			gtk_widget_hide (GTK_WIDGET (self));
+			catched = TRUE;
+			ret = TRUE;
+			break;
+		}
+ 		case GDK_Down:
+		{
+			ret = _gsc_completion_select_next (self, 1);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Down:
+		{
+			ret = _gsc_completion_select_next (self, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Up:
+		{
+			ret = _gsc_completion_select_previous (self, 1);
+			if (!ret)
+				ret = _gsc_completion_select_first (self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Page_Up:
+		{
+			ret = _gsc_completion_select_previous (self, 5);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Home:
+		{
+			ret = _gsc_completion_select_first (self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_End:
+		{
+			ret = _gsc_completion_select_last (self);
+			catched = TRUE;
+			break;
+		}
+		case GDK_Return:
+		case GDK_Tab:
+		{
+			selected = _gsc_completion_select_current_proposal (self);
+			gtk_widget_hide (GTK_WIDGET (self));
+			catched = TRUE;
+			if (selected)
+				ret = TRUE;
+			else
+				ret = FALSE;
+			break;
+		}
+	}
+	if (!catched)
+	{
+		/*FIXME 
+		if (gsc_compare_keys (self->priv->keys[KEYS_INFO].key,
+				      self->priv->keys[KEYS_INFO].mods,
+				      event))
+		{
+			gsc_popup_toggle_proposal_info (self->priv->popup);
+			ret = TRUE;
+		}
+		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_NEXT].key,
+					   self->priv->keys[KEYS_PAGE_NEXT].mods,
+					   event))
+		{
+			gsc_popup_page_next (self->priv->popup);
+			ret = TRUE;
+		}
+		else if (gsc_compare_keys (self->priv->keys[KEYS_PAGE_PREV].key,
+					   self->priv->keys[KEYS_PAGE_PREV].mods,
+					   event))
+		{
+			gsc_popup_page_previous (self->priv->popup);
+			ret = TRUE;
+		}
+		*/
+	}
+	return ret;
 }
 
 /**
@@ -903,48 +984,24 @@ gsc_completion_add_data (GscCompletion *self,
 	gsc_tree_add_data (tree, data);
 }
 
-/**
- * gsc_completion_select_first:
- * @self: The #GscCompletion
- *
- * See #gsc_tree_select_first
- *
- * Returns
- */
 gboolean
-gsc_completion_select_first (GscCompletion *self)
+_gsc_completion_select_first (GscCompletion *self)
 {
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
 	
 	return gsc_tree_select_first (get_current_tree (self));
 }
 
-/**
- * gsc_completion_select_last:
- * @self: The #GscCompletion
- *
- * See #gsc_tree_select_last
- *
- * Returns
- */
 gboolean 
-gsc_completion_select_last (GscCompletion *self)
+_gsc_completion_select_last (GscCompletion *self)
 {
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
 
 	return gsc_tree_select_last (get_current_tree (self));
 }
 
-/**
- * gsc_completion_select_previous:
- * @self: The #GscCompletion
- *
- * See #gsc_tree_select_previous
- *
- * Returns
- */
 gboolean
-gsc_completion_select_previous (GscCompletion *self, 
+_gsc_completion_select_previous (GscCompletion *self, 
 			   gint rows)
 {
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
@@ -952,23 +1009,35 @@ gsc_completion_select_previous (GscCompletion *self,
 	return gsc_tree_select_previous (get_current_tree (self), rows);
 }
 
-/**
- * gsc_completion_select_next:
- * @self: The #GscCompletion
- * @rows: Selects the next @rows row.
- *
- * See #gsc_tree_select_next
- *
- * Returns
- */
 gboolean
-gsc_completion_select_next (GscCompletion *self, 
+_gsc_completion_select_next (GscCompletion *self, 
 		       gint rows)
 {
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
 
 	return gsc_tree_select_next (get_current_tree (self), rows);
 }
+
+gboolean
+_gsc_completion_select_current_proposal (GscCompletion *self)
+{
+	gboolean selected = TRUE;
+	GscProposal *prop = NULL;
+	
+	if (gsc_tree_get_selected_proposal (get_current_tree (self), &prop))
+	{
+		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
+			       0, prop, &selected);
+		selected = TRUE;
+	}
+	else
+	{
+		selected = FALSE;
+	}
+	
+	return selected;
+}
+
 
 /**
  * gsc_completion_register_trigger:
@@ -1245,7 +1314,7 @@ gsc_completion_trigger_event (GscCompletion *self,
 		gtk_window_move (GTK_WINDOW (self),
 				 x, y);
 		
-		g_signal_emit (G_OBJECT (self), signals[COMP_STARTED], 0);
+		//FIXME g_signal_emit (G_OBJECT (self), signals[COMP_STARTED], 0);
 		
 		gsc_completion_show_or_update (GTK_WIDGET (self));
 

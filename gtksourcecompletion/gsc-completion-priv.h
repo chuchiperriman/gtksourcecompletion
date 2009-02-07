@@ -65,8 +65,16 @@ struct _GscCompletionPriv
 	
 };
 
-void	_gsc_completion_info_hide	(GscCompletion *self);
-void	_gsc_completion_info_show	(GscCompletion *self);
+void		_gsc_completion_info_hide		(GscCompletion *self);
+void		_gsc_completion_info_show		(GscCompletion *self);
+gboolean	_gsc_completion_select_next 		(GscCompletion *self,
+							 gint rows);
+gboolean	_gsc_completion_select_previous 	(GscCompletion *self,
+						 	 gint rows);
+gboolean 	_gsc_completion_select_last		(GscCompletion *self);
+gboolean	_gsc_completion_select_first		(GscCompletion *self);
+gboolean	_gsc_completion_select_current_proposal	(GscCompletion *self);
+
 
 G_END_DECLS
 

@@ -1,3 +1,9 @@
+2009-02-07  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.c:
+	Added movement functions to -priv
+	Added mevement keys control
+
 2009-02-02  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:
