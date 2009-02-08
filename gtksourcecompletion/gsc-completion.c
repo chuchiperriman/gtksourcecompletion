@@ -70,29 +70,29 @@ G_DEFINE_TYPE(GscCompletion, gsc_completion, GTK_TYPE_WINDOW);
  * Gsc in GtkSourceView
  */
 
-static GHashTable *completion_map = NULL;
+static GHashTable *gsccompletion_map = NULL;
 
 static GscCompletion* 
 completion_control_get_completion (GtkTextView *view)
 {
-	if (completion_map == NULL)
-		completion_map = g_hash_table_new (g_direct_hash,
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
 						   g_direct_equal);
 
-	return g_hash_table_lookup (completion_map, view);
+	return g_hash_table_lookup (gsccompletion_map, view);
 }
 
 static void 
 completion_control_add_completion (GtkTextView *view,
 				   GscCompletion *comp)
 {
-	g_hash_table_insert (completion_map, view, comp);
+	g_hash_table_insert (gsccompletion_map, view, comp);
 }
 
 static void 
 completion_control_remove_completion (GtkTextView *view)
 {
-	g_hash_table_remove (completion_map, view);
+	g_hash_table_remove (gsccompletion_map, view);
 }
 /* ********************************************************************* */
 
@@ -562,6 +562,8 @@ gsc_completion_finalize (GObject *object)
 				NULL);
 		g_list_free (self->priv->prov_trig);
 	}
+	
+	completion_control_remove_completion(self->priv->view);
 	
 	g_debug ("completion finalize");
 	
@@ -1103,6 +1105,9 @@ gsc_completion_new (GtkTextView *view)
 				    "type", GTK_WINDOW_POPUP,
 				    NULL));
 	self->priv->view = view;
+	
+	completion_control_add_completion(view,self);
+	
 	return GTK_WIDGET (self);
 }
 
@@ -1359,6 +1364,7 @@ gsc_completion_trigger_event (GscCompletion *self,
 	{
 		if (GTK_WIDGET_VISIBLE (self))
 			end_completion (self);
+		return FALSE;
 	}
 	
 	data_list = final_list;
@@ -1550,15 +1556,48 @@ gsc_completion_deactivate (GscCompletion *self)
 	self->priv->active = FALSE;
 }
 
+/*FIXME Doc*/
 GtkWidget*
 gsc_completion_get_bottom_bar (GscCompletion *self)
 {
 	return self->priv->bottom_bar;
 }
+
+/*FIXME Doc*/
 GscInfo*
 gsc_completion_get_info_widget (GscCompletion *self)
 {
 	return GSC_INFO (self->priv->info_window);
 }
+
+/*FIXME Doc*/
+GscTrigger*
+gsc_completion_get_trigger (GscCompletion *self,
+			    const gchar *trigger_name)
+{
+
+	GList *l;
+	GscTrigger *trigger;
+	g_return_val_if_fail (GSC_IS_COMPLETION (self), NULL);
+
+	for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
+	{
+		trigger =  GSC_TRIGGER (l->data);
+		
+		if (g_strcmp0 (gsc_trigger_get_name (trigger), trigger_name) == 0)
+			return trigger;
+	}
+	
+	return NULL;
+}
+
+/*FIXME This will be removed*/
+GscCompletion*
+gsc_completion_get_from_view(GtkTextView *view)
+{
+        return completion_control_get_completion(view);
+}
+
+
 
 

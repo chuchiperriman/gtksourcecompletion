@@ -82,6 +82,9 @@ GtkWidget	*gsc_completion_new			(GtkTextView *view);
 
 GtkTextView	*gsc_completion_get_view		(GscCompletion *self);
 
+GscTrigger	*gsc_completion_get_trigger		(GscCompletion *self,
+							 const gchar *trigger_name);
+
 gboolean	 gsc_completion_register_provider	(GscCompletion *self,
 							 GscProvider *provider,
 							 GscTrigger *trigger);
