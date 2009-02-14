@@ -1,3 +1,8 @@
+2009-02-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.[ch]:
+	Added gsc_completion_get_provider
+
 2009-02-08  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:

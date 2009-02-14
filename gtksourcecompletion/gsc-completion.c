@@ -1230,7 +1230,11 @@ gsc_completion_unregister_trigger (GscCompletion *self,
 		PTPair *ptp = (PTPair *)l->data;
 		
 		if (ptp->trigger == trigger)
+		{
 			free_pair (ptp);
+			self->priv->prov_trig = g_list_remove_link (self->priv->prov_trig, l);
+			//TODO we need start the list again
+		}
 	}
 
 	g_object_unref (trigger);
@@ -1268,6 +1272,8 @@ gsc_completion_unregister_provider (GscCompletion *self,
 		if (ptp->provider == provider)
 		{
 			free_pair (ptp);
+			self->priv->prov_trig = g_list_remove_link (self->priv->prov_trig, l);
+			//TODO we need start the list again
 			ret = TRUE;
 		}
 	}
@@ -1588,6 +1594,25 @@ gsc_completion_get_trigger (GscCompletion *self,
 			return trigger;
 	}
 	
+	return NULL;
+}
+
+/*FIXME Doc*/
+GscProvider*
+gsc_completion_get_provider (GscCompletion *self,
+			     const gchar *prov_name)
+{
+
+	GList *l;
+	g_return_val_if_fail (GSC_IS_COMPLETION (self), NULL);
+
+	for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
+	{
+		PTPair *ptp = (PTPair *)l->data;
+		if (g_strcmp0 (gsc_provider_get_name (ptp->provider), prov_name) == 0)
+			return ptp->provider;
+	}
+		
 	return NULL;
 }
 

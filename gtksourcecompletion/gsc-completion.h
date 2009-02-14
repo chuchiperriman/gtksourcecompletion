@@ -85,6 +85,10 @@ GtkTextView	*gsc_completion_get_view		(GscCompletion *self);
 GscTrigger	*gsc_completion_get_trigger		(GscCompletion *self,
 							 const gchar *trigger_name);
 
+GscProvider	*gsc_completion_get_provider		(GscCompletion *self,
+							 const gchar *prov_name);
+
+//TODO get_provider
 gboolean	 gsc_completion_register_provider	(GscCompletion *self,
 							 GscProvider *provider,
 							 GscTrigger *trigger);
