@@ -86,12 +86,18 @@ static void
 completion_control_add_completion (GtkTextView *view,
 				   GscCompletion *comp)
 {
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
+						   g_direct_equal);
 	g_hash_table_insert (gsccompletion_map, view, comp);
 }
 
 static void 
 completion_control_remove_completion (GtkTextView *view)
 {
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
+						   g_direct_equal);
 	g_hash_table_remove (gsccompletion_map, view);
 }
 /* ********************************************************************* */

@@ -19,7 +19,7 @@ New manager TODO
 Tests TODO
 ============
 
-[ ] Test with a custom info widget
+[X] Test with a custom info widget
 [ ] Test enable-disable completion "on-the-fly"
 [ ] Test disconnecting manage-completion-keys and manage it with another function
 [ ] Test completion filters

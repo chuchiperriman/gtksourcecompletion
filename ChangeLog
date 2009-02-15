@@ -1,3 +1,10 @@
+2009-02-15  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.c:
+	Fixed a check with the static completion-view pairs
+	* test/completion-custom-widgets.c:
+	Created this test to show how we can change the default info widget
+
 2009-02-14  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.[ch]:

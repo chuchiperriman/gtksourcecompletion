@@ -1,4 +1,4 @@
-bin_PROGRAMS = gio-test completion-simple completion-focus 
+bin_PROGRAMS = gio-test completion-simple completion-focus completion-custom-widgets
 
 INCLUDES=	\
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
@@ -57,5 +57,19 @@ completion_focus_LDFLAGS =  \
 	`pkg-config --libs gio-2.0`
 
 completion_focus_LDADD = 	\
+	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
+	$(PACKAGE_LIBS)
+
+
+completion_custom_widgets_SOURCES = 	\
+	gsc-provider-test.h		\
+	gsc-provider-test.c		\
+	completion-custom-widgets.c
+
+completion_custom_widgets_LDFLAGS =  \
+	`pkg-config --libs gtksourceview-2.0`	\
+	`pkg-config --libs gio-2.0`
+
+completion_custom_widgets_LDADD = 	\
 	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
 	$(PACKAGE_LIBS)
