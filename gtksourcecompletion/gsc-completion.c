@@ -571,8 +571,6 @@ gsc_completion_finalize (GObject *object)
 	
 	completion_control_remove_completion(self->priv->view);
 	
-	g_debug ("completion finalize");
-	
 	G_OBJECT_CLASS (gsc_completion_parent_class)->finalize (object);
 }
 
@@ -1342,6 +1340,7 @@ gsc_completion_trigger_event (GscCompletion *self,
 
 	g_return_val_if_fail (GSC_IS_COMPLETION (self), FALSE);
 	g_return_val_if_fail (GSC_IS_TRIGGER (trigger), FALSE);
+	g_return_val_if_fail (self->priv->active, FALSE);
 	
 	/*
 	 * If the completion is visble and there is a trigger active, you cannot

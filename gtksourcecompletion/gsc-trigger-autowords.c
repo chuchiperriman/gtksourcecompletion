@@ -35,7 +35,7 @@
 enum
 {
 	AS_GTK_TEXT_VIEW_KR,
-	AS_GTK_TEXT_VIEW_IT,
+	AS_GTK_TEXT_BUFFER_IT,
 	LAST_SIGNAL
 };
 	
@@ -197,7 +197,7 @@ gsc_trigger_autowords_real_activate (GscTrigger* base)
 				       NULL,
 				       G_CONNECT_AFTER);
 
-	self->priv->signals[AS_GTK_TEXT_VIEW_IT] = 
+	self->priv->signals[AS_GTK_TEXT_BUFFER_IT] = 
 		g_signal_connect_after (gtk_text_view_get_buffer (self->priv->view),
 					"insert-text",
 					G_CALLBACK (autocompletion_insert_text_cb),
@@ -210,17 +210,25 @@ static gboolean
 gsc_trigger_autowords_real_deactivate (GscTrigger* base)
 {
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (base);
-	gint i;
+	GtkTextBuffer *buffer;
 	
-	for (i = 0; i < LAST_SIGNAL; i++)
+	if (g_signal_handler_is_connected (self->priv->view,
+					   self->priv->signals[AS_GTK_TEXT_VIEW_KR]))
 	{
-		if (g_signal_handler_is_connected (self->priv->view,
-						   self->priv->signals[i]))
-		{
-			g_signal_handler_disconnect (self->priv->view,
-						     self->priv->signals[i]);
-		}
+		g_signal_handler_disconnect (self->priv->view,
+					     self->priv->signals[AS_GTK_TEXT_VIEW_KR]);
+		self->priv->signals[AS_GTK_TEXT_VIEW_KR] = 0;
 	}
+
+	buffer = gtk_text_view_get_buffer (self->priv->view);	
+	if (g_signal_handler_is_connected (buffer,
+					   self->priv->signals[AS_GTK_TEXT_BUFFER_IT]))
+	{
+		g_signal_handler_disconnect (buffer,
+					     self->priv->signals[AS_GTK_TEXT_BUFFER_IT]);
+		self->priv->signals[AS_GTK_TEXT_BUFFER_IT] = 0;
+	}
+	
 	return FALSE;
 }
 

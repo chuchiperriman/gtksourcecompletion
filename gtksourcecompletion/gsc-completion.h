@@ -88,7 +88,6 @@ GscTrigger	*gsc_completion_get_trigger		(GscCompletion *self,
 GscProvider	*gsc_completion_get_provider		(GscCompletion *self,
 							 const gchar *prov_name);
 
-//TODO get_provider
 gboolean	 gsc_completion_register_provider	(GscCompletion *self,
 							 GscProvider *provider,
 							 GscTrigger *trigger);
@@ -105,7 +104,6 @@ gboolean	 gsc_completion_unregister_trigger	(GscCompletion *self,
 
 GscTrigger	*gsc_completion_get_active_trigger	(GscCompletion *self);
 
-/*FIXME Perhaps we need pass a GscEvent object instead the trigger*/
 gboolean	 gsc_completion_trigger_event		(GscCompletion *self,
 							 GscTrigger *trigger);
 

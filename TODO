@@ -13,14 +13,15 @@ New manager TODO
 ==================
 
 [ ] Add autoselect feature
-[ ] Create a GscView to show what gtksourceview functions we need and show
-    how the new gtksourceview looks.
+[ ] change activate/deactivate functions to set_active and get_active function
 
 Tests TODO
 ============
 
-[X] Test with a custom info widget
-[ ] Test enable-disable completion "on-the-fly"
-[ ] Test disconnecting manage-completion-keys and manage it with another function
-[ ] Test completion filters
-[ ] Test add a filter widget to the completion 
+[X] Test with a custom info widget.
+[X] Test enable-disable completion "on-the-fly".
+[ ] Test disconnecting manage-completion-keys and manage it with another function.
+[ ] Test completion filters.
+[ ] Test add a filter widget to the completion.
+[ ] Test calltips by pressing some keys
+[ ] Test calltips with the mouse

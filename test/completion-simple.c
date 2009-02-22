@@ -63,6 +63,20 @@ destroy_cb(GtkObject *object,gpointer   user_data)
 	gtk_main_quit ();
 }
 
+static void
+activate_toggled_cb (GtkToggleButton *button,
+		     gpointer user_data)
+{
+	if (gtk_toggle_button_get_active (button))
+	{
+		gsc_completion_activate (comp);
+	}
+	else
+	{
+		gsc_completion_deactivate (comp);
+	}
+}
+
 static gboolean
 key_press(GtkWidget   *widget,
 	GdkEventKey *event,
@@ -83,17 +97,34 @@ GtkWidget*
 create_window (void)
 {
 	GtkWidget *window;
+	GtkWidget *vbox;
+	GtkWidget *hbox;
+	GtkWidget *activate;
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_resize(GTK_WINDOW(window),800,600);
+	
+	vbox = gtk_vbox_new (FALSE,1);
+	hbox = gtk_hbox_new (FALSE,1);
+	
 	view = gtk_source_view_new();
 	GtkWidget *scroll = gtk_scrolled_window_new(NULL,NULL);
 	gtk_container_add(GTK_CONTAINER(scroll),view);
-	gtk_container_add(GTK_CONTAINER(window),scroll);
-	gtk_widget_set_has_tooltip(view,TRUE);
+	
+	activate = gtk_check_button_new_with_label ("Active");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (activate), TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox),activate, FALSE, FALSE, 0);
+	
+	gtk_box_pack_start(GTK_BOX(vbox),scroll, TRUE, TRUE, 0);
+	gtk_box_pack_end(GTK_BOX(vbox),hbox, FALSE, FALSE, 0);
+	
+	
+	gtk_container_add(GTK_CONTAINER(window),vbox);
 	
 	g_signal_connect(view, "key-release-event", G_CALLBACK(key_press), NULL);
 	
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
+	
+	g_signal_connect(activate,"toggled",G_CALLBACK(activate_toggled_cb),NULL);
 	
 	return window;
 }
