@@ -6,5 +6,3 @@ gsc_proposal_get_type
 gsc_trigger_autowords_get_type
 gsc_provider_get_type
 gsc_tree_get_type
-gsc_provider_file_get_type
-gsc_documentwords_provider_get_type

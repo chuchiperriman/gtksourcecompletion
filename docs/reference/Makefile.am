@@ -1,11 +1,11 @@
 GTKDOC_CFLAGS = -I$(top_srcdir) $(DEP_CFLAGS)
-GTKDOC_LIBS = $(top_builddir)/gtksourcecompletion/libgtksourcecompletion-1.0.la
+GTKDOC_LIBS = $(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.7
 
 # The name of the module.
-DOC_MODULE = gtksourcecompletion-1.0
+DOC_MODULE = gtksourcecompletion-2.0
 
 # The top-level SGML file.
 DOC_MAIN_SGML_FILE = gtksourcecompletion-docs.sgml
@@ -36,6 +36,10 @@ IGNORE_HFILES =					\
 	gsc-trigger-dotexample.c		\
 	gsc-provider-test.h			\
 	gsc-provider-test.c			\
+	gsc-provider-file.h			\
+	gsc-provider-file.c			\
+	gsc-documentwords-provider.c		\
+	gsc-documentwords-provider.h		\
 	gsc-marshal.h		
 
 # Extra options to supply to gtkdoc-mkdb

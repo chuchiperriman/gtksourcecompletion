@@ -169,44 +169,6 @@ GSC_TREE_GET_CLASS
 </SECTION>
 
 <SECTION>
-<FILE>gsc-provider-file</FILE>
-GSC_PROVIDER_FILE_NAME
-GscProviderFilePrivate
-<TITLE>GscProviderFile</TITLE>
-GscProviderFile
-gsc_provider_file_new
-gsc_provider_file_set_file
-<SUBSECTION Standard>
-GSC_PROVIDER_FILE
-GSC_IS_PROVIDER_FILE
-GSC_TYPE_PROVIDER_FILE
-gsc_provider_file_get_type
-GSC_PROVIDER_FILE_CLASS
-GSC_IS_PROVIDER_FILE_CLASS
-GSC_PROVIDER_FILE_GET_CLASS
-</SECTION>
-
-<SECTION>
-<FILE>gsc-documentwords-provider</FILE>
-GSC_DOCUMENTWORDS_PROVIDER_NAME
-GscDocumentwordsProviderPrivate
-<TITLE>GscDocumentwordsProvider</TITLE>
-GscDocumentwordsProvider
-GscDocumentwordsProviderSortType
-gsc_documentwords_provider_new
-gsc_documentwords_provider_set_sort_type
-gsc_documentwords_provider_get_sort_type
-<SUBSECTION Standard>
-GSC_DOCUMENTWORDS_PROVIDER
-GSC_IS_DOCUMENTWORDS_PROVIDER
-GSC_TYPE_DOCUMENTWORDS_PROVIDER
-gsc_documentwords_provider_get_type
-GSC_DOCUMENTWORDS_PROVIDER_CLASS
-GSC_IS_DOCUMENTWORDS_PROVIDER_CLASS
-GSC_DOCUMENTWORDS_PROVIDER_GET_CLASS
-</SECTION>
-
-<SECTION>
 <FILE>proposal-template</FILE>
 GscProposal
 <SUBSECTION Standard>

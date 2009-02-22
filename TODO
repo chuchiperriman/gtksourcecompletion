@@ -5,9 +5,12 @@ TODO
 
 [X] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
+[X] Set Gsc-Info text position on middle-left
 [ ] Support to set the focus on the popup and info windows.
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
-[ ] Set Gsc-Info text position on middle-left
+[ ] Control view scrolling: When the user scroll the view, we update the popup 
+    position and, if the cursor goes out of the screen, we hide the completion
+
 
 New manager TODO
 ==================
@@ -15,15 +18,16 @@ New manager TODO
 [ ] Add autoselect feature
 [ ] change activate/deactivate functions to set_active and get_active function
 
+
 Tests TODO
 ============
 
 [X] Test with a custom info widget.
 [X] Test enable-disable completion "on-the-fly".
-[ ] Test disconnecting manage-completion-keys and manage it with another function.
 [X] Test completion filters.
-[ ] Test add a filter widget to the completion.
 [X] Test calltips by pressing some keys
+[ ] Test disconnecting manage-completion-keys and manage it with another function.
+[ ] Test add a filter widget to the completion.
 [ ] Test calltips with the mouse
 [ ] Test calltips autocontrolling the position (on cursor) and the show/hide
 	* show	-> with keys or mouse

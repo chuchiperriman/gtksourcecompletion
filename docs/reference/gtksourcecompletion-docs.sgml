@@ -14,9 +14,8 @@
     <xi:include href="xml/gsc-trigger.xml"/>
     <xi:include href="xml/gsc-trigger-customkey.xml"/>
     <xi:include href="xml/gsc-provider-file.xml"/>
-    <xi:include href="xml/gsc-manager.xml"/>
+    <xi:include href="xml/gsc-completion.xml"/>
     <xi:include href="xml/gsc-info.xml"/>
-    <xi:include href="xml/gsc-documentwords-provider.xml"/>
     <xi:include href="xml/gsc-proposal.xml"/>
     <xi:include href="xml/gsc-trigger-autowords.xml"/>
     <xi:include href="xml/gsc-provider.xml"/>
