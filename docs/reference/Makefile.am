@@ -26,6 +26,8 @@ IGNORE_HFILES =					\
 	xmalloc.h		\
 	provider-template.h			\
 	provider-template.c			\
+	proposal-template.h			\
+	proposal-template.c			\
 	trigger-template.h			\
 	trigger-template.c	\
 	getopt.h			\
