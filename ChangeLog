@@ -4,6 +4,8 @@
 	Control if the completion is active when an event is triggered
 	* test/completion-simple.c: 
 	Added "active" check to enable, disable completion
+	* gtksourcecompletion/gsc-trigger-customkey.c:
+	Fixed keys control!!!!
 
 2009-02-15  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 

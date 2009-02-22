@@ -3,9 +3,9 @@ TODO
 
 [ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
 
-[ ] Support to set the focus on the popup and info windows.
-[ ] Better key control in triggers because if you configure <control>Return and
+[X] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
+[ ] Support to set the focus on the popup and info windows.
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
 [ ] Set Gsc-Info text position on middle-left
 

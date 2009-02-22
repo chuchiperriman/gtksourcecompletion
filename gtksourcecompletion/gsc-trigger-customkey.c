@@ -58,16 +58,16 @@ view_key_press_event_cb (GtkWidget *view,
 			 gpointer user_data)
 {
 	GscTriggerCustomkey *self = GSC_TRIGGER_CUSTOMKEY (user_data);
-	
+	guint s = event->state & gtk_accelerator_get_default_mod_mask();
 	guint key = gdk_keyval_to_lower (self->priv->key);
 	
-	if ((event->state & self->priv->mod) ==  self->priv->mod &&
-		gdk_keyval_to_lower (event->keyval) == key)
+	if (s == self->priv->mod && gdk_keyval_to_lower(event->keyval) == key)
 	{
 		gsc_completion_trigger_event (self->priv->completion,
 					      GSC_TRIGGER (self));
 		return TRUE;
 	}
+	
 	return FALSE;
 }
 
