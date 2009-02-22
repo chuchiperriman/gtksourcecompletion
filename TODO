@@ -21,7 +21,11 @@ Tests TODO
 [X] Test with a custom info widget.
 [X] Test enable-disable completion "on-the-fly".
 [ ] Test disconnecting manage-completion-keys and manage it with another function.
-[ ] Test completion filters.
+[X] Test completion filters.
 [ ] Test add a filter widget to the completion.
-[ ] Test calltips by pressing some keys
+[X] Test calltips by pressing some keys
 [ ] Test calltips with the mouse
+[ ] Test calltips autocontrolling the position (on cursor) and the show/hide
+	* show	-> with keys or mouse
+	* hide	-> when the current line change
+	*	-> when the user press esc

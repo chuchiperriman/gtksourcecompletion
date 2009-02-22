@@ -37,6 +37,7 @@
 #include <gtksourcecompletion/gsc-trigger-customkey.h>
 #include <gtksourcecompletion/gsc-trigger-autowords.h>
 #include <gtksourcecompletion/gsc-utils.h>
+#include <gtksourcecompletion/gsc-info.h>
 
 #include "gsc-documentwords-provider.h"
 #include "gsc-provider-file.h"
@@ -45,6 +46,7 @@
 
 static GtkWidget *view;
 static GscCompletion *comp;
+static GscInfo *info;
 
 static const gboolean change_keys = FALSE;
 
@@ -90,6 +92,30 @@ key_press(GtkWidget   *widget,
 		return TRUE;
 	}
 	
+	guint key = 0;
+	GdkModifierType mod;
+	gtk_accelerator_parse ("<Control>b", &key, &mod);
+	
+	guint s = event->state & gtk_accelerator_get_default_mod_mask();
+	if (s == mod && gdk_keyval_to_lower(event->keyval) == key)
+	{
+		if (!GTK_WIDGET_VISIBLE (info))
+		{
+			gchar *text;
+			gchar *word = gsc_get_last_word (GTK_TEXT_VIEW (view));
+			text = g_strdup_printf ("<b>Calltip</b>: %s", word);
+			
+			gsc_info_set_markup (info, text);
+			g_free (text);
+			gsc_info_move_to_cursor (info, GTK_TEXT_VIEW (view));
+			gtk_widget_show (GTK_WIDGET (info));
+		}
+		else
+		{
+			gtk_widget_hide (GTK_WIDGET (info));
+		}
+	}
+	
 	return FALSE;
 }
 
@@ -100,8 +126,9 @@ create_window (void)
 	GtkWidget *vbox;
 	GtkWidget *hbox;
 	GtkWidget *activate;
+	GtkWidget *label;
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_resize(GTK_WINDOW(window),800,600);
+	gtk_window_resize(GTK_WINDOW(window),600,400);
 	
 	vbox = gtk_vbox_new (FALSE,1);
 	hbox = gtk_hbox_new (FALSE,1);
@@ -111,12 +138,13 @@ create_window (void)
 	gtk_container_add(GTK_CONTAINER(scroll),view);
 	
 	activate = gtk_check_button_new_with_label ("Active");
+	label = gtk_label_new ("F9 filter by \"sp\"\n<Control>b to show a calltip");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (activate), TRUE);
+	gtk_box_pack_start(GTK_BOX(hbox),label, TRUE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),activate, FALSE, FALSE, 0);
 	
 	gtk_box_pack_start(GTK_BOX(vbox),scroll, TRUE, TRUE, 0);
 	gtk_box_pack_end(GTK_BOX(vbox),hbox, FALSE, FALSE, 0);
-	
 	
 	gtk_container_add(GTK_CONTAINER(window),vbox);
 	
@@ -164,6 +192,19 @@ create_completion(void)
 	
 }
 
+static void
+create_info ()
+{
+	info = gsc_info_new ();
+	gsc_info_set_adjust_height (info,
+				    TRUE,
+				    -1);
+	gsc_info_set_adjust_width (info,
+				   TRUE,
+				   -1);
+	
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -174,6 +215,7 @@ main (int argc, char *argv[])
 
 	window = create_window ();
 	create_completion();
+	create_info ();
 	
 	gtk_widget_show_all (window);
 
