@@ -12,7 +12,7 @@ Build-Depends: autotools-dev,
                libglib2.0-dev (>= 2.13.0)
 Standards-Version: 3.8.0
 
-Package: libgtksourcecompletion1.0-0
+Package: libgtksourcecompletion2.0
 Section: libs
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, libgtksourceview2.0-0 (>=2.0.0) 
@@ -22,10 +22,10 @@ Description: Library for adds completion support to GtkSourceView.
  a document words provider that adds (auto)completion of
  previously written words
 
-Package: libgtksourcecompletion1.0-dev
+Package: libgtksourcecompletion2.0-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libgtksourcecompletion1.0-0 (= ${binary:Version}), libgtksourceview2.0-dev (>=2.0.0) 
+Depends: ${misc:Depends}, libgtksourcecompletion2.0 (= ${binary:Version}), libgtksourceview2.0-dev (>=2.0.0) 
 Description: Development files of libgtksourcecompletion
  This library contains a generic popup to add completion 
  support to GtkSourceView. It has some default events and
@@ -35,7 +35,7 @@ Description: Development files of libgtksourcecompletion
  This package contains the header files required if you wish to develop
  software that uses the GtkSourceCompletion
 
-Package: libgtksourcecompletion1.0-doc
+Package: libgtksourcecompletion2.0-doc
 Section: doc
 Architecture: all
 Depends: ${misc:Depends}

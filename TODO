@@ -10,6 +10,8 @@ TODO
 [ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
 [ ] Control view scrolling: When the user scroll the view, we update the popup 
     position and, if the cursor goes out of the screen, we hide the completion
+[ ] It would be nice if the info windows can store the visibility state
+
 
 
 New manager TODO

@@ -15,9 +15,9 @@ include /usr/share/gnome-pkg-tools/1/rules/gnome-version.mk
 # GNOME_MODULE = gtksourceview
 
 # Compile options
-DEB_CONFIGURE_EXTRA_FLAGS += --enable-static
+DEB_CONFIGURE_EXTRA_FLAGS += --enable-static --enable-gtk-doc
 LDFLAGS += -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
 
 # Debhelper Arguments
-DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourcecompletion1.0-0 (>= 0.5.0)'
+DEB_DH_MAKESHLIBS_ARGS += -V 'libgtksourcecompletion2.0-0 (>= 0.7.0)'
 

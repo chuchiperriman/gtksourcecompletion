@@ -3,6 +3,9 @@
 	* gtksourcecompletion/*:
 	* doc/*:
 	A lot of new documentation and fixed some doc issues
+	* debian/*:
+	Updated debian packaging files (Thanks to Andrea Del Signore
+	<sejerpz@tin.it>)
 
 
 2009-02-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>

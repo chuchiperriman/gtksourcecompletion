@@ -1,3 +1,9 @@
+gtksourcecompletion (0.7.0-1) unstable; urgency=low
+
+  * New release
+
+ -- Andrea Del Signore <sejerpz@tin.it>  Sun, 22 Feb 2009 19:10:30 +0100
+
 gtksourcecompletion (0.5.0-1) unstable; urgency=low
 
   * Initial release 
