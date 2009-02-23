@@ -12,10 +12,19 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
-
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+ 
+/**
+ * SECTION:gsc-completion
+ * @title: GscCompletion
+ * @short_description: Main Completion Object
+ *
+ * This is the main completion object. It manages all providers (#GscProvider) and 
+ * triggers (#GscTrigger) for a #GtkTextView.. 
  */
 
 #include <gdk/gdkkeysyms.h> 
@@ -1567,21 +1576,44 @@ gsc_completion_deactivate (GscCompletion *self)
 	self->priv->active = FALSE;
 }
 
-/*FIXME Doc*/
+/**
+ * gsc_completion_get_bottom_bar:
+ * @self: The #GscCompletion
+ *
+ * The bottom bar is the widgetwith the info button, the page name etc.
+ *
+ * Returns: The bottom bar widget (it is a #GtkBox by now)
+ */
 GtkWidget*
 gsc_completion_get_bottom_bar (GscCompletion *self)
 {
 	return self->priv->bottom_bar;
 }
 
-/*FIXME Doc*/
+/**
+ * gsc_completion_get_info_widget:
+ * @self: The #GscCompletion
+ *
+ * The info widget is the window where the completion shows the
+ * proposal info or help. DO NOT USE IT (only to connect to some signal
+ * or set the content in a custom widget).
+ *
+ * Returns: The internal GscInfo widget.
+ */
 GscInfo*
 gsc_completion_get_info_widget (GscCompletion *self)
 {
 	return GSC_INFO (self->priv->info_window);
 }
 
-/*FIXME Doc*/
+/**
+ * gsc_completion_get_trigger:
+ * @self: The #GscCompletion
+ * @trigger_name: The trigger name to find
+ *
+ * Returns: The #GscTrigger registered with @trigger_name, %NULL if it cannot
+ * be found
+ */
 GscTrigger*
 gsc_completion_get_trigger (GscCompletion *self,
 			    const gchar *trigger_name)
@@ -1602,7 +1634,13 @@ gsc_completion_get_trigger (GscCompletion *self,
 	return NULL;
 }
 
-/*FIXME Doc*/
+/**
+ * gsc_completion_get_provider:
+ * @self: The #GscCompletion
+ * @prov_name: The provider name to find
+ *
+ * Returns: The #GscProvider registered with @prov_name
+ */
 GscProvider*
 gsc_completion_get_provider (GscCompletion *self,
 			     const gchar *prov_name)
@@ -1621,13 +1659,16 @@ gsc_completion_get_provider (GscCompletion *self,
 	return NULL;
 }
 
-/*FIXME This will be removed*/
+/**
+ * gsc_completion_get_from_view:
+ * @view: The #GtkTextView associated with a #GscCompletion
+ *
+ * Returns: The #GscCompletion associated with a @view or NULL.
+ */
 GscCompletion*
 gsc_completion_get_from_view(GtkTextView *view)
 {
         return completion_control_get_completion(view);
 }
-
-
 
 

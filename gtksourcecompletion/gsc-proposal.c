@@ -12,12 +12,21 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
-
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
+/**
+ * SECTION:gsc-proposal
+ * @title: GscProposal
+ * @short_description: Completion proposal object
+ *
+ * Every proposal is an item into the popup. It controls the label to be
+ * shown, the help (info) and the apply when the user selects the proposal.
+ *
+ */
   
 #include "gsc-proposal.h"
 #include "gsc-utils.h"

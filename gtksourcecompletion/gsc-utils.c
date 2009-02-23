@@ -12,12 +12,19 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
-
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:gsc-utils
+ * @title: Gsc Utils
+ * @short_description: Useful functions
+ *
+ */
+ 
 #include <string.h> 
 #include "gsc-utils.h"
 
@@ -417,32 +424,6 @@ gsc_get_window_position_in_cursor(GtkWindow *window,
 	
 	return up;
 }
-
-gboolean
-gsc_compare_keys(guint key, guint mods, GdkEventKey *event)
-{
-	guint modifiers = gtk_accelerator_get_default_mod_mask ();
-	/*This is for a gtk bug!!!!*/
-	guint end_key = key;
-	if ((event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK)
-		end_key = gdk_keyval_to_upper(end_key);
-	
-	if (mods == 0 &&
-	    (event->state & modifiers)==0)
-	{
-		if (event->keyval == end_key)
-		{
-			return TRUE;
-		}
-	}else if (((event->state & mods)  == mods) && 
-	    event->keyval == end_key)
-	{
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
 
 
 

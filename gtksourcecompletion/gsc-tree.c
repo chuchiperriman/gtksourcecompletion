@@ -17,6 +17,16 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * SECTION:gsc-tree
+ * @title: GscTree
+ * @short_description: Internal tree Widget.
+ * 
+ *
+ * This object must not be used.
+ *
+ */
+
 #include "gsc-tree.h"
 
 #define GSC_TREE_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\

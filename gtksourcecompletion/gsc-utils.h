@@ -70,10 +70,10 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 				gint *y);
 
 /**
- * gsc_get_text: 
+ * gsc_gsv_get_text: 
  * @text_view: The #GtkTextView 
  *
- * Returns the #GtkTextView content .
+ * Returns All the #GtkTextView content .
  */
 gchar* 
 gsc_gsv_get_text(GtkTextView *text_view);
@@ -203,16 +203,5 @@ gsc_get_window_position_center_parent(GtkWindow *window,
 				      GtkWidget *parent,
 				      gint *x,
 				      gint *y);
-
-/**
- * gsc_compare_keys:
- * @key: key to compare
- * @mods: modifiers to compare
- * @event: Event to be compared with the previous key and modifiers
- *
- * Returns: TRUE if the event key has the same key and mods.
- */
-gboolean
-gsc_compare_keys(guint key, guint mods, GdkEventKey *event);
 
 #endif 

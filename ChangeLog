@@ -1,3 +1,10 @@
+2009-02-23  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/*:
+	* doc/*:
+	A lot of new documentation and fixed some doc issues
+
+
 2009-02-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:

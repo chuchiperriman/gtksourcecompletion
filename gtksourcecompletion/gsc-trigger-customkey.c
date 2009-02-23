@@ -17,6 +17,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/**
+ * SECTION:gsc-trigger-customkey
+ * @title: GscTriggerCustomkey
+ * @short_description: Custom keys trigger
+ *
+ * This object trigger a completion event when the user press the configured
+ * keys.
+ * 
+ */
+
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>

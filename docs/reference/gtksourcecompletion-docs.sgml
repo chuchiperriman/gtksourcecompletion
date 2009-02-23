@@ -3,9 +3,9 @@
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>GtkSourceCompletion Reference Manual</title>
+    <title>GtkSourceCompletion 2.0 Reference Manual</title>
     <releaseinfo>
-      for GtkSourceCompletion
+      GtkSourceCompletion 2.0. This API is not closed!!!!
     </releaseinfo>
   </bookinfo>
 
@@ -13,14 +13,12 @@
     <title>API Reference</title>
     <xi:include href="xml/gsc-trigger.xml"/>
     <xi:include href="xml/gsc-trigger-customkey.xml"/>
-    <xi:include href="xml/gsc-provider-file.xml"/>
     <xi:include href="xml/gsc-completion.xml"/>
     <xi:include href="xml/gsc-info.xml"/>
     <xi:include href="xml/gsc-proposal.xml"/>
     <xi:include href="xml/gsc-trigger-autowords.xml"/>
     <xi:include href="xml/gsc-provider.xml"/>
     <xi:include href="xml/gsc-tree.xml"/>
-    <xi:include href="xml/gsc-popup.xml"/>
     <xi:include href="xml/gsc-utils.xml"/>
   </chapter>
 </book>

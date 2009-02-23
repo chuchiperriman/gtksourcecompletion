@@ -190,6 +190,5 @@ gsc_is_valid_word
 gsc_get_window_position_in_cursor
 gsc_get_window_position_center_screen
 gsc_get_window_position_center_parent
-gsc_compare_keys
 </SECTION>
 

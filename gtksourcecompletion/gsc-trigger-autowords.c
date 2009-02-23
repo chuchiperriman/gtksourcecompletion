@@ -15,6 +15,19 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * SECTION:gsc-trigger-autowords
+ * @title: GscTriggerAutowords
+ * @short_description: Autocompletion words trigger
+ *
+ * This object trigger a completion event when the user writes a words with 
+ * a configured lenght (default 3 characters). You can configure a delay and
+ * the completion event will be triggered n millisecons after the user 
+ * insertion.
+ * 
+ */
+
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
