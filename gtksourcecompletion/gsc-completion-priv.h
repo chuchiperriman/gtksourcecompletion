@@ -53,6 +53,8 @@ struct _GscCompletionPriv
 	GscCompletionPage *active_page;
 	gboolean destroy_has_run;
 	gboolean manage_keys;
+	gboolean remember_info_visibility;
+	gboolean info_visible;
 	
 	/* Completion management */
 	GtkTextView *view;

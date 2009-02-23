@@ -6,6 +6,8 @@
 	* debian/*:
 	Updated debian packaging files (Thanks to Andrea Del Signore
 	<sejerpz@tin.it>)
+	* gtksourcecompletion/gsc-completion.c:
+	Added "remember-info-visibility" property 
 
 
 2009-02-22  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>

@@ -2,16 +2,16 @@ TODO
 =================================
 
 [ ] Remove GtkTextView-GscManager Control when we integrate Gsc into Gsv
+[ ] Support to set the focus on the popup and info windows.
 
 [X] Better key control in triggers because if you configure <control>Return and
     press control+shift+return, it works but it is wrong.
 [X] Set Gsc-Info text position on middle-left
-[ ] Support to set the focus on the popup and info windows.
-[ ] Add a new sort function to gsc-documentwords-provider and remove sort-type
+[X] It would be nice if the info windows can store the visibility state
 [ ] Control view scrolling: When the user scroll the view, we update the popup 
     position and, if the cursor goes out of the screen, we hide the completion
-[ ] It would be nice if the info windows can store the visibility state
-
+[ ] Connect to show/hide or visibility of the info window into GscCompleton to 
+    a better control.
 
 
 New manager TODO

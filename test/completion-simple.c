@@ -79,6 +79,13 @@ activate_toggled_cb (GtkToggleButton *button,
 	}
 }
 
+static void
+remember_toggled_cb (GtkToggleButton *button,
+		     gpointer user_data)
+{
+	g_object_set (comp, "remember-info-visibility", gtk_toggle_button_get_active (button), NULL);
+}
+
 static gboolean
 key_press(GtkWidget   *widget,
 	GdkEventKey *event,
@@ -126,6 +133,7 @@ create_window (void)
 	GtkWidget *vbox;
 	GtkWidget *hbox;
 	GtkWidget *activate;
+	GtkWidget *remember;
 	GtkWidget *label;
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_resize(GTK_WINDOW(window),600,400);
@@ -138,10 +146,13 @@ create_window (void)
 	gtk_container_add(GTK_CONTAINER(scroll),view);
 	
 	activate = gtk_check_button_new_with_label ("Active");
+	remember = gtk_check_button_new_with_label ("Remember info visibility");
 	label = gtk_label_new ("F9 filter by \"sp\"\n<Control>b to show a calltip");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (activate), TRUE);
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (remember), FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox),label, TRUE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),activate, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox),remember, FALSE, FALSE, 0);
 	
 	gtk_box_pack_start(GTK_BOX(vbox),scroll, TRUE, TRUE, 0);
 	gtk_box_pack_end(GTK_BOX(vbox),hbox, FALSE, FALSE, 0);
@@ -153,6 +164,7 @@ create_window (void)
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
 	
 	g_signal_connect(activate,"toggled",G_CALLBACK(activate_toggled_cb),NULL);
+	g_signal_connect(remember,"toggled",G_CALLBACK(remember_toggled_cb),NULL);
 	
 	return window;
 }

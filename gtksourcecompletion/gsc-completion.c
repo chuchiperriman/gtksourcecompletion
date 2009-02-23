@@ -61,7 +61,8 @@ enum
 enum
 {
 	PROP_0,
-	PROP_MANAGE_KEYS
+	PROP_MANAGE_KEYS,
+	PROP_REMEMBER_INFO_VISIBILITY
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -222,10 +223,13 @@ gsc_completion_show_or_update (GtkWidget *widget)
 	
 	if (data && !GTK_WIDGET_VISIBLE (self))
 	{
-
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-					      FALSE);
 		GTK_WIDGET_CLASS (gsc_completion_parent_class)->show (widget);
+		
+		if (!self->priv->remember_info_visibility)
+			self->priv->info_visible = FALSE;
+		
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+					      self->priv->info_visible);
 	}
 }
 
@@ -420,10 +424,12 @@ info_toggled_cb (GtkToggleButton *widget,
 	
 	if (gtk_toggle_button_get_active (widget))
 	{
+		g_debug ("show info toggled");
 		_gsc_completion_info_show (self);
 	}
 	else
 	{
+		g_debug ("hide info toggled");
 		_gsc_completion_info_hide (self);
 	}
 }
@@ -502,9 +508,15 @@ static void
 gsc_completion_hide (GtkWidget *widget)
 {
 	GscCompletion *self = GSC_COMPLETION (widget);
+	gboolean info_visible = self->priv->info_visible;
 	
 	GTK_WIDGET_CLASS (gsc_completion_parent_class)->hide (widget);
-	_gsc_completion_info_hide (self);
+	
+	//setting to FALSE, hide the info window
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+				      FALSE);
+	
+	self->priv->info_visible = info_visible;
 }
 
 static void
@@ -720,6 +732,9 @@ gsc_completion_get_property (GObject    *object,
 		case PROP_MANAGE_KEYS:
 			g_value_set_boolean (value, self->priv->manage_keys);
 			break;
+		case PROP_REMEMBER_INFO_VISIBILITY:
+			g_value_set_boolean (value, self->priv->remember_info_visibility);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -742,6 +757,9 @@ gsc_completion_set_property (GObject      *object,
 		case PROP_MANAGE_KEYS:
 			self->priv->manage_keys = g_value_get_boolean (value);
 			set_manage_keys (self);
+			break;
+		case PROP_REMEMBER_INFO_VISIBILITY:
+			self->priv->remember_info_visibility = g_value_get_boolean (value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -770,9 +788,10 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	klass->proposal_selected = gsc_completion_proposal_selected_default;
 	
 	/**
-	 * GscManager:autoselect:
+	 * GscCompletion:manage-completion-keys:
 	 *
-	 * TRUE to autoselect if there is one proposal in one page.
+	 * TRUE if this object must control the completion keys pressed into the
+	 * #GtkTextView associated (up next proposal, down previous proposal etc.)
 	 */
 	g_object_class_install_property (object_class,
 					 PROP_MANAGE_KEYS,
@@ -780,6 +799,19 @@ gsc_completion_class_init (GscCompletionClass *klass)
 							      _("Manage Up, Down etc. keys when the completion is visible"),
 							      _("Manage Up, Down etc. keys when the completion is visible"),
 							      TRUE,
+							      G_PARAM_READWRITE));
+	/**
+	 * GscCompletion:remember-info-visibility:
+	 *
+	 * TRUE if the completion must remember the last info state
+	 * (visible or hidden)
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_REMEMBER_INFO_VISIBILITY,
+					 g_param_spec_boolean ("remember-info-visibility",
+							      _("Remember the last info state (visible or hidden)"),
+							      _("Remember the last info state (visible or hidden)"),
+							      FALSE,
 							      G_PARAM_READWRITE));
 	
 	/**
@@ -842,6 +874,8 @@ gsc_completion_init (GscCompletion *self)
 	self->priv->active_trigger = NULL;
 	self->priv->active = FALSE;
 	self->priv->manage_keys = TRUE;
+	self->priv->remember_info_visibility = FALSE;
+	self->priv->info_visible = FALSE;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -1041,6 +1075,8 @@ _gsc_completion_info_show (GscCompletion *self)
 	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
 				      gtk_window_get_transient_for (GTK_WINDOW (self)));
 	gtk_widget_show (self->priv->info_window);
+	
+	self->priv->info_visible = TRUE;
 }
 
 void
@@ -1049,6 +1085,7 @@ _gsc_completion_info_hide (GscCompletion *self)
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
 		gtk_widget_hide (self->priv->info_window);
+		self->priv->info_visible = FALSE;
 	}
 }
 
