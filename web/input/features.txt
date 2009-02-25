@@ -1,0 +1,10 @@
+restindex
+	crumb: gscweb features
+	format: html
+	page-title: Features
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+<h2>GtkSourceCompletion Features</h2>
+completado, iconos, paginas, info del completion, calltips, los screencast

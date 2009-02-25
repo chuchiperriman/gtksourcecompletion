@@ -1,0 +1,11 @@
+restindex
+        include: yes
+	crumb: gscweb home
+	format: rest
+	page-title: Home
+	encoding: utf-8
+	output-encoding: None
+        file: styles.css
+/restindex
+
+GtkSourceCompletion Homepage

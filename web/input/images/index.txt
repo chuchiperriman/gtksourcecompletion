@@ -1,0 +1,10 @@
+restindex
+        include: no
+	crumb: gscweb home
+	format: rest
+	page-title: Home
+	encoding: utf-8
+	output-encoding: None
+        file: logo_gsc.png
+        build: no
+/restindex

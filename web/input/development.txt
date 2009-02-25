@@ -1,0 +1,11 @@
+restindex
+	crumb: gscweb development
+	format: html
+	page-title: Development
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+<h2>Development</h2>
+mail-list, repositorio git, bug tracking, descripcion de las librerias que usamos, C, Gobject Gtk etc.
+

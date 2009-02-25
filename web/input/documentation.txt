@@ -1,0 +1,12 @@
+restindex
+	crumb: gscweb documentation
+	format: html
+	page-title: Documentation
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+<h2>Documentation</h2>
+Uso general (gnome live), creacion providers, triggers y proposals, creacion con las tools, filtrado de proposals
+<br/>
+Usos especiales: custom info, sobreescribir proposals (para hacer algo en vez de insertar como el GOTO)

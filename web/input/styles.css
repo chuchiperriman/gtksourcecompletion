@@ -1,0 +1,151 @@
+/* -------------------------------------------------------------------
+    CSS Document by Alexandre Joseph
+    http://alexandrejoseph.com/
+    
+Bienvenue dans la CSS de votresite.com, vous avez tout à 
+fait le droit de vous en inspirez, mais pas de plagier le design.
+En plus, il est de votre intérais d'avoir un site au design original,
+pour qu'il ait sa propre identité visuelle, plutôt qu'un design  plagié...
+
+La feuille de style est organisé de cette façon:
+
+-0: Body
+-1: Page et styles associés
+-2: Header et styles associés
+-3: Contenu et styles associés
+-4: Menu et styles associés
+-5: Footer et styles associés
+-6: Formatage du texte
+
+Bonne visite ;)
+------------------------------------------------------------------- */
+
+body{
+ font-family: Verdana,Geneva,Arial,Helvetica,"Trebuchet MS",sans-serif;
+ font-size: 0.7em;
+ background: white;
+ padding: 1em;
+ color: #707070;
+}
+/* -------------------------------------------------------------------
+Page et styles associés
+ ------------------------------------------------------------------- */
+#page{
+ width: 755px;
+ margin: 0;
+}
+#access{
+text-align: center;
+}
+#access li{
+display: inline;
+}
+#access a{
+ color: white;
+ text-decoration: none;
+}
+#access a:hover{
+ color: #c0c0c0;
+}
+/* -------------------------------------------------------------------
+Header et styles associés
+ ------------------------------------------------------------------- */
+#header{
+ height: 130px;
+ width: 150px;
+ position: absolute;
+ top: 0.5em;
+ left: 1em;
+ background: url(images/logo_gsc.png) no-repeat;
+}
+#header h1{
+ display: none
+}
+/* -------------------------------------------------------------------
+Contenu et styles associés
+ ------------------------------------------------------------------- */
+#contenu{
+ margin-top: 5em;
+ margin-left: 170px;
+/* permet de fixer une hauteur mini sur les navigateurs modernes */
+min-height:50em;
+/* pour obtenir le même effet sur IE, sachant que si le contenu dépasse, il
+"poussera" la hauteur en ne respectant pas la norme. On se joue de ses lacunes
+*/
+height:50em;
+}
+/* pour rétablir le mauvais effet sur les nav. modernes */
+html>body #contenu{
+height:auto;
+}
+#contenu h4{
+ color: #999;
+ font-size: 0.8em;
+ font-weight: normal;
+ text-align: right;
+}
+/* -------------------------------------------------------------------
+Menu et styles associés
+ ------------------------------------------------------------------- */
+#menu h3, #contenu h3{
+ font-size: 1.2em;
+ border-bottom: 1px dotted #707070;
+}
+#menu {
+ position: absolute;
+ top: 15em;
+ left: 1em;
+ width: 155px;
+ overflow:hidden;
+}
+#menu a{
+ color: #707070;
+ text-decoration: none;
+}
+#menu a:hover{
+ color: #999;
+}
+#menu li, ul{
+ list-style: none;
+ margin: 0;
+ padding: 0;
+ padding-left: 0.8em;
+}
+/* -------------------------------------------------------------------
+Footer et styles associés
+ ------------------------------------------------------------------- */
+#footer{
+ clear: both;
+ text-align: center;
+ padding-top: 2em;
+ color: #999;
+}
+#footer li{
+ display: inline;
+ border-right: 1em solid white;
+}
+#footer a{
+ color: #999;
+ text-decoration: none;
+}
+/* -------------------------------------------------------------------
+Formatage du texte
+ ------------------------------------------------------------------- */
+.float-left{
+ float: left;
+}
+.float-right{
+ float: right;
+}
+input, textarea{
+ border: 1px solid #eee;
+ background: white;
+ color: #999;
+}
+a:hover{
+ color: #e99e39;
+}
+a{
+ color: #999;
+ text-decoration: none;
+} 

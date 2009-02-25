@@ -1,0 +1,10 @@
+restindex
+	crumb: gscweb download
+	format: html
+	page-title: Download
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+<h2>Download</h2>
+Última version y changelog de las versiones que se vayan sacando

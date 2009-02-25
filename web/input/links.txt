@@ -1,0 +1,10 @@
+restindex
+	crumb: gscweb links
+	format: html
+	page-title: Links
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+<h2>GtkSourceCompletion Links</h2>
+gnome live, gedit plugins, vtg etc

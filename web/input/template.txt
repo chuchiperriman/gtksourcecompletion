@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+	<title><% title %></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=<% final_encoding %>" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="shortcut icon" href="images/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="<% path_to_root %>styles.css" media="screen" />
+</head>
+<body id="haut">
+<div id="page">
+<div id="header">
+<h1><a href="http://www.google.com">Simple Pingu</a></h1>
+</ul>
+</div>
+<div id="contenu">
+	<% body %>
+</div>
+<div id="menu">
+<#
+        print_details(default_section,
+        	page_title='<h3>Menu</h3>')
+#>
+</div>
+<div id="footer"><p>&copy; www.yoursite.com &middot; <a href="http://alexandrejoseph.com/">Designed by Alexandre Joseph</a></p>
+</div>
+</div>
+</body>
+</html>
+
