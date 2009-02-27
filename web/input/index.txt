@@ -8,4 +8,20 @@ restindex
         file: styles.css
 /restindex
 
+============================
 GtkSourceCompletion Homepage
+============================
+
+GtkSourceCompletion is a library to add (auto)completion and calltips support to GtkSourceView.
+The library manages all events, the popup position etc. but it doesn't complete anything, it is the base library.
+You can develop providers for GtkSourceCompletion and the library will use it to show all the 
+proposals, the information for every proposal etc.
+
+GtkSourceCompletion has been written in C language using then GTK+2 toolkit by **Jesús Barbero Rodríguez**. 
+You can help us to do GtkSourceCompletion a better library for all!!
+
+GtkSourceCompletion is hosted by http://www.sourceforge.net and http://www.github.com for the source code.
+
+This is gedit plugin using GtkSourceCompletion to show snippets (and the snippet info)
+
+.. image:: images/screenshot1.jpg

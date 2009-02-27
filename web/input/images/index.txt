@@ -6,5 +6,6 @@ restindex
 	encoding: utf-8
 	output-encoding: None
         file: logo_gsc.png
+        file: screenshot1.jpg
         build: no
 /restindex

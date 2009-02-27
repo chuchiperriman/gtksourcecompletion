@@ -1,0 +1,11 @@
+restindex
+	crumb: gscweb news
+	format: rest
+	page-title: News
+	encoding: utf-8
+	output-encoding: None
+/restindex
+
+====
+News
+====

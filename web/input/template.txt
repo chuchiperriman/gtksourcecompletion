@@ -10,10 +10,11 @@
 </head>
 <body id="haut">
 <div id="page">
+<a href="index.html" title="GtkSourceCompletion Homepage">
 <div id="header">
-<h1><a href="http://www.google.com">Simple Pingu</a></h1>
-</ul>
+<h1>Simple Pingu</h1>
 </div>
+</a>
 <div id="contenu">
 	<% body %>
 </div>
@@ -23,7 +24,7 @@
         	page_title='<h3>Menu</h3>')
 #>
 </div>
-<div id="footer"><p>&copy; www.yoursite.com &middot; <a href="http://alexandrejoseph.com/">Designed by Alexandre Joseph</a></p>
+<div id="footer"><p>&copy; Perriman 2009 &middot; <a href="http://alexandrejoseph.com/">Original template by Alexandre Joseph</a></p>
 </div>
 </div>
 </body>

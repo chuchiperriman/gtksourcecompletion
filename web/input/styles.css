@@ -22,7 +22,6 @@ Bonne visite ;)
 
 body{
  font-family: Verdana,Geneva,Arial,Helvetica,"Trebuchet MS",sans-serif;
- font-size: 0.7em;
  background: white;
  padding: 1em;
  color: #707070;
@@ -65,14 +64,14 @@ Header et styles associés
 Contenu et styles associés
  ------------------------------------------------------------------- */
 #contenu{
- margin-top: 5em;
+ margin-top: 2em;
  margin-left: 170px;
 /* permet de fixer une hauteur mini sur les navigateurs modernes */
-min-height:50em;
+min-height:30em;
 /* pour obtenir le même effet sur IE, sachant que si le contenu dépasse, il
 "poussera" la hauteur en ne respectant pas la norme. On se joue de ses lacunes
 */
-height:50em;
+height:30em;
 }
 /* pour rétablir le mauvais effet sur les nav. modernes */
 html>body #contenu{
@@ -93,7 +92,7 @@ Menu et styles associés
 }
 #menu {
  position: absolute;
- top: 15em;
+ top: 10em;
  left: 1em;
  width: 155px;
  overflow:hidden;
