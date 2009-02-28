@@ -1,11 +1,28 @@
 restindex
 	crumb: gscweb development
-	format: html
+	format: rest
 	page-title: Development
 	encoding: utf-8
 	output-encoding: None
 /restindex
 
-<h2>Development</h2>
-mail-list, repositorio git, bug tracking, descripcion de las librerias que usamos, C, Gobject Gtk etc.
+===============================
+GtkSourceCompletion Development
+===============================
 
+GtkSourceCompletion has been developed in C using GObject and Gtk+2. The library
+has been developed by Jesús Barbero Rodríguez <chuchiperriman at gmail dot com>
+using Ubuntu, Gnome, Gedit, git, subversion, vim, devhelp... Thanks all the people who 
+make this possible!!!!
+
+You can get the last source code using git from 
+http://github.com/chuchiperriman/gtksourcecompletion/tree/master
+
+  I will write how to do it soon!
+
+The project homepage is http://sourceforge.net/projects/gtksourcecomple/
+
+You can report any bug in the sourceforge bug tracking and you can write a 
+mail to me directly or using the gedit mail-list (http://projects.gnome.org/gedit)
+
+If you want to learn how to use GtkSourceCompletion go to Documentation section

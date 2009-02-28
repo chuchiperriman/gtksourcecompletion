@@ -1,10 +1,46 @@
 restindex
 	crumb: gscweb links
-	format: html
+	format: rest
 	page-title: Links
 	encoding: utf-8
 	output-encoding: None
 /restindex
 
-<h2>GtkSourceCompletion Links</h2>
-gnome live, gedit plugins, vtg etc
+=========================
+GtkSourceCompletion Links
+=========================
+
+Project links
+--------------
+
+Project homepage: http://sourceforge.net/projects/gtksourcecomple/
+
+Source code hosting: http://github.com/chuchiperriman/gtksourcecompletion/tree/master
+
+Gnome live page: http://live.gnome.org/GtkSourceCompletion
+
+GtkSourceView and GtkSourceCompletion integration: http://live.gnome.org/GtkSourceView/GtkSourceCompletion
+
+
+My other Projects
+-----------------
+
+`GtkSnippets <http://sourceforge.net/projects/gtksnippets/>`_: Library 
+for store, manage and "autoparse" code snippets.
+
+`Gedit-gsv-plugin <http://github.com/chuchiperriman/gedit-gsv-plugin>`_: Gedit plugin to add previously written words (auto)completion, 
+open documents completion and recent documents completion (Show a list with the 
+documents and when you select one, it is opened in gedit).
+
+`Gedit-gsp-plugin <http://github.com/chuchiperriman/gedit-gsp-plugin>`_: Gedit plugin to add snippets completion to gedit. It uses 
+GtkSnippets library to manage the snippets. The snippets library supports 
+"inplace" variables replacement and this plugin make use of that.
+
+
+Other projects using GtkSourceCompletion
+----------------------------------------
+
+`Vtg <http://code.google.com/p/vtg>`_: Amazing Gedit Plugin to add autocompletion 
+support for vala source code
+
+

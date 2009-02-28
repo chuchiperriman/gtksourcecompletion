@@ -6,6 +6,33 @@ restindex
 	output-encoding: None
 /restindex
 
-====
-News
-====
+========================
+GtkSourceCompletion News
+========================
+
+2009-02-28
+----------
+
+I have created the web page where you can read all the information about
+GtkSourceCompletion.
+
+2009-01-24
+----------
+
+GtkSourceCompletion-2.0 started. I have changed the library version because
+tha API will change a lot to do it easier and GscManager and GscPopup will be
+joined into an unique object: GscCompletion
+
+2008-12-16
+----------
+
+GtkSourceCompletion 0.5.2 has been released. This is the last release in 
+sourceforge subversion repository and will be the last release of 
+GtkSourceCompletion-1.0 because I will change the main API
+
+2008-11-25
+-----------
+
+Moved the GtkSourceCompletion source code to github instead of sourceforge.
+
+

@@ -7,5 +7,10 @@ restindex
 	output-encoding: None
         file: logo_gsc.png
         file: screenshot1.jpg
+        file: features1.png
+        file: features2.png
+        file: features3.png
+        file: features4.png
+        file: features5.png
         build: no
 /restindex

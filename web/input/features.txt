@@ -1,10 +1,88 @@
 restindex
 	crumb: gscweb features
-	format: html
+	format: rest
 	page-title: Features
 	encoding: utf-8
 	output-encoding: None
 /restindex
 
-<h2>GtkSourceCompletion Features</h2>
-completado, iconos, paginas, info del completion, calltips, los screencast
+============================
+GtkSourceCompletion Features
+============================
+
+
+Completion
+----------
+
+With a provider you can add proposals to GscCompletion and the library show
+the popup with your proposals and manage all the user keys.
+
+.. image:: images/features1.png
+
+
+Icons
+-----
+
+You can set differents icons to each proposal.
+
+.. image:: images/features2.png
+
+
+Pages
+-----
+
+You can assign a page to a proposal. GscCompletion will create a new page with 
+all the proposals with this page name. By example, you can create "function" 
+proposals and "symbols" proposals and show them in differents pages.
+
+.. image:: images/features3.png
+
+
+Proposal Info
+-------------
+
+You can set information for each proposal. When GscCompletion shows the popup,
+the user can see this information in the info popup by pressing <control>i 
+or the info button.
+
+.. image:: images/features4.png
+
+
+Calltips
+--------
+
+The library has a GscInfo object to show calltips. It supports adjust the window
+to the text or set a fixed size.
+
+.. image:: images/features5.png
+
+
+Screencast
+----------
+
+You can see GscCompletion in action. This example show gedit-gsv-pluging and 
+gedit-gsp-plugin using GtkSourceCompletion to show proposals for snippets and
+previously written words:
+
+`Screencast1 <images/screencast1.ogv>`_
+
+This screencast show gedit-gsp-plugin using GtkSourceCompletion to show symbols
+and insert it or go to the definition:
+
+`Screencast2 <images/screencast2.ogv>`_
+
+
+Advanced features
+-----------------
+
+There are no screenshot but GtkSourceCompletion supports proposals filtering. 
+You can show 500 proposals and, when the user writes some text, filter the current
+proposals without reload it again.
+
+GscInfo supports set a custom widget to show the information. GscInfo has a 
+GtkLabel by default by you can replace it with a web browser or another widget
+if you want.
+
+
+
+

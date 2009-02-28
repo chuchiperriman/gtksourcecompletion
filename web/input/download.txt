@@ -1,10 +1,35 @@
 restindex
 	crumb: gscweb download
-	format: html
+	format: rest
 	page-title: Download
 	encoding: utf-8
 	output-encoding: None
 /restindex
 
-<h2>Download</h2>
-Última version y changelog de las versiones que se vayan sacando
+=============================
+GtkSourceCompletion Downloads
+=============================
+
+Downloads
+---------
+
+The last stable release is GtkSourceCompletion 0.5.2
+
+
+ChangeLog
+---------
+
+0.7.0
+~~~~~
+
+Current development version. The mayor library version has changed to 
+GtkSourceCompletion-2.0 because I have changed the main API with the new
+GscCompletion object to do it easier.
+
+0.5.2
+~~~~~
+
+This is the last release before GtkSourceCompletion-2.0 with the new
+GscCompletion object instead the current GscManager and GscPopup.
+
+
