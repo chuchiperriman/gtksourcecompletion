@@ -19,6 +19,11 @@ New manager TODO
 
 [ ] Add autoselect feature
 [ ] change activate/deactivate functions to set_active and get_active function
+[ ] Add "select-first" property to GscCompletion. If TRUE, it set the selection cursor 
+    to the first proposal when the popup is shown (does not select the proposal, only
+    set the focus)
+[ ] Set _gsc_completion_info_show and _gsc_completion_info_hide public in gsc-completion.h?
+    Add a "info-visible" property to get or set info widget visibility?
 
 
 Tests TODO
