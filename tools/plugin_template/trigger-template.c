@@ -23,7 +23,7 @@
 #include "gsc-trigger-##(PLUGIN_ID.lower).h"
 
 struct _GscTrigger##(PLUGIN_ID.camel)Private {
-	GscManager *completion;
+	GscCompletion *completion;
 };
 
 #define GSC_TRIGGER_##(PLUGIN_ID.upper)_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), GscTrigger##(PLUGIN_ID.camel)Private))
@@ -120,7 +120,7 @@ GType gsc_trigger_##(PLUGIN_ID.lower)_get_type ()
  *
  */
 GscTrigger##(PLUGIN_ID.camel)*
-gsc_trigger_##(PLUGIN_ID.lower)_new(GscManager *completion)
+gsc_trigger_##(PLUGIN_ID.lower)_new(GscCompletion *completion)
 {
 	GscTrigger##(PLUGIN_ID.camel) *self = GSC_TRIGGER_##(PLUGIN_ID.upper) (g_object_new (GSC_TYPE_TRIGGER_##(PLUGIN_ID.upper), NULL));
 	self->priv->completion = completion;

@@ -24,7 +24,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtksourcecompletion/gsc-trigger.h>
-#include <gtksourcecompletion/gsc-manager.h>
+#include <gtksourcecompletion/gsc-completion.h>
 
 G_BEGIN_DECLS
 
@@ -51,7 +51,7 @@ struct _GscTrigger##(PLUGIN_ID.camel)Class {
 };
 
 GscTrigger##(PLUGIN_ID.camel)* 
-gsc_trigger_##(PLUGIN_ID.lower)_new(GscManager *completion);
+gsc_trigger_##(PLUGIN_ID.lower)_new(GscCompletion *completion);
 
 GType gsc_trigger_##(PLUGIN_ID.lower)_get_type ();
 
