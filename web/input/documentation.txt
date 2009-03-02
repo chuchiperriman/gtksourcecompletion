@@ -1,12 +1,244 @@
 restindex
 	crumb: gscweb documentation
-	format: html
+	format: rest
 	page-title: Documentation
 	encoding: utf-8
 	output-encoding: None
 /restindex
 
-<h2>Documentation</h2>
-Uso general (gnome live), creacion providers, triggers y proposals, creacion con las tools, filtrado de proposals
-<br/>
-Usos especiales: custom info, sobreescribir proposals (para hacer algo en vez de insertar como el GOTO)
+=================================
+GtkSourceCompletion Documentation
+=================================
+
+API
+---
+
+You can see the last `GtkSourceCompletion API <api/index.html>`_
+
+
+General overview
+----------------
+
+Objects
+~~~~~~~
+
+There are five important objects (for the developer) to manage completion:
+
+**GscCompletion**
+  This is the main object. It manages all providers and triggers
+  for a GtkTextView and manages the popup events. It is the popup object too.
+**GscTrigger**
+  This interface is who decide when a completion event is triggered. By example
+  by pressing <contro>Return or when the user writes N characters for 
+  autocompletion.
+**GscProvider**
+  This interface provide the data to be shown into the popup
+**GscProposal**
+  This object is an entry into the popup with the proposals list. This object 
+  decide what to do when the user selects it.
+**GscInfo**
+  This object can be used to show a calltip or help.
+
+Optionally there are some predefined objects you can use:
+
+**GscTriggerCustomkey**
+  This is an implementation of GscTrigger. You can create this trigger and tell
+  to it the keys to trigger the completion event. If you create this object with
+  <control>Return then this object trigger the completion event when the user 
+  press these keys.
+**GscTriggerAutowords**
+  This is an implementation of GscTrigger. You can use this trigger in a 
+  GtkTextView and the object trigger the completion event when the user writes
+  3 letters of a word. It controls special characters, separators and can be
+  configurated.
+
+General view
+~~~~~~~~~~~~
+
+GscCompletion is the main completion object who manages all providers, triggers,
+events and the popup widget (itself). This object **do not complete anything**, you
+must register a GscProvider to which the manager will delegate the completion
+work when a GscTrigger raise a completion event.
+
+
+The usual workflow can be sum up as below :
+
+1. Develop a provider by implementing GscProvider.
+2. Develop a trigger by implementing GscTrigger or use the triggers provided by
+   the library.
+3. Create a new GscCompletion associated with a GtkTextView.
+4. Register the triggers which will call for completion.
+5. Register the providers which give the proposals to be shown. You can register
+   a provider for various triggers.
+6. When a register trigger call to GscCompletion for completion, the manager calls
+   all providers registered to this trigger to get the proposal to be show.
+7. When a user selects a proposal, the manager call to the proposal apply function
+   (this function inserts the proposal label into the view by default).
+
+
+Multiple triggers can be registered for a unique instance of GscCompletion and 
+multiple providers can be registered for one or various triggers. The completion
+will use the appropriate one depending on the received event. For example, you
+may implement providers for autocompletion, snippets or symbols but only show
+snippets when the user-request trigger call for completion and previously written
+words when autocompletion-trigger call for completion.
+
+A provider must to provide data when it is called. The provider only provide 
+data, does not decide when, the completion controls that with the asociated triggers.
+
+GtkSourceCompletion supports to change the default functionality when you selects
+a proposal. By example, if we want to display the last open documents, 
+we could follow those steps : 
+
+1. Inherit a new GscProposal
+2. Overwrite "apply" function to change the default functionality. In this 
+   function we will open the selected file instead of insert data into the 
+   GtkTextView.
+3. Use the normal API to register and create all objects.
+
+
+Example C code
+~~~~~~~~~~~~~~
+
+This example creates two providers and two triggers. Register the document 
+words provider for autocompletion trigger and user request trigger but the 
+test provider is only registered for autocompletion trigger. Internally the 
+manager ref the objects and, if you don't need the providers nor triggers, 
+you can unref it and the manager will unref too when it or the view will be 
+detroyed then they will be destroyed too.
+
+::
+
+  /*Creating the providers*/
+  GscDocumentwordsProvider *prov = gsc_documentwords_provider_new(GTK_TEXT_VIEW(view));
+  GscProviderTest *prov_test = gsc_provider_test_new(GTK_TEXT_VIEW(view));
+  
+  /*Creating the completion manager*/
+  GscCompletion *comp = gsc_completion_new(GTK_TEXT_VIEW(view));
+  
+  /*Creating the triggers*/
+  GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
+  GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
+  
+  /*First register the triggers*/
+  gsc_completion_register_trigger(comp,GSC_TRIGGER(ur_trigger));
+  gsc_completion_register_trigger(comp,GSC_TRIGGER(ac_trigger));
+  
+  /*Register the providers for the triggers (prov_test only for autocompletion trigger)*/
+  gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ac_trigger));
+  gsc_completion_register_provider(comp,GSC_PROVIDER(prov_test),GSC_TRIGGER (ac_trigger));
+  gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ur_trigger));
+  
+  /*We activate the completion mechanism*/
+  gsc_completion_activate(comp);
+  
+  /*
+  The manager saves references internally. We unref the objects and the 
+  manager will free it when you destroy the manager or the view.
+  */
+  g_object_unref(prov);
+  g_object_unref(prov_test);
+  g_object_unref(ur_trigger);
+  g_object_unref(ac_trigger);
+
+
+GscInfo: Calltips Popup
+~~~~~~~~~~~~~~~~~~~~~~~
+
+GscInfo is the object used to show calltips, help, etc. Currently there is not
+a mechanism like GscCompletion to use triggers and providers. You must to use
+the GscInfo by hand, when you want.
+
+GscInfo supports to change the default widget (a GtkLabel) by a custom widget
+like a text view, a box with a browser and buttons etc. What you want. GscInfo
+manages its position under/upper the GtkTextView cursor and can adjust its
+height and width if you want (and if the custom widget returns the correct width).
+
+A simple example can be:
+
+::
+
+  GscInfo *info = gsc_info_new();
+  /*Adjust height and width with a max value*/
+  gsc_info_set_adjust_height(info,TRUE,100000);
+  gsc_info_set_adjust_width(info,TRUE,100000);
+  
+  .....
+  
+  /*Sets the calltip*/
+  gsc_info_set_markup(info, "My calltip");
+  /*Position to cursor*/
+  gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
+  /*Show the calltip*/
+  gtk_widget_show(GTK_WIDGET(info));
+
+
+Changing the default info widget
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are two ways of changing the default info widget.
+
+Fist way:
+
+1. Get the GscInfo with gsc_completion_get_info_widget ()
+2. Set a custom widget with gsc_info_set_custom()
+3. Connect to "display-info" signal of the GscCompletion object
+4. In the "display-info" callback you must to set the content into you new
+   custom widget.
+
+Second way:
+
+1. Connect to "display-info" signal of the GscManager object
+2. In the "display-info" callback and do:
+
+- Check if the proposal is your proposal 
+- Set the custom widget and set the content in it if the propoposal is yours.
+- If not, set the custom widget to NULL, return FALSE and the completion will use the default mechanism
+
+
+Filtering current proposals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GscCompletion has an special function to filter the current proposals. Think in 
+python class completion. You can create a python-provider and, when the user 
+writes a dot, you show all class members. Then the user writes some chars like 
+.set\_ then you can filter the current proposals to show only proposals starting 
+by set\_ without reload the class members again.
+
+The function is:  
+
+::
+
+  gsc_completion_filter_proposals  (GscCompletion *self,
+				    GscCompletionFilterFunc func,
+				    gpointer user_data)
+
+GscCompletion will call to func for all proposals and the function will return 
+TRUE if the proposal must to be shown or FALSE if not.
+
+
+GtkSourceCompletion objects creation
+------------------------------------
+
+You will need to create some Gsc objects like providers, triggers or proposals.
+In the Gsc source package you can find the *tools* folder where I have created 
+some python scrits to auto generate this objects skeletons easily.
+
+**generate-provider.py**
+  This script will create a new provider skeleton. You can call to this script 
+  and tell the new provider name like *./generate-provider.py file* and a "file" 
+  folder will be created with the .h and .c files.
+  
+**generate-trigger.py**
+  This script will create a new trigger skeleton. You can call to this script 
+  and tell the new trigger name like *./generate-trigger.py members* and a "members" 
+  folder will be created with the .h and .c files.
+
+**generate-proposal.py**
+  This script will create a new proposal skeleton. You can call to this script 
+  and tell the new proposal name like *./generate-provider.py goto* and a "goto" 
+  folder will be created with the .h and .c files. Now you can overwrite the 
+  *apply* function to do some special work when the user selects this proposal.
+
+
+

@@ -13,7 +13,7 @@ GtkSourceCompletion Downloads
 Downloads
 ---------
 
-The last stable release is GtkSourceCompletion 0.5.2
+The last stable release is GtkSourceCompletion 0.5.2. `Download <http://downloads.sourceforge.net/gtksourcecomple/gtksourcecompletion-0.5.2.tar.gz?use_mirror=heanet>`_
 
 
 ChangeLog

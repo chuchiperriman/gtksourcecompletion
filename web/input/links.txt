@@ -28,13 +28,23 @@ My other Projects
 `GtkSnippets <http://sourceforge.net/projects/gtksnippets/>`_: Library 
 for store, manage and "autoparse" code snippets.
 
-`Gedit-gsv-plugin <http://github.com/chuchiperriman/gedit-gsv-plugin>`_: Gedit plugin to add previously written words (auto)completion, 
+`Gedit-gsv-plugin <http://github.com/chuchiperriman/gedit-gsv-plugin>`_: 
+Gedit plugin to add previously written words (auto)completion, 
 open documents completion and recent documents completion (Show a list with the 
 documents and when you select one, it is opened in gedit).
 
-`Gedit-gsp-plugin <http://github.com/chuchiperriman/gedit-gsp-plugin>`_: Gedit plugin to add snippets completion to gedit. It uses 
+`Gedit-gsp-plugin <http://github.com/chuchiperriman/gedit-gsp-plugin>`_:
+Gedit plugin to add snippets completion to gedit. It uses 
 GtkSnippets library to manage the snippets. The snippets library supports 
 "inplace" variables replacement and this plugin make use of that.
+
+`Gedit-sc-plugin <http://github.com/chuchiperriman/gedit-sc-plugin>`_: 
+It's a Gedit plugin that uses ctags to add (auto)completion
+of C symbols, members completion and GOTO features (you select a proposal and
+the definition file is opened and set the cursor on the symbol position).
+It is only a prototype, it is not an stable plugin. I am developing it to see the
+GtkSourceCompletion features and the power of the library. Perhaps in a future 
+I will do a real C (auto)completion plugin...
 
 
 Other projects using GtkSourceCompletion

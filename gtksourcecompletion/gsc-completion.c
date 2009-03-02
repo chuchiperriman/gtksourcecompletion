@@ -1501,8 +1501,8 @@ gsc_completion_finish_completion (GscCompletion *self)
  **/
 void
 gsc_completion_filter_proposals (GscCompletion *self,
-					 GscCompletionFilterFunc func,
-					 gpointer user_data)
+				 GscCompletionFilterFunc func,
+				 gpointer user_data)
 {
 	GList *l;
 	

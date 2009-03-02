@@ -16,9 +16,9 @@ using Ubuntu, Gnome, Gedit, git, subversion, vim, devhelp... Thanks all the peop
 make this possible!!!!
 
 You can get the last source code using git from 
-http://github.com/chuchiperriman/gtksourcecompletion/tree/master
+http://github.com/chuchiperriman/gtksourcecompletion/tree/master by doing:
 
-  I will write how to do it soon!
+  git clone git://github.com/chuchiperriman/gtksourcecompletion.git 
 
 The project homepage is http://sourceforge.net/projects/gtksourcecomple/
 
