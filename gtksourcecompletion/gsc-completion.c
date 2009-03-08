@@ -848,7 +848,6 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	 *
 	 * %TRUE if the completion must to mark as selected the first proposal
 	 * on show
-	 * (visible or hidden)
 	 */
 	g_object_class_install_property (object_class,
 					 PROP_SELECT_ON_SHOW,
