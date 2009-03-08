@@ -63,7 +63,8 @@ enum
 	PROP_0,
 	PROP_MANAGE_KEYS,
 	PROP_REMEMBER_INFO_VISIBILITY,
-	PROP_SELECT_ON_SHOW
+	PROP_SELECT_ON_SHOW,
+	PROP_ACTIVE
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -595,7 +596,7 @@ gsc_completion_finalize (GObject *object)
 	GscCompletion *self = GSC_COMPLETION (object);
 	
 	if (self->priv->active)
-		gsc_completion_deactivate (self);
+		gsc_completion_set_active (self, FALSE);
 	
 	g_list_foreach (self->priv->pages, (GFunc) free_page, NULL);
 	g_list_free (self->priv->pages);
@@ -762,6 +763,9 @@ gsc_completion_get_property (GObject    *object,
 		case PROP_SELECT_ON_SHOW:
 			g_value_set_boolean (value, self->priv->select_on_show);
 			break;
+		case PROP_ACTIVE:
+			g_value_set_boolean (value, self->priv->active);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -790,6 +794,9 @@ gsc_completion_set_property (GObject      *object,
 			break;
 		case PROP_SELECT_ON_SHOW:
 			self->priv->select_on_show = g_value_get_boolean (value);
+			break;
+		case PROP_ACTIVE:
+			gsc_completion_set_active (self, g_value_get_boolean (value));
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -852,8 +859,20 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	g_object_class_install_property (object_class,
 					 PROP_SELECT_ON_SHOW,
 					 g_param_spec_boolean ("select-on-show",
-							      _("Completon mark as selected the first proposal on show"),
-							      _("Completon mark as selected the first proposal on show"),
+							      _("Completion mark as selected the first proposal on show"),
+							      _("Completion mark as selected the first proposal on show"),
+							      FALSE,
+							      G_PARAM_READWRITE));
+	/**
+	 * GscCompletion:active:
+	 *
+	 * %TRUE if the completion mechanism is active. 
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_ACTIVE,
+					 g_param_spec_boolean ("active",
+							      _("Set or get if the completion mechanism is active"),
+							      _("Set or get if the completion mechanism is active"),
 							      FALSE,
 							      G_PARAM_READWRITE));
 	/**
@@ -1573,87 +1592,81 @@ gsc_completion_filter_proposals (GscCompletion *self,
 }
 
 /**
- * gsc_completion_activate:
+ * gsc_completion_set_active:
  * @self: The #GscCompletion
+ * @active: %TRUE if you want to activate the completion mechanism.
  *
- * This function activate the completion mechanism. The completion connects 
- * all signals and activate all registered triggers.
+ * This function activate/deactivate the completion mechanism. The completion
+ * connects/disconnect all signals and activate/deactivate all registered triggers.
  */
 void
-gsc_completion_activate (GscCompletion *self)
-{
-	GList *plist;
-	GscTrigger *trigger;
-
-	g_return_if_fail (GSC_IS_COMPLETION (self));
-	
-	if (self->priv->active)
-		return;
-
-	self->priv->signals_ids[TEXT_VIEW_DESTROY] = 
-			g_signal_connect (self->priv->view,
-					  "destroy",
-					  G_CALLBACK (view_destroy_event_cb),
-					  self);
-	self->priv->signals_ids[TEXT_VIEW_FOCUS_OUT] = 
-			g_signal_connect (self->priv->view,
-					  "focus-out-event",
-					  G_CALLBACK (view_focus_out_event_cb),
-					  self);
-	self->priv->signals_ids[TEXT_VIEW_BUTTON_PRESS] = 
-			g_signal_connect (self->priv->view,
-					  "button-press-event",
-					  G_CALLBACK (view_button_press_event_cb),
-					  self);
-	
-	set_manage_keys (self);
-	
-	/* We activate the triggers */
-	for (plist = self->priv->triggers; plist != NULL; plist = g_list_next (plist))
-	{
-		trigger =  GSC_TRIGGER (plist->data);
-		
-		gsc_trigger_activate (trigger);
-	}
-	
-	self->priv->active = TRUE;
-}
-
-/**
- * gsc_completion_deactivate:
- * @self: The #GscCompletion
- *
- * This function deactivate the completion mechanism. The completion disconnect
- * all signals and deactivate all registered triggers.
- */
-void
-gsc_completion_deactivate (GscCompletion *self)
+gsc_completion_set_active (GscCompletion *self,
+			   gboolean active)
 {
 	GList *l;
 	GscTrigger *trigger;
 	gint i;
 	
-	g_return_if_fail (GSC_COMPLETION (self));
+	g_return_if_fail (GSC_IS_COMPLETION (self));	
 	
-	for (i = 0; i < LAST_EXTERNAL_SIGNAL; i++)
+	if (active)
 	{
-		if (g_signal_handler_is_connected (self->priv->view, 
-						   self->priv->signals_ids[i]))
+		if (self->priv->active)
+			return;
+
+		self->priv->signals_ids[TEXT_VIEW_DESTROY] = 
+				g_signal_connect (self->priv->view,
+						  "destroy",
+						  G_CALLBACK (view_destroy_event_cb),
+						  self);
+		self->priv->signals_ids[TEXT_VIEW_FOCUS_OUT] = 
+				g_signal_connect (self->priv->view,
+						  "focus-out-event",
+						  G_CALLBACK (view_focus_out_event_cb),
+						  self);
+		self->priv->signals_ids[TEXT_VIEW_BUTTON_PRESS] = 
+				g_signal_connect (self->priv->view,
+						  "button-press-event",
+						  G_CALLBACK (view_button_press_event_cb),
+						  self);
+	
+		set_manage_keys (self);
+	
+		/* We activate the triggers */
+		for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
 		{
-			g_signal_handler_disconnect (self->priv->view,
-						     self->priv->signals_ids[i]);
-		}
-		self->priv->signals_ids[i] = 0;
-	}
-	
-	for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
-	{
-		trigger =  GSC_TRIGGER (l->data);
+			trigger =  GSC_TRIGGER (l->data);
 		
-		gsc_trigger_deactivate (trigger);
+			gsc_trigger_activate (trigger);
+		}
 	}
+	else
+	{
+		for (i = 0; i < LAST_EXTERNAL_SIGNAL; i++)
+		{
+			if (g_signal_handler_is_connected (self->priv->view, 
+							   self->priv->signals_ids[i]))
+			{
+				g_signal_handler_disconnect (self->priv->view,
+							     self->priv->signals_ids[i]);
+			}
+			self->priv->signals_ids[i] = 0;
+		}
 	
-	self->priv->active = FALSE;
+		for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
+		{
+			trigger =  GSC_TRIGGER (l->data);
+		
+			gsc_trigger_deactivate (trigger);
+		}
+	}
+	self->priv->active = active;
+}
+
+gboolean
+gsc_completion_get_active (GscCompletion *self)
+{
+	return self->priv->active;
 }
 
 /**

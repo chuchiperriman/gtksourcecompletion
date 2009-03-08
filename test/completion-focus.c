@@ -383,7 +383,7 @@ create_completion(void)
 	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ur_trigger));
 	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_file),GSC_TRIGGER (ur_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_completion_activate(comp);
+	gsc_completion_set_active(comp, TRUE);
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);

@@ -11,6 +11,9 @@
 	* gtksourcecompletion/gsc-completion.c:
 	Added "select-on-show" property to GscCompletion. If TRUE, it set the
 	selection cursor to the first proposal when the popup is shown
+	* gtksourcecompletion/gsc-completion.[ch]:
+	API changed: removed activate/deactivate functions and added
+	set_active get_active functions and an "active" property.
 
 2009-03-01  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 

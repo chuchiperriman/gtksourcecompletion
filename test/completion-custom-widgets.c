@@ -147,7 +147,7 @@ create_completion(void)
 	
 	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_test),GSC_TRIGGER (ac_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_completion_activate(comp);
+	gsc_completion_set_active(comp, TRUE);
 	g_object_unref(prov_test);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);

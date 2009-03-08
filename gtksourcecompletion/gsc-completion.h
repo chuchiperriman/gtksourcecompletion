@@ -113,12 +113,10 @@ void		 gsc_completion_filter_proposals	(GscCompletion *self,
 							 GscCompletionFilterFunc func,
 							 gpointer user_data);
 
-/*
- * FIXME We will remove these functions (goes to -priv.h) because the view
- * will have a "has-completion" property to activate/deactivate completion 
- */
-void		 gsc_completion_activate 		(GscCompletion *self);
-void		 gsc_completion_deactivate		(GscCompletion *self);
+void		 gsc_completion_set_active 		(GscCompletion *self,
+							 gboolean active);
+
+gboolean	 gsc_completion_get_active 		(GscCompletion *self);
 
 GtkWidget	*gsc_completion_get_bottom_bar		(GscCompletion *self);
 

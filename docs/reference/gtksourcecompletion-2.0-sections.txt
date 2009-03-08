@@ -73,8 +73,8 @@ gsc_completion_get_active_trigger
 gsc_completion_trigger_event
 gsc_completion_finish_completion
 gsc_completion_filter_proposals
-gsc_completion_activate
-gsc_completion_deactivate
+gsc_completion_set_active
+gsc_completion_get_active
 gsc_completion_get_bottom_bar
 gsc_completion_get_info_widget
 <SUBSECTION Standard>

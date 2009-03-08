@@ -69,14 +69,7 @@ static void
 activate_toggled_cb (GtkToggleButton *button,
 		     gpointer user_data)
 {
-	if (gtk_toggle_button_get_active (button))
-	{
-		gsc_completion_activate (comp);
-	}
-	else
-	{
-		gsc_completion_deactivate (comp);
-	}
+	g_object_set (comp, "active", gtk_toggle_button_get_active (button), NULL);
 }
 
 static void
@@ -215,7 +208,7 @@ create_completion(void)
 	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ur_trigger));
 	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_file),GSC_TRIGGER (ur_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_completion_activate(comp);
+	gsc_completion_set_active(comp, TRUE);
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);
