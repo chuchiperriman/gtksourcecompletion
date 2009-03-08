@@ -99,11 +99,11 @@ key_press(GtkWidget   *widget,
 		return TRUE;
 	} else if (event->keyval == GDK_F8)
 	{
-		GscInfo *info = gsc_completion_get_info_widget (comp);
-		if (GTK_WIDGET_VISIBLE (GTK_WIDGET (info)))
-			gtk_widget_hide (GTK_WIDGET (info));
+		GscInfo *gsc_info = gsc_completion_get_info_widget (comp);
+		if (GTK_WIDGET_VISIBLE (GTK_WIDGET (gsc_info)))
+			gtk_widget_hide (GTK_WIDGET (gsc_info));
 		else
-			gtk_widget_show (GTK_WIDGET (info));
+			gtk_widget_show (GTK_WIDGET (gsc_info));
 	}
 	
 	guint key = 0;
