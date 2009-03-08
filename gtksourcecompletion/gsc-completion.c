@@ -1663,6 +1663,12 @@ gsc_completion_set_active (GscCompletion *self,
 	self->priv->active = active;
 }
 
+/**
+ * gsc_completion_get_active:
+ * @self: The #GscCompletion
+ *
+ * Returns: %TRUE if the completion mechanism is active, %FALSE if not.
+ */
 gboolean
 gsc_completion_get_active (GscCompletion *self)
 {
