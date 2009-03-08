@@ -10,7 +10,7 @@ TODO
 [X] It would be nice if the info windows can store the visibility state
 [ ] Control view scrolling: When the user scroll the view, we update the popup 
     position and, if the cursor goes out of the screen, we hide the completion
-[ ] Connect to show/hide or visibility of the info window into GscCompleton to 
+[X] Connect to show/hide or visibility of the info window into GscCompleton to 
     a better control.
 
 
@@ -19,11 +19,14 @@ New manager TODO
 
 [ ] Add autoselect feature
 [ ] change activate/deactivate functions to set_active and get_active function
+    and an "active" property.
 [ ] Add "select-first" property to GscCompletion. If TRUE, it set the selection cursor 
     to the first proposal when the popup is shown (does not select the proposal, only
     set the focus)
-[ ] Set _gsc_completion_info_show and _gsc_completion_info_hide public in gsc-completion.h?
-    Add a "info-visible" property to get or set info widget visibility?
+[X] Set _gsc_completion_info_show and _gsc_completion_info_hide public in gsc-completion.h?
+    Add a "info-visible" property to get or set info widget visibility?. Finally 
+    you only need GscInfo *info = gsc_completion_get_info_widget and then 
+    gtk_widget_show and hide.
 
 
 Tests TODO
@@ -40,3 +43,5 @@ Tests TODO
 	* show	-> with keys or mouse
 	* hide	-> when the current line change
 	*	-> when the user press esc
+	
+	

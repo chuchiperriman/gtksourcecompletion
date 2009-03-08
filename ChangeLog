@@ -1,3 +1,14 @@
+2009-03-08  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.c:
+	* gtksourcecompletion/gsc-completion-priv.h:
+	Removed _gsc_completion_info_show and hide and now only have
+	_gsc_completion_update_info_pos to set the position. GscCompletion
+	connect "show" and "hide" signals and update the position
+	automatically.
+	You can use get_info_widget and call to gtk_widget_show and hide to
+	show/hide info programmatically.
+
 2009-03-01  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* tools:

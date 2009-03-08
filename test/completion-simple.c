@@ -97,6 +97,13 @@ key_press(GtkWidget   *widget,
 					  filter_func,
 					  NULL);
 		return TRUE;
+	} else if (event->keyval == GDK_F8)
+	{
+		GscInfo *info = gsc_completion_get_info_widget (comp);
+		if (GTK_WIDGET_VISIBLE (GTK_WIDGET (info)))
+			gtk_widget_hide (GTK_WIDGET (info));
+		else
+			gtk_widget_show (GTK_WIDGET (info));
 	}
 	
 	guint key = 0;
@@ -147,7 +154,7 @@ create_window (void)
 	
 	activate = gtk_check_button_new_with_label ("Active");
 	remember = gtk_check_button_new_with_label ("Remember info visibility");
-	label = gtk_label_new ("F9 filter by \"sp\"\n<Control>b to show a calltip");
+	label = gtk_label_new ("F9 filter by \"sp\"\n<Control>b to show a calltip\nF8 show/hide info");
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (activate), TRUE);
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (remember), FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox),label, TRUE, FALSE, 0);

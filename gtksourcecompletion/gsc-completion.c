@@ -275,7 +275,7 @@ gsc_completion_page_next (GscCompletion *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			_gsc_completion_info_show (self);
+			_gsc_completion_update_info_pos (self);
 		}
 	}
 }
@@ -323,7 +323,7 @@ gsc_completion_page_previous (GscCompletion *self)
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			_gsc_completion_info_show (self);
+			_gsc_completion_update_info_pos (self);
 		}
 	}
 }
@@ -343,7 +343,7 @@ selection_changed_cd (GtkTreeSelection *selection,
 {
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 	{
-		_gsc_completion_info_show (self);
+		_gsc_completion_update_info_pos (self);
 	}
 }
 
@@ -424,13 +424,11 @@ info_toggled_cb (GtkToggleButton *widget,
 	
 	if (gtk_toggle_button_get_active (widget))
 	{
-		g_debug ("show info toggled");
-		_gsc_completion_info_show (self);
+		gtk_widget_show (self->priv->info_window);
 	}
 	else
 	{
-		g_debug ("hide info toggled");
-		_gsc_completion_info_hide (self);
+		gtk_widget_hide (self->priv->info_window);
 	}
 }
 
@@ -468,6 +466,31 @@ switch_page_cb (GtkNotebook *notebook,
 			     self->priv->active_page->name);
 
 	return FALSE;
+}
+
+void
+show_info_cb (GtkWidget *widget,
+	      gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	g_return_if_fail (GTK_WIDGET_VISIBLE (GTK_WIDGET (self)));
+	
+	_gsc_completion_update_info_pos (self);
+	self->priv->info_visible = TRUE;
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+				       TRUE);
+}
+
+void
+hide_info_cb (GtkWidget *widget,
+	      gpointer user_data)
+{
+	GscCompletion *self = GSC_COMPLETION (user_data);
+	
+	self->priv->info_visible = FALSE;
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
+				       FALSE);
 }
 
 static gboolean
@@ -560,7 +583,7 @@ gsc_completion_configure_event (GtkWidget *widget,
 	ret = GTK_WIDGET_CLASS (gsc_completion_parent_class)->configure_event (widget, event);
 	
 	if (GTK_WIDGET_VISIBLE (self->priv->info_window) )
-		_gsc_completion_info_show (self);
+		_gsc_completion_update_info_pos (self);
 	
 	return ret;
 }
@@ -997,6 +1020,16 @@ gsc_completion_init (GscCompletion *self)
 			  G_CALLBACK (gsc_completion_delete_event_cb),
 			  NULL);
 
+	g_signal_connect (self->priv->info_window,
+			  "show",
+			  G_CALLBACK (show_info_cb),
+			  self);
+			  
+	g_signal_connect (self->priv->info_window,
+			  "hide",
+			  G_CALLBACK (hide_info_cb),
+			  self);
+
 	self->priv->triggers = NULL;
 	self->priv->prov_trig = NULL;
 }
@@ -1051,7 +1084,7 @@ gsc_completion_add_data (GscCompletion *self,
 }
 
 void
-_gsc_completion_info_show (GscCompletion *self)
+_gsc_completion_update_info_pos (GscCompletion *self)
 {
 	GscProposal *proposal = NULL;
 	gint y, x, sw, sh;
@@ -1074,19 +1107,6 @@ _gsc_completion_info_show (GscCompletion *self)
 	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
 	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
 				      gtk_window_get_transient_for (GTK_WINDOW (self)));
-	gtk_widget_show (self->priv->info_window);
-	
-	self->priv->info_visible = TRUE;
-}
-
-void
-_gsc_completion_info_hide (GscCompletion *self)
-{
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-	{
-		gtk_widget_hide (self->priv->info_window);
-		self->priv->info_visible = FALSE;
-	}
 }
 
 gboolean

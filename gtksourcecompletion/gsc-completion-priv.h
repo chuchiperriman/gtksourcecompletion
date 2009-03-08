@@ -68,8 +68,7 @@ struct _GscCompletionPriv
 	
 };
 
-void		_gsc_completion_info_hide		(GscCompletion *self);
-void		_gsc_completion_info_show		(GscCompletion *self);
+void		_gsc_completion_update_info_pos		(GscCompletion *self);
 gboolean	_gsc_completion_select_next 		(GscCompletion *self,
 							 gint rows);
 gboolean	_gsc_completion_select_previous 	(GscCompletion *self,
