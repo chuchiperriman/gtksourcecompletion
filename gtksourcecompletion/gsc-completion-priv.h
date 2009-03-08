@@ -55,6 +55,7 @@ struct _GscCompletionPriv
 	gboolean manage_keys;
 	gboolean remember_info_visibility;
 	gboolean info_visible;
+	gboolean select_on_show;
 	
 	/* Completion management */
 	GtkTextView *view;

@@ -62,7 +62,8 @@ enum
 {
 	PROP_0,
 	PROP_MANAGE_KEYS,
-	PROP_REMEMBER_INFO_VISIBILITY
+	PROP_REMEMBER_INFO_VISIBILITY,
+	PROP_SELECT_ON_SHOW
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -758,6 +759,9 @@ gsc_completion_get_property (GObject    *object,
 		case PROP_REMEMBER_INFO_VISIBILITY:
 			g_value_set_boolean (value, self->priv->remember_info_visibility);
 			break;
+		case PROP_SELECT_ON_SHOW:
+			g_value_set_boolean (value, self->priv->select_on_show);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -783,6 +787,9 @@ gsc_completion_set_property (GObject      *object,
 			break;
 		case PROP_REMEMBER_INFO_VISIBILITY:
 			self->priv->remember_info_visibility = g_value_get_boolean (value);
+			break;
+		case PROP_SELECT_ON_SHOW:
+			self->priv->select_on_show = g_value_get_boolean (value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -813,7 +820,7 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	/**
 	 * GscCompletion:manage-completion-keys:
 	 *
-	 * TRUE if this object must control the completion keys pressed into the
+	 * %TRUE if this object must control the completion keys pressed into the
 	 * #GtkTextView associated (up next proposal, down previous proposal etc.)
 	 */
 	g_object_class_install_property (object_class,
@@ -826,7 +833,7 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	/**
 	 * GscCompletion:remember-info-visibility:
 	 *
-	 * TRUE if the completion must remember the last info state
+	 * %TRUE if the completion must remember the last info state
 	 * (visible or hidden)
 	 */
 	g_object_class_install_property (object_class,
@@ -836,7 +843,20 @@ gsc_completion_class_init (GscCompletionClass *klass)
 							      _("Remember the last info state (visible or hidden)"),
 							      FALSE,
 							      G_PARAM_READWRITE));
-	
+	/**
+	 * GscCompletion:select-on-show:
+	 *
+	 * %TRUE if the completion must to mark as selected the first proposal
+	 * on show
+	 * (visible or hidden)
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_SELECT_ON_SHOW,
+					 g_param_spec_boolean ("select-on-show",
+							      _("Completon mark as selected the first proposal on show"),
+							      _("Completon mark as selected the first proposal on show"),
+							      FALSE,
+							      G_PARAM_READWRITE));
 	/**
 	 * GscCompletion::proposal-selected:
 	 * @completion: The #GscCompletion who emits the signal
@@ -899,6 +919,7 @@ gsc_completion_init (GscCompletion *self)
 	self->priv->manage_keys = TRUE;
 	self->priv->remember_info_visibility = FALSE;
 	self->priv->info_visible = FALSE;
+	self->priv->select_on_show = FALSE;
 
 	gtk_window_set_type_hint (GTK_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
@@ -1486,6 +1507,9 @@ gsc_completion_trigger_event (GscCompletion *self,
 		gtk_widget_grab_focus (GTK_WIDGET (self->priv->view));
 
 		self->priv->active_trigger = trigger;
+		
+		if (self->priv->select_on_show)
+			_gsc_completion_select_first (self);
 	}
 	
 	return TRUE;

@@ -8,6 +8,9 @@
 	automatically.
 	You can use get_info_widget and call to gtk_widget_show and hide to
 	show/hide info programmatically.
+	* gtksourcecompletion/gsc-completion.c:
+	Added "select-on-show" property to GscCompletion. If TRUE, it set the
+	selection cursor to the first proposal when the popup is shown
 
 2009-03-01  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
