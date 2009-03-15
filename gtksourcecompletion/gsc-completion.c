@@ -526,7 +526,7 @@ gsc_completion_proposal_selected_default (GscCompletion *self,
 {
 	gsc_proposal_apply (proposal, self->priv->view);
 	end_completion (self);
-	return TRUE;
+	return FALSE;
 }
 
 static void

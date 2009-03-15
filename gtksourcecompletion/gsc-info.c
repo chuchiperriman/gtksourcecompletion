@@ -164,7 +164,7 @@ gsc_info_init (GscInfo *self)
 					GTK_POLICY_AUTOMATIC);
 	gtk_widget_show (self->priv->info_scroll);
 
-	self->priv->label = gtk_label_new (NULL);
+	self->priv->label = gtk_label_new (" ");
 	/*Top left position*/
 	gtk_misc_set_alignment (GTK_MISC (self->priv->label), 0, 0.5);
 	gtk_misc_set_padding (GTK_MISC (self->priv->label), 5, 5);
