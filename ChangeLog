@@ -1,5 +1,12 @@
 2009-03-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gsc-marshal.c:
+	* gtksourcecompletion/gsc-marshal.h:
+	* gtksourcecompletion/Makefile.am:
+	Do not link with libglade and remove unncessary files.
+
+2009-03-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gsc-completion.c:
 	Minor style fixes, and added a FIXME.
 
