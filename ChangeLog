@@ -1,3 +1,8 @@
+2009-03-19  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.c:
+	Patch to fix focus problems on osx. Thanks to Andrea Del Signore
+
 2009-03-18  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-info.c:

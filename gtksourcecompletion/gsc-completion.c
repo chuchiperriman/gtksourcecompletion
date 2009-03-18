@@ -1497,7 +1497,6 @@ gsc_completion_trigger_event (GscCompletion *self,
 	
 	gint x, y;
 	gboolean selected = FALSE;
-	GtkWindow *win;
 	
 	if (!selected)
 	{
@@ -1518,10 +1517,6 @@ gsc_completion_trigger_event (GscCompletion *self,
 		
 		gsc_completion_show_or_update (GTK_WIDGET (self));
 
-		/*Set the focus to the View, not the completion popup*/
-		win = GTK_WINDOW (gtk_widget_get_ancestor (GTK_WIDGET (self->priv->view),
-				  GTK_TYPE_WINDOW));
-		gtk_window_present (win);
 		gtk_widget_grab_focus (GTK_WIDGET (self->priv->view));
 
 		self->priv->active_trigger = trigger;
