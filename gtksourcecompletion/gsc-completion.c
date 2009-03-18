@@ -1060,7 +1060,7 @@ gsc_completion_init (GscCompletion *self)
 			  NULL);
 
 	g_signal_connect (self->priv->info_window,
-			  "show",
+			  "show-info",
 			  G_CALLBACK (show_info_cb),
 			  self);
 			  
@@ -1131,7 +1131,7 @@ _gsc_completion_update_info_pos (GscCompletion *self)
 	if (gsc_tree_get_selected_proposal (get_current_tree (self), &proposal))
 	{
 		gboolean ret = TRUE;
-		g_signal_emit_by_name (self, "display-info", proposal, &ret);
+		g_signal_emit (self, signals[DISPLAY_INFO], 0, proposal, &ret);
 	}
 	
 	gtk_window_get_position (GTK_WINDOW (self), &x, &y);

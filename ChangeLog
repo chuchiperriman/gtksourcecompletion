@@ -1,3 +1,11 @@
+2009-03-18  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-info.c:
+	Added "show-info" signal emitted before the real "show" function
+	* gtksourcecompletion/gsc-completion.c:
+	Uses the new "show-info" signal to a better info management and fix
+	the flickering
+
 2009-03-15  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:

@@ -43,6 +43,15 @@ struct _GscInfoPrivate
 	gint max_width;
 };
 
+/* Signals */
+enum
+{
+	SHOW_INFO,
+	LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = { 0 };
+
 /*Type definition*/
 G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
 
@@ -119,6 +128,8 @@ static void
 show (GtkWidget *widget)
 {
 	GscInfo *self = GSC_INFO (widget);
+	
+	g_signal_emit (self, signals[SHOW_INFO], 0);
 	
 	GTK_WIDGET_CLASS (gsc_info_parent_class)->show (GTK_WIDGET (self));
 	
@@ -206,6 +217,24 @@ gsc_info_class_init (GscInfoClass *klass)
 	widget_class->show = show;
 	widget_class->hide = hide;
 	
+	/**
+	 * GscInfo::show-info:
+	 * @info: The #GscInf who emits the signal
+	 *
+	 * This signal is emited before any "show" management. You can connect
+	 * to this signal if you want to change some properties or position
+	 * before to so the real "show".
+	 **/
+	signals[SHOW_INFO] =
+		g_signal_new ("show-info",
+			      G_TYPE_FROM_CLASS (klass),
+			      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+			      0,
+			      NULL, 
+			      NULL,
+			      g_cclosure_marshal_VOID__VOID, 
+			      G_TYPE_NONE,
+			      0);
 }
 
 /**
