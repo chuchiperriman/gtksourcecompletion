@@ -351,7 +351,7 @@ selection_changed_cd (GtkTreeSelection *selection,
 
 static GscCompletionPage *
 gsc_completion_page_new (GscCompletion *self,
-		    const gchar *tree_name)
+			 const gchar *tree_name)
 {
 	/*Creates the new trees*/
 	GscCompletionPage *page;
@@ -470,7 +470,7 @@ switch_page_cb (GtkNotebook *notebook,
 	return FALSE;
 }
 
-void
+static void
 show_info_cb (GtkWidget *widget,
 	      gpointer user_data)
 {
@@ -481,10 +481,10 @@ show_info_cb (GtkWidget *widget,
 	_gsc_completion_update_info_pos (self);
 	self->priv->info_visible = TRUE;
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-				       TRUE);
+				      TRUE);
 }
 
-void
+static void
 hide_info_cb (GtkWidget *widget,
 	      gpointer user_data)
 {
@@ -492,7 +492,7 @@ hide_info_cb (GtkWidget *widget,
 	
 	self->priv->info_visible = FALSE;
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
-				       FALSE);
+				      FALSE);
 }
 
 static gboolean
@@ -559,8 +559,8 @@ gsc_completion_realize (GtkWidget *widget)
 
 static gboolean
 gsc_completion_delete_event_cb (GtkWidget *widget,
-			   GdkEvent  *event,
-			   gpointer   user_data) 
+				GdkEvent  *event,
+				gpointer   user_data) 
 {
 	/*Prevent the alt+F4 keys*/
 	return TRUE;
@@ -954,7 +954,7 @@ gsc_completion_init (GscCompletion *self)
 	gtk_notebook_set_show_tabs (GTK_NOTEBOOK (self->priv->notebook), FALSE);
 	gtk_notebook_set_show_border (GTK_NOTEBOOK (self->priv->notebook),
 				      FALSE);
-				      
+	
 	/* Add default page */
 	self->priv->active_page = gsc_completion_page_new (self, DEFAULT_PAGE);
 	
@@ -1211,11 +1211,11 @@ GtkWidget*
 gsc_completion_new (GtkTextView *view)
 {
 	GscCompletion *self = GSC_COMPLETION (g_object_new (GSC_TYPE_COMPLETION,
-				    "type", GTK_WINDOW_POPUP,
-				    NULL));
+							    "type", GTK_WINDOW_POPUP,
+							    NULL));
 	self->priv->view = view;
 	
-	completion_control_add_completion(view,self);
+	completion_control_add_completion (view,self);
 	
 	return GTK_WIDGET (self);
 }
@@ -1495,12 +1495,16 @@ gsc_completion_trigger_event (GscCompletion *self,
 	
 	g_list_free (final_list);
 	
-	gint x, y;
 	gboolean selected = FALSE;
-	GtkWindow *win;
 	
+	/*
+	 * FIXME: You are always going to enter here. selected is always FALSE
+	 */
 	if (!selected)
 	{
+		gint x, y;
+		GtkWindow *win;
+		
 		if (!GTK_WIDGET_HAS_FOCUS (self->priv->view))
 			return FALSE;
 		
@@ -1580,8 +1584,8 @@ gsc_completion_filter_proposals (GscCompletion *self,
 		if (gsc_tree_get_num_proposals (GSC_TREE (page->view)) > 0)
 		{
 			gsc_tree_filter_visible (GSC_TREE (page->view),
-             					 (GscTreeFilterVisibleFunc) func,
-             					 user_data);
+						 (GscTreeFilterVisibleFunc) func,
+						 user_data);
 		}
 	}
   
@@ -1607,7 +1611,7 @@ gsc_completion_set_active (GscCompletion *self,
 	GscTrigger *trigger;
 	gint i;
 	
-	g_return_if_fail (GSC_IS_COMPLETION (self));	
+	g_return_if_fail (GSC_IS_COMPLETION (self));
 	
 	if (active)
 	{
@@ -1762,7 +1766,7 @@ gsc_completion_get_provider (GscCompletion *self,
  * gsc_completion_get_from_view:
  * @view: The #GtkTextView associated with a #GscCompletion
  *
- * Returns: The #GscCompletion associated with a @view or NULL.
+ * Returns: The #GscCompletion associated with a @view or %NULL.
  */
 GscCompletion*
 gsc_completion_get_from_view(GtkTextView *view)
