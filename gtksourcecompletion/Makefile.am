@@ -5,8 +5,7 @@ INCLUDES = \
 	-DICON_DIR=\""$(datadir)/gtksourcecompletion/pixmaps"\"	\
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" \
 	$(PACKAGE_CFLAGS) \
-	`pkg-config --cflags gtksourceview-2.0` \
-	`pkg-config --cflags libglade-2.0`
+	`pkg-config --cflags gtksourceview-2.0`
 
 AM_CFLAGS =\
 	 -Wall\
