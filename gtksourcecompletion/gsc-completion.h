@@ -21,7 +21,6 @@
 #define GSC_COMPLETION_H
 
 #include <gtk/gtk.h>
-#include "gsc-tree.h"
 #include "gsc-provider.h"
 #include "gsc-info.h"
 
@@ -44,7 +43,8 @@ G_BEGIN_DECLS
 
 #define DEFAULT_PAGE "Default"
 
-typedef GscTreeFilterVisibleFunc GscCompletionFilterFunc;
+typedef gboolean (* GscCompletionFilterFunc) (GscProposal *proposal,
+					      gpointer     user_data);
 
 typedef struct _GscCompletionPriv GscCompletionPriv;
 typedef struct _GscCompletion GscCompletion;
@@ -61,8 +61,10 @@ struct _GscCompletionClass
 {
 	GtkWindowClass parent_class;
 
-	gboolean (* proposal_selected)(GscCompletion *completion, GscProposal *proposal);
-	gboolean (* display_info)     (GscCompletion *completion, GscProposal *proposal);
+	gboolean (* proposal_selected)(GscCompletion *completion,
+				       GscProposal *proposal);
+	gboolean (* display_info)     (GscCompletion *completion,
+				       GscProposal *proposal);
 };
 
 /* ********************* Control Functions ******************** */

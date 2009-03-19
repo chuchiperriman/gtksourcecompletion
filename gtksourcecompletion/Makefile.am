@@ -25,7 +25,6 @@ libgtksourcecompletion_headers = 	\
 	gsc-proposal.h			\
 	gsc-trigger-customkey.h		\
 	gsc-trigger-autowords.h		\
-	gsc-tree.h			\
 	gsc-i18n.h			\
 	gsc-completion.h		\
 	gsc-completion-priv.h		\
@@ -39,7 +38,6 @@ libgtksourcecompletion_2_0_la_SOURCES = \
 	gsc-proposal.c			\
 	gsc-trigger-customkey.c		\
 	gsc-trigger-autowords.c		\
-	gsc-tree.c			\
 	gsc-completion.c		\
 	gsc-info.c			\
 	$(libgtksourcecompletion_headers)

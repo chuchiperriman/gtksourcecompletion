@@ -32,10 +32,21 @@ enum
 	LAST_EXTERNAL_SIGNAL
 };
 
+typedef struct _GscTree
+{
+	GtkTreeView *treeview;
+	GtkListStore *list_store;
+	GtkTreeModelFilter *model_filter;
+	
+	gboolean filter_active;
+	gpointer filter_data;
+	GscCompletionFilterFunc filter_func;
+} GscTree;
+
 typedef struct _GscCompletionPage
 {
 	gchar *name;
-	GtkWidget *view;
+	GscTree *tree;
 } GscCompletionPage;
 
 struct _GscCompletionPriv
