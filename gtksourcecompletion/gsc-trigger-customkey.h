@@ -23,8 +23,8 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "gsc-trigger.h"
-#include "gsc-completion.h"
+#include "gtksourcecompletiontrigger.h"
+#include "gtksourcecompletion.h"
 
 G_BEGIN_DECLS
 

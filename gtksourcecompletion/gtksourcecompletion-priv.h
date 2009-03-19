@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-completion-priv.h
+ *  gtksourcecompletion-priv.h
  *
  *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
  *
@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GSC_COMPLETION_PRIV_H
-#define GSC_COMPLETION_PRIV_H
+#ifndef GTK_SOURCE_COMPLETION_PRIV_H
+#define GTK_SOURCE_COMPLETION_PRIV_H
 
 G_BEGIN_DECLS
 
@@ -32,7 +32,7 @@ enum
 	LAST_EXTERNAL_SIGNAL
 };
 
-typedef struct _GscTree
+typedef struct _GtkSourceCompletionTree
 {
 	GtkTreeView *treeview;
 	GtkListStore *list_store;
@@ -40,16 +40,16 @@ typedef struct _GscTree
 	
 	gboolean filter_active;
 	gpointer filter_data;
-	GscCompletionFilterFunc filter_func;
-} GscTree;
+	GtkSourceCompletionFilterFunc filter_func;
+} GtkSourceCompletionTree;
 
-typedef struct _GscCompletionPage
+typedef struct _GtkSourceCompletionPage
 {
 	gchar *name;
-	GscTree *tree;
-} GscCompletionPage;
+	GtkSourceCompletionTree *tree;
+} GtkSourceCompletionPage;
 
-struct _GscCompletionPriv
+struct _GtkSourceCompletionPriv
 {
 	/* Widget and popup variables*/
 	GtkWidget *info_window;
@@ -61,7 +61,7 @@ struct _GscCompletionPriv
 	GtkWidget *bottom_bar;
 	
 	GList *pages;
-	GscCompletionPage *active_page;
+	GtkSourceCompletionPage *active_page;
 	gboolean destroy_has_run;
 	gboolean manage_keys;
 	gboolean remember_info_visibility;
@@ -72,7 +72,7 @@ struct _GscCompletionPriv
 	GtkTextView *view;
 	GList *triggers;
 	GList *prov_trig;
-	GscTrigger *active_trigger;
+	GtkSourceCompletionTrigger *active_trigger;
 	
 	/*TRUE if the completion mechanism is active*/
 	gboolean active;
@@ -80,14 +80,14 @@ struct _GscCompletionPriv
 	
 };
 
-void		_gsc_completion_update_info_pos		(GscCompletion *self);
-gboolean	_gsc_completion_select_next 		(GscCompletion *self,
-							 gint rows);
-gboolean	_gsc_completion_select_previous 	(GscCompletion *self,
-						 	 gint rows);
-gboolean 	_gsc_completion_select_last		(GscCompletion *self);
-gboolean	_gsc_completion_select_first		(GscCompletion *self);
-gboolean	_gsc_completion_select_current_proposal	(GscCompletion *self);
+void		_gtk_source_completion_update_info_pos		(GtkSourceCompletion *self);
+gboolean	_gtk_source_completion_select_next 		(GtkSourceCompletion *self,
+								 gint rows);
+gboolean	_gtk_source_completion_select_previous		(GtkSourceCompletion *self,
+							 	 gint rows);
+gboolean 	_gtk_source_completion_select_last		(GtkSourceCompletion *self);
+gboolean	_gtk_source_completion_select_first		(GtkSourceCompletion *self);
+gboolean	_gtk_source_completion_select_current_proposal	(GtkSourceCompletion *self);
 
 
 G_END_DECLS

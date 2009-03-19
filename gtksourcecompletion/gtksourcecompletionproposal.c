@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-proposal.c
+ *  gtksourcecompletionproposal.c
  *
  *  Copyright (C) 2008 - ChuchiPerriman <chuchiperriman@gmail.com>
  *
@@ -19,29 +19,28 @@
  */
 
 /**
- * SECTION:gsc-proposal
- * @title: GscProposal
+ * SECTION:gtksourcecompletionproposal
+ * @title: GtkSourceCompletionProposal
  * @short_description: Completion proposal object
  *
  * Every proposal is an item into the popup. It controls the label to be
  * shown, the help (info) and the apply when the user selects the proposal.
- *
  */
   
-#include "gsc-proposal.h"
+#include "gtksourcecompletionproposal.h"
 #include "gsc-utils.h"
 #include "gsc-marshal.h"
 #include "gsc-i18n.h"
 
-#define GSC_PROPOSAL_DEFAULT_PAGE _("Default")
-#define GSC_PROPOSAL_DEFAULT_PRIORITY 10
+#define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE _("Default")
+#define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PRIORITY 10
 
-#define GSC_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), \
-					 GSC_TYPE_PROPOSAL, GscProposalPrivate))
+#define GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), \
+							   GTK_TYPE_SOURCE_COMPLETION_PROPOSAL, GtkSourceCompletionProposalPrivate))
 
-G_DEFINE_TYPE(GscProposal, gsc_proposal, G_TYPE_OBJECT);
+G_DEFINE_TYPE(GtkSourceCompletionProposal, gtk_source_completion_proposal, G_TYPE_OBJECT);
 
-struct _GscProposalPrivate
+struct _GtkSourceCompletionProposalPrivate
 {
 	gchar *label;
 	gchar *info;
@@ -60,35 +59,35 @@ enum
 };
 
 static gboolean
-gsc_proposal_apply_default (GscProposal *self,
-			    GtkTextView *view)
+gtk_source_completion_proposal_apply_default (GtkSourceCompletionProposal *self,
+					      GtkTextView *view)
 {
-	gsc_replace_actual_word (view,
-				 self->priv->label);
+	gtk_source_completion_replace_actual_word (view,
+						   self->priv->label);
 	return FALSE;
 }
 
-static const gchar*
-gsc_proposal_get_info_default (GscProposal *self)
+static const gchar *
+gtk_source_completion_proposal_get_info_default (GtkSourceCompletionProposal *self)
 {
 	return self->priv->info;
 }
 
 static void
-gsc_proposal_init (GscProposal *self)
+gtk_source_completion_proposal_init (GtkSourceCompletionProposal *self)
 {
-	self->priv = GSC_PROPOSAL_GET_PRIVATE (self);
+	self->priv = GTK_SOURCE_COMPLETION_PROPOSAL_GET_PRIVATE (self);
 	
 	self->priv->label = NULL;
 	self->priv->info = NULL;
 	self->priv->icon = NULL;
-	self->priv->page_name = g_strdup (GSC_PROPOSAL_DEFAULT_PAGE);
+	self->priv->page_name = g_strdup (GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE);
 }
 
 static void
-gsc_proposal_finalize (GObject *object)
+gtk_source_completion_proposal_finalize (GObject *object)
 {
-	GscProposal *self = GSC_PROPOSAL (object);
+	GtkSourceCompletionProposal *self = GTK_SOURCE_COMPLETION_PROPOSAL (object);
 	
 	g_free (self->priv->label);
 	g_free (self->priv->info);
@@ -97,20 +96,20 @@ gsc_proposal_finalize (GObject *object)
 	if (self->priv->icon != NULL)
 		g_object_unref(self->priv->icon);
 	
-	G_OBJECT_CLASS (gsc_proposal_parent_class)->finalize (object);
+	G_OBJECT_CLASS (gtk_source_completion_proposal_parent_class)->finalize (object);
 }
 
 static void
-gsc_proposal_get_property (GObject    *object,
-			   guint       prop_id,
-			   GValue     *value,
-			   GParamSpec *pspec)
+gtk_source_completion_proposal_get_property (GObject    *object,
+					     guint       prop_id,
+					     GValue     *value,
+					     GParamSpec *pspec)
 {
-	GscProposal *self;
+	GtkSourceCompletionProposal *self;
 
-	g_return_if_fail (GSC_IS_PROPOSAL (object));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (object));
 
-	self = GSC_PROPOSAL (object);
+	self = GTK_SOURCE_COMPLETION_PROPOSAL (object);
 
 	switch (prop_id)
 	{
@@ -128,7 +127,7 @@ gsc_proposal_get_property (GObject    *object,
 			break;
 		case PROP_PAGE_NAME:
 			g_value_set_string (value,
-					     self->priv->page_name);
+					    self->priv->page_name);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -137,16 +136,16 @@ gsc_proposal_get_property (GObject    *object,
 }
 
 static void
-gsc_proposal_set_property (GObject      *object,
-			   guint         prop_id,
-			   const GValue *value,
-			   GParamSpec   *pspec)
+gtk_source_completion_proposal_set_property (GObject      *object,
+					     guint         prop_id,
+					     const GValue *value,
+					     GParamSpec   *pspec)
 {
-	GscProposal *self;
+	GtkSourceCompletionProposal *self;
 
-	g_return_if_fail (GSC_IS_PROPOSAL (object));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (object));
 
-	self = GSC_PROPOSAL (object);
+	self = GTK_SOURCE_COMPLETION_PROPOSAL (object);
 
 	switch (prop_id)
 	{
@@ -172,23 +171,23 @@ gsc_proposal_set_property (GObject      *object,
 }
 
 static void
-gsc_proposal_class_init (GscProposalClass *klass)
+gtk_source_completion_proposal_class_init (GtkSourceCompletionProposalClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 
-	object_class->get_property = gsc_proposal_get_property;
-	object_class->set_property = gsc_proposal_set_property;
-	object_class->finalize = gsc_proposal_finalize;
+	object_class->get_property = gtk_source_completion_proposal_get_property;
+	object_class->set_property = gtk_source_completion_proposal_set_property;
+	object_class->finalize = gtk_source_completion_proposal_finalize;
 
-	g_type_class_add_private (object_class, sizeof (GscProposalPrivate));
+	g_type_class_add_private (object_class, sizeof (GtkSourceCompletionProposalPrivate));
 	
-	klass->apply = gsc_proposal_apply_default;
-	klass->get_info = gsc_proposal_get_info_default;
+	klass->apply = gtk_source_completion_proposal_apply_default;
+	klass->get_info = gtk_source_completion_proposal_get_info_default;
 	
 	/* Proposal properties */
 	
 	/**
-	 * GscProposal:label:
+	 * GtkSourceCompletionProposal:label:
 	 *
 	 * Label to be shown for this proposal
 	 */
@@ -200,7 +199,7 @@ gsc_proposal_class_init (GscProposalClass *klass)
 							      NULL,
 							      G_PARAM_READWRITE));
 	/**
-	 * GscProposal:info:
+	 * GtkSourceCompletionProposal:info:
 	 *
 	 * Info to be shown for this proposal
 	 */
@@ -212,7 +211,7 @@ gsc_proposal_class_init (GscProposalClass *klass)
 							      NULL,
 							      G_PARAM_READWRITE));
 	/**
-	 * GscProposal:icon:
+	 * GtkSourceCompletionProposal:icon:
 	 *
 	 * Icon to be shown for this proposal
 	 */
@@ -224,7 +223,7 @@ gsc_proposal_class_init (GscProposalClass *klass)
 							      G_PARAM_READWRITE));
 
 	/**
-	 * GscProposal:page-name:
+	 * GtkSourceCompletionProposal:page-name:
 	 *
 	 * Page name for this proposal
 	 */
@@ -238,25 +237,25 @@ gsc_proposal_class_init (GscProposalClass *klass)
 }
 
 /**
- * gsc_proposal_new:
+ * gtk_source_completion_proposal_new:
  * @label: Item label that will be shown in the completion popup. 
  * @info: Item info markup that will be shown when the user select to view the item info.
  * @icon: Item icon that will be shown in the completion popup
  *
- * This function creates a new #GscProposal. By default, when the user selects 
+ * This function creates a new #GtkSourceCompletionProposal. By default, when the user selects 
  * the proposal, the proposal label will be inserted into the GtkTextView.
  * You can overwrite the apply and disply-info functions to overwrite the default.
  *
- * Returns: A new #GscProposal
+ * Returns: A new #GtkSourceCompletionProposal
  */
-GscProposal*
-gsc_proposal_new (const gchar *label,
-		  const gchar *info,
-		  GdkPixbuf *icon)
+GtkSourceCompletionProposal *
+gtk_source_completion_proposal_new (const gchar *label,
+				    const gchar *info,
+				    GdkPixbuf *icon)
 {
-	GscProposal *self;
+	GtkSourceCompletionProposal *self;
 	
-	self = GSC_PROPOSAL (g_object_new (GSC_TYPE_PROPOSAL, NULL));
+	self = GTK_SOURCE_COMPLETION_PROPOSAL (g_object_new (GTK_TYPE_SOURCE_COMPLETION_PROPOSAL, NULL));
 	
 	self->priv->label = g_strdup (label);
 	self->priv->info = g_strdup (info);
@@ -268,60 +267,59 @@ gsc_proposal_new (const gchar *label,
 	{
 		self->priv->icon = NULL;
 	}
-		
 	
 	return self;
 }
 
 /**
- * gsc_proposal_get_label:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_get_label:
+ * @self: The #GtkSourceCompletionProposal
  *
  * Returns: The proposal label that will be shown into the popup
  */
-const gchar*
-gsc_proposal_get_label (GscProposal *self)
+const gchar *
+gtk_source_completion_proposal_get_label (GtkSourceCompletionProposal *self)
 {
-	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self), NULL);
 	
 	return self->priv->label;
 }
 
 /**
- * gsc_proposal_get_icon:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_get_icon:
+ * @self: The #GtkSourceCompletionProposal
  *
  * Gets the icon of this @proposal that will be shown into the popup.
  *
  * Returns: the icon of this @proposal that will be shown into the popup
  */
-const GdkPixbuf*
-gsc_proposal_get_icon (GscProposal *self)
+const GdkPixbuf *
+gtk_source_completion_proposal_get_icon (GtkSourceCompletionProposal *self)
 {
-	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self), NULL);
 
 	return self->priv->icon;
 }
 
 /**
- * gsc_proposal_set_page_name:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_set_page_name:
+ * @self: The #GtkSourceCompletionProposal
  * @page_name: The name for the page
  *
  * Sets the name of the page where this proposal will be shown.
  * If @page_name is %NULL the default page will be used.
  */
 void
-gsc_proposal_set_page_name (GscProposal *self,
-			    const gchar *page_name)
+gtk_source_completion_proposal_set_page_name (GtkSourceCompletionProposal *self,
+					      const gchar *page_name)
 {
-	g_return_if_fail (GSC_IS_PROPOSAL (self));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self));
 
 	g_free (self->priv->page_name);
 	
 	if (page_name == NULL)
 	{
-		self->priv->page_name = g_strdup (GSC_PROPOSAL_DEFAULT_PAGE);
+		self->priv->page_name = g_strdup (GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE);
 	}
 	else
 	{
@@ -330,55 +328,54 @@ gsc_proposal_set_page_name (GscProposal *self,
 }
 
 /**
- * gsc_proposal_get_page_name:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_get_page_name:
+ * @self: The #GtkSourceCompletionProposal
  *
  * Gets the page name where the @proposal will be placed.
  *
  * Returns: the page name where the @proposal will be placed.
  */
-const gchar*
-gsc_proposal_get_page_name (GscProposal *self)
+const gchar *
+gtk_source_completion_proposal_get_page_name (GtkSourceCompletionProposal *self)
 {
-	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self), NULL);
 	
 	return self->priv->page_name;
 }
 
 /**
- * gsc_proposal_get_info:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_get_info:
+ * @self: The #GtkSourceCompletionProposal
  *
  * The completion calls this function when the user wants to see the proposal info.
  * You can overwrite this function if you need to change the default mechanism.
  *
  * Returns: The proposal info markup asigned for this proposal or NULL;
  */
-const gchar* 
-gsc_proposal_get_info (GscProposal *self)
+const gchar *
+gtk_source_completion_proposal_get_info (GtkSourceCompletionProposal *self)
 {
-	g_return_val_if_fail (GSC_IS_PROPOSAL (self), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self), NULL);
 
-	return GSC_PROPOSAL_GET_CLASS (self)->get_info (self);
+	return GTK_SOURCE_COMPLETION_PROPOSAL_GET_CLASS (self)->get_info (self);
 }
 
 /**
- * gsc_proposal_apply:
- * @self: The #GscProposal
+ * gtk_source_completion_proposal_apply:
+ * @self: The #GtkSourceCompletionProposal
  * @view: The #GtkTextView
  * 
  * The completion calls this function when the user selects the proposal. 
  * The default handler insert the proposal label into the view. 
  * You can overwrite this function.
- *
  */
 void
-gsc_proposal_apply (GscProposal *self,
-		    GtkTextView *view)
+gtk_source_completion_proposal_apply (GtkSourceCompletionProposal *self,
+				      GtkTextView *view)
 {
-	g_return_if_fail (GSC_IS_PROPOSAL (self));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (self));
 	
-	GSC_PROPOSAL_GET_CLASS (self)->apply (self, view);
+	GTK_SOURCE_COMPLETION_PROPOSAL_GET_CLASS (self)->apply (self, view);
 }
 
 

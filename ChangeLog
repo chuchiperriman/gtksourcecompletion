@@ -1,6 +1,28 @@
 2009-03-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/Makefile.am:
+	* gtksourcecompletion/gsc-trigger-autowords.c:
+	* gtksourcecompletion/gsc-trigger-autowords.h:
+	* gtksourcecompletion/gsc-trigger-customkey.h:
+	* gtksourcecompletion/gsc-utils.c:
+	* gtksourcecompletion/gsc-utils.h:
+	* gtksourcecompletion/gtksourcecompletion-priv.h:
+	* gtksourcecompletion/gtksourcecompletion.c:
+	* gtksourcecompletion/gtksourcecompletion.h:
+	* gtksourcecompletion/gtksourcecompletioninfo.c:
+	* gtksourcecompletion/gtksourcecompletioninfo.h:
+	* gtksourcecompletion/gtksourcecompletionproposal.c:
+	* gtksourcecompletion/gtksourcecompletionproposal.h:
+	* gtksourcecompletion/gtksourcecompletionprovider.c:
+	* gtksourcecompletion/gtksourcecompletionprovider.h:
+	* gtksourcecompletion/gtksourcecompletiontrigger.c:
+	* gtksourcecompletion/gtksourcecompletiontrigger.h:
+	Removed all files to have the consensual name in gtksourceview.
+	Some files are already missing: the ones with gsc-*.
+
+2009-03-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/Makefile.am:
 	* gtksourcecompletion/gsc-completion-priv.h:
 	* gtksourcecompletion/gsc-completion.c:
 	* gtksourcecompletion/gsc-tree.c:

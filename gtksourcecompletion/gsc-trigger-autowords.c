@@ -18,7 +18,7 @@
 
 /**
  * SECTION:gsc-trigger-autowords
- * @title: GscTriggerAutowords
+ * @title: GtkSourceCompletionTriggerAutowords
  * @short_description: Autocompletion words trigger
  *
  * This object trigger a completion event when the user writes a words with 
@@ -42,7 +42,7 @@
 
 #define GSC_TRIGGER_AUTOWORDS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
 					      GSC_TYPE_TRIGGER_AUTOWORDS, \
-					      GscTriggerAutowordsPrivate))
+					      GtkSourceCompletionTriggerAutowordsPrivate))
 
 /* Autocompletion signals */
 enum
@@ -52,7 +52,7 @@ enum
 	LAST_SIGNAL
 };
 	
-struct _GscTriggerAutowordsPrivate
+struct _GtkSourceCompletionTriggerAutowordsPrivate
 {
 	GscCompletion* completion;
 	GtkTextView *view;
@@ -74,16 +74,16 @@ enum
 	PROP_DELAY
 };
 
-static void	 gsc_trigger_autowords_iface_init	(GscTriggerIface *iface);
+static void	 gsc_trigger_autowords_iface_init	(GtkSourceCompletionTriggerIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GscTriggerAutowords,
+G_DEFINE_TYPE_WITH_CODE (GtkSourceCompletionTriggerAutowords,
 			 gsc_trigger_autowords,
 			 G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (GSC_TYPE_TRIGGER,
 				 		gsc_trigger_autowords_iface_init))
 
 static gint
-get_text_offset (GscTriggerAutowords *self)
+get_text_offset (GtkSourceCompletionTriggerAutowords *self)
 {
 	GtkTextBuffer *buffer;
 	GtkTextMark* mark;
@@ -99,7 +99,7 @@ get_text_offset (GscTriggerAutowords *self)
 static gboolean
 autocompletion_raise_event (gpointer event)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (event);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (event);
 	gchar* word;
 	gint offset;
 	
@@ -121,7 +121,7 @@ autocompletion_raise_event (gpointer event)
 	}
 	else
 	{
-		GscTrigger *active_trigger;
+		GtkSourceCompletionTrigger *active_trigger;
 		
 		active_trigger = gsc_completion_get_active_trigger (self->priv->completion);
 		if (active_trigger && strcmp (gsc_trigger_get_name (active_trigger),
@@ -138,7 +138,7 @@ autocompletion_key_release_cb (GtkWidget *view,
 			       GdkEventKey *event, 
 			       gpointer user_data)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
 	guint keyval = event->keyval;
 	
 	if (GDK_BackSpace == keyval)
@@ -171,7 +171,7 @@ autocompletion_insert_text_cb (GtkTextBuffer *buffer,
 			       gint len,
 			       gpointer user_data)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
 	
 	/* Prevent "paste" */
 	if (len <= 2)
@@ -192,15 +192,15 @@ autocompletion_insert_text_cb (GtkTextBuffer *buffer,
 }
 
 static const gchar* 
-gsc_trigger_autowords_real_get_name (GscTrigger *self)
+gsc_trigger_autowords_real_get_name (GtkSourceCompletionTrigger *self)
 {
 	return GSC_TRIGGER_AUTOWORDS_NAME;
 }
 
 static gboolean
-gsc_trigger_autowords_real_activate (GscTrigger* base)
+gsc_trigger_autowords_real_activate (GtkSourceCompletionTrigger* base)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (base);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (base);
 	
 	self->priv->signals[AS_GTK_TEXT_VIEW_KR] = 
 		g_signal_connect_data (self->priv->view,
@@ -220,9 +220,9 @@ gsc_trigger_autowords_real_activate (GscTrigger* base)
 }
 
 static gboolean
-gsc_trigger_autowords_real_deactivate (GscTrigger* base)
+gsc_trigger_autowords_real_deactivate (GtkSourceCompletionTrigger* base)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (base);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (base);
 	GtkTextBuffer *buffer;
 	
 	if (g_signal_handler_is_connected (self->priv->view,
@@ -253,7 +253,7 @@ gsc_trigger_autowords_get_property (GObject *object,
 {
 	g_return_if_fail (GSC_IS_TRIGGER_AUTOWORDS (object));
 
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
 
 	switch (property_id)
 	{
@@ -280,7 +280,7 @@ gsc_trigger_autowords_set_property (GObject *object,
 {
 	g_return_if_fail (GSC_IS_TRIGGER_AUTOWORDS (object));
 
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
 
 	switch (property_id)
 	{
@@ -297,7 +297,7 @@ gsc_trigger_autowords_set_property (GObject *object,
 }
 
 static void 
-gsc_trigger_autowords_init (GscTriggerAutowords *self)
+gsc_trigger_autowords_init (GtkSourceCompletionTriggerAutowords *self)
 {
 	self->priv = GSC_TRIGGER_AUTOWORDS_GET_PRIVATE (self);
 	
@@ -310,7 +310,7 @@ gsc_trigger_autowords_init (GscTriggerAutowords *self)
 static void 
 gsc_trigger_autowords_finalize(GObject *object)
 {
-	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
+	GtkSourceCompletionTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (object);
 
 	if (self->priv->source_id != 0)
 	{
@@ -324,11 +324,11 @@ gsc_trigger_autowords_finalize(GObject *object)
 }
 
 static void 
-gsc_trigger_autowords_class_init (GscTriggerAutowordsClass * klass)
+gsc_trigger_autowords_class_init (GtkSourceCompletionTriggerAutowordsClass * klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	g_type_class_add_private (klass, sizeof (GscTriggerAutowordsPrivate));
+	g_type_class_add_private (klass, sizeof (GtkSourceCompletionTriggerAutowordsPrivate));
 
 	object_class->get_property = gsc_trigger_autowords_get_property;
 	object_class->set_property = gsc_trigger_autowords_set_property;
@@ -365,7 +365,7 @@ gsc_trigger_autowords_class_init (GscTriggerAutowordsClass * klass)
 }
 
 static void 
-gsc_trigger_autowords_iface_init (GscTriggerIface * iface)
+gsc_trigger_autowords_iface_init (GtkSourceCompletionTriggerIface * iface)
 {
 	iface->get_name   = gsc_trigger_autowords_real_get_name;
 	iface->activate   = gsc_trigger_autowords_real_activate;
@@ -376,12 +376,12 @@ gsc_trigger_autowords_iface_init (GscTriggerIface * iface)
  * gsc_trigger_autowords_new:
  * @completion: The #GscCompletion where the triggered will be used
  *
- * Returns: A new #GscTriggerAutowords
+ * Returns: A new #GtkSourceCompletionTriggerAutowords
  */
-GscTriggerAutowords*
+GtkSourceCompletionTriggerAutowords*
 gsc_trigger_autowords_new (GscCompletion *completion)
 {
-	GscTriggerAutowords *self;
+	GtkSourceCompletionTriggerAutowords *self;
 	
 	g_return_val_if_fail (GSC_IS_COMPLETION (completion), NULL);
 	
@@ -395,7 +395,7 @@ gsc_trigger_autowords_new (GscCompletion *completion)
 
 /**
  * gsc_trigger_autowords_set_delay:
- * @self: The #GscTriggerAutowords
+ * @self: The #GtkSourceCompletionTriggerAutowords
  * @delay: milliseconds to delay the autocompletion event.
  *
  * The delay time is the time between the last user key pressed
@@ -406,7 +406,7 @@ gsc_trigger_autowords_new (GscCompletion *completion)
  *
  */
 void
-gsc_trigger_autowords_set_delay (GscTriggerAutowords* self,
+gsc_trigger_autowords_set_delay (GtkSourceCompletionTriggerAutowords* self,
 				 guint delay)
 {
 	g_return_if_fail (GSC_IS_TRIGGER_AUTOWORDS (self));

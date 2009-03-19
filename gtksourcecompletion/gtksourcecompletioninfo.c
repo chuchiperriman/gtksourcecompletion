@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-info.c
+ *  gtksourcecompletioninfo.c
  *
  *  Copyright (C) 2008 - ChuchiPerriman <chuchiperriman@gmail.com>
  *
@@ -20,17 +20,17 @@
 
 /**
  * SECTION:gsc-info
- * @title: GscInfo
+ * @title: GtkSourceCompletionInfo
  * @short_description: Calltips object
  *
  * This object can be used to show a calltip or help. 
  */
   
-#include "gsc-info.h"
+#include "gtksourcecompletioninfo.h"
 #include "gsc-utils.h"
 #include "gsc-i18n.h"
 
-struct _GscInfoPrivate
+struct _GtkSourceCompletionInfoPrivate
 {
 	GtkWidget *box;
 	GtkWidget *info_scroll;
@@ -53,15 +53,15 @@ enum
 static guint signals[LAST_SIGNAL] = { 0 };
 
 /*Type definition*/
-G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
+G_DEFINE_TYPE(GtkSourceCompletionInfo, gtk_source_completion_info, GTK_TYPE_WINDOW);
 
-#define GSC_INFO_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_INFO, GscInfoPrivate))
+#define GTK_SOURCE_COMPLETION_INFO_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION_INFO, GtkSourceCompletionInfoPrivate))
 #define WINDOW_WIDTH 350
 #define WINDOW_HEIGHT 200
 
 
 static void
-get_max_size (GscInfo *self,
+get_max_size (GtkSourceCompletionInfo *self,
 	      GtkWidget *widget,
 	      gint *w,
 	      gint *h)
@@ -104,7 +104,7 @@ get_max_size (GscInfo *self,
 }
 
 static void
-adjust_resize (GscInfo *self)
+adjust_resize (GtkSourceCompletionInfo *self)
 {
 	gint w, h;
 	
@@ -127,11 +127,11 @@ adjust_resize (GscInfo *self)
 static void
 show (GtkWidget *widget)
 {
-	GscInfo *self = GSC_INFO (widget);
+	GtkSourceCompletionInfo *self = GTK_SOURCE_COMPLETION_INFO (widget);
 	
 	g_signal_emit (self, signals[SHOW_INFO], 0);
 	
-	GTK_WIDGET_CLASS (gsc_info_parent_class)->show (GTK_WIDGET (self));
+	GTK_WIDGET_CLASS (gtk_source_completion_info_parent_class)->show (GTK_WIDGET (self));
 	
 	gtk_label_select_region (GTK_LABEL (self->priv->label), 0, 0);
 }
@@ -139,17 +139,17 @@ show (GtkWidget *widget)
 static void
 hide (GtkWidget *widget)
 {
-	GscInfo *self = GSC_INFO (widget);
+	GtkSourceCompletionInfo *self = GTK_SOURCE_COMPLETION_INFO (widget);
 	
 	gtk_label_set_label (GTK_LABEL (self->priv->label), "");
 	
-	GTK_WIDGET_CLASS (gsc_info_parent_class)->hide (GTK_WIDGET (self));
+	GTK_WIDGET_CLASS (gtk_source_completion_info_parent_class)->hide (GTK_WIDGET (self));
 }
 
 static void
-gsc_info_init (GscInfo *self)
+gtk_source_completion_info_init (GtkSourceCompletionInfo *self)
 {
-	self->priv = GSC_INFO_GET_PRIVATE (self);
+	self->priv = GTK_SOURCE_COMPLETION_INFO_GET_PRIVATE (self);
 	self->priv->adjust_height = FALSE;
 	self->priv->adjust_width = FALSE;
 	self->priv->max_height = WINDOW_HEIGHT;
@@ -198,27 +198,27 @@ gsc_info_init (GscInfo *self)
 }
 
 static void
-gsc_info_finalize (GObject *object)
+gtk_source_completion_info_finalize (GObject *object)
 {
-	/*GscInfo *self = GSC_INFO(object);*/
+	/*GtkSourceCompletionInfo *self = GTK_SOURCE_COMPLETION_INFO(object);*/
 	
-	G_OBJECT_CLASS (gsc_info_parent_class)->finalize (object);
+	G_OBJECT_CLASS (gtk_source_completion_info_parent_class)->finalize (object);
 }
 
 static void
-gsc_info_class_init (GscInfoClass *klass)
+gtk_source_completion_info_class_init (GtkSourceCompletionInfoClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-	g_type_class_add_private (object_class, sizeof (GscInfoPrivate));
+	g_type_class_add_private (object_class, sizeof (GtkSourceCompletionInfoPrivate));
 
-	object_class->finalize = gsc_info_finalize;
+	object_class->finalize = gtk_source_completion_info_finalize;
 	widget_class->show = show;
 	widget_class->hide = hide;
 	
 	/**
-	 * GscInfo::show-info:
+	 * GtkSourceCompletionInfo::show-info:
 	 * @info: The #GscInf who emits the signal
 	 *
 	 * This signal is emited before any "show" management. You can connect
@@ -238,37 +238,37 @@ gsc_info_class_init (GscInfoClass *klass)
 }
 
 /**
- * gsc_info_new:
+ * gtk_source_completion_info_new:
  *
- * Returns: The new GscInfo.
+ * Returns: The new GtkSourceCompletionInfo.
  *
  */
-GscInfo*
-gsc_info_new (void)
+GtkSourceCompletionInfo*
+gtk_source_completion_info_new (void)
 {
-	GscInfo *self = GSC_INFO (g_object_new (GSC_TYPE_INFO,
-					        "type", GTK_WINDOW_POPUP,
-					        NULL));
+	GtkSourceCompletionInfo *self = GTK_SOURCE_COMPLETION_INFO (g_object_new (GTK_TYPE_SOURCE_COMPLETION_INFO,
+										  "type", GTK_WINDOW_POPUP,
+										  NULL));
 	return self;
 }
 
 /**
- * gsc_info_move_to_cursor:
- * @self: The #GscInfo
+ * gtk_source_completion_info_move_to_cursor:
+ * @self: The #GtkSourceCompletionInfo
  * @view: The current GtkTextView where we want to show the info
  *
- * Moves the #GscInfo to under the @view cursor. If it cannot be shown down,
+ * Moves the #GtkSourceCompletionInfo to under the @view cursor. If it cannot be shown down,
  * it will be shown up
  *
  */
 void
-gsc_info_move_to_cursor (GscInfo* self,
-			 GtkTextView *view)
+gtk_source_completion_info_move_to_cursor (GtkSourceCompletionInfo* self,
+					   GtkTextView *view)
 {
 	int x,y;
 	gboolean resized = FALSE;
 	
-	g_return_if_fail  (GSC_IS_INFO (self));
+	g_return_if_fail  (GTK_IS_SOURCE_COMPLETION_INFO (self));
 
 	adjust_resize (self);
 	
@@ -293,26 +293,26 @@ gsc_info_move_to_cursor (GscInfo* self,
 }
 
 /**
- * gsc_info_set_markup:
- * @self: The #GscInfo
+ * gtk_source_completion_info_set_markup:
+ * @self: The #GtkSourceCompletionInfo
  * @markup: Text markup to be shown (see <link 
  * linkend="PangoMarkupFormat">Pango markup format</link>). 
  *
- * Sets the text markup to be shown into the GscInfo window.
+ * Sets the text markup to be shown into the GtkSourceCompletionInfo window.
  *
  */
 void
-gsc_info_set_markup (GscInfo* self,
-		     const gchar* markup)
+gtk_source_completion_info_set_markup (GtkSourceCompletionInfo* self,
+				       const gchar* markup)
 {
-	g_return_if_fail  (GSC_IS_INFO (self));
+	g_return_if_fail  (GTK_IS_SOURCE_COMPLETION_INFO (self));
 
 	gtk_label_set_markup (GTK_LABEL (self->priv->label), markup);
 }
 
 /**
- * gsc_info_set_adjust_height:
- * @self: The #GscInfo
+ * gtk_source_completion_info_set_adjust_height:
+ * @self: The #GtkSourceCompletionInfo
  * @adjust: TRUE to adjust height to content, FALSE to fixed height
  * @max_height: if adjust = TRUE, set the max height. -1 to preserve the 
  * current value
@@ -323,11 +323,11 @@ gsc_info_set_markup (GscInfo* self,
  *
  */
 void
-gsc_info_set_adjust_height (GscInfo* self,
-			    gboolean adjust,
-			    gint max_height)
+gtk_source_completion_info_set_adjust_height (GtkSourceCompletionInfo* self,
+					      gboolean adjust,
+					      gint max_height)
 {
-	g_return_if_fail  (GSC_IS_INFO (self));
+	g_return_if_fail  (GTK_IS_SOURCE_COMPLETION_INFO (self));
 
 	self->priv->adjust_height = adjust;
 	
@@ -338,8 +338,8 @@ gsc_info_set_adjust_height (GscInfo* self,
 }
 
 /**
- * gsc_info_set_adjust_width:
- * @self: The #GscInfo
+ * gtk_source_completion_info_set_adjust_width:
+ * @self: The #GtkSourceCompletionInfo
  * @adjust: TRUE to adjust width to content, FALSE to fixed width
  * @max_width: if adjust = TRUE, set the max height. -1 to preserve the 
  * current value
@@ -350,11 +350,11 @@ gsc_info_set_adjust_height (GscInfo* self,
  *
  */
 void
-gsc_info_set_adjust_width (GscInfo* self,
-			   gboolean adjust,
-			   gint max_width)
+gtk_source_completion_info_set_adjust_width (GtkSourceCompletionInfo* self,
+					     gboolean adjust,
+					     gint max_width)
 {
-	g_return_if_fail  (GSC_IS_INFO (self));
+	g_return_if_fail  (GTK_IS_SOURCE_COMPLETION_INFO (self));
 	
 	self->priv->adjust_width = adjust;
 	
@@ -365,8 +365,8 @@ gsc_info_set_adjust_width (GscInfo* self,
 }
 
 /**
- * gsc_info_set_custom:
- * @self: The #GscInfo
+ * gtk_source_completion_info_set_custom:
+ * @self: The #GtkSourceCompletionInfo
  * @custom_widget: A #GtkWidget
  *
  * Replaces the widget packed into the window with custom_widget. By default a
@@ -374,10 +374,10 @@ gsc_info_set_adjust_width (GscInfo* self,
  *
  */
 void
-gsc_info_set_custom (GscInfo* self,
-		     GtkWidget *custom_widget)
+gtk_source_completion_info_set_custom (GtkSourceCompletionInfo* self,
+				       GtkWidget *custom_widget)
 {
-	g_return_if_fail (GSC_IS_INFO (self));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (self));
 	
 	if (self->priv->custom_widget == custom_widget)
 		return;
@@ -419,16 +419,16 @@ gsc_info_set_custom (GscInfo* self,
 }
 
 /**
- * gsc_info_get_custom:
- * @self: The #GscInfo
+ * gtk_source_completion_info_get_custom:
+ * @self: The #GtkSourceCompletionInfo
  *
  * Returns: The custom widget setted or NULL.
  *
  */
 GtkWidget*
-gsc_info_get_custom (GscInfo* self)
+gtk_source_completion_info_get_custom (GtkSourceCompletionInfo* self)
 {
-	g_return_val_if_fail (GSC_IS_INFO (self), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (self), NULL);
 
 	return self->priv->custom_widget;
 }

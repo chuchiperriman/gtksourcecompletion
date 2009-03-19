@@ -15,31 +15,27 @@ lib_LTLIBRARIES = \
 	libgtksourcecompletion-2.0.la
 
 BUILT_SOURCES =		\
-        gsc-marshal.c	\
-        gsc-marshal.h
+	gsc-marshal.c	\
+	gsc-marshal.h
 
 libgtksourcecompletion_headers = 	\
-	gsc-provider.h			\
-	gsc-trigger.h			\
+	gtksourcecompletionprovider.h	\
+	gtksourcecompletiontrigger.h	\
 	gsc-utils.h			\
-	gsc-proposal.h			\
-	gsc-trigger-customkey.h		\
-	gsc-trigger-autowords.h		\
+	gtksourcecompletionproposal.h	\
 	gsc-i18n.h			\
-	gsc-completion.h		\
-	gsc-completion-priv.h		\
-	gsc-info.h
+	gtksourcecompletion.h		\
+	gtksourcecompletion-priv.h	\
+	gtksourcecompletioninfo.h
 
 libgtksourcecompletion_2_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
-	gsc-provider.c			\
-	gsc-trigger.c			\
+	gtksourcecompletionprovider.c	\
+	gtksourcecompletiontrigger.c	\
 	gsc-utils.c			\
-	gsc-proposal.c			\
-	gsc-trigger-customkey.c		\
-	gsc-trigger-autowords.c		\
-	gsc-completion.c		\
-	gsc-info.c			\
+	gtksourcecompletionproposal.c	\
+	gtksourcecompletion.c		\
+	gtksourcecompletioninfo.c	\
 	$(libgtksourcecompletion_headers)
 	
 
@@ -51,18 +47,15 @@ libgtksourcecompletion_2_0_la_LDFLAGS = \
 	`pkg-config --libs gtksourceview-2.0`
 
 INST_H_FILES = \
-	gsc-provider.h			\
-	gsc-trigger.h			\
+	gtksourcecompletionprovider.h	\
+	gtksourcecompletiontrigger.h	\
 	gsc-utils.h			\
-	gsc-proposal.h			\
-	gsc-trigger-customkey.h		\
-	gsc-trigger-autowords.h		\
-	gsc-providers.h			\
-	gsc-tree.h			\
+	gtksourcecompletionproposal.h	\
+	gtksourceproviders.h		\
 	gsc-i18n.h			\
-	gsc-completion.h		\
-	gsc-completion-priv.h		\
-	gsc-info.h
+	gtksourcecompletion.h		\
+	gtksourcecompletion-priv.h	\
+	gtksourcecompletioninfo.h
 
 gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@
@@ -77,8 +70,8 @@ CLEAN_FILES=$(BUILT_SOURCES)
 
 libgtksourcecompletion_2_0_includedir = $(includedir)/gtksourcecompletion-2.0/gtksourcecompletion
 
-libgtksourcecompletion_2_0_include_HEADERS =          \
-	$(libgtksourcecompletion_headers)             
+libgtksourcecompletion_2_0_include_HEADERS =	\
+	$(libgtksourcecompletion_headers)
 
 #headerdir = $(prefix)/include/gtksourcecompletion
 

@@ -87,7 +87,7 @@ gsc_gsv_get_text(GtkTextView *text_view);
  *
  */
 void
-gsc_replace_actual_word(GtkTextView *text_view, 
+gtk_source_completion_replace_actual_word(GtkTextView *text_view, 
 				    const gchar* text);
 
 /**
