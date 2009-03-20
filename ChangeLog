@@ -1,3 +1,12 @@
+2009-03-20  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/Makefile.am:
+	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.c:
+	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.h:
+	* gtksourcecompletion/gtksourcecompletiontrigger-customkey.c:
+	* gtksourcecompletion/gtksourcecompletiontrigger-customkey.h:
+	Renamed files and methods.
+
 2009-03-19  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
 	* gtksourcecompletion/Makefile.am:

@@ -15,8 +15,8 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __GSC_TRIGGER_AUTOWORDS_H__
-#define __GSC_TRIGGER_AUTOWORDS_H__
+#ifndef __GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_H__
+#define __GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_H__
 
 #include <glib.h>
 #include <glib-object.h>
@@ -25,14 +25,14 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_TRIGGER_AUTOWORDS (gsc_trigger_autowords_get_type ())
-#define GSC_TRIGGER_AUTOWORDS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowords))
-#define GSC_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsClass))
-#define GSC_IS_TRIGGER_AUTOWORDS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_TRIGGER_AUTOWORDS))
-#define GSC_IS_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_TRIGGER_AUTOWORDS))
-#define GSC_TRIGGER_AUTOWORDS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsClass))
+#define GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (gtk_source_completion_trigger_autowords_get_type ())
+#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowords))
+#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsClass))
+#define GTK_IS_SOURCE_COMPLETION_TRIGGER_AUTOWORDS(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS))
+#define GTK_IS_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS))
+#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, GtkSourceCompletionTriggerAutowordsClass))
 
-#define GSC_TRIGGER_AUTOWORDS_NAME "GtkSourceCompletionTriggerAutowords"
+#define GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_NAME "GtkSourceCompletionTriggerAutowords"
 
 typedef struct _GtkSourceCompletionTriggerAutowordsPrivate GtkSourceCompletionTriggerAutowordsPrivate;
 
@@ -52,12 +52,13 @@ struct _GtkSourceCompletionTriggerAutowordsClass
 	GObjectClass parent;
 };
 
-GType			 gsc_trigger_autowords_get_type		(void);
+GType		 gtk_source_completion_trigger_autowords_get_type	(void);
 
-GtkSourceCompletionTriggerAutowords	*gsc_trigger_autowords_new		(GscCompletion *completion);
+GtkSourceCompletionTriggerAutowords
+		*gtk_source_completion_trigger_autowords_new		(GtkSourceCompletion *completion);
 
-void			 gsc_trigger_autowords_set_delay	(GtkSourceCompletionTriggerAutowords* trigger,
-								 guint delay);
+void		 gtk_source_completion_trigger_autowords_set_delay	(GtkSourceCompletionTriggerAutowords* trigger,
+									 guint delay);
 
 G_END_DECLS
 

@@ -26,7 +26,9 @@ libgtksourcecompletion_headers = 	\
 	gsc-i18n.h			\
 	gtksourcecompletion.h		\
 	gtksourcecompletion-priv.h	\
-	gtksourcecompletioninfo.h
+	gtksourcecompletioninfo.h	\
+	gtksourcecompletiontrigger-autowords.h	\
+	gtksourcecompletiontrigger-customkey.h
 
 libgtksourcecompletion_2_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
@@ -36,6 +38,8 @@ libgtksourcecompletion_2_0_la_SOURCES = \
 	gtksourcecompletionproposal.c	\
 	gtksourcecompletion.c		\
 	gtksourcecompletioninfo.c	\
+	gtksourcecompletiontrigger-autowords.c	\
+	gtksourcecompletiontrigger-customkey.c	\
 	$(libgtksourcecompletion_headers)
 	
 
@@ -55,7 +59,9 @@ INST_H_FILES = \
 	gsc-i18n.h			\
 	gtksourcecompletion.h		\
 	gtksourcecompletion-priv.h	\
-	gtksourcecompletioninfo.h
+	gtksourcecompletioninfo.h	\
+	gtksourcecompletiontrigger-autowords.h	\
+	gtksourcecompletiontrigger-customkey.h
 
 gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@
