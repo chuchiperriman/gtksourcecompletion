@@ -2,6 +2,8 @@
 
 	* proyect:
 	Changed the license from LGPL to GPL
+	* gtksourcecompletion/gsc-utils.[ch]:
+	Removed unused functions (unused by the library)
 
 2009-03-20  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

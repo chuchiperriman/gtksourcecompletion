@@ -114,15 +114,6 @@ gsc_get_last_word(GtkTextView *text_view)
 	return gsc_get_last_word_and_iter(text_view, NULL, NULL);
 }
 
-gchar*
-gsc_get_last_word_cleaned(GtkTextView *view)
-{
-	gchar *word = gsc_get_last_word_and_iter(view, NULL, NULL);
-	gchar *clean_word = gsc_clear_word(word);
-	g_free(word);
-	return clean_word;
-}
-
 void
 gsc_get_cursor_pos(GtkTextView *text_view, 
 		   gint *x, 
@@ -157,19 +148,6 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 	*y = win_y + yy + location.height;
 }
 
-gchar*
-gsc_gsv_get_text(GtkTextView *text_view)
-{
-	GtkTextIter start, end;
-	GtkTextBuffer *buffer;
-	
-	buffer = gtk_text_view_get_buffer(text_view);
-	gtk_text_buffer_get_start_iter (buffer, &start);
-	gtk_text_buffer_get_end_iter (buffer, &end);
-	return gtk_text_buffer_get_text(buffer,&start,&end,FALSE);
-	
-}
-
 void
 gtk_source_completion_replace_actual_word(GtkTextView *text_view, 
 			const gchar* text)
@@ -191,162 +169,6 @@ gtk_source_completion_replace_actual_word(GtkTextView *text_view,
 	gtk_text_buffer_insert(buffer, &word_start, text,-1);
 	gtk_text_buffer_delete_mark(buffer,mark);
 	gtk_text_buffer_end_user_action(buffer);
-}
-
-gchar*
-gsc_clear_word(const gchar* word)
-{
-	int len = g_utf8_strlen(word,-1);
-	int i;
-	const gchar *temp = word;
-	
-	for (i=0;i<len;i++)
-	{
-		if (gsc_char_is_separator(g_utf8_get_char(temp)))
-			temp = g_utf8_next_char(temp);
-		else
-			return g_strdup(temp);
-		
-	}
-	return NULL;
-}
-
-gchar *
-gsc_compute_line_indentation (GtkTextView *view,
-			      GtkTextIter *cur)
-{
-	GtkTextIter start;
-	GtkTextIter end;
-
-	gunichar ch;
-	gint line;
-
-	line = gtk_text_iter_get_line (cur);
-
-	gtk_text_buffer_get_iter_at_line (gtk_text_view_get_buffer (view),
-					  &start,
-					  line);
-
-	end = start;
-
-	ch = gtk_text_iter_get_char (&end);
-
-	while (g_unichar_isspace (ch) &&
-	       (ch != '\n') &&
-	       (ch != '\r') &&
-	       (gtk_text_iter_compare (&end, cur) < 0))
-	{
-		if (!gtk_text_iter_forward_char (&end))
-			break;
-
-		ch = gtk_text_iter_get_char (&end);
-	}
-
-	if (gtk_text_iter_equal (&start, &end))
-		return NULL;
-
-	return gtk_text_iter_get_slice (&start, &end);
-}
-
-gchar*
-gsc_get_text_with_indent(const gchar* content,gchar *indent)
-{
-	GString *fin = NULL;
-	gchar *ret = NULL;
-	gint len = strlen(content);
-	gint i;
-	gint last_line = 0;
-	for (i=0;i < len;i++)
-	{
-		if (content[i] == '\n' || content[i] =='\r')
-		{
-			if (fin==NULL)
-				fin = g_string_new_len(content,i+1);
-			else
-			{
-				fin = g_string_append_len(fin,
-							  &content[last_line+1],
-							  i - last_line);
-			}
-			fin = g_string_append(fin,indent);
-			last_line = i;
-		}
-	}
-	if (fin==NULL)
-		ret = g_strdup(content);
-	else
-	{
-		if (last_line < len -1)
-		{
-			fin = g_string_append_len(fin,
-						  &content[last_line+1],
-						  len - last_line);
-		}
-		ret = g_string_free(fin,FALSE);
-	}
-	return ret;
-}
-
-
-void
-gsc_insert_text_with_indent(GtkTextView *view, const gchar* text)
-{
-	GtkTextBuffer * buffer = gtk_text_view_get_buffer(view);
-	GtkTextMark *insert = gtk_text_buffer_get_insert(buffer);
-	GtkTextIter cur;
-	gtk_text_buffer_get_iter_at_mark(buffer,&cur,insert);
-	gchar *indent = gsc_compute_line_indentation(view,&cur);
-	gchar *indent_text = gsc_get_text_with_indent(text, indent);
-	g_free(indent);
-	gtk_text_buffer_insert_at_cursor(buffer,indent_text,-1);
-	g_free(indent_text);
-	gtk_text_view_scroll_mark_onscreen(view,insert);
-}
-
-gboolean
-gsc_is_valid_word(gchar *current_word, gchar *completion_word)
-{
-	if (completion_word==NULL)
-		return FALSE;
-	if (current_word==NULL)
-		return TRUE;
-	
-	gint len_cur = g_utf8_strlen (current_word,-1);
-	if (g_utf8_collate(current_word,completion_word) == 0)
-		return FALSE;
-
-	if (len_cur!=0 && strncmp(current_word,completion_word,len_cur)==0)
-		return TRUE;
-
-	return FALSE;
-}
-
-void
-gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y)
-{
-	gint w,h;
-	gint sw = gdk_screen_width();
-	gint sh = gdk_screen_height();
-	gtk_window_get_size(window, &w, &h);
-	*x = (sw/2) - (w/2) - 20;
-	*y = (sh/2) - (h/2);
-}
-
-void
-gsc_get_window_position_center_parent(GtkWindow *window,
-				      GtkWidget *parent,
-				      gint *x,
-				      gint *y)
-{
-	GtkWindow *parent_win = GTK_WINDOW(gtk_widget_get_ancestor(parent,
-				GTK_TYPE_WINDOW));
-	gint w,h,px,py, pw,ph;
-	gtk_window_get_position(parent_win,&px,&py);
-	gtk_window_get_size(parent_win, &pw, &ph);
-	gtk_window_get_size(window, &w, &h);
-	
-	*x = px + ((pw/2) - (w/2) -20);
-	*y = py + ((ph/2) - (h/2));
 }
 
 gboolean 

@@ -48,17 +48,6 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 gchar*
 gsc_get_last_word(GtkTextView *text_view);
 
-/**
- * gsc_get_last_word_cleaned:
- * @text_view: The #GtkTextView
- *
- * See #gsc_get_last_word and #gsc_clear_word
- *
- * Returns: the last word written in the #GtkTextView or "" (new allocated)
- */
-gchar*
-gsc_get_last_word_cleaned(GtkTextView *text_view);
-
 /** 
  * gsc_get_cursor_pos:
  * @text_view: The #GtkTextView
@@ -71,15 +60,6 @@ void
 gsc_get_cursor_pos(GtkTextView *text_view, 
 				gint *x, 
 				gint *y);
-
-/**
- * gsc_gsv_get_text: 
- * @text_view: The #GtkTextView 
- *
- * Returns All the #GtkTextView content .
- */
-gchar* 
-gsc_gsv_get_text(GtkTextView *text_view);
 
 /**
  * gsc_replace_actual_word:
@@ -105,64 +85,6 @@ gboolean
 gsc_char_is_separator(gunichar ch);
 
 /**
- * gsc_clear_word:
- * @word: The word to be cleaned
- * 
- * Clean the word eliminates the special characters at the start of this word.
- * By example "$variable" is cleaned to "variable"
- *
- * Returns New allocated string with the word cleaned. If all characters are 
- * separators, it return NULL;
- *
- */
-gchar*
-gsc_clear_word(const gchar* word);
-
-/**
- * gsc_compute_line_indentation:
- * @view: The #GtkTextView
- * @cur: Cursor in the line where we compute the indentation
- *
- * Returns: New allocated string with the indentation of this line
- */
-gchar *
-gsc_compute_line_indentation (GtkTextView *view,
-			     GtkTextIter *cur);
-
-/**
- * gsc_get_text_with_indent:
- * @content: The initial text to indent
- * @indent: Indentation string. You can get the indentation of a line with
- * #gsc_compute_line_indentation.
- *
- * Returns: New allocated string with the content indented.
- */
-gchar*
-gsc_get_text_with_indent(const gchar* content,gchar *indent);
-
-/**
- * gsc_insert_text_with_indent:
- * @view: The #GtkTextView where we will insert the indented text
- * @text: Text to indent and insert into the view.
- *
- * This function indent the text and insert it into the view in the current
- * position.
- */
-void
-gsc_insert_text_with_indent(GtkTextView *view, const gchar* text);
-
-/**
- * gsc_is_valid_word:
- * @current_word: The current word 
- * @completion_word: The completion word
- *
- * Returns: TRUE if the completion_word starts with current_word and it is not
- * the same word.
- */
-gboolean
-gsc_is_valid_word(gchar *current_word, gchar *completion_word);
-
-/**
  * gsc_get_window_position_in_cursor:
  * @window: Window to set
  * @view: Parent view where we get the cursor position
@@ -178,33 +100,5 @@ gsc_get_window_position_in_cursor(GtkWindow *window,
 				  gint *x,
 				  gint *y,
 				  gboolean *resized);
-
-/**
- * gsc_get_window_position_center_screen:
- * @window: Window to set
- * @x: The returned x position
- * @y: The returned y position
- *
- * Assing x and y values to center the window in the screen
- *
- */
-void
-gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y);
-
-/**
- * gsc_get_window_position_center_parent:
- * @window: Window to set
- * @parent: Parent widget where we want to center the window
- * @x: The returned x position
- * @y: The returned y position
- *
- * Assing x and y values to center the window in the parent widget
- *
- */
-void
-gsc_get_window_position_center_parent(GtkWindow *window,
-				      GtkWidget *parent,
-				      gint *x,
-				      gint *y);
 
 #endif 
