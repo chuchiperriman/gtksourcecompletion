@@ -4,6 +4,14 @@
 	Changed the license from LGPL to GPL
 	* gtksourcecompletion/gsc-utils.[ch]:
 	Removed unused functions (unused by the library)
+	* gtksourcecompletion/gsc-utils.c:
+	* gtksourcecompletion/gsc-utils.h:
+	* gtksourcecompletion/gtksourcecompletion.c:
+	* gtksourcecompletion/gtksourcecompletioninfo.c:
+	* gtksourcecompletion/gtksourcecompletionproposal.c:
+	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.c:
+	Renamed gsc_utils functions
+
 
 2009-03-20  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 

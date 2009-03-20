@@ -274,11 +274,11 @@ gtk_source_completion_info_move_to_cursor (GtkSourceCompletionInfo* self,
 
 	adjust_resize (self);
 	
-	gsc_get_window_position_in_cursor (GTK_WINDOW (self),
-					   view,
-					   &x,
-					   &y,
-					   &resized);
+	gsc_utils_window_get_position_at_cursor (GTK_WINDOW (self),
+						 view,
+						 &x,
+						 &y,
+						 &resized);
 	if (resized)
 	{
 		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),

@@ -1847,9 +1847,9 @@ gtk_source_completion_trigger_event (GtkSourceCompletion *self,
 	 *add a new "position-type": cursor, center_screen,
 	 *center_window, custom etc.
 	 */
-	gsc_get_window_position_in_cursor (GTK_WINDOW (self),
-					   self->priv->view,
-					   &x, &y, NULL);
+	gsc_utils_window_get_position_at_cursor (GTK_WINDOW (self),
+						 self->priv->view,
+						 &x, &y, NULL);
 
 	gtk_window_move (GTK_WINDOW (self),
 			 x, y);

@@ -31,9 +31,10 @@
 #include "gsc-utils.h"
 
 gboolean
-gsc_char_is_separator(const gunichar ch)
+gsc_utils_char_is_separator(const gunichar ch)
 {
-	if (g_unichar_isprint(ch) && (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
+	if (g_unichar_isprint(ch) && 
+	    (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
 	{
 		return FALSE;
 	}
@@ -42,9 +43,9 @@ gsc_char_is_separator(const gunichar ch)
 }
 
 gchar*
-gsc_get_last_word_and_iter(GtkTextView *text_view, 
-			   GtkTextIter *start_word, 
-			   GtkTextIter *end_word)
+gsc_utils_view_get_last_word_and_iter(GtkTextView *text_view, 
+				      GtkTextIter *start_word, 
+				      GtkTextIter *end_word)
 {
 	GtkTextMark* insert_mark;
 	GtkTextBuffer* text_buffer;
@@ -77,7 +78,7 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 	while ((no_doc_start = gtk_text_iter_backward_char(start_iter)) == TRUE)
 	{
 		ch = gtk_text_iter_get_char(start_iter);
-		if (gsc_char_is_separator(ch))
+		if (gsc_utils_char_is_separator(ch))
 		{
 			found = TRUE;
 			break;
@@ -109,15 +110,15 @@ gsc_get_last_word_and_iter(GtkTextView *text_view,
 }
 
 gchar*
-gsc_get_last_word(GtkTextView *text_view)
+gsc_utils_view_get_last_word(GtkTextView *text_view)
 {
-	return gsc_get_last_word_and_iter(text_view, NULL, NULL);
+	return gsc_utils_view_get_last_word_and_iter(text_view, NULL, NULL);
 }
 
 void
-gsc_get_cursor_pos(GtkTextView *text_view, 
-		   gint *x, 
-		   gint *y)
+gsc_utils_view_get_cursor_pos(GtkTextView *text_view, 
+			      gint *x, 
+			      gint *y)
 {
 	GdkWindow *win;
 	GtkTextMark* insert_mark;
@@ -149,8 +150,8 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 }
 
 void
-gtk_source_completion_replace_actual_word(GtkTextView *text_view, 
-			const gchar* text)
+gsc_utils_view_replace_current_word(GtkTextView *text_view, 
+				    const gchar* text)
 {
 	GtkTextBuffer *buffer;
 	GtkTextIter word_start, word_end;
@@ -158,7 +159,7 @@ gtk_source_completion_replace_actual_word(GtkTextView *text_view,
 	buffer = gtk_text_view_get_buffer(text_view);
 	gtk_text_buffer_begin_user_action(buffer);
 	
-	gsc_get_last_word_and_iter(text_view,&word_start, &word_end);
+	gsc_utils_view_get_last_word_and_iter(text_view,&word_start, &word_end);
 
 	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,
 							"temp_replace",
@@ -172,18 +173,18 @@ gtk_source_completion_replace_actual_word(GtkTextView *text_view,
 }
 
 gboolean 
-gsc_get_window_position_in_cursor(GtkWindow *window,
-				  GtkTextView *view,
-				  gint *x,
-				  gint *y,
-				  gboolean *resized)
+gsc_utils_window_get_position_at_cursor(GtkWindow *window,
+					GtkTextView *view,
+					gint *x,
+					gint *y,
+					gboolean *resized)
 {
 	gint w, h, xtext, ytext, ytemp;
 	gint sw = gdk_screen_width();
 	gint sh = gdk_screen_height();
 	gboolean resize = FALSE;
 	gboolean up = FALSE;
-	gsc_get_cursor_pos(view,x,y);
+	gsc_utils_view_get_cursor_pos(view,x,y);
 	
 	gtk_window_get_size(window, &w, &h);
 	

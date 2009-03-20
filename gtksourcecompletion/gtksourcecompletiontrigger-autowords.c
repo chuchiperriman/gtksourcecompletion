@@ -115,8 +115,8 @@ autocompletion_raise_event (gpointer event)
 	if (offset != self->priv->text_offset)
 		return FALSE;
 	
-	word = gsc_get_last_word_and_iter (self->priv->view,
-					   NULL, NULL);
+	word = gsc_utils_view_get_last_word (self->priv->view);
+	
 	if (strlen (word) >= self->priv->min_len)
 	{
 		g_free (self->priv->actual_word);

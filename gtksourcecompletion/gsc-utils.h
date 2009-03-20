@@ -26,7 +26,18 @@
 #include <gtk/gtk.h>
 
 /**
-* gsc_get_last_word_and_iter:
+ * gsc_utils_char_is_separator:
+ * @ch: The character to check
+ *
+ * A separator is a character like (, an space etc. An _ is not a separator
+ *
+ * Returns TRUE if the ch is a separator
+ */
+gboolean
+gsc_utils_char_is_separator(gunichar ch);
+
+/**
+* gsc_utils_view_get_last_word_and_iter:
 * @text_view: The #GtkTextView
 * @start_word: if != NULL then assign it the start position of the word
 * @end_word: if != NULL then assing it the end position of the word
@@ -35,21 +46,21 @@
 *
 **/
 gchar*
-gsc_get_last_word_and_iter(GtkTextView *text_view, 
-					GtkTextIter *start_word, 
-					GtkTextIter *end_word);
+gsc_utils_view_get_last_word_and_iter(GtkTextView *text_view, 
+				      GtkTextIter *start_word, 
+				      GtkTextIter *end_word);
 
 /**
- * gsc_get_last_word:
+ * gsc_utils_view_get_last_word:
  * @text_view: The #GtkTextView
  *
  * Returns: the last word written in the #GtkTextView or ""
  */
 gchar*
-gsc_get_last_word(GtkTextView *text_view);
+gsc_utils_view_get_last_word(GtkTextView *text_view);
 
 /** 
- * gsc_get_cursor_pos:
+ * gsc_utils_view_get_cursor_pos:
  * @text_view: The #GtkTextView
  * @x: Assign the x position of the cursor
  * @y: Assign the y position of the cursor
@@ -57,12 +68,12 @@ gsc_get_last_word(GtkTextView *text_view);
  * Gets the cursor position on the screen.
  */
 void
-gsc_get_cursor_pos(GtkTextView *text_view, 
-				gint *x, 
-				gint *y);
+gsc_utils_view_get_cursor_pos(GtkTextView *text_view, 
+			      gint *x, 
+			      gint *y);
 
 /**
- * gsc_replace_actual_word:
+ * gsc_utils_view_replace_current_word:
  * @text_view: The #GtkTextView
  * @text: The text to be inserted instead of the current word
  * 
@@ -70,22 +81,11 @@ gsc_get_cursor_pos(GtkTextView *text_view,
  *
  */
 void
-gtk_source_completion_replace_actual_word(GtkTextView *text_view, 
+gsc_utils_view_replace_current_word(GtkTextView *text_view, 
 				    const gchar* text);
 
 /**
- * gsc_char_is_separator:
- * @ch: The character to check
- *
- * A separator is a character like (, an space etc. An _ is not a separator
- *
- * Returns TRUE if the ch is a separator
- */
-gboolean
-gsc_char_is_separator(gunichar ch);
-
-/**
- * gsc_get_window_position_in_cursor:
+ * gsc_utils_window_get_position_at_cursor:
  * @window: Window to set
  * @view: Parent view where we get the cursor position
  * @x: The returned x position
@@ -95,10 +95,10 @@ gsc_char_is_separator(gunichar ch);
  * the position is under the text.
  */
 gboolean 
-gsc_get_window_position_in_cursor(GtkWindow *window,
-				  GtkTextView *view,
-				  gint *x,
-				  gint *y,
-				  gboolean *resized);
+gsc_utils_window_get_position_at_cursor(GtkWindow *window,
+					GtkTextView *view,
+					gint *x,
+					gint *y,
+					gboolean *resized);
 
 #endif 

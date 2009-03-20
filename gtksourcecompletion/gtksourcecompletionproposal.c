@@ -64,8 +64,8 @@ static gboolean
 gtk_source_completion_proposal_apply_default (GtkSourceCompletionProposal *self,
 					      GtkTextView *view)
 {
-	gtk_source_completion_replace_actual_word (view,
-						   self->priv->label);
+	gsc_utils_view_replace_current_word (view,
+					     self->priv->label);
 	return FALSE;
 }
 
