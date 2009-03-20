@@ -34,7 +34,6 @@
 #include "gsc-utils.h"
 #include "gsc-marshal.h"
 #include "gtksourcecompletion.h"
-#include "gtksourcecompletion-priv.h"
 #include <string.h>
 
 static gboolean lib_initialized = FALSE;
@@ -54,12 +53,6 @@ enum
 	N_COLUMNS
 };
 
-typedef struct 
-{
-	GtkSourceCompletionTrigger *trigger;
-	GtkSourceCompletionProvider *provider;
-} PTPair;
-
 /* Signals */
 enum
 {
@@ -75,6 +68,65 @@ enum
 	PROP_REMEMBER_INFO_VISIBILITY,
 	PROP_SELECT_ON_SHOW,
 	PROP_ACTIVE
+};
+
+enum
+{
+	TEXT_VIEW_KP,
+	TEXT_VIEW_DESTROY,
+	TEXT_VIEW_FOCUS_OUT,
+	TEXT_VIEW_BUTTON_PRESS,
+	LAST_EXTERNAL_SIGNAL
+};
+
+typedef struct 
+{
+	GtkSourceCompletionTrigger *trigger;
+	GtkSourceCompletionProvider *provider;
+} PTPair;
+
+typedef struct _GtkSourceCompletionPage GtkSourceCompletionPage;
+struct _GtkSourceCompletionPage
+{
+	gchar *name;
+	
+	GtkTreeView *treeview;
+	GtkListStore *list_store;
+	GtkTreeModelFilter *model_filter;
+	
+	gboolean filter_active;
+	gpointer filter_data;
+	GtkSourceCompletionFilterFunc filter_func;
+};
+
+struct _GtkSourceCompletionPriv
+{
+	/* Widget and popup variables*/
+	GtkWidget *info_window;
+	GtkWidget *info_button;
+	GtkWidget *notebook;
+	GtkWidget *tab_label;
+	GtkWidget *next_page_button;
+	GtkWidget *prev_page_button;
+	GtkWidget *bottom_bar;
+	
+	GList *pages;
+	GtkSourceCompletionPage *active_page;
+	gboolean destroy_has_run;
+	gboolean manage_keys;
+	gboolean remember_info_visibility;
+	gboolean info_visible;
+	gboolean select_on_show;
+	
+	/* Completion management */
+	GtkTextView *view;
+	GList *triggers;
+	GList *prov_trig;
+	GtkSourceCompletionTrigger *active_trigger;
+	
+	/*TRUE if the completion mechanism is active*/
+	gboolean active;
+	gulong signals_ids[LAST_EXTERNAL_SIGNAL];
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
@@ -99,7 +151,7 @@ completion_control_get_completion (GtkTextView *view)
 {
 	if (gsccompletion_map == NULL)
 		gsccompletion_map = g_hash_table_new (g_direct_hash,
-						   g_direct_equal);
+						      g_direct_equal);
 
 	return g_hash_table_lookup (gsccompletion_map, view);
 }
@@ -110,7 +162,7 @@ completion_control_add_completion (GtkTextView *view,
 {
 	if (gsccompletion_map == NULL)
 		gsccompletion_map = g_hash_table_new (g_direct_hash,
-						   g_direct_equal);
+						      g_direct_equal);
 	g_hash_table_insert (gsccompletion_map, view, comp);
 }
 
@@ -119,145 +171,28 @@ completion_control_remove_completion (GtkTextView *view)
 {
 	if (gsccompletion_map == NULL)
 		gsccompletion_map = g_hash_table_new (g_direct_hash,
-						   g_direct_equal);
+						      g_direct_equal);
 	g_hash_table_remove (gsccompletion_map, view);
 }
 /* ********************************************************************* */
 
-/************************** TreeView utility functions *****************/
 static gboolean
-filter_func (GtkTreeModel *model,
-	     GtkTreeIter *iter,
-	     gpointer data)
-{
-	GtkSourceCompletionTree *tree = (GtkSourceCompletionTree *)data;
-	GtkSourceCompletionProposal *proposal = NULL;
-	
-	if (!tree->filter_active || !tree->filter_func)
-		return TRUE;
-		
-	gtk_tree_model_get (model,
-			    iter,
-			    COLUMN_DATA,
-			    &proposal,
-			    -1);
-	
-	if (proposal == NULL)
-		return TRUE;
-	
-	return tree->filter_func (proposal, tree->filter_data);
-}
-
-static void
-row_activated_cb (GtkTreeView *tree_view,
-		  GtkTreePath *path,
-		  GtkTreeViewColumn *column,
-		  GtkSourceCompletion *self)
-{
-	_gtk_source_completion_select_current_proposal (self);
-}
-
-static void 
-selection_changed_cd (GtkTreeSelection *selection, 
-		      GtkSourceCompletion *self)
-{
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
-	{
-		_gtk_source_completion_update_info_pos (self);
-	}
-}
-
-static GtkSourceCompletionTree *
-create_treeview (GtkSourceCompletion *completion)
-{
-	GtkSourceCompletionTree *tree;
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
-	GtkCellRenderer* renderer_pixbuf;
-	GtkTreeViewColumn* column_pixbuf;
-	GtkTreeModel *model;
-	GtkTreeSelection *selection;
-	
-	tree = g_slice_new (GtkSourceCompletionTree);
-	
-	tree->treeview = GTK_TREE_VIEW (gtk_tree_view_new ());
-	gtk_widget_show (GTK_WIDGET (tree->treeview));
-	
-	tree->filter_data = NULL;
-	tree->filter_active = FALSE;
-	tree->filter_func = NULL;
-
-	g_object_set (tree->treeview, "can-focus", FALSE, NULL);
-	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (tree->treeview),
-					   FALSE);
-	
-	/* Create the Tree */
-	renderer_pixbuf = gtk_cell_renderer_pixbuf_new ();
-	column_pixbuf = gtk_tree_view_column_new_with_attributes ("Pixbuf",
-								  renderer_pixbuf, 
-								  "pixbuf", 
-								  COLUMN_PIXBUF, 
-								  NULL);
-	
-	column = gtk_tree_view_column_new ();
-	renderer = gtk_cell_renderer_text_new ();
-	gtk_tree_view_column_pack_start (column, renderer, FALSE);
-	gtk_tree_view_column_set_attributes (column, renderer,
-					     "text", COLUMN_NAME, NULL);
-
-	gtk_tree_view_append_column (tree->treeview, column_pixbuf);
-	gtk_tree_view_append_column (tree->treeview, column);
-	
-	/* Create the model */
-	tree->list_store = gtk_list_store_new (N_COLUMNS,
-					       GDK_TYPE_PIXBUF, 
-					       G_TYPE_STRING, 
-					       G_TYPE_POINTER);
-	
-	model = gtk_tree_model_filter_new (GTK_TREE_MODEL (tree->list_store),
-					   NULL);
-
-	tree->model_filter = GTK_TREE_MODEL_FILTER (model);
-	
-	gtk_tree_model_filter_set_visible_func (tree->model_filter,
-						filter_func,
-						tree,
-						NULL);
-
-	gtk_tree_view_set_model (tree->treeview,
-				 model);
-	
-	g_signal_connect (tree->treeview,
-			  "row-activated",
-			  G_CALLBACK (row_activated_cb),
-			  completion);
-	
-	selection = gtk_tree_view_get_selection (tree->treeview);
-	g_signal_connect (selection,
-			  "changed",
-			  G_CALLBACK (selection_changed_cd),
-			  completion);
-	
-	return tree;
-}
-
-static gboolean
-gsc_tree_get_selected_proposal (GtkSourceCompletionTree *tree,
-				GtkSourceCompletionProposal **proposal)
+get_selected_proposal (GtkSourceCompletionPage *page,
+		       GtkSourceCompletionProposal *proposal)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
 	GtkTreeSelection *selection;
 	
-	selection = gtk_tree_view_get_selection (tree->treeview);
+	selection = gtk_tree_view_get_selection (page->treeview);
 	
 	if (gtk_tree_selection_get_selected (selection, NULL, &iter))
 	{
-		model = gtk_tree_view_get_model (tree->treeview);
+		model = gtk_tree_view_get_model (page->treeview);
 		
 		gtk_tree_model_get (model, &iter,
 				    COLUMN_DATA,
-				    proposal, -1);
+				    &proposal, -1);
 		
 		return TRUE;
 	}
@@ -265,64 +200,46 @@ gsc_tree_get_selected_proposal (GtkSourceCompletionTree *tree,
 	return FALSE;
 }
 
-static void
-gsc_tree_add_data (GtkSourceCompletionTree *tree,
-		   GtkSourceCompletionProposal *data)
+static gboolean
+select_current_proposal (GtkSourceCompletion *self)
 {
-	GtkTreeIter iter;
-
-	g_assert (data != NULL);
+	gboolean selected = TRUE;
+	GtkSourceCompletionProposal *prop = NULL;
 	
-	gtk_list_store_append (tree->list_store, &iter);
-			
-	gtk_list_store_set (tree->list_store, 
-			    &iter,
-			    COLUMN_PIXBUF, gtk_source_completion_proposal_get_icon (data),
-			    COLUMN_NAME, gtk_source_completion_proposal_get_label (data),
-			    COLUMN_DATA, data,
-			    -1);
-}
-
-static void
-gsc_tree_clear (GtkSourceCompletionTree *tree)
-{
-	GtkTreeModel *model = GTK_TREE_MODEL (tree->list_store);
-	GtkTreeIter iter;
-	GtkSourceCompletionProposal *data;
-	
-	if (gtk_tree_model_get_iter_first (model, &iter))
+	if (get_selected_proposal (self->priv->active_page, prop))
 	{
-		do
-		{
-			gtk_tree_model_get (model, &iter,
-					    COLUMN_DATA, &data, -1);
-			g_object_unref (data);
-		} while (gtk_tree_model_iter_next (model, &iter));
+		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
+			       0, prop, &selected);
+		selected = TRUE;
+	}
+	else
+	{
+		selected = FALSE;
 	}
 	
-	gtk_list_store_clear (tree->list_store);
+	return selected;
 }
 
 static gboolean
-gsc_tree_select_first (GtkSourceCompletionTree *tree)
+select_first_proposal (GtkSourceCompletionPage *page)
 {
 	GtkTreeIter iter;
 	GtkTreePath* path;
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	selection = gtk_tree_view_get_selection (tree->treeview);
+	selection = gtk_tree_view_get_selection (page->treeview);
 
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 
-	model = gtk_tree_view_get_model (tree->treeview);
+	model = gtk_tree_view_get_model (page->treeview);
 		
 	if (gtk_tree_model_get_iter_first (model, &iter))
 	{
 		gtk_tree_selection_select_iter (selection, &iter);
 		path = gtk_tree_model_get_path (model, &iter);
-		gtk_tree_view_scroll_to_cell (tree->treeview,
+		gtk_tree_view_scroll_to_cell (page->treeview,
 					      path, 
 					      NULL, 
 					      FALSE, 
@@ -336,7 +253,7 @@ gsc_tree_select_first (GtkSourceCompletionTree *tree)
 }
 
 static gboolean 
-gsc_tree_select_last (GtkSourceCompletionTree *tree)
+select_last_proposal (GtkSourceCompletionPage *page)
 {
 	GtkTreeIter iter;
 	GtkTreeModel* model;
@@ -344,11 +261,11 @@ gsc_tree_select_last (GtkSourceCompletionTree *tree)
 	GtkTreePath* path;
 	gint children;
 	
-	if (!GTK_WIDGET_VISIBLE (tree->treeview))
+	if (!GTK_WIDGET_VISIBLE (page->treeview))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection (tree->treeview);
-	model = gtk_tree_view_get_model (tree->treeview);
+	selection = gtk_tree_view_get_selection (page->treeview);
+	model = gtk_tree_view_get_model (page->treeview);
 	
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
@@ -361,7 +278,7 @@ gsc_tree_select_last (GtkSourceCompletionTree *tree)
 	
 		gtk_tree_selection_select_iter (selection, &iter);
 		path = gtk_tree_model_get_path (model, &iter);
-		gtk_tree_view_scroll_to_cell (tree->treeview,
+		gtk_tree_view_scroll_to_cell (page->treeview,
 					      path, 
 					      NULL, 
 					      FALSE, 
@@ -375,7 +292,7 @@ gsc_tree_select_last (GtkSourceCompletionTree *tree)
 }
 
 static gboolean
-gsc_tree_select_previous (GtkSourceCompletionTree *tree, 
+select_previous_proposal (GtkSourceCompletionPage *page,
 			  gint rows)
 {
 	GtkTreeIter iter;
@@ -383,10 +300,10 @@ gsc_tree_select_previous (GtkSourceCompletionTree *tree,
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	if (!GTK_WIDGET_VISIBLE (tree->treeview))
+	if (!GTK_WIDGET_VISIBLE (page->treeview))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection (tree->treeview);
+	selection = gtk_tree_view_get_selection (page->treeview);
 	
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
@@ -403,7 +320,7 @@ gsc_tree_select_previous (GtkSourceCompletionTree *tree,
 		if (gtk_tree_model_get_iter(model, &iter, path))
 		{
 			gtk_tree_selection_select_iter (selection, &iter);
-			gtk_tree_view_scroll_to_cell (tree->treeview,
+			gtk_tree_view_scroll_to_cell (page->treeview,
 						      path, 
 						      NULL, 
 						      FALSE, 
@@ -414,24 +331,24 @@ gsc_tree_select_previous (GtkSourceCompletionTree *tree,
 	}
 	else
 	{
-		return gsc_tree_select_first (tree);
+		return select_first_proposal (page);
 	}
 	
 	return TRUE;
 }
 
 static gboolean
-gsc_tree_select_next (GtkSourceCompletionTree *tree, 
+select_next_proposal (GtkSourceCompletionPage *page,
 		      gint rows)
 {
 	GtkTreeIter iter;
 	GtkTreeModel* model;
 	GtkTreeSelection* selection;
 	
-	if (!GTK_WIDGET_VISIBLE (tree->treeview))
+	if (!GTK_WIDGET_VISIBLE (page->treeview))
 		return FALSE;
 	
-	selection = gtk_tree_view_get_selection (tree->treeview);
+	selection = gtk_tree_view_get_selection (page->treeview);
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
 		return FALSE;
 	
@@ -443,11 +360,11 @@ gsc_tree_select_next (GtkSourceCompletionTree *tree,
 		for (i = 0; i < rows; i++)
 		{
 			if (!gtk_tree_model_iter_next (model, &iter))
-				return gsc_tree_select_last (tree);
+				return select_last_proposal (page);
 		}
 		gtk_tree_selection_select_iter (selection, &iter);
 		path = gtk_tree_model_get_path (model, &iter);
-		gtk_tree_view_scroll_to_cell (tree->treeview,
+		gtk_tree_view_scroll_to_cell (page->treeview,
 					      path, 
 					      NULL, 
 					      FALSE, 
@@ -457,34 +374,139 @@ gsc_tree_select_next (GtkSourceCompletionTree *tree,
 	}
 	else
 	{
-		return gsc_tree_select_first (tree);
+		return select_first_proposal (page);
 	}
 	
 	return TRUE;
 }
 
-static gint 
-gsc_tree_get_num_proposals (GtkSourceCompletionTree *tree)
+static void
+update_info_pos (GtkSourceCompletion *self)
 {
-	GtkTreeModel *model = gtk_tree_view_get_model (tree->treeview);
+	GtkSourceCompletionProposal *proposal = NULL;
+	gint y, x, sw, sh;
+	
+	if (get_selected_proposal (self->priv->active_page, proposal))
+	{
+		gboolean ret = TRUE;
+		g_signal_emit (self, signals[DISPLAY_INFO], 0, proposal, &ret);
+	}
+	
+	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
+	sw = gdk_screen_width ();
+	sh = gdk_screen_height ();
+	x += WINDOW_WIDTH;
+
+	if (x + WINDOW_WIDTH >= sw)
+	{
+		x -= (WINDOW_WIDTH * 2);
+	}
+	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
+	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
+				      gtk_window_get_transient_for (GTK_WINDOW (self)));
+}
+
+static gboolean
+filter_func (GtkTreeModel *model,
+	     GtkTreeIter *iter,
+	     gpointer data)
+{
+	GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)data;
+	GtkSourceCompletionProposal *proposal = NULL;
+	
+	if (!page->filter_active || !page->filter_func)
+		return TRUE;
+		
+	gtk_tree_model_get (model,
+			    iter,
+			    COLUMN_DATA,
+			    &proposal,
+			    -1);
+	
+	if (proposal == NULL)
+		return TRUE;
+	
+	return page->filter_func (proposal, page->filter_data);
+}
+
+static void
+row_activated_cb (GtkTreeView *tree_view,
+		  GtkTreePath *path,
+		  GtkTreeViewColumn *column,
+		  GtkSourceCompletion *self)
+{
+	select_current_proposal (self);
+}
+
+static void 
+selection_changed_cd (GtkTreeSelection *selection, 
+		      GtkSourceCompletion *self)
+{
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+	{
+		update_info_pos (self);
+	}
+}
+
+static void
+add_proposal (GtkSourceCompletionPage *page,
+	      GtkSourceCompletionProposal *data)
+{
+	GtkTreeIter iter;
+
+	g_assert (data != NULL);
+	
+	gtk_list_store_append (page->list_store, &iter);
+			
+	gtk_list_store_set (page->list_store, 
+			    &iter,
+			    COLUMN_PIXBUF, gtk_source_completion_proposal_get_icon (data),
+			    COLUMN_NAME, gtk_source_completion_proposal_get_label (data),
+			    COLUMN_DATA, data,
+			    -1);
+}
+
+static void
+clear_treeview (GtkSourceCompletionPage *page)
+{
+	GtkTreeModel *model = GTK_TREE_MODEL (page->list_store);
+	GtkTreeIter iter;
+	GtkSourceCompletionProposal *data;
+	
+	if (gtk_tree_model_get_iter_first (model, &iter))
+	{
+		do
+		{
+			gtk_tree_model_get (model, &iter,
+					    COLUMN_DATA, &data, -1);
+			g_object_unref (data);
+		} while (gtk_tree_model_iter_next (model, &iter));
+	}
+	
+	gtk_list_store_clear (page->list_store);
+}
+
+static gint 
+get_num_proposals (GtkSourceCompletionPage *page)
+{
+	GtkTreeModel *model = gtk_tree_view_get_model (page->treeview);
 	
 	return gtk_tree_model_iter_n_children (model, NULL);
 }
 
 static void
-gsc_tree_filter_visible (GtkSourceCompletionTree *tree,
-			 GtkSourceCompletionFilterFunc func,
-			 gpointer user_data)
+filter_visible (GtkSourceCompletionPage *page,
+		GtkSourceCompletionFilterFunc func,
+		gpointer user_data)
 {
-	tree->filter_active = TRUE;
-	tree->filter_data = user_data;
-	tree->filter_func = func;
-	gtk_tree_model_filter_refilter (tree->model_filter);
-	tree->filter_active = FALSE;
-	tree->filter_data = NULL;
-	tree->filter_func = NULL;
+	page->filter_active = TRUE;
+	page->filter_data = user_data;
+	page->filter_func = func;
+	gtk_tree_model_filter_refilter (page->model_filter);
+	page->filter_active = FALSE;
+	page->filter_data = NULL;
+	page->filter_func = NULL;
 }
-/************************ TreeView utility functions END *****************/
 
 static void
 free_pair (gpointer data)
@@ -492,12 +514,6 @@ free_pair (gpointer data)
 	PTPair *ptp = (PTPair *)data;
 	g_object_unref (ptp->provider);
 	g_slice_free (PTPair, ptp);
-}
-
-static GtkSourceCompletionTree*
-get_current_tree (GtkSourceCompletion *self)
-{
-	return self->priv->active_page->tree;
 }
 
 static void
@@ -537,7 +553,7 @@ gtk_source_completion_clear (GtkSourceCompletion *self)
 	{
 		GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)l->data;
 		
-		gsc_tree_clear (page->tree);
+		clear_treeview (page);
 	}
 }
 
@@ -554,16 +570,16 @@ update_pages_visibility (GtkSourceCompletion *self)
 	{
 		GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)l->data;
 		
-		if (gsc_tree_get_num_proposals (page->tree) > 0)
+		if (get_num_proposals (page) > 0)
 		{
 			/*Selects the first page with data*/
 			if (!first_set)
 			{
 				gtk_notebook_set_current_page (GTK_NOTEBOOK (self->priv->notebook),
 							       i);
-				ad = gtk_tree_view_get_vadjustment (page->tree->treeview);
+				ad = gtk_tree_view_get_vadjustment (page->treeview);
 				gtk_adjustment_set_value (ad, 0);
-				ad = gtk_tree_view_get_hadjustment (page->tree->treeview);
+				ad = gtk_tree_view_get_hadjustment (page->treeview);
 				gtk_adjustment_set_value (ad, 0);
 				first_set = TRUE;
 			}
@@ -633,7 +649,7 @@ gtk_source_completion_page_next (GtkSourceCompletion *self)
 		}
 		popup_page = (GtkSourceCompletionPage *)g_list_nth_data (self->priv->pages, page);
 	}
-	while (gsc_tree_get_num_proposals (popup_page->tree) == 0 &&
+	while (get_num_proposals (popup_page) == 0 &&
 	       page != current_page);
 
 	if (page != current_page)
@@ -645,11 +661,11 @@ gtk_source_completion_page_next (GtkSourceCompletion *self)
 		 * After setting the page the active_page was updated
 		 * so we can update the tree
 		 */
-		_gtk_source_completion_select_first (self);
+		select_first_proposal (popup_page);
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			_gtk_source_completion_update_info_pos (self);
+			update_info_pos (self);
 		}
 	}
 }
@@ -680,9 +696,9 @@ gtk_source_completion_page_previous (GtkSourceCompletion *self)
 			page--;
 		}
 		popup_page = (GtkSourceCompletionPage *)g_list_nth_data (self->priv->pages,
-								   page);
+									 page);
 	}
-	while (gsc_tree_get_num_proposals (popup_page->tree) == 0 &&
+	while (get_num_proposals (popup_page) == 0 &&
 	       page != current_page);
 	
 	if (page != current_page)
@@ -694,21 +710,27 @@ gtk_source_completion_page_previous (GtkSourceCompletion *self)
 		 * After setting the page the active_page was updated
 		 * so we can update the tree
 		 */
-		_gtk_source_completion_select_first (self);
+		select_first_proposal (popup_page);
 	
 		if (GTK_WIDGET_VISIBLE (self->priv->info_window))
 		{
-			_gtk_source_completion_update_info_pos (self);
+			update_info_pos (self);
 		}
 	}
 }
 
 static GtkSourceCompletionPage *
 gtk_source_completion_page_new (GtkSourceCompletion *self,
-			 const gchar *tree_name)
+				const gchar *tree_name)
 {
 	/*Creates the new trees*/
 	GtkSourceCompletionPage *page;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
+	GtkCellRenderer* renderer_pixbuf;
+	GtkTreeViewColumn* column_pixbuf;
+	GtkTreeModel *model;
+	GtkTreeSelection *selection;
 	GtkWidget *label;
 	GtkWidget *sw;
 	
@@ -716,7 +738,64 @@ gtk_source_completion_page_new (GtkSourceCompletion *self,
 	
 	page->name = g_strdup (tree_name);
 	
-	page->tree = create_treeview (self);
+	page->treeview = GTK_TREE_VIEW (gtk_tree_view_new ());
+	gtk_widget_show (GTK_WIDGET (page->treeview));
+	
+	page->filter_data = NULL;
+	page->filter_active = FALSE;
+	page->filter_func = NULL;
+
+	g_object_set (page->treeview, "can-focus", FALSE, NULL);
+	gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (page->treeview),
+					   FALSE);
+	
+	/* Create the Tree */
+	renderer_pixbuf = gtk_cell_renderer_pixbuf_new ();
+	column_pixbuf = gtk_tree_view_column_new_with_attributes ("Pixbuf",
+								  renderer_pixbuf, 
+								  "pixbuf", 
+								  COLUMN_PIXBUF, 
+								  NULL);
+	
+	column = gtk_tree_view_column_new ();
+	renderer = gtk_cell_renderer_text_new ();
+	gtk_tree_view_column_pack_start (column, renderer, FALSE);
+	gtk_tree_view_column_set_attributes (column, renderer,
+					     "text", COLUMN_NAME, NULL);
+
+	gtk_tree_view_append_column (page->treeview, column_pixbuf);
+	gtk_tree_view_append_column (page->treeview, column);
+	
+	/* Create the model */
+	page->list_store = gtk_list_store_new (N_COLUMNS,
+					       GDK_TYPE_PIXBUF, 
+					       G_TYPE_STRING, 
+					       G_TYPE_POINTER);
+	
+	model = gtk_tree_model_filter_new (GTK_TREE_MODEL (page->list_store),
+					   NULL);
+
+	page->model_filter = GTK_TREE_MODEL_FILTER (model);
+	
+	gtk_tree_model_filter_set_visible_func (page->model_filter,
+						filter_func,
+						page,
+						NULL);
+
+	gtk_tree_view_set_model (page->treeview,
+				 model);
+	
+	g_signal_connect (page->treeview,
+			  "row-activated",
+			  G_CALLBACK (row_activated_cb),
+			  self);
+	
+	selection = gtk_tree_view_get_selection (page->treeview);
+	g_signal_connect (selection,
+			  "changed",
+			  G_CALLBACK (selection_changed_cd),
+			  self);
+	
 	self->priv->pages = g_list_append (self->priv->pages,
 					   page);
 	
@@ -728,7 +807,7 @@ gtk_source_completion_page_new (GtkSourceCompletion *self,
 					GTK_POLICY_AUTOMATIC);
 	
 	gtk_container_add (GTK_CONTAINER (sw),
-			   GTK_WIDGET (page->tree->treeview));
+			   GTK_WIDGET (page->treeview));
 	
 	label = gtk_label_new (tree_name);
 	
@@ -738,8 +817,8 @@ gtk_source_completion_page_new (GtkSourceCompletion *self,
 	return page;
 }
 
-static GtkSourceCompletionTree*
-get_tree_by_name (GtkSourceCompletion *self,
+static GtkSourceCompletionPage *
+get_page_by_name (GtkSourceCompletion *self,
 		  const gchar* tree_name)
 {
 	GtkSourceCompletionPage *page;
@@ -750,12 +829,12 @@ get_tree_by_name (GtkSourceCompletion *self,
 		page = (GtkSourceCompletionPage *)l->data;
 	
 		if (strcmp (page->name, tree_name) == 0)
-			return page->tree;
+			return page;
 	}
 	
 	page = gtk_source_completion_page_new (self, tree_name);
 
-	return page->tree;
+	return page;
 }
 
 static void
@@ -802,7 +881,7 @@ switch_page_cb (GtkNotebook *notebook,
 	
 	/* Update the active page */
 	self->priv->active_page = (GtkSourceCompletionPage *)g_list_nth_data (self->priv->pages,
-								   page_num);
+									      page_num);
 	
 	gtk_label_set_label (GTK_LABEL (self->priv->tab_label),
 			     self->priv->active_page->name);
@@ -818,7 +897,7 @@ show_info_cb (GtkWidget *widget,
 	
 	g_return_if_fail (GTK_WIDGET_VISIBLE (GTK_WIDGET (self)));
 	
-	_gtk_source_completion_update_info_pos (self);
+	update_info_pos (self);
 	self->priv->info_visible = TRUE;
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->priv->info_button),
 				      TRUE);
@@ -837,7 +916,7 @@ hide_info_cb (GtkWidget *widget,
 
 static gboolean
 gtk_source_completion_display_info_default (GtkSourceCompletion *self,
-				     GtkSourceCompletionProposal *proposal)
+					    GtkSourceCompletionProposal *proposal)
 {
 	if (proposal)
 	{
@@ -863,10 +942,11 @@ gtk_source_completion_display_info_default (GtkSourceCompletion *self,
 
 static gboolean
 gtk_source_completion_proposal_selected_default (GtkSourceCompletion *self,
-					  GtkSourceCompletionProposal *proposal)
+						 GtkSourceCompletionProposal *proposal)
 {
 	gtk_source_completion_proposal_apply (proposal, self->priv->view);
 	end_completion (self);
+	
 	return FALSE;
 }
 
@@ -900,8 +980,8 @@ gtk_source_completion_realize (GtkWidget *widget)
 
 static gboolean
 gtk_source_completion_delete_event_cb (GtkWidget *widget,
-				GdkEvent  *event,
-				gpointer   user_data) 
+				       GdkEvent  *event,
+				       gpointer   user_data) 
 {
 	/*Prevent the alt+F4 keys*/
 	return TRUE;
@@ -913,21 +993,21 @@ free_page (gpointer data,
 {
 	GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)data;
 	
-	g_slice_free (GtkSourceCompletionTree, page->tree);
 	g_free (page->name);
 	g_slice_free (GtkSourceCompletionPage, page);
 }
 
 static gboolean
 gtk_source_completion_configure_event (GtkWidget *widget,
-			   GdkEventConfigure *event)
+				       GdkEventConfigure *event)
 {
-	gboolean ret;
 	GtkSourceCompletion *self = GTK_SOURCE_COMPLETION (widget);
+	gboolean ret;
+	
 	ret = GTK_WIDGET_CLASS (gtk_source_completion_parent_class)->configure_event (widget, event);
 	
-	if (GTK_WIDGET_VISIBLE (self->priv->info_window) )
-		_gtk_source_completion_update_info_pos (self);
+	if (GTK_WIDGET_VISIBLE (self->priv->info_window))
+		update_info_pos (self);
 	
 	return ret;
 }
@@ -1000,40 +1080,40 @@ view_key_press_event_cb (GtkWidget *view,
 		}
  		case GDK_Down:
 		{
-			ret = _gtk_source_completion_select_next (self, 1);
+			ret = select_next_proposal (self->priv->active_page, 1);
 			break;
 		}
 		case GDK_Page_Down:
 		{
-			ret = _gtk_source_completion_select_next (self, 5);
+			ret = select_next_proposal (self->priv->active_page, 5);
 			break;
 		}
 		case GDK_Up:
 		{
-			ret = _gtk_source_completion_select_previous (self, 1);
+			ret = select_previous_proposal (self->priv->active_page, 1);
 			if (!ret)
-				ret = _gtk_source_completion_select_first (self);
+				ret = select_first_proposal (self->priv->active_page);
 			break;
 		}
 		case GDK_Page_Up:
 		{
-			ret = _gtk_source_completion_select_previous (self, 5);
+			ret = select_previous_proposal (self->priv->active_page, 5);
 			break;
 		}
 		case GDK_Home:
 		{
-			ret = _gtk_source_completion_select_first (self);
+			ret = select_first_proposal (self->priv->active_page);
 			break;
 		}
 		case GDK_End:
 		{
-			ret = _gtk_source_completion_select_last (self);
+			ret = select_last_proposal (self->priv->active_page);
 			break;
 		}
 		case GDK_Return:
 		case GDK_Tab:
 		{
-			ret = _gtk_source_completion_select_current_proposal (self);
+			ret = select_current_proposal (self);
 			gtk_widget_hide (GTK_WIDGET (self));
 			break;
 		}
@@ -1452,99 +1532,6 @@ view_button_press_event_cb (GtkWidget *widget,
 	return FALSE;
 }
 
-static void
-gtk_source_completion_add_data (GtkSourceCompletion *self,
-				GtkSourceCompletionProposal* data)
-{
-	GtkSourceCompletionTree *tree;
-	
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (self));
-	
-	tree = get_tree_by_name (self, gtk_source_completion_proposal_get_page_name (data));
-	
-	gsc_tree_add_data (tree, data);
-}
-
-void
-_gtk_source_completion_update_info_pos (GtkSourceCompletion *self)
-{
-	GtkSourceCompletionProposal *proposal = NULL;
-	gint y, x, sw, sh;
-	
-	if (gsc_tree_get_selected_proposal (get_current_tree (self), &proposal))
-	{
-		gboolean ret = TRUE;
-		g_signal_emit (self, signals[DISPLAY_INFO], 0, proposal, &ret);
-	}
-	
-	gtk_window_get_position (GTK_WINDOW (self), &x, &y);
-	sw = gdk_screen_width ();
-	sh = gdk_screen_height ();
-	x += WINDOW_WIDTH;
-
-	if (x + WINDOW_WIDTH >= sw)
-	{
-		x -= (WINDOW_WIDTH * 2);
-	}
-	gtk_window_move (GTK_WINDOW (self->priv->info_window), x, y);
-	gtk_window_set_transient_for (GTK_WINDOW (self->priv->info_window),
-				      gtk_window_get_transient_for (GTK_WINDOW (self)));
-}
-
-gboolean
-_gtk_source_completion_select_first (GtkSourceCompletion *self)
-{
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), FALSE);
-	
-	return gsc_tree_select_first (get_current_tree (self));
-}
-
-gboolean 
-_gtk_source_completion_select_last (GtkSourceCompletion *self)
-{
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), FALSE);
-
-	return gsc_tree_select_last (get_current_tree (self));
-}
-
-gboolean
-_gtk_source_completion_select_previous (GtkSourceCompletion *self,
-					gint rows)
-{
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), FALSE);
-
-	return gsc_tree_select_previous (get_current_tree (self), rows);
-}
-
-gboolean
-_gtk_source_completion_select_next (GtkSourceCompletion *self,
-				    gint rows)
-{
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), FALSE);
-
-	return gsc_tree_select_next (get_current_tree (self), rows);
-}
-
-gboolean
-_gtk_source_completion_select_current_proposal (GtkSourceCompletion *self)
-{
-	gboolean selected = TRUE;
-	GtkSourceCompletionProposal *prop = NULL;
-	
-	if (gsc_tree_get_selected_proposal (get_current_tree (self), &prop))
-	{
-		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
-			       0, prop, &selected);
-		selected = TRUE;
-	}
-	else
-	{
-		selected = FALSE;
-	}
-	
-	return selected;
-}
-
 /**
  * gtk_source_completion_new:
  *
@@ -1831,10 +1818,14 @@ gtk_source_completion_trigger_event (GtkSourceCompletion *self,
 	/* Insert the data into the model */
 	do
 	{
-		last_proposal = GTK_SOURCE_COMPLETION_PROPOSAL (data_list->data);
+		GtkSourceCompletionPage *page;
 		
-		gtk_source_completion_add_data (self,
-					 last_proposal);
+		last_proposal = GTK_SOURCE_COMPLETION_PROPOSAL (data_list->data);
+		page = get_page_by_name (self,
+					 gtk_source_completion_proposal_get_page_name (last_proposal));
+		
+		add_proposal (page,
+			      last_proposal);
 	} while ((data_list = g_list_next (data_list)) != NULL);
 	
 	g_list_free (final_list);
@@ -1861,7 +1852,7 @@ gtk_source_completion_trigger_event (GtkSourceCompletion *self,
 	self->priv->active_trigger = trigger;
 	
 	if (self->priv->select_on_show)
-		_gtk_source_completion_select_first (self);
+		select_first_proposal (self->priv->active_page);
 
 	return TRUE;
 }
@@ -1910,11 +1901,11 @@ gtk_source_completion_filter_proposals (GtkSourceCompletion *self,
 	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
 	{
 		GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)l->data;
-		if (gsc_tree_get_num_proposals (page->tree) > 0)
+		if (get_num_proposals (page) > 0)
 		{
-			gsc_tree_filter_visible (page->tree,
-						 (GtkSourceCompletionFilterFunc) func,
-						 user_data);
+			filter_visible (page,
+					(GtkSourceCompletionFilterFunc) func,
+					user_data);
 		}
 	}
 
@@ -2053,6 +2044,7 @@ gtk_source_completion_get_trigger (GtkSourceCompletion *self,
 
 	GList *l;
 	GtkSourceCompletionTrigger *trigger;
+	
 	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), NULL);
 
 	for (l = self->priv->triggers; l != NULL; l = g_list_next (l))
@@ -2079,6 +2071,7 @@ gtk_source_completion_get_provider (GtkSourceCompletion *self,
 {
 
 	GList *l;
+	
 	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), NULL);
 
 	for (l = self->priv->prov_trig; l != NULL; l = g_list_next (l))
@@ -2100,7 +2093,7 @@ gtk_source_completion_get_provider (GtkSourceCompletion *self,
 GtkSourceCompletion*
 gtk_source_completion_get_from_view (GtkTextView *view)
 {
-        return completion_control_get_completion (view);
+	return completion_control_get_completion (view);
 }
 
 

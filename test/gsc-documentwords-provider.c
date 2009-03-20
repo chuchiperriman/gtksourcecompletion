@@ -19,7 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "gsc-documentwords-provider.h"
-#include "gsc-utils.h"
+#include "gsc-utils-test.h"
 
 #define ICON_FILE ICON_DIR"/document-words-icon.png"
 

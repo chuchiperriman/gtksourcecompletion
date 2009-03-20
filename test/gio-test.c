@@ -4,7 +4,7 @@
 #include <glib/gprintf.h>
 #include <gtk/gtk.h>
 #include <gio/gio.h>
-#include "../gtksourcecompletion/gsc-utils.h"
+#include "gsc-utils-test.h"
 #include "../gtksourcecompletion/gtksourcecompletionproposal.h"
 
 static gboolean

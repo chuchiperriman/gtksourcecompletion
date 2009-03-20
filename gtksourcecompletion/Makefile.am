@@ -25,7 +25,6 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletionproposal.h	\
 	gsc-i18n.h			\
 	gtksourcecompletion.h		\
-	gtksourcecompletion-priv.h	\
 	gtksourcecompletioninfo.h	\
 	gtksourcecompletiontrigger-autowords.h	\
 	gtksourcecompletiontrigger-customkey.h
@@ -58,7 +57,6 @@ INST_H_FILES = \
 	gtksourceproviders.h		\
 	gsc-i18n.h			\
 	gtksourcecompletion.h		\
-	gtksourcecompletion-priv.h	\
 	gtksourcecompletioninfo.h	\
 	gtksourcecompletiontrigger-autowords.h	\
 	gtksourcecompletiontrigger-customkey.h

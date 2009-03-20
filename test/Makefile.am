@@ -16,7 +16,9 @@ AM_CFLAGS = \
 noinst_PROGRAMS = gio-test completion-simple completion-focus
 
 gio_test_SOURCES = 		\
-	gio-test.c
+	gio-test.c			\
+	gsc-utils-test.c		\
+	gsc-utils-test.h
 
 gio_test_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\
@@ -33,7 +35,9 @@ completion_simple_SOURCES = 		\
 	gsc-provider-file.h		\
 	completion-simple.c		\
 	gsc-provider-test.h		\
-	gsc-provider-test.c
+	gsc-provider-test.c		\
+	gsc-utils-test.c		\
+	gsc-utils-test.h
 
 completion_simple_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\
@@ -50,7 +54,9 @@ completion_focus_SOURCES = 		\
 	gsc-provider-file.h		\
 	completion-focus.c		\
 	gsc-provider-test.h		\
-	gsc-provider-test.c
+	gsc-provider-test.c		\
+	gsc-utils-test.c		\
+	gsc-utils-test.h
 
 completion_focus_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\
@@ -65,6 +71,8 @@ completion_custom_widgets_SOURCES = 	\
 	gsc-provider-test.h		\
 	gsc-provider-test.c		\
 	completion-custom-widgets.c
+	gsc-utils-test.c		\
+	gsc-utils-test.h
 
 completion_custom_widgets_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\

@@ -1,3 +1,17 @@
+2009-03-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gtksourcecompletion/gtksourcecompletion-priv.h:
+	* test/gsc-utils-test.c:
+	* test/gsc-utils-test.h:
+	* gtksourcecompletion/Makefile.am:
+	* gtksourcecompletion/gtksourcecompletion.c:
+	* test/Makefile.am:
+	* test/completion-simple.c:
+	* test/gio-test.c:
+	* test/gsc-documentwords-provider.c:
+	Removed gtksourcecompletion-priv.h. Moved GtkSourceCompletionTree
+	to GtkSourceCompletionPage and updated test cases.
+
 2009-03-20  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* proyect:

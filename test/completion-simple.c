@@ -36,7 +36,7 @@
 #include <gtksourcecompletion/gtksourcecompletion.h>
 #include <gtksourcecompletion/gtksourcecompletiontrigger-customkey.h>
 #include <gtksourcecompletion/gtksourcecompletiontrigger-autowords.h>
-#include <gtksourcecompletion/gsc-utils.h>
+#include "gsc-utils-test.h"
 #include <gtksourcecompletion/gtksourcecompletioninfo.h>
 
 #include "gsc-documentwords-provider.h"
