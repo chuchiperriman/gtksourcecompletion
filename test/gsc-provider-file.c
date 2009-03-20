@@ -36,16 +36,16 @@ struct _GscProviderFilePrivate
 	GtkTextView *view;
 };
 
-static void 		 gsc_provider_file_iface_init		(GscProviderIface *iface);
+static void 		 gsc_provider_file_iface_init		(GtkSourceCompletionProviderIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GscProviderFile,
 			 gsc_provider_file,
 			 G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (GSC_TYPE_PROVIDER,
+			 G_IMPLEMENT_INTERFACE (GTK_TYPE_SOURCE_COMPLETION_PROVIDER,
 				 		gsc_provider_file_iface_init))
 
 static const gchar* 
-gsc_provider_file_real_get_name (GscProvider* self)
+gsc_provider_file_real_get_name (GtkSourceCompletionProvider* self)
 {
 	return GSC_PROVIDER_FILE_NAME;
 }
@@ -56,11 +56,11 @@ table_foreach (gpointer key,
 	       gpointer user_data)
 {
 	GscProviderFile *self = GSC_PROVIDER_FILE (user_data);
-	GscProposal* prop = NULL;
+	GtkSourceCompletionProposal* prop = NULL;
 	
 	if (gsc_is_valid_word (self->priv->current_word, (gchar*)key))
 	{
-		prop = gsc_proposal_new ((gchar*)key,
+		prop = gtk_source_completion_proposal_new ((gchar*)key,
 					 NULL,
 					 self->priv->icon);
 		self->priv->current_props = g_list_append (self->priv->current_props,
@@ -135,8 +135,8 @@ get_words (GscProviderFile *self,
 }
 
 static GList* 
-gsc_provider_file_real_get_proposals (GscProvider* base,
-				      GscTrigger *trigger)
+gsc_provider_file_real_get_proposals (GtkSourceCompletionProvider* base,
+				      GtkSourceCompletionTrigger *trigger)
 {
 	GscProviderFile *self = GSC_PROVIDER_FILE (base);
 	GFileInfo *info;
@@ -238,7 +238,7 @@ gsc_provider_file_real_get_proposals (GscProvider* base,
 }
 
 static void
-gsc_provider_file_real_finish (GscProvider* base)
+gsc_provider_file_real_finish (GtkSourceCompletionProvider* base)
 {
 
 }
@@ -275,7 +275,7 @@ gsc_provider_file_class_init (GscProviderFileClass *klass)
 }
 
 static void
-gsc_provider_file_iface_init (GscProviderIface *iface)
+gsc_provider_file_iface_init (GtkSourceCompletionProviderIface *iface)
 {
 	iface->get_name      = gsc_provider_file_real_get_name;
 	iface->get_proposals = gsc_provider_file_real_get_proposals;

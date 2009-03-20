@@ -22,7 +22,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gio/gio.h>
-#include <gtksourcecompletion/gsc-provider.h>
+#include <gtksourcecompletion/gtksourcecompletionprovider.h>
 
 G_BEGIN_DECLS
 

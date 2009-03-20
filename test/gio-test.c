@@ -5,16 +5,16 @@
 #include <gtk/gtk.h>
 #include <gio/gio.h>
 #include "../gtksourcecompletion/gsc-utils.h"
-#include "../gtksourcecompletion/gsc-proposal.h"
+#include "../gtksourcecompletion/gtksourcecompletionproposal.h"
 
 static gboolean
 table_foreach (gpointer key,
 		gpointer value,
 		gpointer user_data)
 {
-	GscProposal* prop = NULL;
+	GtkSourceCompletionProposal* prop = NULL;
 	GList **list = (GList**) user_data;
-	prop = gsc_proposal_new((gchar*)key,
+	prop = gtk_source_completion_proposal_new((gchar*)key,
 				NULL,
 				NULL);
 	*list = g_list_append(*list,prop);
@@ -176,11 +176,11 @@ int main( int argc, const char* argv[] )
 	
 	GList *proposals = get_words(buffer);
 	GList *p = proposals;
-	GscProposal *prop = NULL;
+	GtkSourceCompletionProposal *prop = NULL;
 	do
 	{
-		prop = GSC_PROPOSAL(p->data);
-		g_debug("Proposal: %s",gsc_proposal_get_label(prop));
+		prop = GTK_SOURCE_COMPLETION_PROPOSAL(p->data);
+		g_debug("Proposal: %s",gtk_source_completion_proposal_get_label(prop));
 		g_object_unref(prop);
 	}while((p = g_list_next(p)) != NULL);
 	g_list_free(proposals);

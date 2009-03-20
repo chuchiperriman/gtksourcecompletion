@@ -33,17 +33,17 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
-#include <gtksourcecompletion/gsc-completion.h>
-#include <gtksourcecompletion/gsc-info.h>
-#include <gtksourcecompletion/gsc-trigger-customkey.h>
-#include <gtksourcecompletion/gsc-trigger-autowords.h>
+#include <gtksourcecompletion/gtksourcecompletion.h>
+#include <gtksourcecompletion/gtksourcecompletioninfo.h>
+#include <gtksourcecompletion/gtksourcecompletiontrigger-customkey.h>
+#include <gtksourcecompletion/gtksourcecompletiontrigger-autowords.h>
 #include <gtksourcecompletion/gsc-utils.h>
 
 #include "gsc-provider-test.h"
 
 
 static GtkWidget *view;
-static GscCompletion *comp;
+static GtkSourceCompletion *comp;
 
 static const gboolean change_keys = FALSE;
 
@@ -57,10 +57,10 @@ typedef struct
 
 
 static gboolean
-filter_func (GscProposal *proposal,
+filter_func (GtkSourceCompletionProposal *proposal,
 	     gpointer user_data)
 {
-	const gchar *label = gsc_proposal_get_label (proposal);
+	const gchar *label = gtk_source_completion_proposal_get_label (proposal);
 	return g_str_has_prefix (label, "sp");
 }
 
@@ -71,22 +71,22 @@ destroy_cb(GtkObject *object,gpointer   user_data)
 }
 
 static gboolean
-display_info_cb (GscCompletion *comp,
-		 GscProposal *prop,
+display_info_cb (GtkSourceCompletion *comp,
+		 GtkSourceCompletionProposal *prop,
 		 gpointer user_data)
 {
 	CustomWidget *cw = (CustomWidget*) user_data;
 	gchar *text;
 	
-	text = g_strdup_printf ("Header of: %s", gsc_proposal_get_label (prop));
+	text = g_strdup_printf ("Header of: %s", gtk_source_completion_proposal_get_label (prop));
 	gtk_label_set_text (GTK_LABEL (cw->header), text);
 	g_free (text);
 	
-	text = g_strdup_printf ("Content: \n%s", gsc_proposal_get_info (prop));
+	text = g_strdup_printf ("Content: \n%s", gtk_source_completion_proposal_get_info (prop));
 	gtk_label_set_text (GTK_LABEL (cw->content), text);
 	g_free (text);
 	
-	text = g_strdup_printf ("Foot of: %s", gsc_proposal_get_label (prop));
+	text = g_strdup_printf ("Foot of: %s", gtk_source_completion_proposal_get_label (prop));
 	gtk_label_set_text (GTK_LABEL (cw->foot), text);
 	g_free (text);
 	return TRUE;
@@ -99,7 +99,7 @@ key_press(GtkWidget   *widget,
 {
 	if (event->keyval == GDK_F9)
 	{
-		gsc_completion_filter_proposals (comp,
+		gtk_source_completion_filter_proposals (comp,
 					  filter_func,
 					  NULL);
 		return TRUE;
@@ -133,21 +133,21 @@ create_completion(void)
 	GscProviderTest *prov_test = gsc_provider_test_new(GTK_TEXT_VIEW(view));
 	
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
-	comp = GSC_COMPLETION(gsc_completion_new(GTK_TEXT_VIEW(view)));
-	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
-	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
+	comp = GTK_SOURCE_COMPLETION(gtk_source_completion_new(GTK_TEXT_VIEW(view)));
+	GtkSourceCompletionTriggerCustomkey *ur_trigger = gtk_source_completion_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
+	GtkSourceCompletionTriggerAutowords *ac_trigger = gtk_source_completion_trigger_autowords_new(comp);
 
 	g_object_set (ac_trigger,
 		      "delay", 500,
 		      "min-len", 4,
 		      NULL);
 	
-	gsc_completion_register_trigger(comp,GSC_TRIGGER(ur_trigger));
-	gsc_completion_register_trigger(comp,GSC_TRIGGER(ac_trigger));
+	gtk_source_completion_register_trigger(comp,GTK_SOURCE_COMPLETION_TRIGGER(ur_trigger));
+	gtk_source_completion_register_trigger(comp,GTK_SOURCE_COMPLETION_TRIGGER(ac_trigger));
 	
-	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_test),GSC_TRIGGER (ac_trigger));
+	gtk_source_completion_register_provider(comp,GTK_SOURCE_COMPLETION_PROVIDER(prov_test),GTK_SOURCE_COMPLETION_TRIGGER (ac_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_completion_set_active(comp, TRUE);
+	gtk_source_completion_set_active(comp, TRUE);
 	g_object_unref(prov_test);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);
@@ -195,8 +195,8 @@ create_completion(void)
 			  FALSE,
 			  1);
 			  
-	GscInfo *info = gsc_completion_get_info_widget (comp);
-	gsc_info_set_custom(info, box);
+	GtkSourceCompletionInfo *info = gtk_source_completion_get_info_widget (comp);
+	gtk_source_completion_info_set_custom(info, box);
 	
 	gtk_widget_show_all (box);
 	

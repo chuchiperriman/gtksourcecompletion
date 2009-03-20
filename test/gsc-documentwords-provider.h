@@ -20,7 +20,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "gsc-provider.h"
+#include <gtksourcecompletion/gtksourcecompletionprovider.h>
 
 G_BEGIN_DECLS
 

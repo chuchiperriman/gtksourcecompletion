@@ -1,5 +1,19 @@
 2009-03-20  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* test/completion-custom-widgets.c:
+	* test/completion-focus.c:
+	* test/completion-simple.c:
+	* test/gio-test.c:
+	* test/gsc-documentwords-provider.c:
+	* test/gsc-documentwords-provider.h:
+	* test/gsc-provider-file.c:
+	* test/gsc-provider-file.h:
+	* test/gsc-provider-test.c:
+	* test/gsc-provider-test.h:
+	Test cases are working again.
+
+2009-03-20  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/Makefile.am:
 	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.c:
 	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.h:

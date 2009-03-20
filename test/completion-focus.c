@@ -33,10 +33,10 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
-#include <gtksourcecompletion/gsc-completion.h>
-#include <gtksourcecompletion/gsc-trigger-customkey.h>
-#include <gtksourcecompletion/gsc-trigger-autowords.h>
-#include <gtksourcecompletion/gsc-info.h>
+#include <gtksourcecompletion/gtksourcecompletion.h>
+#include <gtksourcecompletion/gtksourcecompletiontrigger-customkey.h>
+#include <gtksourcecompletion/gtksourcecompletiontrigger-autowords.h>
+#include <gtksourcecompletion/gtksourcecompletioninfo.h>
 #include <gtksourcecompletion/gsc-utils.h>
 
 #include "gsc-documentwords-provider.h"
@@ -45,8 +45,8 @@
 
 
 static GtkWidget *view;
-static GscCompletion *comp;
-static GscInfo *info;
+static GtkSourceCompletion *comp;
+static GtkSourceCompletionInfo *info;
 static GtkWidget *custom = NULL;
 static GtkWidget *entry = NULL;
 
@@ -54,10 +54,10 @@ static const gboolean change_keys = FALSE;
 
 
 static gboolean
-filter_func (GscProposal *proposal,
+filter_func (GtkSourceCompletionProposal *proposal,
 	     gpointer user_data)
 {
-	const gchar *label = gsc_proposal_get_label (proposal);
+	const gchar *label = gtk_source_completion_proposal_get_label (proposal);
 	return g_str_has_prefix (label, "sp");
 }
 
@@ -204,7 +204,7 @@ key_press(GtkWidget   *widget,
 		}
 		else
 		{
-			gsc_info_set_custom(info, custom);
+			gtk_source_completion_info_set_custom(info, custom);
 			/*
 			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(custom_view));
 			gtk_text_buffer_set_text(buffer,
@@ -212,7 +212,7 @@ key_press(GtkWidget   *widget,
 						 -1);
 			*/
 			gtk_entry_set_text(GTK_ENTRY(entry), gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
-			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
+			gtk_source_completion_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
 			gtk_widget_grab_focus (view);
 			/*
@@ -223,7 +223,7 @@ key_press(GtkWidget   *widget,
 	}
 	else if (event->keyval == GDK_F5)
 	{
-		gsc_info_set_custom(info, NULL);
+		gtk_source_completion_info_set_custom(info, NULL);
 		/* Normal info usage with the default widget*/
 		if (GTK_WIDGET_VISIBLE(GTK_WIDGET(info)))
 		{
@@ -231,10 +231,10 @@ key_press(GtkWidget   *widget,
 		}
 		else
 		{
-			gsc_info_set_markup(info,
+			gtk_source_completion_info_set_markup(info,
 					    gsc_gsv_get_text(GTK_TEXT_VIEW(view)));
 			
-			gsc_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
+			gtk_source_completion_info_move_to_cursor(info,GTK_TEXT_VIEW(view));
 			gtk_widget_show(GTK_WIDGET(info));
 		}
 	}
@@ -252,7 +252,7 @@ key_press(GtkWidget   *widget,
 	}
 	else if (event->keyval == GDK_F9)
 	{
-		gsc_completion_filter_proposals (comp,
+		gtk_source_completion_filter_proposals (comp,
 					  filter_func,
 					  NULL);
 		return TRUE;
@@ -311,7 +311,7 @@ create_window (void)
 }
 
 static void
-set_custom_keys(GscCompletion *comp)
+set_custom_keys(GtkSourceCompletion *comp)
 {
 	if (change_keys)
 	{
@@ -332,13 +332,13 @@ set_custom_keys(GscCompletion *comp)
 }
 
 static void
-comp_started (GscCompletion *comp, gpointer user_data)
+comp_started (GtkSourceCompletion *comp, gpointer user_data)
 {
 	g_debug ("Started");
 }
 
 static void
-comp_finished (GscCompletion *comp, gpointer user_data)
+comp_finished (GtkSourceCompletion *comp, gpointer user_data)
 {
 	g_debug ("finished");
 }
@@ -354,7 +354,7 @@ create_completion(void)
 	GscProviderTest *prov_test = gsc_provider_test_new(GTK_TEXT_VIEW(view));
 	
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
-	comp = GSC_COMPLETION(gsc_completion_new(GTK_TEXT_VIEW(view)));
+	comp = GTK_SOURCE_COMPLETION(gtk_source_completion_new(GTK_TEXT_VIEW(view)));
 	
 	/*FIXME
 	g_object_set (comp,
@@ -368,36 +368,36 @@ create_completion(void)
 	*/
 	
 	
-	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
-	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
+	GtkSourceCompletionTriggerCustomkey *ur_trigger = gtk_source_completion_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
+	GtkSourceCompletionTriggerAutowords *ac_trigger = gtk_source_completion_trigger_autowords_new(comp);
 	g_object_set (ac_trigger,
 		      "delay", 500,
 		      "min-len", 4,
 		      NULL);
 	
-	gsc_completion_register_trigger(comp,GSC_TRIGGER(ur_trigger));
-	gsc_completion_register_trigger(comp,GSC_TRIGGER(ac_trigger));
+	gtk_source_completion_register_trigger(comp,GTK_SOURCE_COMPLETION_TRIGGER(ur_trigger));
+	gtk_source_completion_register_trigger(comp,GTK_SOURCE_COMPLETION_TRIGGER(ac_trigger));
 	
-	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ac_trigger));
-	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_test),GSC_TRIGGER (ac_trigger));
-	gsc_completion_register_provider(comp,GSC_PROVIDER(prov),GSC_TRIGGER (ur_trigger));
-	gsc_completion_register_provider(comp,GSC_PROVIDER(prov_file),GSC_TRIGGER (ur_trigger));
+	gtk_source_completion_register_provider(comp,GTK_SOURCE_COMPLETION_PROVIDER(prov),GTK_SOURCE_COMPLETION_TRIGGER (ac_trigger));
+	gtk_source_completion_register_provider(comp,GTK_SOURCE_COMPLETION_PROVIDER(prov_test),GTK_SOURCE_COMPLETION_TRIGGER (ac_trigger));
+	gtk_source_completion_register_provider(comp,GTK_SOURCE_COMPLETION_PROVIDER(prov),GTK_SOURCE_COMPLETION_TRIGGER (ur_trigger));
+	gtk_source_completion_register_provider(comp,GTK_SOURCE_COMPLETION_PROVIDER(prov_file),GTK_SOURCE_COMPLETION_TRIGGER (ur_trigger));
 	//gtk_source_completion_register_provider(comp,prov_cutils,GSC_USERREQUEST_TRIGGER_NAME);
-	gsc_completion_set_active(comp, TRUE);
+	gtk_source_completion_set_active(comp, TRUE);
 	g_object_unref(prov);
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);
 	
 }
 
-static GscInfo*
+static GtkSourceCompletionInfo*
 create_info()
 {
-	info = gsc_info_new();
+	info = gtk_source_completion_info_new();
 	GtkRequisition req = {100,100};
 	gtk_widget_size_request(GTK_WIDGET(info),&req);
-	gsc_info_set_adjust_height(info,TRUE,100000);
-	gsc_info_set_adjust_width(info,TRUE,100000);
+	gtk_source_completion_info_set_adjust_height(info,TRUE,100000);
+	gtk_source_completion_info_set_adjust_width(info,TRUE,100000);
 
 	GtkWidget          *toplevel;
 	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (view));

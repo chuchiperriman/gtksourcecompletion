@@ -21,7 +21,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <gtksourcecompletion/gsc-provider.h>
+#include <gtksourcecompletion/gtksourcecompletionprovider.h>
 
 G_BEGIN_DECLS
 
