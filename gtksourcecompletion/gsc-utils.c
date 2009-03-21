@@ -250,5 +250,3 @@ gsc_utils_window_get_position_at_cursor(GtkWindow *window,
 	return up;
 }
 
-
-

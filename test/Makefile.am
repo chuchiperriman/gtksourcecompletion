@@ -25,7 +25,7 @@ gio_test_LDFLAGS =  \
 	`pkg-config --libs gio-2.0`
 
 gio_test_LDADD = 	\
-	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
+	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-3.0.la	\
 	$(PACKAGE_LIBS)
 
 completion_simple_SOURCES = 		\
@@ -44,7 +44,7 @@ completion_simple_LDFLAGS =  \
 	`pkg-config --libs gio-2.0`
 
 completion_simple_LDADD = 	\
-	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
+	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-3.0.la	\
 	$(PACKAGE_LIBS)
 
 completion_focus_SOURCES = 		\
@@ -63,7 +63,7 @@ completion_focus_LDFLAGS =  \
 	`pkg-config --libs gio-2.0`
 
 completion_focus_LDADD = 	\
-	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
+	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-3.0.la	\
 	$(PACKAGE_LIBS)
 
 
@@ -79,5 +79,5 @@ completion_custom_widgets_LDFLAGS =  \
 	`pkg-config --libs gio-2.0`
 
 completion_custom_widgets_LDADD = 	\
-	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
+	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-3.0.la	\
 	$(PACKAGE_LIBS)

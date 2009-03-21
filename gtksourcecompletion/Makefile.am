@@ -12,7 +12,7 @@ AM_CFLAGS =\
 	 -g
 	 
 lib_LTLIBRARIES = \
-	libgtksourcecompletion-2.0.la
+	libgtksourcecompletion-3.0.la
 
 BUILT_SOURCES =		\
 	gsc-marshal.c	\
@@ -29,7 +29,7 @@ libgtksourcecompletion_headers = 	\
 	gtksourcecompletiontrigger-autowords.h	\
 	gtksourcecompletiontrigger-customkey.h
 
-libgtksourcecompletion_2_0_la_SOURCES = \
+libgtksourcecompletion_3_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
 	gtksourcecompletionprovider.c	\
 	gtksourcecompletiontrigger.c	\
@@ -42,10 +42,10 @@ libgtksourcecompletion_2_0_la_SOURCES = \
 	$(libgtksourcecompletion_headers)
 	
 
-libgtksourcecompletion_2_0_la_LIBADD = \
+libgtksourcecompletion_3_0_la_LIBADD = \
 	$(PACKAGE_LIBS) 
 	
-libgtksourcecompletion_2_0_la_LDFLAGS = \
+libgtksourcecompletion_3_0_la_LDFLAGS = \
 	-version-info 1:0:0 	\
 	`pkg-config --libs gtksourceview-2.0`
 
@@ -72,9 +72,9 @@ EXTRA_DIST=gsc-marshal.list
 
 CLEAN_FILES=$(BUILT_SOURCES)
 
-libgtksourcecompletion_2_0_includedir = $(includedir)/gtksourcecompletion-2.0/gtksourcecompletion
+libgtksourcecompletion_3_0_includedir = $(includedir)/gtksourcecompletion-3.0/gtksourcecompletion
 
-libgtksourcecompletion_2_0_include_HEADERS =	\
+libgtksourcecompletion_3_0_include_HEADERS =	\
 	$(libgtksourcecompletion_headers)
 
 #headerdir = $(prefix)/include/gtksourcecompletion
