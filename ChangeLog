@@ -1,5 +1,10 @@
 2009-03-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
 
+	* gtksourcecompletion/gtksourcecompletion.c:
+	Fix bug applying the proposal.
+
+2009-03-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
 	* gtksourcecompletion/gtksourcecompletion-priv.h:
 	* test/gsc-utils-test.c:
 	* test/gsc-utils-test.h:

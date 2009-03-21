@@ -178,7 +178,7 @@ completion_control_remove_completion (GtkTextView *view)
 
 static gboolean
 get_selected_proposal (GtkSourceCompletionPage *page,
-		       GtkSourceCompletionProposal *proposal)
+		       GtkSourceCompletionProposal **proposal)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -192,7 +192,7 @@ get_selected_proposal (GtkSourceCompletionPage *page,
 		
 		gtk_tree_model_get (model, &iter,
 				    COLUMN_DATA,
-				    &proposal, -1);
+				    proposal, -1);
 		
 		return TRUE;
 	}
@@ -206,7 +206,7 @@ select_current_proposal (GtkSourceCompletion *self)
 	gboolean selected = TRUE;
 	GtkSourceCompletionProposal *prop = NULL;
 	
-	if (get_selected_proposal (self->priv->active_page, prop))
+	if (get_selected_proposal (self->priv->active_page, &prop))
 	{
 		g_signal_emit (G_OBJECT (self), signals[PROPOSAL_SELECTED],
 			       0, prop, &selected);
@@ -386,7 +386,7 @@ update_info_pos (GtkSourceCompletion *self)
 	GtkSourceCompletionProposal *proposal = NULL;
 	gint y, x, sw, sh;
 	
-	if (get_selected_proposal (self->priv->active_page, proposal))
+	if (get_selected_proposal (self->priv->active_page, &proposal))
 	{
 		gboolean ret = TRUE;
 		g_signal_emit (self, signals[DISPLAY_INFO], 0, proposal, &ret);
