@@ -1,6 +1,6 @@
 2009-03-21  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
-	* proyect:
+	* project:
 	Changed library version to gtksourcecompletion-3.0 
 
 2009-03-21  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
@@ -24,7 +24,7 @@
 
 2009-03-20  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
-	* proyect:
+	* project:
 	Changed the license from LGPL to GPL
 	* gtksourcecompletion/gsc-utils.[ch]:
 	Removed unused functions (unused by the library)
