@@ -15,8 +15,8 @@ lib_LTLIBRARIES = \
 	libgtksourcecompletion-3.0.la
 
 BUILT_SOURCES =		\
-	gsc-marshal.c	\
-	gsc-marshal.h
+	gtksourcecompletionmarshal.c	\
+	gtksourcecompletionmarshal.h
 
 libgtksourcecompletion_headers = 	\
 	gtksourcecompletionprovider.h	\
@@ -61,14 +61,14 @@ INST_H_FILES = \
 	gtksourcecompletiontrigger-autowords.h	\
 	gtksourcecompletiontrigger-customkey.h
 
-gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)
+gtksourcecompletionmarshal.h: gtksourcecompletionmarshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=gtksourcecompletion_marshal > $@
 
-gsc-marshal.c: gsc-marshal.list $(GLIB_GENMARSHAL)
-	echo "#include \"gsc-marshal.h\"" > $@ && \
+gtksourcecompletionmarshal.c: gtksourcecompletionmarshal.list $(GLIB_GENMARSHAL)
+	echo "#include \"gtksourcecompletionmarshal.h\"" > $@ && \
 	$(GLIB_GENMARSHAL) $< --body --prefix=gtksourcecompletion_marshal >> $@
 
-EXTRA_DIST=gsc-marshal.list
+EXTRA_DIST=gtksourcecompletionmarshal.list
 
 CLEAN_FILES=$(BUILT_SOURCES)
 
