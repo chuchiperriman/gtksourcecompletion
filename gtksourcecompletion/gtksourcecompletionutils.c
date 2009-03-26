@@ -1,5 +1,5 @@
 /*
- * gsc-utils.c
+ * gtksourcecompletionutils.c
  * This file is part of gtksourcecompletion
  *
  * Copyright (C) 2007 -2009 Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
@@ -28,10 +28,18 @@
  */
  
 #include <string.h> 
-#include "gsc-utils.h"
+#include "gtksourcecompletionutils.h"
 
+/**
+ * gsc_utils_char_is_separator:
+ * @ch: The character to check
+ *
+ * A separator is a character like (, an space etc. An _ is not a separator
+ *
+ * Returns TRUE if the ch is a separator
+ */
 gboolean
-gsc_utils_char_is_separator(const gunichar ch)
+gtk_source_completion_utils_is_separator(const gunichar ch)
 {
 	if (g_unichar_isprint(ch) && 
 	    (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
@@ -42,8 +50,17 @@ gsc_utils_char_is_separator(const gunichar ch)
 	return TRUE;
 }
 
+/**
+* gsc_utils_view_get_last_word_and_iter:
+* @text_view: The #GtkTextView
+* @start_word: if != NULL then assign it the start position of the word
+* @end_word: if != NULL then assing it the end position of the word
+* 
+* Returns: the last word written in the #GtkTextView or ""
+*
+**/
 gchar*
-gsc_utils_view_get_last_word_and_iter(GtkTextView *text_view, 
+gtk_source_completion_utils_get_word_iter(GtkTextView *text_view, 
 				      GtkTextIter *start_word, 
 				      GtkTextIter *end_word)
 {
@@ -78,7 +95,7 @@ gsc_utils_view_get_last_word_and_iter(GtkTextView *text_view,
 	while ((no_doc_start = gtk_text_iter_backward_char(start_iter)) == TRUE)
 	{
 		ch = gtk_text_iter_get_char(start_iter);
-		if (gsc_utils_char_is_separator(ch))
+		if (gtk_source_completion_utils_is_separator(ch))
 		{
 			found = TRUE;
 			break;
@@ -109,14 +126,28 @@ gsc_utils_view_get_last_word_and_iter(GtkTextView *text_view,
 	return text;
 }
 
+/**
+ * gsc_utils_view_get_last_word:
+ * @text_view: The #GtkTextView
+ *
+ * Returns: the last word written in the #GtkTextView or ""
+ */
 gchar*
-gsc_utils_view_get_last_word(GtkTextView *text_view)
+gtk_source_completion_utils_get_word(GtkTextView *text_view)
 {
-	return gsc_utils_view_get_last_word_and_iter(text_view, NULL, NULL);
+	return gtk_source_completion_utils_get_word_iter (text_view, NULL, NULL);
 }
 
+/** 
+ * gsc_utils_view_get_cursor_pos:
+ * @text_view: The #GtkTextView
+ * @x: Assign the x position of the cursor
+ * @y: Assign the y position of the cursor
+ *
+ * Gets the cursor position on the screen.
+ */
 void
-gsc_utils_view_get_cursor_pos(GtkTextView *text_view, 
+gtk_source_completion_utils_get_cursor_pos(GtkTextView *text_view, 
 			      gint *x, 
 			      gint *y)
 {
@@ -149,8 +180,16 @@ gsc_utils_view_get_cursor_pos(GtkTextView *text_view,
 	*y = win_y + yy + location.height;
 }
 
+/**
+ * gsc_utils_view_replace_current_word:
+ * @text_view: The #GtkTextView
+ * @text: The text to be inserted instead of the current word
+ * 
+ * Replaces the current word in the #GtkTextView with the new word
+ *
+ */
 void
-gsc_utils_view_replace_current_word(GtkTextView *text_view, 
+gtk_source_completion_utils_replace_current_word(GtkTextView *text_view, 
 				    const gchar* text)
 {
 	GtkTextBuffer *buffer;
@@ -159,7 +198,7 @@ gsc_utils_view_replace_current_word(GtkTextView *text_view,
 	buffer = gtk_text_view_get_buffer(text_view);
 	gtk_text_buffer_begin_user_action(buffer);
 	
-	gsc_utils_view_get_last_word_and_iter(text_view,&word_start, &word_end);
+	gtk_source_completion_utils_get_word_iter (text_view,&word_start, &word_end);
 
 	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,
 							"temp_replace",
@@ -172,8 +211,18 @@ gsc_utils_view_replace_current_word(GtkTextView *text_view,
 	gtk_text_buffer_end_user_action(buffer);
 }
 
+/**
+ * gsc_utils_window_get_position_at_cursor:
+ * @window: Window to set
+ * @view: Parent view where we get the cursor position
+ * @x: The returned x position
+ * @y: The returned y position
+ *
+ * Returns: TRUE if the position is over the text and FALSE if 
+ * the position is under the text.
+ */
 gboolean 
-gsc_utils_window_get_position_at_cursor(GtkWindow *window,
+gtk_source_completion_utils_get_pos_at_cursor(GtkWindow *window,
 					GtkTextView *view,
 					gint *x,
 					gint *y,
@@ -184,7 +233,7 @@ gsc_utils_window_get_position_at_cursor(GtkWindow *window,
 	gint sh = gdk_screen_height();
 	gboolean resize = FALSE;
 	gboolean up = FALSE;
-	gsc_utils_view_get_cursor_pos(view,x,y);
+	gtk_source_completion_utils_get_cursor_pos (view,x,y);
 	
 	gtk_window_get_size(window, &w, &h);
 	

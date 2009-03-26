@@ -33,7 +33,6 @@
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
-#include "gsc-utils.h"
 #include "gtksourcecompletiontrigger-customkey.h"
 
 #define GTK_SOURCE_COMPLETION_TRIGGER_CUSTOMKEY_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), \

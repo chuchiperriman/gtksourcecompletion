@@ -18,7 +18,7 @@
  */
 
 #include "gsc-provider-file.h"
-#include "gsc-utils.h"
+#include "gtksourcecompletionutils.h"
 
 /*TODO Change the icon*/
 #define ICON_FILE ICON_DIR"/document-words-icon.png"

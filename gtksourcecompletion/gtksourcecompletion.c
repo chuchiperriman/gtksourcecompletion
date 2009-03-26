@@ -30,8 +30,8 @@
  */
 
 #include <gdk/gdkkeysyms.h> 
-#include "gsc-i18n.h"
-#include "gsc-utils.h"
+#include "gtksourcecompletionutils.h"
+#include "gtksourcecompletioni18n.h"
 #include "gsc-marshal.h"
 #include "gtksourcecompletion.h"
 #include <string.h>
@@ -1838,9 +1838,9 @@ gtk_source_completion_trigger_event (GtkSourceCompletion *self,
 	 *add a new "position-type": cursor, center_screen,
 	 *center_window, custom etc.
 	 */
-	gsc_utils_window_get_position_at_cursor (GTK_WINDOW (self),
-						 self->priv->view,
-						 &x, &y, NULL);
+	gtk_source_completion_utils_get_pos_at_cursor (GTK_WINDOW (self),
+						       self->priv->view,
+						       &x, &y, NULL);
 
 	gtk_window_move (GTK_WINDOW (self),
 			 x, y);

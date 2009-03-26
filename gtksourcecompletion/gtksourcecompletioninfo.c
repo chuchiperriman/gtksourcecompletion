@@ -29,8 +29,8 @@
  */
   
 #include "gtksourcecompletioninfo.h"
-#include "gsc-utils.h"
-#include "gsc-i18n.h"
+#include "gtksourcecompletionutils.h"
+#include "gtksourcecompletioni18n.h"
 
 struct _GtkSourceCompletionInfoPrivate
 {
@@ -274,11 +274,11 @@ gtk_source_completion_info_move_to_cursor (GtkSourceCompletionInfo* self,
 
 	adjust_resize (self);
 	
-	gsc_utils_window_get_position_at_cursor (GTK_WINDOW (self),
-						 view,
-						 &x,
-						 &y,
-						 &resized);
+	gtk_source_completion_utils_get_pos_at_cursor (GTK_WINDOW (self),
+						       view,
+						       &x,
+						       &y,
+						       &resized);
 	if (resized)
 	{
 		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),

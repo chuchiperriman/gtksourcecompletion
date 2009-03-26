@@ -37,9 +37,9 @@
 #include <ctype.h>
 #include <gtksourceview/gtksourceview.h>
 #include <gdk/gdkkeysyms.h>
-#include "gsc-utils.h"
+#include "gtksourcecompletionutils.h"
 #include "gtksourcecompletiontrigger-autowords.h"
-#include "gsc-i18n.h"
+#include "gtksourcecompletioni18n.h"
 
 #define DEFAULT_MIN_LEN (3)
 #define DEFAULT_DELAY (200)
@@ -115,7 +115,7 @@ autocompletion_raise_event (gpointer event)
 	if (offset != self->priv->text_offset)
 		return FALSE;
 	
-	word = gsc_utils_view_get_last_word (self->priv->view);
+	word = gtk_source_completion_utils_get_word (self->priv->view);
 	
 	if (strlen (word) >= self->priv->min_len)
 	{

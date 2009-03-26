@@ -21,9 +21,9 @@ BUILT_SOURCES =		\
 libgtksourcecompletion_headers = 	\
 	gtksourcecompletionprovider.h	\
 	gtksourcecompletiontrigger.h	\
-	gsc-utils.h			\
+	gtksourcecompletionutils.h			\
 	gtksourcecompletionproposal.h	\
-	gsc-i18n.h			\
+	gtksourcecompletioni18n.h			\
 	gtksourcecompletion.h		\
 	gtksourcecompletioninfo.h	\
 	gtksourcecompletiontrigger-autowords.h	\
@@ -33,7 +33,7 @@ libgtksourcecompletion_3_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
 	gtksourcecompletionprovider.c	\
 	gtksourcecompletiontrigger.c	\
-	gsc-utils.c			\
+	gtksourcecompletionutils.c			\
 	gtksourcecompletionproposal.c	\
 	gtksourcecompletion.c		\
 	gtksourcecompletioninfo.c	\
@@ -52,10 +52,10 @@ libgtksourcecompletion_3_0_la_LDFLAGS = \
 INST_H_FILES = \
 	gtksourcecompletionprovider.h	\
 	gtksourcecompletiontrigger.h	\
-	gsc-utils.h			\
+	gtksourcecompletionutils.h			\
 	gtksourcecompletionproposal.h	\
 	gtksourceproviders.h		\
-	gsc-i18n.h			\
+	gtksourcecompletioni18n.h			\
 	gtksourcecompletion.h		\
 	gtksourcecompletioninfo.h	\
 	gtksourcecompletiontrigger-autowords.h	\

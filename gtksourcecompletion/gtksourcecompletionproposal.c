@@ -30,9 +30,9 @@
  */
   
 #include "gtksourcecompletionproposal.h"
-#include "gsc-utils.h"
+#include "gtksourcecompletionutils.h"
 #include "gsc-marshal.h"
-#include "gsc-i18n.h"
+#include "gtksourcecompletioni18n.h"
 
 #define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE _("Default")
 #define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PRIORITY 10
@@ -64,8 +64,8 @@ static gboolean
 gtk_source_completion_proposal_apply_default (GtkSourceCompletionProposal *self,
 					      GtkTextView *view)
 {
-	gsc_utils_view_replace_current_word (view,
-					     self->priv->label);
+	gtk_source_completion_utils_replace_current_word (view,
+							  self->priv->label);
 	return FALSE;
 }
 

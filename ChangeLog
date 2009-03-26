@@ -1,3 +1,10 @@
+2009-03-26  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-utils.[ch]:
+	Renamed to gtksourcecompletionutils.[ch]
+	* gtksourcecompletion/gsc-i18n.h:
+	Renamed to gtksourcecompletioni18n.h
+
 2009-03-21  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* project:
