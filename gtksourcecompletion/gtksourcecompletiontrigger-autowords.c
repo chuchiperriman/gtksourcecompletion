@@ -35,7 +35,6 @@
 #include <glib/gprintf.h>
 #include <string.h>
 #include <ctype.h>
-#include <gtksourceview/gtksourceview.h>
 #include <gdk/gdkkeysyms.h>
 #include "gtksourcecompletionutils.h"
 #include "gtksourcecompletiontrigger-autowords.h"
@@ -55,7 +54,7 @@ enum
 	AS_GTK_TEXT_BUFFER_IT,
 	LAST_SIGNAL
 };
-	
+
 struct _GtkSourceCompletionTriggerAutowordsPrivate
 {
 	GtkSourceCompletion* completion;
@@ -407,7 +406,6 @@ gtk_source_completion_trigger_autowords_new (GtkSourceCompletion *completion)
 	
 	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (g_object_new (GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS,
 								      NULL));
-	
 	self->priv->completion = completion;
 	self->priv->view = gtk_source_completion_get_view (completion);
 	
