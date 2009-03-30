@@ -32,10 +32,7 @@
  * 
  */
 
-#include <glib/gprintf.h>
 #include <string.h>
-#include <ctype.h>
-#include <gdk/gdkkeysyms.h>
 #include "gtksourcecompletionutils.h"
 #include "gtksourcecompletiontrigger-autowords.h"
 #include "gtksourcecompletioni18n.h"
@@ -47,27 +44,19 @@
 								GTK_TYPE_SOURCE_COMPLETION_TRIGGER_AUTOWORDS, \
 								GtkSourceCompletionTriggerAutowordsPrivate))
 
-/* Autocompletion signals */
-enum
-{
-	AS_GTK_TEXT_VIEW_KR,
-	AS_GTK_TEXT_BUFFER_IT,
-	LAST_SIGNAL
-};
-
 struct _GtkSourceCompletionTriggerAutowordsPrivate
 {
 	GtkSourceCompletion* completion;
 	GtkTextView *view;
-	
-	gulong signals[LAST_SIGNAL];
-	
-	gchar *actual_word;
-	
+	gulong ins_handler;
+	gulong del_handler;
 	guint source_id;
 	guint delay;
 	guint min_len;
-	gint text_offset;
+	
+	gchar *init_text;
+	gint line;
+	gint line_offset;
 };
 
 enum
@@ -85,89 +74,76 @@ G_DEFINE_TYPE_WITH_CODE (GtkSourceCompletionTriggerAutowords,
 			 G_IMPLEMENT_INTERFACE (GTK_TYPE_SOURCE_COMPLETION_TRIGGER,
 				 		gtk_source_completion_trigger_autowords_iface_init))
 
-static gint
-get_text_offset (GtkSourceCompletionTriggerAutowords *self)
+static gboolean
+autocompletion_filter_func (GtkSourceCompletionProposal *proposal,
+			    gpointer user_data)
 {
-	GtkTextBuffer *buffer;
-	GtkTextMark* mark;
-	GtkTextIter iter;
-	
-	buffer = gtk_text_view_get_buffer (self->priv->view);
-	mark = gtk_text_buffer_get_insert (buffer);
-	gtk_text_buffer_get_iter_at_mark (buffer, &iter, mark);
-	
-	return gtk_text_iter_get_offset (&iter);
+	const gchar *label = gtk_source_completion_proposal_get_label (proposal);
+	const gchar *text = (const gchar*)user_data;
+	return g_str_has_prefix (label, text);
 }
 
 static gboolean
 autocompletion_raise_event (gpointer event)
 {
-	GtkSourceCompletionTriggerAutowords *self;
+	GtkSourceCompletionTriggerAutowords *self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (event);
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (self->priv->view);
+	GtkTextMark *insert_mark = gtk_text_buffer_get_insert (buffer);
+	GtkTextIter iter;
 	gchar* word;
-	gint offset;
-	
-	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (event);
-	
-	/*Check if the user has changed the cursor position.If yes, we don't complete*/
-	offset = get_text_offset (self);
-	
-	if (offset != self->priv->text_offset)
+
+	/*Check if the user has changed the cursor position.If yes, we don't complete*/	
+	gtk_text_buffer_get_iter_at_mark (buffer, &iter, insert_mark);
+	if ((gtk_text_iter_get_line (&iter) != self->priv->line) ||
+	    (gtk_text_iter_get_line_offset (&iter) != self->priv->line_offset))
+	{
 		return FALSE;
-	
+	}
+	    
 	word = gtk_source_completion_utils_get_word (self->priv->view);
-	
 	if (strlen (word) >= self->priv->min_len)
 	{
-		g_free (self->priv->actual_word);
-		self->priv->actual_word = word;
+		g_free (self->priv->init_text);
+		self->priv->init_text = word;
 		
 		gtk_source_completion_trigger_event (self->priv->completion,
 						     GTK_SOURCE_COMPLETION_TRIGGER (self));
 	}
 	else
 	{
-		GtkSourceCompletionTrigger *active_trigger;
-		
-		active_trigger = gtk_source_completion_get_active_trigger (self->priv->completion);
-		if (active_trigger && strcmp (gtk_source_completion_trigger_get_name (active_trigger),
-					      GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_NAME) == 0)
-		{
-			gtk_source_completion_finish_completion (self->priv->completion);
-		}
+		g_free (word);
 	}
+	
 	return FALSE;
 }
 
 static gboolean
-autocompletion_key_release_cb (GtkWidget *view,
-			       GdkEventKey *event, 
-			       gpointer user_data)
+autocompletion_delete_range_cb (GtkWidget *view,
+				GtkTextIter *start,
+				GtkTextIter *end,
+				gpointer user_data)
 {
-	GtkSourceCompletionTriggerAutowords *self;
-	guint keyval = event->keyval;
 	
-	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (user_data);
+	GtkSourceCompletionTriggerAutowords *self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (user_data);
 	
-	if (GDK_BackSpace == keyval)
+	if (GTK_WIDGET_VISIBLE (self->priv->completion) &&
+	    gtk_source_completion_get_active_trigger(self->priv->completion) == GTK_SOURCE_COMPLETION_TRIGGER (self))
 	{
-		/* Only update the completion if the popup is visible */
-		if (GTK_WIDGET_VISIBLE (self->priv->completion))
+		if (gtk_text_iter_get_line (start) != self->priv->line ||
+		    gtk_text_iter_get_line_offset (start) < self->priv->line_offset)
 		{
-			if (self->priv->source_id != 0)
-			{
-				/* Stop the event because the user is written very fast*/
-				g_source_remove (self->priv->source_id);
-				self->priv->source_id = 0;
-			}
-	
-			self->priv->text_offset = get_text_offset (self);
-			/*raise event in 0,5 seconds*/
-			self->priv->source_id = g_timeout_add (self->priv->delay,
-							       autocompletion_raise_event,
-							       self);
+			gtk_source_completion_finish_completion (self->priv->completion);
+		}
+		else
+		{
+			/*Filter the current proposals */
+			gchar *temp = gtk_source_completion_utils_get_word (self->priv->view);
+			gtk_source_completion_filter_proposals (self->priv->completion,
+							 autocompletion_filter_func,
+							 temp);
+			g_free (temp);
 		}
 	}
-
 	return FALSE;
 }
 
@@ -178,25 +154,50 @@ autocompletion_insert_text_cb (GtkTextBuffer *buffer,
 			       gint len,
 			       gpointer user_data)
 {
-	GtkSourceCompletionTriggerAutowords *self;
+	GtkSourceCompletionTriggerAutowords *self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (user_data);
 	
-	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (user_data);
-	
-	/* Prevent "paste" */
-	if (len <= 2)
+	/*Raise the event if completion is not visible*/
+	if (!GTK_WIDGET_VISIBLE (self->priv->completion))
 	{
-		if (self->priv->source_id != 0)
+		/* Prevent "paste" */
+		if (len <= 2)
 		{
-			/* Stop the event because the user is written very fast*/
-			g_source_remove (self->priv->source_id);
-			self->priv->source_id = 0;
-		}
+			if (self->priv->source_id != 0)
+			{
+				/* Stop the event because the user is written very fast*/
+				g_source_remove (self->priv->source_id);
+				self->priv->source_id = 0;
+			}
 
-		self->priv->text_offset = get_text_offset (self);
-		/*raise event in 0,5 seconds*/
-		self->priv->source_id = g_timeout_add (self->priv->delay,
-						       autocompletion_raise_event,
-						       self);
+			self->priv->line = gtk_text_iter_get_line (location);
+			self->priv->line_offset = gtk_text_iter_get_line_offset (location);
+			/*raise event in 0,5 seconds*/
+			self->priv->source_id = g_timeout_add (self->priv->delay,
+							       autocompletion_raise_event,
+							       self);
+		}
+	}
+	else
+	{
+		/*If completion is visible, filter the content if the trigger si autowords*/
+		if (gtk_source_completion_get_active_trigger(self->priv->completion) == GTK_SOURCE_COMPLETION_TRIGGER (self))
+		{
+			if (gtk_source_completion_utils_is_separator (g_utf8_get_char (text)) ||
+			    gtk_text_iter_get_line (location) != self->priv->line ||
+			    gtk_text_iter_get_line_offset (location) < self->priv->line_offset)
+			{
+				gtk_source_completion_finish_completion (self->priv->completion);
+			}
+			else
+			{
+				/*Filter the current proposals */
+				gchar *temp = gtk_source_completion_utils_get_word (self->priv->view);
+				gtk_source_completion_filter_proposals (self->priv->completion,
+								 autocompletion_filter_func,
+								 temp);
+				g_free (temp);
+			}
+		}
 	}
 }
 
@@ -210,23 +211,20 @@ static gboolean
 gtk_source_completion_trigger_autowords_real_activate (GtkSourceCompletionTrigger* base)
 {
 	GtkSourceCompletionTriggerAutowords *self;
+	GtkTextBuffer *buffer;
 	
 	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (base);
+	buffer = gtk_text_view_get_buffer (self->priv->view);
 	
-	self->priv->signals[AS_GTK_TEXT_VIEW_KR] = 
-		g_signal_connect_data (self->priv->view,
-				       "key-release-event",
-				       G_CALLBACK (autocompletion_key_release_cb),
-				       self,
-				       NULL,
-				       G_CONNECT_AFTER);
+	self->priv->del_handler = g_signal_connect_after (buffer,
+							  "delete-range",
+							  G_CALLBACK (autocompletion_delete_range_cb),
+							  self);
 
-	self->priv->signals[AS_GTK_TEXT_BUFFER_IT] = 
-		g_signal_connect_after (gtk_text_view_get_buffer (self->priv->view),
-					"insert-text",
-					G_CALLBACK (autocompletion_insert_text_cb),
-					self);
-	
+	self->priv->ins_handler = g_signal_connect_after (buffer,
+							  "insert-text",
+							  G_CALLBACK (autocompletion_insert_text_cb),
+							  self);
 	return TRUE;
 }
 
@@ -237,24 +235,14 @@ gtk_source_completion_trigger_autowords_real_deactivate (GtkSourceCompletionTrig
 	GtkTextBuffer *buffer;
 	
 	self = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS (base);
+	buffer = gtk_text_view_get_buffer (self->priv->view);
 	
-	if (g_signal_handler_is_connected (self->priv->view,
-					   self->priv->signals[AS_GTK_TEXT_VIEW_KR]))
-	{
-		g_signal_handler_disconnect (self->priv->view,
-					     self->priv->signals[AS_GTK_TEXT_VIEW_KR]);
-		self->priv->signals[AS_GTK_TEXT_VIEW_KR] = 0;
-	}
-
-	buffer = gtk_text_view_get_buffer (self->priv->view);	
-	if (g_signal_handler_is_connected (buffer,
-					   self->priv->signals[AS_GTK_TEXT_BUFFER_IT]))
-	{
-		g_signal_handler_disconnect (buffer,
-					     self->priv->signals[AS_GTK_TEXT_BUFFER_IT]);
-		self->priv->signals[AS_GTK_TEXT_BUFFER_IT] = 0;
-	}
-	
+	g_signal_handler_disconnect (buffer,
+				     self->priv->ins_handler);
+	self->priv->ins_handler = 0;
+	g_signal_handler_disconnect (buffer,
+				     self->priv->del_handler);
+	self->priv->del_handler = 0;
 	return FALSE;
 }
 
@@ -318,7 +306,7 @@ gtk_source_completion_trigger_autowords_init (GtkSourceCompletionTriggerAutoword
 {
 	self->priv = GTK_SOURCE_COMPLETION_TRIGGER_AUTOWORDS_GET_PRIVATE (self);
 	
-	self->priv->actual_word = NULL;
+	self->priv->init_text = NULL;
 	self->priv->source_id = 0;
 	self->priv->delay = DEFAULT_DELAY;
 	self->priv->min_len = DEFAULT_MIN_LEN;
@@ -336,8 +324,10 @@ gtk_source_completion_trigger_autowords_finalize(GObject *object)
 		g_source_remove (self->priv->source_id);
 		self->priv->source_id = 0;
 	}
+	
+	//TODO deactivate if it is activate
 
-	g_free (self->priv->actual_word);
+	g_free (self->priv->init_text);
 
 	G_OBJECT_CLASS (gtk_source_completion_trigger_autowords_parent_class)->finalize (object);
 }

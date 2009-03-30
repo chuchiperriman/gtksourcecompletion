@@ -1,3 +1,9 @@
+2009-03-30  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.c:
+	Reimplemented. Now raise the trigger once and filter the content when
+	the user write
+
 2009-03-27  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-marshal.list:
