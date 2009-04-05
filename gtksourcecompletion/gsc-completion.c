@@ -1193,7 +1193,7 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	 * GscCompletion:select-on-show:
 	 *
 	 * %TRUE if the completion must to mark as selected the first proposal
-	 * on show
+	 * on show (and when the filter is updated)
 	 */
 	g_object_class_install_property (object_class,
 					 PROP_SELECT_ON_SHOW,
@@ -1923,6 +1923,11 @@ gsc_completion_filter_proposals (GscCompletion *self,
 	if (!update_pages_visibility (self))
 	{
 		end_completion (self);
+	}
+	else
+	{
+		if (self->priv->select_on_show)
+			_gsc_completion_select_first (self);
 	}
 }
 
