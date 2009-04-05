@@ -34,6 +34,7 @@ enum
 
 typedef struct _GscTree
 {
+	GtkScrolledWindow *scroll;
 	GtkTreeView *treeview;
 	GtkListStore *list_store;
 	GtkTreeModelFilter *model_filter;

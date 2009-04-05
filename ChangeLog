@@ -1,3 +1,8 @@
+2009-04-06  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.[ch]:
+	Added new functions to set the page position!
+
 2009-03-30  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-trigger-autowords.c:

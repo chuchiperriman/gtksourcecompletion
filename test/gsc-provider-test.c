@@ -81,6 +81,11 @@ gsc_provider_test_real_get_proposals (GscProvider* base,
 				NULL);
 	gsc_proposal_set_page_name(prop,"Page 3");
 	list = g_list_append (list, prop);
+	prop = gsc_proposal_new("Proposal Fixed page",
+				"Info proposal fixed",
+				NULL);
+	gsc_proposal_set_page_name(prop,"Fixed");
+	list = g_list_append (list, prop);
 	return list;
 }
 

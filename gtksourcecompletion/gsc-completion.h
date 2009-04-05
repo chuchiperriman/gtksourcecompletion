@@ -124,6 +124,15 @@ GtkWidget	*gsc_completion_get_bottom_bar		(GscCompletion *self);
 
 GscInfo		*gsc_completion_get_info_widget		(GscCompletion *self);
 
+gint		gsc_completion_get_page_pos		(GscCompletion *self,
+							 const gchar *page_name);
+
+gint		gsc_completion_get_n_pages		(GscCompletion *self);
+
+gboolean	gsc_completion_set_page_pos		(GscCompletion *self,
+							 const gchar *page_name,
+							 gint position);
+
 G_END_DECLS
 
 #endif 
