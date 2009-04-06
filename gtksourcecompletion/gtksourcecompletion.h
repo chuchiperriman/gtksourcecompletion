@@ -131,6 +131,15 @@ GtkWidget	*gtk_source_completion_get_bottom_bar		(GtkSourceCompletion *self);
 GtkSourceCompletionInfo
 		*gtk_source_completion_get_info_widget		(GtkSourceCompletion *self);
 
+gint		gtk_source_completion_get_page_pos		(GtkSourceCompletion *self,
+								 const gchar *page_name);
+
+gint		gtk_source_completion_get_n_pages		(GtkSourceCompletion *self);
+
+void	gtk_source_completion_set_page_pos		(GtkSourceCompletion *self,
+								 const gchar *page_name,
+								 gint position);
+
 G_END_DECLS
 
 #endif 

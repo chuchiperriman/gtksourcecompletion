@@ -81,6 +81,11 @@ gsc_provider_test_real_get_proposals (GtkSourceCompletionProvider* base,
 				NULL);
 	gtk_source_completion_proposal_set_page_name(prop,"Page 3");
 	list = g_list_append (list, prop);
+	prop = gtk_source_completion_proposal_new("Proposal Fixed page",
+				"Info proposal fixed",
+				NULL);
+	gtk_source_completion_proposal_set_page_name(prop,"Fixed");
+	list = g_list_append (list, prop);
 	return list;
 }
 

@@ -43,6 +43,8 @@
 #include "gsc-provider-file.h"
 #include "gsc-provider-test.h"
 
+#define TEST_PAGE "Page 3"
+#define FIXED_PAGE "Fixed"
 
 static GtkWidget *view;
 static GtkSourceCompletion *comp;
@@ -50,6 +52,27 @@ static GtkSourceCompletionInfo *info;
 
 static const gboolean change_keys = FALSE;
 
+static void
+show_completion_cb (GtkWidget *w, gpointer user_data)
+{
+	gint n = gtk_source_completion_get_n_pages (comp);
+	gint pos = gtk_source_completion_get_page_pos (comp, TEST_PAGE);
+	if (pos == n -1)
+		pos = 1;
+	else
+		pos++;
+	
+	gtk_source_completion_set_page_pos (comp, TEST_PAGE, pos);
+	g_debug ("pos: %d, urpos: %d", pos, 
+		gtk_source_completion_get_page_pos (comp, TEST_PAGE));
+	g_assert (gtk_source_completion_get_page_pos (comp, TEST_PAGE) == pos);
+}
+
+static void
+hide_completion_cb (GtkWidget *w, gpointer user_data)
+{
+	
+}
 
 static gboolean
 filter_func (GtkSourceCompletionProposal *proposal,
@@ -217,6 +240,9 @@ create_completion(void)
 	g_object_unref(ur_trigger);
 	g_object_unref(ac_trigger);
 	
+	g_signal_connect(comp,"show",G_CALLBACK(show_completion_cb),NULL);
+	g_signal_connect(comp,"hide",G_CALLBACK(hide_completion_cb),NULL);
+	
 }
 
 static void
@@ -243,6 +269,9 @@ main (int argc, char *argv[])
 	window = create_window ();
 	create_completion();
 	create_info ();
+	
+	g_assert (gtk_source_completion_get_n_pages (comp) == 1);
+	gtk_source_completion_set_page_pos (comp, FIXED_PAGE, 0);
 	
 	gtk_widget_show_all (window);
 

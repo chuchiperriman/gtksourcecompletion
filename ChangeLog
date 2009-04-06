@@ -1,3 +1,10 @@
+2009-04-07  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gtksourcecompletion.[ch]:
+	Added new functions to set the page position!
+	If select-on-show is TRUE, we select the first proposal when
+	the filter is updated too
+
 2009-03-30  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gtksourcecompletiontrigger-autowords.c:

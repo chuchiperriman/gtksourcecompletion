@@ -32,7 +32,7 @@
 #include <gdk/gdkkeysyms.h> 
 #include "gtksourcecompletionutils.h"
 #include "gtksourcecompletioni18n.h"
-#include "gsc-marshal.h"
+#include "gtksourcecompletionmarshal.h"
 #include "gtksourcecompletion.h"
 #include <string.h>
 
@@ -90,6 +90,7 @@ struct _GtkSourceCompletionPage
 {
 	gchar *name;
 	
+	GtkScrolledWindow *scroll;
 	GtkTreeView *treeview;
 	GtkListStore *list_store;
 	GtkTreeModelFilter *model_filter;
@@ -732,7 +733,6 @@ gtk_source_completion_page_new (GtkSourceCompletion *self,
 	GtkTreeModel *model;
 	GtkTreeSelection *selection;
 	GtkWidget *label;
-	GtkWidget *sw;
 	
 	page = g_slice_new (GtkSourceCompletionPage);
 	
@@ -799,20 +799,21 @@ gtk_source_completion_page_new (GtkSourceCompletion *self,
 	self->priv->pages = g_list_append (self->priv->pages,
 					   page);
 	
-	sw = gtk_scrolled_window_new (NULL, NULL);
-	gtk_widget_show (sw);
+	page->scroll = GTK_SCROLLED_WINDOW (gtk_scrolled_window_new (NULL, NULL));
+	gtk_widget_show (GTK_WIDGET (page->scroll));
 	
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+	gtk_scrolled_window_set_policy (page->scroll,
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
 	
-	gtk_container_add (GTK_CONTAINER (sw),
+	gtk_container_add (GTK_CONTAINER (page->scroll),
 			   GTK_WIDGET (page->treeview));
 	
 	label = gtk_label_new (tree_name);
 	
 	gtk_notebook_append_page (GTK_NOTEBOOK (self->priv->notebook),
-				  sw, label);
+				  GTK_WIDGET (page->scroll),
+				  label);
 	
 	return page;
 }
@@ -1277,7 +1278,7 @@ gtk_source_completion_class_init (GtkSourceCompletionClass *klass)
 	 * GtkSourceCompletion:select-on-show:
 	 *
 	 * %TRUE if the completion must to mark as selected the first proposal
-	 * on show
+	 * on show (and when the filter is updated)
 	 */
 	g_object_class_install_property (object_class,
 					 PROP_SELECT_ON_SHOW,
@@ -1845,7 +1846,11 @@ gtk_source_completion_trigger_event (GtkSourceCompletion *self,
 	gtk_window_move (GTK_WINDOW (self),
 			 x, y);
 	
-	gtk_source_completion_show_or_update (GTK_WIDGET (self));
+	/*
+	* We must call to gtk_widget_show and not to gsc_completion_show_or_update
+	* because if we don't call to gtk_widget_show, the show signal is not emitted
+	*/
+	gtk_widget_show (GTK_WIDGET (self));
 
 	gtk_widget_grab_focus (GTK_WIDGET (self->priv->view));
 
@@ -1912,6 +1917,11 @@ gtk_source_completion_filter_proposals (GtkSourceCompletion *self,
 	if (!update_pages_visibility (self))
 	{
 		end_completion (self);
+	}
+	else
+	{
+		if (self->priv->select_on_show)
+			select_first_proposal (self->priv->active_page);
 	}
 }
 
@@ -2096,4 +2106,91 @@ gtk_source_completion_get_from_view (GtkTextView *view)
 	return completion_control_get_completion (view);
 }
 
+/**
+ * gtk_source_completion_get_page_pos:
+ * @self: The #GtkSourceCompletion
+ * @page_name: The page name to search
+ *
+ * Search the page position with the given name
+ *
+ * Returns: the page position or -1 if it is not found
+ */
+gint
+gtk_source_completion_get_page_pos (GtkSourceCompletion *self,
+				    const gchar *page_name)
+{
+	GList *l;
+	gint pos = 0;
+	
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), -1);
+	
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
+	{
+		GtkSourceCompletionPage *page = (GtkSourceCompletionPage *)l->data;
+		if (g_strcmp0 (page_name, page->name) == 0)
+			return pos;
+		
+		pos++;
+	}
+	
+	return -1;
+}
+
+/**
+ * gtk_source_completion_get_n_pages:
+ * @self: The #GtkSourceCompletion
+ * 
+ * Returns: The number of pages
+ */
+gint
+gtk_source_completion_get_n_pages (GtkSourceCompletion *self)
+{
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (self), -1);
+	
+	return g_list_length (self->priv->pages);
+}
+
+/**
+ * gtk_source_completion_set_page_pos:
+ * @self: The #GtkSourceCompletion
+ * @page_name: The page name you want to set the position (stating by 1 because 
+ * 0 is the default page)
+ * @position: The new position of the page. If this is negative, or is larger
+ * than the number of elements in the list, the new element is added on to
+ * the end of the list
+ * 
+ */
+void
+gtk_source_completion_set_page_pos (GtkSourceCompletion *self,
+				    const gchar *page_name,
+				    gint position)
+{
+	GList *l;
+	GtkSourceCompletionPage *page;
+	
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (self));
+
+	for (l = self->priv->pages; l != NULL; l = g_list_next (l))
+	{
+		page = (GtkSourceCompletionPage *)l->data;
+		if (g_strcmp0 (page_name, page->name) == 0)
+		{
+			break;
+		}
+		page = NULL;
+	}
+	
+	if (page == NULL)
+	{
+		page = gtk_source_completion_page_new (self, page_name);
+	}
+	
+	self->priv->pages = g_list_remove (self->priv->pages, page);
+	self->priv->pages = g_list_insert (self->priv->pages, page, position);
+	gtk_notebook_reorder_child (GTK_NOTEBOOK (self->priv->notebook),
+				    GTK_WIDGET (page->scroll),
+				    position);
+	if (GTK_WIDGET_VISIBLE (self))
+		update_pages_visibility (self);
+}
 

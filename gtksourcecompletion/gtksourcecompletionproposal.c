@@ -31,7 +31,7 @@
   
 #include "gtksourcecompletionproposal.h"
 #include "gtksourcecompletionutils.h"
-#include "gsc-marshal.h"
+#include "gtksourcecompletionmarshal.h"
 #include "gtksourcecompletioni18n.h"
 
 #define GTK_SOURCE_COMPLETION_PROPOSAL_DEFAULT_PAGE _("Default")
