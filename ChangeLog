@@ -1,3 +1,8 @@
+2009-04-07  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-completion.c:
+	Bug setting the active page
+
 2009-04-06  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.[ch]:

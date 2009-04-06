@@ -1850,8 +1850,6 @@ gsc_completion_trigger_event (GscCompletion *self,
 	gtk_window_move (GTK_WINDOW (self),
 			 x, y);
 	
-	self->priv->active_page = (GscCompletionPage *)self->priv->pages->data;
-	
 	/*
 	We must call to gtk_widget_show and not to gsc_completion_show_or_update
 	because if we don't call to gtk_widget_show, the show signal is not emitted
