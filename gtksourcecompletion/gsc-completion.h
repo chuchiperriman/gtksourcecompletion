@@ -27,11 +27,6 @@
 G_BEGIN_DECLS
 
 /*
- * FIXME: And this here?
- */
-#define USER_REQUEST_TRIGGER_NAME "user-request"
-
-/*
  * Type checking and casting macros
  */
 #define GSC_TYPE_COMPLETION              (gsc_completion_get_type())

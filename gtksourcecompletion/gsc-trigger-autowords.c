@@ -50,7 +50,6 @@ struct _GscTriggerAutowordsPrivate
 	guint delay;
 	guint min_len;
 	
-	gchar *init_text;
 	gint line;
 	gint line_offset;
 };
@@ -100,16 +99,10 @@ autocompletion_raise_event (gpointer event)
 					   NULL, NULL);
 	if (strlen (word) >= self->priv->min_len)
 	{
-		g_free (self->priv->init_text);
-		self->priv->init_text = word;
-		
 		gsc_completion_trigger_event (self->priv->completion,
 					      GSC_TRIGGER (self));
 	}
-	else
-	{
-		g_free (word);
-	}
+	g_free (word);
 	
 	return FALSE;
 }
@@ -293,10 +286,11 @@ gsc_trigger_autowords_init (GscTriggerAutowords *self)
 {
 	self->priv = GSC_TRIGGER_AUTOWORDS_GET_PRIVATE (self);
 	
-	self->priv->init_text = NULL;
 	self->priv->source_id = 0;
 	self->priv->delay = DEFAULT_DELAY;
 	self->priv->min_len = DEFAULT_MIN_LEN;
+	self->priv->line = 0;
+	self->priv->line_offset = 0;
 }
 
 static void 
@@ -309,8 +303,6 @@ gsc_trigger_autowords_finalize(GObject *object)
 		g_source_remove (self->priv->source_id);
 		self->priv->source_id = 0;
 	}
-
-	g_free (self->priv->init_text);
 
 	G_OBJECT_CLASS (gsc_trigger_autowords_parent_class)->finalize (object);
 }

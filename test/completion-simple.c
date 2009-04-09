@@ -34,7 +34,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
 #include <gtksourcecompletion/gsc-completion.h>
-#include <gtksourcecompletion/gsc-trigger-customkey.h>
+#include <gtksourcecompletion/gsc-trigger-userrequest.h>
 #include <gtksourcecompletion/gsc-trigger-autowords.h>
 #include <gtksourcecompletion/gsc-utils.h>
 #include <gtksourcecompletion/gsc-info.h>
@@ -216,7 +216,7 @@ create_completion(void)
 	//GscCutilsProvider *prov_cutils = gsc_cutils_provider_new();
 	comp = GSC_COMPLETION(gsc_completion_new(GTK_TEXT_VIEW(view)));
 	
-	GscTriggerCustomkey *ur_trigger = gsc_trigger_customkey_new(comp,"User Request Trigger","<Control>Return");
+	GscTriggerUserRequest *ur_trigger = gsc_trigger_userrequest_new(comp);
 	GscTriggerAutowords *ac_trigger = gsc_trigger_autowords_new(comp);
 	g_object_set (ac_trigger,
 		      "delay", 500,

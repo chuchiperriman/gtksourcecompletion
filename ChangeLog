@@ -1,3 +1,11 @@
+2009-04-09  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
+
+	* gtksourcecompletion/gsc-trigger-userrequest.[ch]:
+	New user request trigger. Raise an event then the user press
+	<Control>Return and filter the content while the user is writting
+	* gtksourcecompletion/gsc-trigger-autowords.c:
+	Removed an unused variable
+
 2009-04-07  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
 
 	* gtksourcecompletion/gsc-completion.c:
