@@ -4,5 +4,5 @@ gsc_info_get_type
 gsc_completion_get_type
 gsc_proposal_get_type
 gsc_trigger_autowords_get_type
+gsc_trigger_userrequest_get_type
 gsc_provider_get_type
-gsc_tree_get_type

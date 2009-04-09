@@ -95,7 +95,7 @@ view_key_press_event_cb (GtkWidget *view,
 }
 
 static gboolean
-delete_range_cb (GtkWidget *view,
+delete_range_cb (GtkWidget *buffer,
 		 GtkTextIter *start,
 		 GtkTextIter *end,
 		 gpointer user_data)
@@ -113,6 +113,7 @@ delete_range_cb (GtkWidget *view,
 		}
 		else
 		{
+			GtkTextView *view = gsc_completion_get_view (self->priv->completion);
 			/*Filter the current proposals */
 			gchar *temp = gsc_get_last_word (GTK_TEXT_VIEW (view));
 			gsc_completion_filter_proposals (self->priv->completion,

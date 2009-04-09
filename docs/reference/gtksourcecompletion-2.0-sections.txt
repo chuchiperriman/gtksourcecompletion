@@ -54,7 +54,6 @@ GSC_INFO_GET_CLASS
 
 <SECTION>
 <FILE>gsc-completion</FILE>
-USER_REQUEST_TRIGGER_NAME
 DEFAULT_PAGE
 GscCompletionFilterFunc
 GscCompletionPriv
@@ -77,6 +76,9 @@ gsc_completion_set_active
 gsc_completion_get_active
 gsc_completion_get_bottom_bar
 gsc_completion_get_info_widget
+gsc_completion_get_page_pos
+gsc_completion_get_n_pages
+gsc_completion_set_page_pos
 <SUBSECTION Standard>
 GSC_COMPLETION
 GSC_IS_COMPLETION
@@ -128,6 +130,24 @@ GSC_TRIGGER_AUTOWORDS_GET_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>gsc-trigger-userrequest</FILE>
+GSC_TRIGGER_USERREQUEST_NAME
+GscTriggerUserRequestPrivate
+<TITLE>GscTriggerUserRequest</TITLE>
+GscTriggerUserRequest
+gsc_trigger_userrequest_new
+gsc_trigger_userrequest_set_keys
+<SUBSECTION Standard>
+GSC_TRIGGER_USERREQUEST
+GSC_IS_TRIGGER_USERREQUEST
+GSC_TYPE_TRIGGER_USERREQUEST
+gsc_trigger_userrequest_get_type
+GSC_TRIGGER_USERREQUEST_CLASS
+GSC_IS_TRIGGER_USERREQUEST_CLASS
+GSC_TRIGGER_USERREQUEST_GET_CLASS
+</SECTION>
+
+<SECTION>
 <FILE>gsc-provider</FILE>
 GSC_PROVIDER_GET_INTERFACE
 GscProvider
@@ -140,32 +160,6 @@ GSC_PROVIDER
 GSC_IS_PROVIDER
 GSC_TYPE_PROVIDER
 gsc_provider_get_type
-</SECTION>
-
-<SECTION>
-<FILE>gsc-tree</FILE>
-GscTreeFilterVisibleFunc
-GscTreePriv
-<TITLE>GscTree</TITLE>
-GscTree
-gsc_tree_new
-gsc_tree_get_selected_proposal
-gsc_tree_add_data
-gsc_tree_clear
-gsc_tree_select_first
-gsc_tree_select_last
-gsc_tree_select_previous
-gsc_tree_select_next
-gsc_tree_get_num_proposals
-gsc_tree_filter_visible
-<SUBSECTION Standard>
-GSC_TREE
-GSC_IS_TREE
-GSC_TYPE_TREE
-gsc_tree_get_type
-GSC_TREE_CLASS
-GSC_IS_TREE_CLASS
-GSC_TREE_GET_CLASS
 </SECTION>
 
 <SECTION>
@@ -190,5 +184,11 @@ gsc_is_valid_word
 gsc_get_window_position_in_cursor
 gsc_get_window_position_center_screen
 gsc_get_window_position_center_parent
+</SECTION>
+
+<SECTION>
+<FILE>gtksourcecompletionmarshal</FILE>
+gtksourcecompletion_marshal_BOOLEAN__POINTER
+gtksourcecompletion_marshal_BOOLEAN__VOID
 </SECTION>
 
