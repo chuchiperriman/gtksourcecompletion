@@ -33,11 +33,11 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtksourceview/gtksourceview.h>
-#include <gtksourcecompletion/gsc-completion.h>
-#include <gtksourcecompletion/gsc-trigger-userrequest.h>
-#include <gtksourcecompletion/gsc-trigger-autowords.h>
-#include <gtksourcecompletion/gsc-utils.h>
-#include <gtksourcecompletion/gsc-info.h>
+#include "gsc-completion.h"
+#include "gsc-trigger-userrequest.h"
+#include "gsc-trigger-autowords.h"
+#include "gsc-utils.h"
+#include "gsc-info.h"
 
 #include "gsc-documentwords-provider.h"
 #include "gsc-provider-file.h"
