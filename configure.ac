@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(gtksourcecompletion,0.7.0)
+AC_INIT(gtksourcecompletion,0.7.1)
 dnl Every other copy of the package version number gets its value from here
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 
