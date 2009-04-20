@@ -1,4 +1,14 @@
 ===========================
+ gtksourcecompletion 0.7.0
+===========================
+
+New Features and fixes
+======================
+- This is the last gsc version (only fix releases)
+- Added info widget
+- A lot of improvements
+
+===========================
  gtksourcecompletion 0.5.0
 ===========================
 
