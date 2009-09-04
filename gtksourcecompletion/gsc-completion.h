@@ -1,132 +1,102 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-completion.h
+/*
+ * gtksourcecompletion.h
+ * This file is part of gtksourcecompletion
  *
- *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
+ * Copyright (C) 2007 -2009 Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, 
+ * Boston, MA 02111-1307, USA.
  */
-
+ 
 #ifndef GSC_COMPLETION_H
 #define GSC_COMPLETION_H
 
 #include <gtk/gtk.h>
-#include "gsc-provider.h"
-#include "gsc-info.h"
+#include <gtksourceview/gtksourcecompletioninfo.h>
+#include <gtksourceview/gtksourcecompletionprovider.h>
 
 G_BEGIN_DECLS
 
 /*
  * Type checking and casting macros
  */
-#define GSC_TYPE_COMPLETION              (gsc_completion_get_type())
-#define GSC_COMPLETION(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GSC_TYPE_COMPLETION, GscCompletion))
-#define GSC_COMPLETION_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GSC_TYPE_COMPLETION, GscCompletionClass))
-#define GSC_IS_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GSC_TYPE_COMPLETION))
-#define GSC_IS_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_COMPLETION))
-#define GSC_COMPLETION_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_COMPLETION, GscCompletionClass))
+#define GSC_TYPE_SOURCE_COMPLETION              (gsc_completion_get_type())
+#define GSC_COMPLETION(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GSC_TYPE_SOURCE_COMPLETION, Gsc))
+#define GSC_COMPLETION_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GSC_TYPE_SOURCE_COMPLETION, GscClass))
+#define GSC_IS_SOURCE_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GSC_TYPE_SOURCE_COMPLETION))
+#define GSC_IS_SOURCE_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_SOURCE_COMPLETION))
+#define GSC_COMPLETION_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_SOURCE_COMPLETION, GscClass))
 
-#define DEFAULT_PAGE "Default"
+#define GSC_COMPLETION_ERROR		(gsc_completion_error_quark ())
 
-typedef gboolean (* GscCompletionFilterFunc) (GscProposal *proposal,
-					      gpointer     user_data);
+typedef struct _GscPrivate GscPrivate;
+typedef struct _GscCompletion Gsc;
+typedef struct _GscClass GscClass;
 
-typedef struct _GscCompletionPriv GscCompletionPriv;
-typedef struct _GscCompletion GscCompletion;
-typedef struct _GscCompletionClass GscCompletionClass;
-
-struct _GscCompletion
+typedef enum
 {
-	GtkWindow parent;
+	GSC_COMPLETION_ERROR_ALREADY_BOUND = 0,
+	GSC_COMPLETION_ERROR_NOT_BOUND,
+} GscError;
 
-	GscCompletionPriv *priv;
+/* Forward declaration of GtkSourceView */
+struct _GtkSourceView;
+
+struct _Gsc
+{
+	GObject parent;
+
+	GscPrivate *priv;
 };
 
-struct _GscCompletionClass
+struct _GscClass
 {
-	GtkWindowClass parent_class;
+	GObjectClass parent_class;
 
-	gboolean (* proposal_selected)(GscCompletion *completion,
-				       GscProposal *proposal);
-	gboolean (* display_info)     (GscCompletion *completion,
-				       GscProposal *proposal);
+	gboolean 	(* proposal_activated)		(GscCompletion         *completion,
+	                                                 GscProvider *provider,
+							 GscProposal *proposal);
+	void 		(* show)			(GscCompletion         *completion);
+	void		(* hide)			(GscCompletion         *completion);
 };
 
-/* ********************* Control Functions ******************** */
-/* 
- * FIXME This functions will be deleted when we insert GscCompletion
- * into GtkSourceView. These functions store the relationship between the
- * GscCompletions and the GtkTextView.
- */
+GType		 gsc_completion_get_type			(void) G_GNUC_CONST;
 
-GscCompletion	*gsc_completion_get_from_view		(GtkTextView *view);
+GQuark		 gsc_completion_error_quark		(void);
 
-/* ************************************************************* */
+gboolean	 gsc_completion_add_provider		(GscCompletion          *completion,
+								 GscProvider  *provider,
+								 GError                      **error);
 
-GType		 gsc_completion_get_type		(void) G_GNUC_CONST;
+gboolean	 gsc_completion_remove_provider		(GscCompletion          *completion,
+								 GscProvider  *provider,
+								 GError                      **error);
 
-GtkWidget	*gsc_completion_new			(GtkTextView *view);
+GList		*gsc_completion_get_providers		(GscCompletion         *completion,
+                                                                 const gchar                 *capabilities);
+gboolean	 gsc_completion_show			(GscCompletion         *completion,
+								 GList                       *providers,
+								 GtkTextIter                 *place);
 
-GtkTextView	*gsc_completion_get_view		(GscCompletion *self);
+void		 gsc_completion_hide			(GscCompletion         *completion);
 
-GscTrigger	*gsc_completion_get_trigger		(GscCompletion *self,
-							 const gchar *trigger_name);
+GscInfo *
+		 gsc_completion_get_info_window		(GscCompletion         *completion);
 
-GscProvider	*gsc_completion_get_provider		(GscCompletion *self,
-							 const gchar *prov_name);
-
-gboolean	 gsc_completion_register_provider	(GscCompletion *self,
-							 GscProvider *provider,
-							 GscTrigger *trigger);
-
-gboolean	 gsc_completion_unregister_provider	(GscCompletion *self,
-							 GscProvider *provider,
-							 GscTrigger *trigger);
-
-gboolean	 gsc_completion_register_trigger	(GscCompletion *self,
-							 GscTrigger *trigger);
-
-gboolean	 gsc_completion_unregister_trigger	(GscCompletion *self,
-							 GscTrigger *trigger);
-
-GscTrigger	*gsc_completion_get_active_trigger	(GscCompletion *self);
-
-gboolean	 gsc_completion_trigger_event		(GscCompletion *self,
-							 GscTrigger *trigger);
-
-void		 gsc_completion_finish_completion	(GscCompletion *self);
-
-void		 gsc_completion_filter_proposals	(GscCompletion *self,
-							 GscCompletionFilterFunc func,
-							 gpointer user_data);
-
-void		 gsc_completion_set_active 		(GscCompletion *self,
-							 gboolean active);
-
-gboolean	 gsc_completion_get_active 		(GscCompletion *self);
-
-GtkWidget	*gsc_completion_get_bottom_bar		(GscCompletion *self);
-
-GscInfo		*gsc_completion_get_info_widget		(GscCompletion *self);
-
-gint		gsc_completion_get_page_pos		(GscCompletion *self,
-							 const gchar *page_name);
-
-gint		gsc_completion_get_n_pages		(GscCompletion *self);
-
-gboolean	gsc_completion_set_page_pos		(GscCompletion *self,
-							 const gchar *page_name,
-							 gint position);
+struct _GtkSourceView *
+		 gsc_completion_get_view			(Gsc	     *completion);
 
 G_END_DECLS
 

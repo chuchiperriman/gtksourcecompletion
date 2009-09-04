@@ -116,7 +116,7 @@ autocompletion_delete_range_cb (GtkWidget *view,
 	
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
 	
-	if (GTK_WIDGET_VISIBLE (self->priv->completion) &&
+	if (GSC_WIDGET_VISIBLE (self->priv->completion) &&
 	    gsc_completion_get_active_trigger(self->priv->completion) == GSC_TRIGGER (self))
 	{
 		if (gtk_text_iter_get_line (start) != self->priv->line ||
@@ -147,7 +147,7 @@ autocompletion_insert_text_cb (GtkTextBuffer *buffer,
 	GscTriggerAutowords *self = GSC_TRIGGER_AUTOWORDS (user_data);
 	
 	/*Raise the event if completion is not visible*/
-	if (!GTK_WIDGET_VISIBLE (self->priv->completion))
+	if (!GSC_WIDGET_VISIBLE (self->priv->completion))
 	{
 		/* Prevent "paste" */
 		if (len <= 2)

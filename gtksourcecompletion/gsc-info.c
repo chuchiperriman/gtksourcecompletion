@@ -53,7 +53,7 @@ enum
 static guint signals[LAST_SIGNAL] = { 0 };
 
 /*Type definition*/
-G_DEFINE_TYPE(GscInfo, gsc_info, GTK_TYPE_WINDOW);
+G_DEFINE_TYPE(GscInfo, gsc_info, GSC_TYPE_WINDOW);
 
 #define GSC_INFO_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_INFO, GscInfoPrivate))
 #define WINDOW_WIDTH 350
@@ -112,8 +112,8 @@ adjust_resize (GscInfo *self)
 	{
 		/* Default widget */
 		get_max_size (self, self->priv->label, &w, &h);
-		w = w + 5 + GTK_WIDGET (self->priv->info_scroll)->style->ythickness * 2;
-		h = h + 5 + GTK_WIDGET (self->priv->info_scroll)->style->xthickness * 2;
+		w = w + 5 + GSC_WIDGET (self->priv->info_scroll)->style->ythickness * 2;
+		h = h + 5 + GSC_WIDGET (self->priv->info_scroll)->style->xthickness * 2;
 	}
 	else
 	{
@@ -121,7 +121,7 @@ adjust_resize (GscInfo *self)
 		get_max_size (self, self->priv->custom_widget, &w, &h);
 	}
 	
-	gtk_window_resize (GTK_WINDOW (self), w, h);
+	gtk_window_resize (GSC_WINDOW (self), w, h);
 }
 
 static void
@@ -131,9 +131,9 @@ show (GtkWidget *widget)
 	
 	g_signal_emit (self, signals[SHOW_INFO], 0);
 	
-	GTK_WIDGET_CLASS (gsc_info_parent_class)->show (GTK_WIDGET (self));
+	GSC_WIDGET_CLASS (gsc_info_parent_class)->show (GSC_WIDGET (self));
 	
-	gtk_label_select_region (GTK_LABEL (self->priv->label), 0, 0);
+	gtk_label_select_region (GSC_LABEL (self->priv->label), 0, 0);
 }
 
 static void
@@ -141,9 +141,9 @@ hide (GtkWidget *widget)
 {
 	GscInfo *self = GSC_INFO (widget);
 	
-	gtk_label_set_label (GTK_LABEL (self->priv->label), "");
+	gtk_label_set_label (GSC_LABEL (self->priv->label), "");
 	
-	GTK_WIDGET_CLASS (gsc_info_parent_class)->hide (GTK_WIDGET (self));
+	GSC_WIDGET_CLASS (gsc_info_parent_class)->hide (GSC_WIDGET (self));
 }
 
 static void
@@ -159,41 +159,41 @@ gsc_info_init (GscInfo *self)
 	/*
 	 * Make it look like a tooltip
 	 */
-	gtk_widget_set_name (GTK_WIDGET (self), "gtk-tooltip");
-	gtk_widget_ensure_style (GTK_WIDGET (self));
+	gtk_widget_set_name (GSC_WIDGET (self), "gtk-tooltip");
+	gtk_widget_ensure_style (GSC_WIDGET (self));
 	
-	gtk_window_set_type_hint (GTK_WINDOW (self),
+	gtk_window_set_type_hint (GSC_WINDOW (self),
 				  GDK_WINDOW_TYPE_HINT_NORMAL);
-	gtk_window_set_decorated (GTK_WINDOW (self), FALSE);
-	gtk_window_set_default_size (GTK_WINDOW (self),
+	gtk_window_set_decorated (GSC_WINDOW (self), FALSE);
+	gtk_window_set_default_size (GSC_WINDOW (self),
 				     WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	self->priv->info_scroll = gtk_scrolled_window_new (NULL, NULL);
 
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
-					GTK_POLICY_AUTOMATIC,
-					GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_policy (GSC_SCROLLED_WINDOW (self->priv->info_scroll),
+					GSC_POLICY_AUTOMATIC,
+					GSC_POLICY_AUTOMATIC);
 	gtk_widget_show (self->priv->info_scroll);
 
 	self->priv->label = gtk_label_new (" ");
 	/*Top left position*/
-	gtk_misc_set_alignment (GTK_MISC (self->priv->label), 0, 0.5);
-	gtk_misc_set_padding (GTK_MISC (self->priv->label), 5, 5);
-	gtk_label_set_selectable (GTK_LABEL (self->priv->label), TRUE);
+	gtk_misc_set_alignment (GSC_MISC (self->priv->label), 0, 0.5);
+	gtk_misc_set_padding (GSC_MISC (self->priv->label), 5, 5);
+	gtk_label_set_selectable (GSC_LABEL (self->priv->label), TRUE);
 	
 	gtk_widget_show (self->priv->label);
 
-	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
+	gtk_scrolled_window_add_with_viewport (GSC_SCROLLED_WINDOW (self->priv->info_scroll),
 					       self->priv->label);
 
 	self->priv->box = gtk_vbox_new (FALSE, 1);
 	
 	gtk_widget_show (self->priv->box);
-	gtk_box_pack_start (GTK_BOX (self->priv->box),
+	gtk_box_pack_start (GSC_BOX (self->priv->box),
 			    self->priv->info_scroll,
 			    TRUE, TRUE, 0);
 	
-	gtk_container_add (GTK_CONTAINER (self), 
+	gtk_container_add (GSC_CONTAINER (self), 
 			   self->priv->box);
 }
 
@@ -209,7 +209,7 @@ static void
 gsc_info_class_init (GscInfoClass *klass)
 {
 	GObjectClass* object_class = G_OBJECT_CLASS (klass);
-	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+	GtkWidgetClass *widget_class = GSC_WIDGET_CLASS (klass);
 
 	g_type_class_add_private (object_class, sizeof (GscInfoPrivate));
 
@@ -247,7 +247,7 @@ GscInfo*
 gsc_info_new (void)
 {
 	GscInfo *self = GSC_INFO (g_object_new (GSC_TYPE_INFO,
-					        "type", GTK_WINDOW_POPUP,
+					        "type", GSC_WINDOW_POPUP,
 					        NULL));
 	return self;
 }
@@ -272,24 +272,24 @@ gsc_info_move_to_cursor (GscInfo* self,
 
 	adjust_resize (self);
 	
-	gsc_get_window_position_in_cursor (GTK_WINDOW (self),
+	gsc_get_window_position_in_cursor (GSC_WINDOW (self),
 					   view,
 					   &x,
 					   &y,
 					   &resized);
 	if (resized)
 	{
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
-						GTK_POLICY_ALWAYS,
-						GTK_POLICY_ALWAYS);
+		gtk_scrolled_window_set_policy (GSC_SCROLLED_WINDOW (self->priv->info_scroll),
+						GSC_POLICY_ALWAYS,
+						GSC_POLICY_ALWAYS);
 	}
 	else
 	{
-		gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (self->priv->info_scroll),
-						GTK_POLICY_NEVER,
-						GTK_POLICY_NEVER);
+		gtk_scrolled_window_set_policy (GSC_SCROLLED_WINDOW (self->priv->info_scroll),
+						GSC_POLICY_NEVER,
+						GSC_POLICY_NEVER);
 	}
-	gtk_window_move (GTK_WINDOW (self), x, y);
+	gtk_window_move (GSC_WINDOW (self), x, y);
 }
 
 /**
@@ -307,7 +307,7 @@ gsc_info_set_markup (GscInfo* self,
 {
 	g_return_if_fail  (GSC_IS_INFO (self));
 
-	gtk_label_set_markup (GTK_LABEL (self->priv->label), markup);
+	gtk_label_set_markup (GSC_LABEL (self->priv->label), markup);
 }
 
 /**
@@ -384,11 +384,11 @@ gsc_info_set_custom (GscInfo* self,
 		
 	if (custom_widget)
 	{
-		g_return_if_fail (GTK_IS_WIDGET (custom_widget));
+		g_return_if_fail (GSC_IS_WIDGET (custom_widget));
 		
 		if (self->priv->custom_widget)
 		{
-			gtk_container_remove (GTK_CONTAINER (self->priv->box),
+			gtk_container_remove (GSC_CONTAINER (self->priv->box),
 					      self->priv->custom_widget);
 			g_object_unref (self->priv->custom_widget);
 			self->priv->custom_widget = NULL;
@@ -399,7 +399,7 @@ gsc_info_set_custom (GscInfo* self,
 		}
 		
 		self->priv->custom_widget = g_object_ref (custom_widget);
-		gtk_container_add (GTK_CONTAINER (self->priv->box),
+		gtk_container_add (GSC_CONTAINER (self->priv->box),
 				   custom_widget);
 		gtk_widget_show (self->priv->custom_widget);
 	}
@@ -408,7 +408,7 @@ gsc_info_set_custom (GscInfo* self,
 
 		if (self->priv->custom_widget)
 		{
-			gtk_container_remove (GTK_CONTAINER (self->priv->box),
+			gtk_container_remove (GSC_CONTAINER (self->priv->box),
 					      self->priv->custom_widget);
 			g_object_unref (self->priv->custom_widget);
 			self->priv->custom_widget = NULL;

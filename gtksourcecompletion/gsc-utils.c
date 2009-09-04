@@ -20,7 +20,7 @@
 
 /**
  * SECTION:gsc-utils
- * @title: Gsc Utils
+ * @title: GscCompletionUtils
  * @short_description: Useful functions
  *
  */
@@ -141,14 +141,14 @@ gsc_get_cursor_pos(GtkTextView *text_view,
 					&start,
 					&location );
 	gtk_text_view_buffer_to_window_coords (text_view,
-						GTK_TEXT_WINDOW_WIDGET,
+						GSC_TEXT_WINDOW_WIDGET,
 						location.x, 
 						location.y,
 						&win_x, 
 						&win_y);
 
 	win = gtk_text_view_get_window (text_view, 
-	                                GTK_TEXT_WINDOW_WIDGET);
+	                                GSC_TEXT_WINDOW_WIDGET);
 	gdk_window_get_origin (win, &xx, &yy);
 	
 	*x = win_x + xx;
@@ -336,8 +336,8 @@ gsc_get_window_position_center_parent(GtkWindow *window,
 				      gint *x,
 				      gint *y)
 {
-	GtkWindow *parent_win = GTK_WINDOW(gtk_widget_get_ancestor(parent,
-				GTK_TYPE_WINDOW));
+	GtkWindow *parent_win = GSC_WINDOW(gtk_widget_get_ancestor(parent,
+				GSC_TYPE_WINDOW));
 	gint w,h,px,py, pw,ph;
 	gtk_window_get_position(parent_win,&px,&py);
 	gtk_window_get_size(parent_win, &pw, &ph);
@@ -386,7 +386,7 @@ gsc_get_window_position_in_cursor(GtkWindow *window,
 	if ((*y + h) > sh)
 	{
 		PangoLayout* layout = 
-			gtk_widget_create_pango_layout(GTK_WIDGET(view), NULL);
+			gtk_widget_create_pango_layout(GSC_WIDGET(view), NULL);
 		pango_layout_get_pixel_size(layout,&xtext,&ytext);
 		ytemp = *y - ytext;
 		/* Cabe arriba? */

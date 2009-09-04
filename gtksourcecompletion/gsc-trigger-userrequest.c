@@ -78,7 +78,7 @@ view_key_press_event_cb (GtkWidget *view,
 	
 	if (s == self->priv->mod && gdk_keyval_to_lower(event->keyval) == key)
 	{
-		GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW(view));
+		GtkTextBuffer *buffer = gtk_text_view_get_buffer (GSC_TEXT_VIEW(view));
 		GtkTextMark *insert = gtk_text_buffer_get_insert(buffer);
 		GtkTextIter location;
 		gtk_text_buffer_get_iter_at_mark(buffer,&location,insert);
@@ -103,7 +103,7 @@ delete_range_cb (GtkWidget *buffer,
 	
 	GscTriggerUserRequest *self = GSC_TRIGGER_USERREQUEST (user_data);
 	
-	if (GTK_WIDGET_VISIBLE (self->priv->completion) &&
+	if (GSC_WIDGET_VISIBLE (self->priv->completion) &&
 	    gsc_completion_get_active_trigger(self->priv->completion) == GSC_TRIGGER (self))
 	{
 		if (gtk_text_iter_get_line (start) != self->priv->line ||
@@ -115,7 +115,7 @@ delete_range_cb (GtkWidget *buffer,
 		{
 			GtkTextView *view = gsc_completion_get_view (self->priv->completion);
 			/*Filter the current proposals */
-			gchar *temp = gsc_get_last_word (GTK_TEXT_VIEW (view));
+			gchar *temp = gsc_get_last_word (GSC_TEXT_VIEW (view));
 			gsc_completion_filter_proposals (self->priv->completion,
 							 filter_func,
 							 temp);
@@ -135,7 +135,7 @@ insert_text_cb (GtkTextBuffer *buffer,
 	GscTriggerUserRequest *self = GSC_TRIGGER_USERREQUEST (user_data);
 	
 	/*Raise the event if completion is not visible*/
-	if (GTK_WIDGET_VISIBLE (self->priv->completion))
+	if (GSC_WIDGET_VISIBLE (self->priv->completion))
 	{
 		/*If completion is visible, filter the content if the trigger si autowords*/
 		if (gsc_completion_get_active_trigger(self->priv->completion) == GSC_TRIGGER (self))
@@ -175,7 +175,7 @@ gsc_trigger_userrequest_real_activate (GscTrigger* base)
 	view = gsc_completion_get_view (self->priv->completion);
 	buffer = gtk_text_view_get_buffer (view);
 	
-	g_assert (GTK_IS_TEXT_VIEW (view));
+	g_assert (GSC_IS_TEXT_VIEW (view));
 	
 	self->priv->kp_handler = g_signal_connect (view,
 					       "key-press-event",

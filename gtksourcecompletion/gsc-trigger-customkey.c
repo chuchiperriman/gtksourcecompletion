@@ -40,7 +40,7 @@
 /* User request signals */
 enum
 {
-	CKP_GTK_TEXT_VIEW_KP,
+	CKP_GSC_TEXT_VIEW_KP,
 	LAST_SIGNAL
 };
 
@@ -96,9 +96,9 @@ gsc_trigger_customkey_real_activate (GscTrigger* base)
 	GtkTextView *view;
 
 	view = gsc_completion_get_view (self->priv->completion);
-	g_assert (GTK_IS_TEXT_VIEW (view));
+	g_assert (GSC_IS_TEXT_VIEW (view));
 	
-	self->priv->signals[CKP_GTK_TEXT_VIEW_KP] =  
+	self->priv->signals[CKP_GSC_TEXT_VIEW_KP] =  
 			g_signal_connect_data (view,
 					       "key-press-event",
 					       G_CALLBACK (view_key_press_event_cb),
@@ -117,7 +117,7 @@ gsc_trigger_customkey_real_deactivate (GscTrigger* base)
 	view = gsc_completion_get_view (self->priv->completion);
 	
 	g_signal_handler_disconnect (view,
-				     self->priv->signals[CKP_GTK_TEXT_VIEW_KP]);
+				     self->priv->signals[CKP_GSC_TEXT_VIEW_KP]);
 	
 	return FALSE;
 }

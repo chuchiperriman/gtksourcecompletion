@@ -17,8 +17,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef GTK_SNIPPETS_GSV_UTILS_H
-#define GTK_SNIPPETS_GSV_UTILS_H
+#ifndef GSC_SNIPPETS_GSV_UTILS_H
+#define GSC_SNIPPETS_GSV_UTILS_H
 
 #include <gtk/gtk.h>
 
