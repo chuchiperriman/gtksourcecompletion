@@ -20,12 +20,8 @@ BUILT_SOURCES =		\
 
 libgtksourcecompletion_headers = 	\
 	gsc-provider.h			\
-	gsc-trigger.h			\
 	gsc-utils.h			\
 	gsc-proposal.h			\
-	gsc-trigger-customkey.h		\
-	gsc-trigger-userrequest.h	\
-	gsc-trigger-autowords.h		\
 	gsc-i18n.h			\
 	gsc-completion.h		\
 	gsc-completion-priv.h		\
@@ -34,12 +30,8 @@ libgtksourcecompletion_headers = 	\
 libgtksourcecompletion_2_0_la_SOURCES = \
 	$(BUILT_SOURCES)		\
 	gsc-provider.c			\
-	gsc-trigger.c			\
 	gsc-utils.c			\
 	gsc-proposal.c			\
-	gsc-trigger-customkey.c		\
-	gsc-trigger-userrequest.c	\
-	gsc-trigger-autowords.c		\
 	gsc-completion.c		\
 	gsc-info.c			\
 	$(libgtksourcecompletion_headers)
@@ -54,12 +46,8 @@ libgtksourcecompletion_2_0_la_LDFLAGS = \
 
 INST_H_FILES = \
 	gsc-provider.h			\
-	gsc-trigger.h			\
 	gsc-utils.h			\
 	gsc-proposal.h			\
-	gsc-trigger-customkey.h		\
-	gsc-trigger-userrequest.h	\
-	gsc-trigger-autowords.h		\
 	gsc-providers.h			\
 	gsc-tree.h			\
 	gsc-i18n.h			\

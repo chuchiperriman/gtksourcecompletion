@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*- 
- * gtksourcecompletioncontext.h
+ * gsccontext.h
  * 
  * Copyright  (C)  2009  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
  * 
@@ -26,32 +26,32 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_SOURCE_COMPLETION_CONTEXT                              \
+#define GTK_TYPE_SOURCE_COMPLETION_CONTEXT                              \
    (gsc_completion_context_get_type())
 #define GSC_COMPLETION_CONTEXT(obj)                              \
    (G_TYPE_CHECK_INSTANCE_CAST ((obj),                                  \
-                                GSC_TYPE_SOURCE_COMPLETION_CONTEXT,     \
+                                GTK_TYPE_SOURCE_COMPLETION_CONTEXT,     \
                                 GscContext))
 #define GSC_COMPLETION_CONTEXT_CLASS(klass)                      \
    (G_TYPE_CHECK_CLASS_CAST ((klass),                                   \
-                             GSC_TYPE_SOURCE_COMPLETION_CONTEXT,        \
+                             GTK_TYPE_SOURCE_COMPLETION_CONTEXT,        \
                              GscContextClass))
-#define GSC_IS_SOURCE_COMPLETION_CONTEXT(obj)                           \
+#define GTK_IS_SOURCE_COMPLETION_CONTEXT(obj)                           \
    (G_TYPE_CHECK_INSTANCE_TYPE ((obj),                                  \
-                                GSC_TYPE_SOURCE_COMPLETION_CONTEXT))
-#define GSC_IS_SOURCE_COMPLETION_CONTEXT_CLASS(klass)                   \
+                                GTK_TYPE_SOURCE_COMPLETION_CONTEXT))
+#define GTK_IS_SOURCE_COMPLETION_CONTEXT_CLASS(klass)                   \
    (G_TYPE_CHECK_CLASS_TYPE ((klass),                                   \
-                             GSC_TYPE_SOURCE_COMPLETION_CONTEXT))
+                             GTK_TYPE_SOURCE_COMPLETION_CONTEXT))
 #define GSC_COMPLETION_CONTEXT_GET_CLASS(obj)                    \
    (G_TYPE_INSTANCE_GET_CLASS ((obj),                                   \
-                               GSC_TYPE_SOURCE_COMPLETION_CONTEXT,      \
+                               GTK_TYPE_SOURCE_COMPLETION_CONTEXT,      \
                                GscContextClass))
 
 typedef struct _GscContextPrivate GscContextPrivate;
 typedef struct _GscContext      GscContext;
 typedef struct _GscContextClass GscContextClass;
 
-#include "gtksourcecompletionmodel.h"
+#include "gsc-model.h"
 
 struct _GscContextClass
 {

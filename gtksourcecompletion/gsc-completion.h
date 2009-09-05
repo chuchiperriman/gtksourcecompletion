@@ -1,6 +1,6 @@
 /*
- * gtksourcecompletion.h
- * This file is part of gtksourcecompletion
+ * gsc.h
+ * This file is part of gsc
  *
  * Copyright (C) 2007 -2009 Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
  *
@@ -24,44 +24,44 @@
 #define GSC_COMPLETION_H
 
 #include <gtk/gtk.h>
-#include <gtksourceview/gtksourcecompletioninfo.h>
-#include <gtksourceview/gtksourcecompletionprovider.h>
+#include "gsc-info.h"
+#include "gsc-provider.h"
 
 G_BEGIN_DECLS
 
 /*
  * Type checking and casting macros
  */
-#define GSC_TYPE_SOURCE_COMPLETION              (gsc_completion_get_type())
-#define GSC_COMPLETION(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GSC_TYPE_SOURCE_COMPLETION, Gsc))
-#define GSC_COMPLETION_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GSC_TYPE_SOURCE_COMPLETION, GscClass))
-#define GSC_IS_SOURCE_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GSC_TYPE_SOURCE_COMPLETION))
-#define GSC_IS_SOURCE_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_SOURCE_COMPLETION))
-#define GSC_COMPLETION_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_SOURCE_COMPLETION, GscClass))
+#define GTK_TYPE_SOURCE_COMPLETION              (gsc_completion_get_type())
+#define GSC_COMPLETION(obj)              (G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_SOURCE_COMPLETION, GscCompletion))
+#define GSC_COMPLETION_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_SOURCE_COMPLETION, GscCompletionClass))
+#define GTK_IS_SOURCE_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_SOURCE_COMPLETION))
+#define GTK_IS_SOURCE_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION))
+#define GSC_COMPLETION_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_SOURCE_COMPLETION, GscCompletionClass))
 
 #define GSC_COMPLETION_ERROR		(gsc_completion_error_quark ())
 
-typedef struct _GscPrivate GscPrivate;
-typedef struct _GscCompletion Gsc;
-typedef struct _GscClass GscClass;
+typedef struct _GscCompletionPrivate GscCompletionPrivate;
+typedef struct _GscCompletion GscCompletion;
+typedef struct _GscCompletionClass GscCompletionClass;
 
 typedef enum
 {
 	GSC_COMPLETION_ERROR_ALREADY_BOUND = 0,
 	GSC_COMPLETION_ERROR_NOT_BOUND,
-} GscError;
+} GscCompletionError;
 
 /* Forward declaration of GtkSourceView */
 struct _GtkSourceView;
 
-struct _Gsc
+struct _GscCompletion
 {
 	GObject parent;
 
-	GscPrivate *priv;
+	GscCompletionPrivate *priv;
 };
 
-struct _GscClass
+struct _GscCompletionClass
 {
 	GObjectClass parent_class;
 
@@ -96,7 +96,7 @@ GscInfo *
 		 gsc_completion_get_info_window		(GscCompletion         *completion);
 
 struct _GtkSourceView *
-		 gsc_completion_get_view			(Gsc	     *completion);
+		 gsc_completion_get_view			(GscCompletion	     *completion);
 
 G_END_DECLS
 

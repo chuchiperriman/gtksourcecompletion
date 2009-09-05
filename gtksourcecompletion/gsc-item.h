@@ -1,6 +1,6 @@
 /*
- * gtksourcecompletionitem.h
- * This file is part of gtksourcecompletion
+ * gscitem.h
+ * This file is part of gsc
  *
  * Copyright (C) 2009 - Jesse van den Kieboom
  *
@@ -24,17 +24,17 @@
 #define __GSC_COMPLETION_ITEM_H__
 
 #include <glib-object.h>
-#include <gtksourceview/gtksourcecompletionproposal.h>
+#include "gsc-proposal.h"
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_SOURCE_COMPLETION_ITEM			(gsc_completion_item_get_type ())
-#define GSC_COMPLETION_ITEM(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_SOURCE_COMPLETION_ITEM, GscItem))
-#define GSC_COMPLETION_ITEM_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_SOURCE_COMPLETION_ITEM, GscItem const))
-#define GSC_COMPLETION_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_SOURCE_COMPLETION_ITEM, GscItemClass))
-#define GSC_IS_SOURCE_COMPLETION_ITEM(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_SOURCE_COMPLETION_ITEM))
-#define GSC_IS_SOURCE_COMPLETION_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_SOURCE_COMPLETION_ITEM))
-#define GSC_COMPLETION_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_SOURCE_COMPLETION_ITEM, GscItemClass))
+#define GTK_TYPE_SOURCE_COMPLETION_ITEM			(gsc_completion_item_get_type ())
+#define GSC_COMPLETION_ITEM(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_SOURCE_COMPLETION_ITEM, GscItem))
+#define GSC_COMPLETION_ITEM_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_SOURCE_COMPLETION_ITEM, GscItem const))
+#define GSC_COMPLETION_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_SOURCE_COMPLETION_ITEM, GscItemClass))
+#define GTK_IS_SOURCE_COMPLETION_ITEM(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_SOURCE_COMPLETION_ITEM))
+#define GTK_IS_SOURCE_COMPLETION_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION_ITEM))
+#define GSC_COMPLETION_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_SOURCE_COMPLETION_ITEM, GscItemClass))
 
 typedef struct _GscItem		GscItem;
 typedef struct _GscItemClass	GscItemClass;

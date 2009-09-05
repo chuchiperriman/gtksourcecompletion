@@ -1,21 +1,23 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*-
- *  gsc-utils.c
+/*
+ * gscutils.c
+ * This file is part of gsc
  *
- *  Copyright (C) 2007 - Chuchiperriman <chuchiperriman@gmail.com>
+ * Copyright (C) 2007 -2009 Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, 
+ * Boston, MA 02111-1307, USA.
  */
 
 /**
@@ -28,10 +30,19 @@
 #include <string.h> 
 #include "gsc-utils.h"
 
+/**
+ * gsc_utils_char_is_separator:
+ * @ch: The character to check
+ *
+ * A separator is a character like (, an space etc. An _ is not a separator
+ *
+ * Returns TRUE if the ch is a separator
+ */
 gboolean
-gsc_char_is_separator(const gunichar ch)
+gsc_completion_utils_is_separator(const gunichar ch)
 {
-	if (g_unichar_isprint(ch) && (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
+	if (g_unichar_isprint(ch) && 
+	    (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
 	{
 		return FALSE;
 	}
@@ -39,391 +50,340 @@ gsc_char_is_separator(const gunichar ch)
 	return TRUE;
 }
 
-gchar*
-gsc_get_last_word_and_iter(GtkTextView *text_view, 
-			   GtkTextIter *start_word, 
-			   GtkTextIter *end_word)
+/**
+ * gsc_completion_utils_get_word_iter:
+ *
+ * @source_buffer: The #GtkSourceBuffer
+ * @start_word: if != NULL then assign it the start position of the word
+ * @end_word: if != NULL then assing it the end position of the word
+ * 
+ * Returns: the current word
+ *
+ */
+gchar *
+gsc_completion_utils_get_word_iter (GtkSourceBuffer *source_buffer, 
+                                           GtkTextIter     *current,
+					   GtkTextIter     *start_word, 
+					   GtkTextIter     *end_word)
 {
-	GtkTextMark* insert_mark;
-	GtkTextBuffer* text_buffer;
-	GtkTextIter actual,temp;
-	GtkTextIter *start_iter;
-	gchar* text;
+	GtkTextBuffer *text_buffer;
 	gunichar ch;
-	gboolean found, no_doc_start;
+	gboolean no_doc_start;
 	
-	if (start_word != NULL)
+	text_buffer = GTK_TEXT_BUFFER (source_buffer);
+	
+	if (current == NULL)
 	{
-		start_iter = start_word;
+		gtk_text_buffer_get_iter_at_mark (text_buffer,
+		                                  start_word,
+		                                  gtk_text_buffer_get_insert (text_buffer));
 	}
 	else
 	{
-		start_iter = &temp;
+		*start_word = *current;
 	}
 	
-	text_buffer = gtk_text_view_get_buffer(text_view);
-	insert_mark = gtk_text_buffer_get_insert(text_buffer);
-	gtk_text_buffer_get_iter_at_mark(text_buffer,&actual,insert_mark);
-	
-	*start_iter = actual;
-	if (end_word!=NULL)
+	*end_word = *start_word;
+
+	while ((no_doc_start = gtk_text_iter_backward_char (start_word)) == TRUE)
 	{
-		*end_word = actual;
-	}
-	
-	found = FALSE;
-	while ((no_doc_start = gtk_text_iter_backward_char(start_iter)) == TRUE)
-	{
-		ch = gtk_text_iter_get_char(start_iter);
-		if (gsc_char_is_separator(ch))
+		ch = gtk_text_iter_get_char (start_word);
+
+		if (gsc_completion_utils_is_separator (ch))
 		{
-			found = TRUE;
 			break;
 		}
 	}
 	
 	if (!no_doc_start)
 	{
-		gtk_text_buffer_get_start_iter(text_buffer,start_iter);
-		text = gtk_text_iter_get_text (start_iter, &actual);
+		gtk_text_buffer_get_start_iter (text_buffer, start_word);
+		return gtk_text_iter_get_text (start_word, end_word);
 	}
 	else
 	{
-	
-		if (found)
-		{
-			gtk_text_iter_forward_char(start_iter);
-			text = gtk_text_iter_get_text (start_iter, &actual);
-		}
-		else
-		{
-			*start_iter = actual;
-			/*FIXME dup this var?*/
-			text = "";
-		}
+		gtk_text_iter_forward_char (start_word);
+		return gtk_text_iter_get_text (start_word, end_word);
 	}
+}
+
+/**
+ * gsc_completion_utils_get_word:
+ * @source_buffer: The #GtkSourceBuffer
+ *
+ * Returns: the current word
+ */
+gchar *
+gsc_completion_utils_get_word (GtkSourceBuffer *source_buffer)
+{
+	GtkTextIter start;
+	GtkTextIter end;
 	
-	return text;
+	return gsc_completion_utils_get_word_iter (source_buffer, NULL, &start, &end);
 }
 
-gchar*
-gsc_get_last_word(GtkTextView *text_view)
-{
-	return gsc_get_last_word_and_iter(text_view, NULL, NULL);
-}
-
-gchar*
-gsc_get_last_word_cleaned(GtkTextView *view)
-{
-	gchar *word = gsc_get_last_word_and_iter(view, NULL, NULL);
-	gchar *clean_word = gsc_clear_word(word);
-	g_free(word);
-	return clean_word;
-}
-
-void
-gsc_get_cursor_pos(GtkTextView *text_view, 
-		   gint *x, 
-		   gint *y)
+static void
+get_iter_pos (GtkSourceView *source_view, 
+              GtkTextIter   *iter,
+              gint          *x,
+              gint          *y,
+              gint          *height)
 {
 	GdkWindow *win;
-	GtkTextMark* insert_mark;
-	GtkTextBuffer* text_buffer;
-	GtkTextIter start;
+	GtkTextView *text_view;
 	GdkRectangle location;
-	gint win_x, win_y;
-	gint xx, yy;
+	gint win_x;
+	gint win_y;
+	gint xx;
+	gint yy;
 
-	text_buffer = gtk_text_view_get_buffer(text_view);
-	insert_mark = gtk_text_buffer_get_insert(text_buffer);
-	gtk_text_buffer_get_iter_at_mark(text_buffer,&start,insert_mark);
-	gtk_text_view_get_iter_location(text_view,
-					&start,
-					&location );
+	text_view = GTK_TEXT_VIEW (source_view);
+	
+	gtk_text_view_get_iter_location (text_view, iter, &location);
+
 	gtk_text_view_buffer_to_window_coords (text_view,
-						GSC_TEXT_WINDOW_WIDGET,
-						location.x, 
-						location.y,
-						&win_x, 
-						&win_y);
+					       GTK_TEXT_WINDOW_WIDGET,
+					       location.x, 
+					       location.y,
+					       &win_x, 
+					       &win_y);
 
-	win = gtk_text_view_get_window (text_view, 
-	                                GSC_TEXT_WINDOW_WIDGET);
+	win = gtk_text_view_get_window (text_view, GTK_TEXT_WINDOW_WIDGET);
 	gdk_window_get_origin (win, &xx, &yy);
 	
 	*x = win_x + xx;
 	*y = win_y + yy + location.height;
-}
-
-gchar*
-gsc_gsv_get_text(GtkTextView *text_view)
-{
-	GtkTextIter start, end;
-	GtkTextBuffer *buffer;
-	
-	buffer = gtk_text_view_get_buffer(text_view);
-	gtk_text_buffer_get_start_iter (buffer, &start);
-	gtk_text_buffer_get_end_iter (buffer, &end);
-	return gtk_text_buffer_get_text(buffer,&start,&end,FALSE);
-	
+	*height = location.height;
 }
 
 void
-gsc_replace_actual_word(GtkTextView *text_view, 
-			const gchar* text)
+gsc_completion_utils_replace_word (GtkSourceBuffer *source_buffer,
+					  GtkTextIter     *iter,
+					  const gchar     *text,
+					  gint             len)
 {
 	GtkTextBuffer *buffer;
-	GtkTextIter word_start, word_end;
-	
-	buffer = gtk_text_view_get_buffer(text_view);
-	gtk_text_buffer_begin_user_action(buffer);
-	
-	gsc_get_last_word_and_iter(text_view,&word_start, &word_end);
+	gchar *word;
+	GtkTextIter word_start;
+	GtkTextIter word_end;
+	GtkTextMark *mark;
 
-	GtkTextMark *mark = gtk_text_buffer_create_mark(buffer,
-							"temp_replace",
-							&word_start,
-							TRUE);
-	gtk_text_buffer_delete(buffer,&word_start,&word_end);
-	gtk_text_buffer_get_iter_at_mark(buffer,&word_start,mark);
-	gtk_text_buffer_insert(buffer, &word_start, text,-1);
-	gtk_text_buffer_delete_mark(buffer,mark);
-	gtk_text_buffer_end_user_action(buffer);
-}
-
-gchar*
-gsc_clear_word(const gchar* word)
-{
-	int len = g_utf8_strlen(word,-1);
-	int i;
-	const gchar *temp = word;
+	g_return_if_fail (GTK_IS_SOURCE_BUFFER (source_buffer));
 	
-	for (i=0;i<len;i++)
+	buffer = GTK_TEXT_BUFFER (source_buffer);
+	gtk_text_buffer_begin_user_action (buffer);
+	
+	mark = gtk_text_buffer_create_mark (buffer, NULL, iter, TRUE);
+	word = gsc_completion_utils_get_word_iter (source_buffer, iter, &word_start, &word_end);
+	g_free (word);
+
+	gtk_text_buffer_delete (buffer, &word_start, &word_end);
+	
+	if (text != NULL)
 	{
-		if (gsc_char_is_separator(g_utf8_get_char(temp)))
-			temp = g_utf8_next_char(temp);
-		else
-			return g_strdup(temp);
-		
+		gtk_text_buffer_insert (buffer, &word_start, text, len);
 	}
-	return NULL;
+
+	/* Reinitialize iter */
+	gtk_text_buffer_get_iter_at_mark (buffer, iter, mark);
+	gtk_text_buffer_delete_mark (buffer, mark);
+	gtk_text_buffer_end_user_action (buffer);
 }
 
-gchar *
-gsc_compute_line_indentation (GtkTextView *view,
-			      GtkTextIter *cur)
+/**
+ * gsc_utils_view_replace_current_word:
+ * @source_buffer: The #GtkSourceBuffer
+ * @text: The text to be inserted instead of the current word
+ * 
+ * Replaces the current word in the #GtkSourceBuffer with the new word
+ *
+ */
+void
+gsc_completion_utils_replace_current_word (GtkSourceBuffer *source_buffer, 
+						  const gchar     *text,
+						  gint             len)
 {
-	GtkTextIter start;
-	GtkTextIter end;
+	GtkTextIter iter;
+	GtkTextMark *mark;
+	
+	g_return_if_fail (GTK_IS_SOURCE_BUFFER (source_buffer));
 
-	gunichar ch;
-	gint line;
+	mark = gtk_text_buffer_get_insert (GTK_TEXT_BUFFER (source_buffer));
+	gtk_text_buffer_get_iter_at_mark (GTK_TEXT_BUFFER (source_buffer),
+	                                  &iter,
+	                                  mark);
 
-	line = gtk_text_iter_get_line (cur);
+	gsc_completion_utils_replace_word (source_buffer,
+	                                          &iter,
+	                                          text,
+	                                          len);
+}
 
-	gtk_text_buffer_get_iter_at_line (gtk_text_view_get_buffer (view),
-					  &start,
-					  line);
-
-	end = start;
-
-	ch = gtk_text_iter_get_char (&end);
-
-	while (g_unichar_isspace (ch) &&
-	       (ch != '\n') &&
-	       (ch != '\r') &&
-	       (gtk_text_iter_compare (&end, cur) < 0))
+static void
+compensate_for_gravity (GtkWindow *window,
+                        gint      *x,
+                        gint      *y,
+                        gint      w,
+                        gint      h)
+{
+	GdkGravity gravity;
+	
+	gravity = gtk_window_get_gravity (window);
+	
+	/* Horizontal */
+	switch (gravity)
 	{
-		if (!gtk_text_iter_forward_char (&end))
+		case GDK_GRAVITY_NORTH:
+		case GDK_GRAVITY_SOUTH:
+		case GDK_GRAVITY_CENTER:
+			*x = w / 2;
 			break;
-
-		ch = gtk_text_iter_get_char (&end);
+		case GDK_GRAVITY_NORTH_EAST:
+		case GDK_GRAVITY_SOUTH_EAST:
+		case GDK_GRAVITY_EAST:
+			*x = w;
+			break;
+		default:
+			*x = 0;
+			break;
 	}
-
-	if (gtk_text_iter_equal (&start, &end))
-		return NULL;
-
-	return gtk_text_iter_get_slice (&start, &end);
+	
+	/* Vertical */
+	switch (gravity)
+	{
+		case GDK_GRAVITY_WEST:
+		case GDK_GRAVITY_CENTER:
+		case GDK_GRAVITY_EAST:
+			*y = w / 2;
+			break;
+		case GDK_GRAVITY_SOUTH_EAST:
+		case GDK_GRAVITY_SOUTH:
+		case GDK_GRAVITY_SOUTH_WEST:
+			*y = w;
+			break;
+		default:
+			*y = 0;
+			break;
+	}
 }
 
-gchar*
-gsc_get_text_with_indent(const gchar* content,gchar *indent)
+static void
+move_overlap (gint     *x,
+              gint     *y,
+              gint      w,
+              gint      h,
+              gint      oy,
+              gint      cx,
+              gint      cy,
+              gint      line_height,
+              gboolean  move_up)
 {
-	GString *fin = NULL;
-	gchar *ret = NULL;
-	gint len = strlen(content);
-	gint i;
-	gint last_line = 0;
-	for (i=0;i < len;i++)
+	/* Test if there is overlap */
+	if (*y - cy < oy && *y - cy + h > oy - line_height)
 	{
-		if (content[i] == '\n' || content[i] =='\r')
+		if (move_up)
 		{
-			if (fin==NULL)
-				fin = g_string_new_len(content,i+1);
-			else
-			{
-				fin = g_string_append_len(fin,
-							  &content[last_line+1],
-							  i - last_line);
-			}
-			fin = g_string_append(fin,indent);
-			last_line = i;
+			*y = oy - line_height - h + cy;
+		}
+		else
+		{
+			*y = oy + cy;
 		}
 	}
-	if (fin==NULL)
-		ret = g_strdup(content);
+}
+
+/**
+ * gsc_completion_utils_move_to_iter:
+ * @window: the #GtkWindow to move
+ * @view: the view 
+ * @iter: the iter to move @window to
+ *
+ */
+void
+gsc_completion_utils_move_to_iter (GtkWindow     *window,
+					  GtkSourceView *view,
+					  GtkTextIter   *iter)
+{
+	gint x;
+	gint y;
+	gint w;
+	gint h;
+	gint cx;
+	gint cy;
+	gint oy;
+	gint height;
+	GdkScreen *screen;
+	gboolean overlapup;
+
+	gint sw = gdk_screen_width();
+	gint sh = gdk_screen_height();
+	
+	if (window != NULL)
+	{
+		screen = gtk_window_get_screen (window);
+	}
 	else
 	{
-		if (last_line < len -1)
-		{
-			fin = g_string_append_len(fin,
-						  &content[last_line+1],
-						  len - last_line);
-		}
-		ret = g_string_free(fin,FALSE);
+		screen = gdk_screen_get_default ();
 	}
-	return ret;
-}
-
-
-void
-gsc_insert_text_with_indent(GtkTextView *view, const gchar* text)
-{
-	GtkTextBuffer * buffer = gtk_text_view_get_buffer(view);
-	GtkTextMark *insert = gtk_text_buffer_get_insert(buffer);
-	GtkTextIter cur;
-	gtk_text_buffer_get_iter_at_mark(buffer,&cur,insert);
-	gchar *indent = gsc_compute_line_indentation(view,&cur);
-	gchar *indent_text = gsc_get_text_with_indent(text, indent);
-	g_free(indent);
-	gtk_text_buffer_insert_at_cursor(buffer,indent_text,-1);
-	g_free(indent_text);
-	gtk_text_view_scroll_mark_onscreen(view,insert);
-}
-
-gboolean
-gsc_is_valid_word(gchar *current_word, gchar *completion_word)
-{
-	if (completion_word==NULL)
-		return FALSE;
-	if (current_word==NULL)
-		return TRUE;
 	
-	gint len_cur = g_utf8_strlen (current_word,-1);
-	if (g_utf8_collate(current_word,completion_word) == 0)
-		return FALSE;
+	sw = gdk_screen_get_width (screen);
+	sh = gdk_screen_get_height (screen);
 
-	if (len_cur!=0 && strncmp(current_word,completion_word,len_cur)==0)
-		return TRUE;
-
-	return FALSE;
-}
-
-void
-gsc_get_window_position_center_screen(GtkWindow *window, gint *x, gint *y)
-{
-	gint w,h;
-	gint sw = gdk_screen_width();
-	gint sh = gdk_screen_height();
-	gtk_window_get_size(window, &w, &h);
-	*x = (sw/2) - (w/2) - 20;
-	*y = (sh/2) - (h/2);
-}
-
-void
-gsc_get_window_position_center_parent(GtkWindow *window,
-				      GtkWidget *parent,
-				      gint *x,
-				      gint *y)
-{
-	GtkWindow *parent_win = GSC_WINDOW(gtk_widget_get_ancestor(parent,
-				GSC_TYPE_WINDOW));
-	gint w,h,px,py, pw,ph;
-	gtk_window_get_position(parent_win,&px,&py);
-	gtk_window_get_size(parent_win, &pw, &ph);
-	gtk_window_get_size(window, &w, &h);
+	get_iter_pos (view, iter, &x, &y, &height);
+	gtk_window_get_size (window, &w, &h);
 	
-	*x = px + ((pw/2) - (w/2) -20);
-	*y = py + ((ph/2) - (h/2));
-}
+	oy = y;
+	compensate_for_gravity (window, &cx, &cy, w, h);
 
-gboolean 
-gsc_get_window_position_in_cursor(GtkWindow *window,
-				  GtkTextView *view,
-				  gint *x,
-				  gint *y,
-				  gboolean *resized)
-{
-	gint w, h, xtext, ytext, ytemp;
-	gint sw = gdk_screen_width();
-	gint sh = gdk_screen_height();
-	gboolean resize = FALSE;
-	gboolean up = FALSE;
-	gsc_get_cursor_pos(view,x,y);
-	
-	gtk_window_get_size(window, &w, &h);
-	
-	/* Processing x position and width */
-	if (w > (sw - 8))
+	/* Push window inside screen */
+	if (x - cx + w > sw)
 	{
-		/* Resize to view all the window */
-		resize = TRUE;
-		w = sw -8;
+		x = (sw - w) + cx;
 	}
-	
-	/* Move position to view all the window */
-	if ((*x + w) > (sw - 4))
+	else if (x - cx < 0)
 	{
-		*x = sw - w -4;
+		x = cx;
 	}
 
-	/* Processing y position and height */
-	
-	/* 
-	If we cannot show it down, we show it up and if we cannot show it up, we
-	show the window at the largest position 
-	*/
-	if ((*y + h) > sh)
+	if (y - cy + h > sh)
 	{
-		PangoLayout* layout = 
-			gtk_widget_create_pango_layout(GSC_WIDGET(view), NULL);
-		pango_layout_get_pixel_size(layout,&xtext,&ytext);
-		ytemp = *y - ytext;
-		/* Cabe arriba? */
-		if ((ytemp - h) >= 4)
-		{
-			*y = ytemp - h;
-			up = TRUE;
-		}
-		else
-		{
-			/* 
-			Si no cabe arriba, lo ponemos donde haya más espacio
-			y redimensionamos la ventana
-			*/
-			if ((sh - *y) > ytemp)
-			{
-				h = sh - *y - 4;
-			}
-			else
-			{
-				*y = 4;
-				h = ytemp -4;
-				up = TRUE;
-			}
-			resize = TRUE;
-		}
-		g_object_unref(layout);
+		y = (sh - h) + cy;
+		overlapup = TRUE;
+	}
+	else if (y - cy < 0)
+	{
+		y = cy;
+		overlapup = FALSE;
+	}
+	else
+	{
+		overlapup = TRUE;
 	}
 	
-	if (resize)
-		gtk_window_resize(window, w, h);
-
-	if (resized != NULL)
-		*resized = resize;
+	/* Make sure that text is still readable */
+	move_overlap (&x, &y, w, h, oy, cx, cy, height, overlapup);
 	
-	return up;
+	gtk_window_move (window, x, y);
 }
 
-
-
+/**
+ * gsc_completion_utils_get_pos_at_cursor:
+ * @window: the #GtkWindow to move
+ * @view: the view 
+ *
+ */
+void 
+gsc_completion_utils_move_to_cursor (GtkWindow     *window,
+					    GtkSourceView *view)
+{
+	GtkTextBuffer *buffer;
+	GtkTextIter insert;
+	
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+	gtk_text_buffer_get_iter_at_mark (buffer, &insert, gtk_text_buffer_get_insert (buffer));
+	
+	gsc_completion_utils_move_to_iter (window,
+	                                          view,
+	                                          &insert);
+}

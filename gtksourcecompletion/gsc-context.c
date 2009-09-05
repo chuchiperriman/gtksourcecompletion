@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*- 
- * gtksourcecompletioncontext.c
+ * gsccontext.c
  * 
  * Copyright  (C)  2009  Jesús Barbero Rodríguez <chuchiperriman@gmail.com>
  * 
@@ -20,12 +20,12 @@
  * 
  */
 
-#include "gtksourcecompletioncontext.h"
-#include "gtksourcecompletionutils.h"
-#include "gtksourceview-marshal.h"
+#include "gsc-context.h"
+#include "gsc-utils.h"
+#include "gsc-marshal.h"
 
 #define GSC_COMPLETION_CONTEXT_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), \
-										       GSC_TYPE_SOURCE_COMPLETION_CONTEXT, \
+										       GTK_TYPE_SOURCE_COMPLETION_CONTEXT, \
 										       GscContextPrivate))
 
 static void gsc_completion_context_finalize (GObject *object);
@@ -144,14 +144,14 @@ update_criteria (GscContext	*context)
 {
 	GtkTextBuffer 	*buffer;
 
-	buffer = gtk_text_view_get_buffer (GSC_TEXT_VIEW (context->priv->view));
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (context->priv->view));
 	gtk_text_buffer_get_iter_at_mark (buffer,
 	                                  &(context->priv->iter),
 	                                  gtk_text_buffer_get_insert (buffer));
 	
 	g_free (context->priv->criteria);
         context->priv->criteria =
-                gsc_completion_utils_get_word (GSC_SOURCE_BUFFER (gtk_text_view_get_buffer (context->priv->view)));
+                gsc_completion_utils_get_word (GTK_SOURCE_BUFFER (gtk_text_view_get_buffer (context->priv->view)));
 }
 
 GscContext*
@@ -164,10 +164,10 @@ gsc_completion_context_new (GscModel	*model,
 	ProviderInfo *pinfo;
 
 	g_return_val_if_fail (providers != NULL, NULL);
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_MODEL (model), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), NULL);
 	g_return_val_if_fail (GSC_IS_TEXT_VIEW (view), NULL);
 	
-	context = g_object_new (GSC_TYPE_SOURCE_COMPLETION_CONTEXT, NULL);
+	context = g_object_new (GTK_TYPE_SOURCE_COMPLETION_CONTEXT, NULL);
 	context->priv->model = model;
 	context->priv->view = view;
 	for (l = providers; l != NULL; l = g_list_next (l))
@@ -191,8 +191,8 @@ gsc_completion_context_add_proposals (GscContext		*context,
 	GList *item;
 	GscProposal *proposal;
 
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context));
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_PROVIDER (provider));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider));
 	g_return_if_fail (!context->priv->invalidated);
 
 	pinfo = (ProviderInfo*)g_hash_table_lookup (context->priv->pinfo_table, provider);
@@ -229,7 +229,7 @@ gsc_completion_context_add_proposals (GscContext		*context,
 		{
 			for (item = proposals; item; item = g_list_next (item))
 			{
-				if (GSC_IS_SOURCE_COMPLETION_PROPOSAL (item->data))
+				if (GTK_IS_SOURCE_COMPLETION_PROPOSAL (item->data))
 				{
 					proposal = GSC_COMPLETION_PROPOSAL (item->data);
 					gsc_completion_model_append (context->priv->model,
@@ -248,7 +248,7 @@ gsc_completion_context_add_proposals (GscContext		*context,
 void
 gsc_completion_context_finish (GscContext	*context)
 {
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context));
 	g_return_if_fail (!context->priv->invalidated);
 
 	g_signal_emit (context, signals[FINISHED], 0);
@@ -258,7 +258,7 @@ gsc_completion_context_finish (GscContext	*context)
 GtkTextView*
 gsc_completion_context_get_view (GscContext	*context)
 {
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT(context), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT(context), NULL);
 
 	return context->priv->view;
 }
@@ -267,7 +267,7 @@ void
 gsc_completion_context_get_iter (GscContext	*context,
 					GtkTextIter *iter)
 {
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT(context));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT(context));
 
 	*iter = context->priv->iter;
 }
@@ -283,7 +283,7 @@ gsc_completion_context_get_iter (GscContext	*context,
 gchar*
 gsc_completion_context_get_criteria (GscContext	*context)
 {
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT(context), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT(context), NULL);
 
 	return context->priv->criteria;
 }
@@ -300,7 +300,7 @@ gsc_completion_context_get_criteria (GscContext	*context)
 GList*
 gsc_completion_context_get_providers (GscContext *context)
 {
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
 	return g_hash_table_get_keys (context->priv->pinfo_table);
 }
 
@@ -318,8 +318,8 @@ gsc_completion_context_get_proposals (GscContext		*context,
 					     GscProvider	*provider)
 {
 	ProviderInfo *pinfo;
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
 	
 	pinfo = (ProviderInfo*)g_hash_table_lookup (context->priv->pinfo_table, provider);
 
@@ -329,7 +329,7 @@ gsc_completion_context_get_proposals (GscContext		*context,
 gboolean
 gsc_completion_context_is_valid (GscContext	*context)
 {
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context), FALSE);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context), FALSE);
 	
 	return !context->priv->invalidated;
 }
@@ -340,7 +340,7 @@ gsc_completion_context_update (GscContext	*context)
 	ProviderInfo *pinfo;
 	GList *pinfo_list;
 	GList *l;
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context));
 
 	pinfo_list = g_hash_table_get_values (context->priv->pinfo_table);
 	for (l = pinfo_list; l != NULL; l = g_list_next (l))
@@ -364,7 +364,7 @@ gsc_completion_context_set_filter_provider (GscContext	*context,
 	GList *providers;
 	GList *current;
 	
-	g_return_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context));
+	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context));
 	//TODO Check if the provider is in the list of providers
 
 	if (context->priv->filter_provider == provider)
@@ -405,7 +405,7 @@ gsc_completion_context_set_filter_provider (GscContext	*context,
 GscProvider*
 gsc_completion_context_get_filter_provider (GscContext *context)
 {
-	g_return_val_if_fail (GSC_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
+	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context), NULL);
 
 	return context->priv->filter_provider;
 }
