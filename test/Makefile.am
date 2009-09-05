@@ -1,4 +1,4 @@
-bin_PROGRAMS = gio-test completion-simple completion-focus completion-custom-widgets
+bin_PROGRAMS = completion-simple
 
 INCLUDES=	\
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
@@ -13,7 +13,7 @@ INCLUDES=	\
 AM_CFLAGS = \
 	-Wall	
 
-noinst_PROGRAMS = gio-test completion-simple completion-focus
+noinst_PROGRAMS = completion-simple
 
 gio_test_SOURCES = 		\
 	gio-test.c
@@ -27,10 +27,6 @@ gio_test_LDADD = 	\
 	$(PACKAGE_LIBS)
 
 completion_simple_SOURCES = 		\
-	gsc-documentwords-provider.c	\
-	gsc-documentwords-provider.h	\
-	gsc-provider-file.c		\
-	gsc-provider-file.h		\
 	completion-simple.c		\
 	gsc-provider-test.h		\
 	gsc-provider-test.c

@@ -18,132 +18,164 @@
  */
 
 #include "gsc-provider-test.h"
+#include <gtksourcecompletion/gsc-completion.h>
+#include <gtksourcecompletion/gsc-item.h>
 
-struct _GscProviderTestPrivate {
-	
+#define GSC_PROVIDER_TEST_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_PROVIDER_TEST, GscProviderTestPrivate))
+
+static void	 gsc_provider_test_iface_init	(GscProviderIface *iface);
+
+struct _GscProviderTestPrivate
+{
+	gchar *name;
+	GdkPixbuf *icon;
+	GdkPixbuf *proposal_icon;
 };
 
-#define GSC_PROVIDER_TEST_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_GSC_PROVIDER_TEST, GscProviderTestPrivate))
+G_DEFINE_TYPE_WITH_CODE (GscProviderTest,
+			 gsc_provider_test,
+			 G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (GSC_TYPE_PROVIDER,
+				 		gsc_provider_test_iface_init))
 
-static const gchar* 
-gsc_provider_test_real_get_name (GscProvider* self);
-static GList* 
-gsc_provider_test_real_get_proposals (GscProvider* base,
-						     GscTrigger *trigger);
-static void 
-gsc_provider_test_real_finish (GscProvider* base);
-
-static gpointer 
-gsc_provider_test_parent_class = NULL;
-static GscProviderIface* 
-gsc_provider_test_parent_iface = NULL;
-
-
-static const gchar* 
-gsc_provider_test_real_get_name (GscProvider* self)
+static const gchar * 
+gsc_provider_test_get_name (GscProvider *self)
 {
-	return GSC_PROVIDER_TEST_NAME;
+	return GSC_PROVIDER_TEST (self)->priv->name;
 }
 
-static GList* 
-gsc_provider_test_real_get_proposals (GscProvider* base,
-						GscTrigger *trigger)
+static GdkPixbuf * 
+gsc_provider_test_get_icon (GscProvider *self)
 {
-	GList *list = NULL;
-	GscProposal *prop;
-	
-	prop = gsc_proposal_new("Proposal 1",
-				"Info proposal 1",
-				NULL);
-	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal 2",
-				"Info proposal 2",
-				NULL);
-	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal 3",
-				"Info proposal 3",
-				NULL);
-	list = g_list_append (list, prop);
-	
-	/*Page 2*/
-	prop = gsc_proposal_new("Proposal 1,2",
-				"Info proposal 1,2",
-				NULL);
-	gsc_proposal_set_page_name(prop,"Page 2");
-	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal 2,2",
-				"Info proposal 2,2",
-				NULL);
-	gsc_proposal_set_page_name(prop,"Page 2");
-	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal 3,3",
-				"Info proposal 3,3",
-				NULL);
-	gsc_proposal_set_page_name(prop,"Page 3");
-	list = g_list_append (list, prop);
-	prop = gsc_proposal_new("Proposal Fixed page",
-				"Info proposal fixed",
-				NULL);
-	gsc_proposal_set_page_name(prop,"Fixed");
-	list = g_list_append (list, prop);
+	return GSC_PROVIDER_TEST (self)->priv->icon;
+}
+
+
+static GList *
+append_item (GList *list, const gchar *name, GdkPixbuf *icon, const gchar *info,
+	     const gchar *criteria)
+{
+	GscItem *prop;
+
+	if (g_str_has_prefix (name, criteria))
+	{
+		prop = gsc_item_new (name, name, icon, info);
+		return g_list_append (list, prop);
+	}
 	return list;
 }
 
-static void 
-gsc_provider_test_real_finish (GscProvider* base)
+static void
+gsc_provider_test_populate_completion (GscProvider *base,
+				       GscContext  *context)
 {
+	GscProviderTest *provider = GSC_PROVIDER_TEST (base);
+	GList *list = NULL;
+	gchar *criteria = gsc_context_get_criteria (context);
+
+	list = append_item (list, "aaaa", provider->priv->proposal_icon, "Info proposal 1.1", criteria);
+	list = append_item (list, "aaab", provider->priv->proposal_icon, "Info proposal 1.2", criteria);
+	list = append_item (list, "bbbc", provider->priv->proposal_icon, "Info proposal 1.3", criteria);
+	list = append_item (list, "bbbd", provider->priv->proposal_icon, "Info proposal 1.3", criteria);
+
+	gsc_context_add_proposals (context, base, list);
+
+	//TODO Who frees the list?
 
 }
 
-static void 
-gsc_provider_test_finalize(GObject *object)
+/*
+static gboolean
+gsc_provider_test_filter_proposal (GscProvider *provider,
+                                   GtkSourceCompletionProposal *proposal,
+                                   GtkTextIter                 *iter,
+                                   const gchar                 *criteria)
 {
-	GscProviderTest *self;
-	self = GSC_PROVIDER_TEST(object);
-	G_OBJECT_CLASS(gsc_provider_test_parent_class)->finalize(object);
+	const gchar *label;
+	
+	label = gtk_source_completion_proposal_get_label (proposal);
+	return g_str_has_prefix (label, criteria);
+}
+*/
+
+static const gchar *
+gsc_provider_test_get_capabilities (GscProvider *provider)
+{
+	return GSC_COMPLETION_CAPABILITY_INTERACTIVE ","
+	       GSC_COMPLETION_CAPABILITY_AUTOMATIC;
 }
 
+static void 
+gsc_provider_test_finalize (GObject *object)
+{
+	GscProviderTest *provider = GSC_PROVIDER_TEST (object);
+	
+	g_free (provider->priv->name);
+	
+	if (provider->priv->icon != NULL)
+	{
+		g_object_unref (provider->priv->icon);
+	}
+	
+	if (provider->priv->proposal_icon != NULL)
+	{
+		g_object_unref (provider->priv->proposal_icon);
+	}
+
+	G_OBJECT_CLASS (gsc_provider_test_parent_class)->finalize (object);
+}
 
 static void 
 gsc_provider_test_class_init (GscProviderTestClass *klass)
 {
-	gsc_provider_test_parent_class = g_type_class_peek_parent (klass);
-	G_OBJECT_CLASS (klass)->finalize = gsc_provider_test_finalize;
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	
+	object_class->finalize = gsc_provider_test_finalize;
+	
+	g_type_class_add_private (object_class, sizeof(GscProviderTestPrivate));
 }
 
 static void
-gsc_provider_test_interface_init (GscProviderIface *iface)
+gsc_provider_test_iface_init (GscProviderIface *iface)
 {
-	gsc_provider_test_parent_iface = g_type_interface_peek_parent (iface);
-	
-	iface->get_name = gsc_provider_test_real_get_name;
-	iface->get_proposals = gsc_provider_test_real_get_proposals;
-	iface->finish = gsc_provider_test_real_finish;
-}
+	iface->get_name = gsc_provider_test_get_name;
+	iface->get_icon = gsc_provider_test_get_icon;
 
+	iface->populate_completion = gsc_provider_test_populate_completion;
+	//iface->filter_proposal = gsc_provider_test_filter_proposal;
+	iface->get_capabilities = gsc_provider_test_get_capabilities;
+}
 
 static void 
 gsc_provider_test_init (GscProviderTest * self)
 {
-	self->priv = g_new0(GscProviderTestPrivate, 1);
+	GtkIconTheme *theme;
+	gint width;
+	
+	self->priv = GSC_PROVIDER_TEST_GET_PRIVATE (self);
+	
+	theme = gtk_icon_theme_get_default ();
+
+	gtk_icon_size_lookup (GTK_ICON_SIZE_MENU, &width, NULL);
+	self->priv->proposal_icon = gtk_icon_theme_load_icon (theme,
+	                                                      GTK_STOCK_YES,
+	                                                      width,
+	                                                      GTK_ICON_LOOKUP_USE_BUILTIN,
+	                                                      NULL);
 }
 
-GType gsc_provider_test_get_type ()
+GscProviderTest *
+gsc_provider_test_new (const gchar *name,
+                       GdkPixbuf   *icon)
 {
-	static GType g_define_type_id = 0;
-	if (G_UNLIKELY (g_define_type_id == 0)) {
-		static const GTypeInfo g_define_type_info = { sizeof (GscProviderTestClass), (GBaseInitFunc) NULL, (GBaseFinalizeFunc) NULL, (GClassInitFunc) gsc_provider_test_class_init, (GClassFinalizeFunc) NULL, NULL, sizeof (GscProviderTest), 0, (GInstanceInitFunc) gsc_provider_test_init };
-		g_define_type_id = g_type_register_static (G_TYPE_OBJECT, "GscProviderTest", &g_define_type_info, 0);
-		static const GInterfaceInfo gsc_provider_info = { (GInterfaceInitFunc) gsc_provider_test_interface_init, (GInterfaceFinalizeFunc) NULL, NULL};
-		g_type_add_interface_static (g_define_type_id, GSC_TYPE_PROVIDER, &gsc_provider_info);
+	GscProviderTest *ret = g_object_new (GSC_TYPE_PROVIDER_TEST, NULL);
+	
+	ret->priv->name = g_strdup (name);
+	
+	if (icon != NULL)
+	{
+		ret->priv->icon = g_object_ref (icon);
 	}
-	return g_define_type_id;
+
+	return ret;
 }
-
-
-GscProviderTest*
-gsc_provider_test_new()
-{
-	return GSC_PROVIDER_TEST (g_object_new (GSC_TYPE_PROVIDER_TEST, NULL));
-}
-

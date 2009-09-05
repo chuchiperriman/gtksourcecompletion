@@ -25,7 +25,7 @@
 #include "gsc-utils.h"
 #include "gsc-i18n.h"
 
-#define GSC_COMPLETION_ITEM_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GTK_TYPE_SOURCE_COMPLETION_ITEM, GscItemPrivate))
+#define GSC_COMPLETION_ITEM_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_ITEM, GscItemPrivate))
 
 struct _GscItemPrivate
 {
@@ -52,7 +52,7 @@ static void gsc_completion_proposal_iface_init (gpointer g_iface, gpointer iface
 G_DEFINE_TYPE_WITH_CODE (GscItem, 
 			 gsc_completion_item, 
 			 G_TYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (GTK_TYPE_SOURCE_COMPLETION_PROPOSAL,
+			 G_IMPLEMENT_INTERFACE (GSC_TYPE_PROPOSAL,
 			 			gsc_completion_proposal_iface_init))
 
 static const gchar *
@@ -313,7 +313,7 @@ gsc_completion_item_new (const gchar *label,
 				GdkPixbuf   *icon,
 				const gchar *info)
 {
-	return g_object_new (GTK_TYPE_SOURCE_COMPLETION_ITEM, 
+	return g_object_new (GSC_TYPE_ITEM, 
 			     "label", label,
 			     "text", text,
 			     "icon", icon,
@@ -341,7 +341,7 @@ gsc_completion_item_new_with_markup (const gchar *markup,
                                             GdkPixbuf   *icon,
                                             const gchar *info)
 {
-	return g_object_new (GTK_TYPE_SOURCE_COMPLETION_ITEM, 
+	return g_object_new (GSC_TYPE_ITEM, 
 			     "markup", markup,
 			     "text", text,
 			     "icon", icon,

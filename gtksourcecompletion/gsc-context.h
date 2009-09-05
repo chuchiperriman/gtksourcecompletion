@@ -26,25 +26,25 @@
 
 G_BEGIN_DECLS
 
-#define GTK_TYPE_SOURCE_COMPLETION_CONTEXT                              \
+#define GSC_TYPE_CONTEXT                              \
    (gsc_completion_context_get_type())
 #define GSC_COMPLETION_CONTEXT(obj)                              \
    (G_TYPE_CHECK_INSTANCE_CAST ((obj),                                  \
-                                GTK_TYPE_SOURCE_COMPLETION_CONTEXT,     \
+                                GSC_TYPE_CONTEXT,     \
                                 GscContext))
 #define GSC_COMPLETION_CONTEXT_CLASS(klass)                      \
    (G_TYPE_CHECK_CLASS_CAST ((klass),                                   \
-                             GTK_TYPE_SOURCE_COMPLETION_CONTEXT,        \
+                             GSC_TYPE_CONTEXT,        \
                              GscContextClass))
 #define GTK_IS_SOURCE_COMPLETION_CONTEXT(obj)                           \
    (G_TYPE_CHECK_INSTANCE_TYPE ((obj),                                  \
-                                GTK_TYPE_SOURCE_COMPLETION_CONTEXT))
+                                GSC_TYPE_CONTEXT))
 #define GTK_IS_SOURCE_COMPLETION_CONTEXT_CLASS(klass)                   \
    (G_TYPE_CHECK_CLASS_TYPE ((klass),                                   \
-                             GTK_TYPE_SOURCE_COMPLETION_CONTEXT))
+                             GSC_TYPE_CONTEXT))
 #define GSC_COMPLETION_CONTEXT_GET_CLASS(obj)                    \
    (G_TYPE_INSTANCE_GET_CLASS ((obj),                                   \
-                               GTK_TYPE_SOURCE_COMPLETION_CONTEXT,      \
+                               GSC_TYPE_CONTEXT,      \
                                GscContextClass))
 
 typedef struct _GscContextPrivate GscContextPrivate;

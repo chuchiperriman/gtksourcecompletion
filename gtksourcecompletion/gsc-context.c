@@ -25,7 +25,7 @@
 #include "gsc-marshal.h"
 
 #define GSC_COMPLETION_CONTEXT_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), \
-										       GTK_TYPE_SOURCE_COMPLETION_CONTEXT, \
+										       GSC_TYPE_CONTEXT, \
 										       GscContextPrivate))
 
 static void gsc_completion_context_finalize (GObject *object);
@@ -167,7 +167,7 @@ gsc_completion_context_new (GscModel	*model,
 	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), NULL);
 	g_return_val_if_fail (GSC_IS_TEXT_VIEW (view), NULL);
 	
-	context = g_object_new (GTK_TYPE_SOURCE_COMPLETION_CONTEXT, NULL);
+	context = g_object_new (GSC_TYPE_CONTEXT, NULL);
 	context->priv->model = model;
 	context->priv->view = view;
 	for (l = providers; l != NULL; l = g_list_next (l))

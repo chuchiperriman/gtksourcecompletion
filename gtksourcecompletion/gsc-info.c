@@ -76,7 +76,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_TYPE(GscInfo, gsc_completion_info, GTK_TYPE_WINDOW);
 
-#define GSC_COMPLETION_INFO_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GTK_TYPE_SOURCE_COMPLETION_INFO, GscInfoPrivate))
+#define GSC_COMPLETION_INFO_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), GSC_TYPE_INFO, GscInfoPrivate))
 
 static void
 get_scrolled_window_sizing (GscInfo *info,
@@ -384,7 +384,7 @@ gsc_completion_info_class_init (GscInfoClass *klass)
 GscInfo *
 gsc_completion_info_new (void)
 {
-	return g_object_new (GTK_TYPE_SOURCE_COMPLETION_INFO, 
+	return g_object_new (GSC_TYPE_INFO, 
 	                     "type", GTK_WINDOW_POPUP, 
 	                     NULL);
 }

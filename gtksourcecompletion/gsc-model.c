@@ -24,7 +24,7 @@
 
 #define ITEMS_PER_CALLBACK 100
 
-#define GSC_COMPLETION_MODEL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GTK_TYPE_SOURCE_COMPLETION_MODEL, GscModelPrivate))
+#define GSC_COMPLETION_MODEL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_MODEL, GscModelPrivate))
 
 typedef struct
 {
@@ -546,7 +546,7 @@ num_dec (GscModel    *model,
 GscModel*
 gsc_completion_model_new (void)
 {
-	return g_object_new (GTK_TYPE_SOURCE_COMPLETION_MODEL, NULL);
+	return g_object_new (GSC_TYPE_MODEL, NULL);
 }
 
 static GList *

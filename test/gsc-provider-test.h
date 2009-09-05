@@ -21,7 +21,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "gsc-provider.h"
+#include <gtksourcecompletion/gsc-provider.h>
 
 G_BEGIN_DECLS
 
@@ -35,21 +35,25 @@ G_BEGIN_DECLS
 #define GSC_PROVIDER_TEST_NAME "GscProviderTest"
 
 typedef struct _GscProviderTest GscProviderTest;
-typedef struct _GscProviderTestClass GscProviderTestClass;
 typedef struct _GscProviderTestPrivate GscProviderTestPrivate;
+typedef struct _GscProviderTestClass GscProviderTestClass;
 
-struct _GscProviderTest {
+struct _GscProviderTest
+{
 	GObject parent;
-	GscProviderTestPrivate *priv;	
+	
+	GscProviderTestPrivate *priv;
 };
 
-struct _GscProviderTestClass {
+struct _GscProviderTestClass
+{
 	GObjectClass parent;
 };
 
-GType gsc_provider_test_get_type ();
+GType		 gsc_provider_test_get_type	(void) G_GNUC_CONST;
 
-GscProviderTest* gsc_provider_test_new();
+GscProviderTest *gsc_provider_test_new (const gchar *name,
+                                        GdkPixbuf   *icon);
 
 G_END_DECLS
 

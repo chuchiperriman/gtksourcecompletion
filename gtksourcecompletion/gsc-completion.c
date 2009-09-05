@@ -37,7 +37,6 @@
 #include "gsc-context.h"
 #include <string.h>
 #include <gtksourceview/gtksourceview.h>
-#include "gsc-completion-priv.h"
 #include <stdarg.h>
 
 #define WINDOW_WIDTH 350
