@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define GSC_TYPE_PROPOSAL			(gsc_completion_proposal_get_type ())
 #define GSC_COMPLETION_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROPOSAL, GscProposal))
-#define GTK_IS_SOURCE_COMPLETION_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROPOSAL))
+#define GTK_IS_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROPOSAL))
 #define GSC_COMPLETION_PROPOSAL_GET_INTERFACE(obj)	(G_TYPE_INSTANCE_GET_INTERFACE ((obj), GSC_TYPE_PROPOSAL, GscProposalIface))
 
 typedef struct _GscProposal		GscProposal;

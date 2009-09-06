@@ -78,7 +78,7 @@ static void tree_model_iface_init (gpointer g_iface, gpointer iface_data);
 G_DEFINE_TYPE_WITH_CODE (GscModel, 
                          gsc_completion_model, 
                          G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (GSC_TYPE_TREE_MODEL,
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_TREE_MODEL,
                                                 tree_model_iface_init))
 
 
@@ -95,7 +95,7 @@ path_from_list (GscModel *model,
 {
 	gint index = 0;
 
-	g_assert (GTK_IS_SOURCE_COMPLETION_PROPOSAL (((ProposalNode*)item->data)->proposal));
+	g_assert (GTK_IS_PROPOSAL (((ProposalNode*)item->data)->proposal));
 	index = g_list_position (model->priv->store, item);
 	
 	if (index == -1)
@@ -111,7 +111,7 @@ path_from_list (GscModel *model,
 static GtkTreeModelFlags
 tree_model_get_flags (GtkTreeModel *tree_model)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), 0);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), 0);
 
 	return 0;
 }
@@ -119,7 +119,7 @@ tree_model_get_flags (GtkTreeModel *tree_model)
 static gint
 tree_model_get_n_columns (GtkTreeModel *tree_model)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), 0);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), 0);
 
 	return GSC_COMPLETION_MODEL_N_COLUMNS;
 }
@@ -128,7 +128,7 @@ static GType
 tree_model_get_column_type (GtkTreeModel *tree_model,
 			    gint          index)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), G_TYPE_INVALID);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), G_TYPE_INVALID);
 	g_return_val_if_fail (index >= 0 && index < GSC_COMPLETION_MODEL_N_COLUMNS, G_TYPE_INVALID);
 
 	return GSC_COMPLETION_MODEL (tree_model)->priv->column_types[index];
@@ -169,7 +169,7 @@ tree_model_get_iter (GtkTreeModel *tree_model,
 	GscModel *model;
 	gint *indices;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (path != NULL, FALSE);
 	
@@ -185,7 +185,7 @@ tree_model_get_path (GtkTreeModel *tree_model,
 {
 	GscModel *model;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), NULL);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), NULL);
 	g_return_val_if_fail (iter != NULL, NULL);
 	g_return_val_if_fail (iter->user_data != NULL, NULL);
 
@@ -201,7 +201,7 @@ tree_model_get_value (GtkTreeModel *tree_model,
 {
 	ProposalNode *node;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model));
+	g_return_if_fail (GSC_IS_MODEL (tree_model));
 	g_return_if_fail (iter != NULL);
 	g_return_if_fail (iter->user_data != NULL);
 	g_return_if_fail (column >= 0 && column < GSC_COMPLETION_MODEL_N_COLUMNS);
@@ -262,7 +262,7 @@ static gboolean
 tree_model_iter_next (GtkTreeModel *tree_model,
 		      GtkTreeIter  *iter)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	
 	return get_next_element ((GList *)iter->user_data, iter);
@@ -273,7 +273,7 @@ tree_model_iter_children (GtkTreeModel *tree_model,
 			  GtkTreeIter  *iter,
 			  GtkTreeIter  *parent)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (parent == NULL || parent->user_data != NULL, FALSE);
 	
@@ -286,7 +286,7 @@ static gboolean
 tree_model_iter_has_child (GtkTreeModel *tree_model,
 			   GtkTreeIter  *iter)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	
 	return FALSE;
@@ -296,7 +296,7 @@ static gint
 tree_model_iter_n_children (GtkTreeModel *tree_model,
 			    GtkTreeIter  *iter)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), 0);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), 0);
 	g_return_val_if_fail (iter == NULL || iter->user_data != NULL, 0);
 	
 	if (iter == NULL)
@@ -315,7 +315,7 @@ tree_model_iter_nth_child (GtkTreeModel *tree_model,
 			   GtkTreeIter  *parent, 
 			   gint          n)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (parent == NULL || parent->user_data != NULL, FALSE);
 
@@ -336,7 +336,7 @@ tree_model_iter_parent (GtkTreeModel *tree_model,
 			GtkTreeIter  *iter,
 			GtkTreeIter  *child)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (tree_model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (tree_model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (child != NULL, FALSE);
 	
@@ -747,8 +747,8 @@ gsc_completion_model_set_proposals (GscModel	    *model,
 	GscProposal *proposal;
 	RemoveInfo rinfo;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider));
+	g_return_if_fail (GSC_IS_MODEL (model));
+	g_return_if_fail (GSC_IS_PROVIDER (provider));
 
 	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
 	if (info)
@@ -779,7 +779,7 @@ gsc_completion_model_set_proposals (GscModel	    *model,
 
 	for (item = proposals; item; item = g_list_next (item))
 	{
-		if (GTK_IS_SOURCE_COMPLETION_PROPOSAL (item->data))
+		if (GTK_IS_PROPOSAL (item->data))
 		{
 			proposal = GSC_COMPLETION_PROPOSAL (item->data);
 			gsc_completion_model_append (model,
@@ -797,9 +797,9 @@ gsc_completion_model_append (GscModel    *model,
 {
 	ProposalNode *node;
 	
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal));
+	g_return_if_fail (GSC_IS_MODEL (model));
+	g_return_if_fail (GSC_IS_PROVIDER (provider));
+	g_return_if_fail (GTK_IS_PROPOSAL (proposal));
 	
 	node = g_slice_new (ProposalNode);
 	node->provider = g_object_ref (provider);
@@ -812,7 +812,7 @@ gsc_completion_model_append (GscModel    *model,
 void
 gsc_completion_model_cancel_add_proposals (GscModel    *model)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model));
+	g_return_if_fail (GSC_IS_MODEL (model));
 
 	if (model->priv->idle_id != 0)
 	{
@@ -834,7 +834,7 @@ gsc_completion_model_clear (GscModel *model)
 	GtkTreePath *path;
 	ProposalNode *node;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model));
+	g_return_if_fail (GSC_IS_MODEL (model));
 
 	/* Clear the queue of missing elements to append */
 	gsc_completion_model_cancel_add_proposals (model);
@@ -856,7 +856,7 @@ gboolean
 gsc_completion_model_is_empty (GscModel *model,
                                       gboolean                  invisible)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
 	
 	if (invisible)
 	{
@@ -875,8 +875,8 @@ gsc_completion_model_n_proposals (GscModel    *model,
 {
 	HeaderInfo *info;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), 0);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), 0);
+	g_return_val_if_fail (GSC_IS_MODEL (model), 0);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), 0);
 	
 	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
 	
@@ -896,7 +896,7 @@ gsc_completion_model_iter_previous (GscModel *model,
 {
 	GList *item;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (iter->user_data != NULL, FALSE);
 	
@@ -921,7 +921,7 @@ gsc_completion_model_iter_last (GscModel *model,
 {
 	GList *item;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_MODEL (model), FALSE);
+	g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
 	g_return_val_if_fail (iter != NULL, FALSE);
 	
 	item = model->priv->last;

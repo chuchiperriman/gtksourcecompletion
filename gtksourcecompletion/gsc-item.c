@@ -20,12 +20,11 @@
  * Boston, MA  02110-1301  USA
  */
 
-#include <gtksourceview/gscitem.h>
-
+#include "gsc-item.h"
 #include "gsc-utils.h"
 #include "gsc-i18n.h"
 
-#define GSC_COMPLETION_ITEM_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_ITEM, GscItemPrivate))
+#define GSC_ITEM_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_ITEM, GscItemPrivate))
 
 struct _GscItemPrivate
 {
@@ -50,7 +49,7 @@ enum
 static void gsc_completion_proposal_iface_init (gpointer g_iface, gpointer iface_data);
 
 G_DEFINE_TYPE_WITH_CODE (GscItem, 
-			 gsc_completion_item, 
+			 gsc_item, 
 			 G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (GSC_TYPE_PROPOSAL,
 			 			gsc_completion_proposal_iface_init))
@@ -58,31 +57,31 @@ G_DEFINE_TYPE_WITH_CODE (GscItem,
 static const gchar *
 gsc_completion_proposal_get_label_impl (GscProposal *self)
 {
-	return GSC_COMPLETION_ITEM (self)->priv->label;
+	return GSC_ITEM (self)->priv->label;
 }
 
 static const gchar *
 gsc_completion_proposal_get_markup_impl (GscProposal *self)
 {
-	return GSC_COMPLETION_ITEM (self)->priv->markup;
+	return GSC_ITEM (self)->priv->markup;
 }
 
 static const gchar *
 gsc_completion_proposal_get_text_impl (GscProposal *self)
 {
-	return GSC_COMPLETION_ITEM (self)->priv->text;
+	return GSC_ITEM (self)->priv->text;
 }
 
 static GdkPixbuf *
 gsc_completion_proposal_get_icon_impl (GscProposal *self)
 {
-	return GSC_COMPLETION_ITEM (self)->priv->icon;
+	return GSC_ITEM (self)->priv->icon;
 }
 
 static const gchar *
 gsc_completion_proposal_get_info_impl (GscProposal *self)
 {
-	return GSC_COMPLETION_ITEM (self)->priv->info;
+	return GSC_ITEM (self)->priv->info;
 }
 
 static void
@@ -100,9 +99,9 @@ gsc_completion_proposal_iface_init (gpointer g_iface,
 }
 
 static void
-gsc_completion_item_finalize (GObject *object)
+gsc_item_finalize (GObject *object)
 {
-	GscItem *self = GSC_COMPLETION_ITEM(object);
+	GscItem *self = GSC_ITEM(object);
 	
 	g_free (self->priv->label);
 	g_free (self->priv->markup);
@@ -115,20 +114,20 @@ gsc_completion_item_finalize (GObject *object)
 		g_object_unref (self->priv->icon);
 	}
 
-	G_OBJECT_CLASS (gsc_completion_item_parent_class)->finalize (object);
+	G_OBJECT_CLASS (gsc_item_parent_class)->finalize (object);
 }
 
 static void
-gsc_completion_item_get_property (GObject    *object,
+gsc_item_get_property (GObject    *object,
 					 guint       prop_id,
 					 GValue     *value,
 					 GParamSpec *pspec)
 {
 	GscItem *self;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_ITEM (object));
+	g_return_if_fail (GSC_IS_ITEM (object));
 
-	self = GSC_COMPLETION_ITEM (object);
+	self = GSC_ITEM (object);
 
 	switch (prop_id)
 	{
@@ -160,16 +159,16 @@ emit_changed (GscItem *item)
 }
 
 static void
-gsc_completion_item_set_property (GObject      *object,
+gsc_item_set_property (GObject      *object,
 					 guint         prop_id,
 					 const GValue *value,
 					 GParamSpec   *pspec)
 {
 	GscItem *self;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_ITEM (object));
+	g_return_if_fail (GSC_IS_ITEM (object));
 
-	self = GSC_COMPLETION_ITEM (object);
+	self = GSC_ITEM (object);
 
 	switch (prop_id)
 	{
@@ -211,13 +210,13 @@ gsc_completion_item_set_property (GObject      *object,
 }
 
 static void
-gsc_completion_item_class_init (GscItemClass *klass)
+gsc_item_class_init (GscItemClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	object_class->finalize = gsc_completion_item_finalize;
-	object_class->get_property = gsc_completion_item_get_property;
-	object_class->set_property = gsc_completion_item_set_property;
+	object_class->finalize = gsc_item_finalize;
+	object_class->get_property = gsc_item_get_property;
+	object_class->set_property = gsc_item_set_property;
 
 	/**
 	 * GscItem:label:
@@ -288,13 +287,13 @@ gsc_completion_item_class_init (GscItemClass *klass)
 }
 
 static void
-gsc_completion_item_init (GscItem *self)
+gsc_item_init (GscItem *self)
 {
-	self->priv = GSC_COMPLETION_ITEM_GET_PRIVATE (self);
+	self->priv = GSC_ITEM_GET_PRIVATE (self);
 }
 
 /** 
- * gsc_completion_item_new:
+ * gsc_item_new:
  * @label: The item label
  * @text: The item text
  * @icon: The item icon
@@ -308,7 +307,7 @@ gsc_completion_item_init (GscItem *self)
  *
  */
 GscItem *
-gsc_completion_item_new (const gchar *label,
+gsc_item_new (const gchar *label,
 				const gchar *text,
 				GdkPixbuf   *icon,
 				const gchar *info)
@@ -322,7 +321,7 @@ gsc_completion_item_new (const gchar *label,
 }
 
 /** 
- * gsc_completion_item_new_with_markup:
+ * gsc_item_new_with_markup:
  * @markup: The item markup label
  * @text: The item text
  * @icon: The item icon
@@ -336,7 +335,7 @@ gsc_completion_item_new (const gchar *label,
  *
  */
 GscItem *
-gsc_completion_item_new_with_markup (const gchar *markup,
+gsc_item_new_with_markup (const gchar *markup,
                                             const gchar *text,
                                             GdkPixbuf   *icon,
                                             const gchar *info)
@@ -350,7 +349,7 @@ gsc_completion_item_new_with_markup (const gchar *markup,
 }
 
 /** 
- * gsc_completion_item_new_from_stock:
+ * gsc_item_new_from_stock:
  * @label: The item label
  * @text: The item text
  * @stock: The stock icon
@@ -363,7 +362,7 @@ gsc_completion_item_new_with_markup (const gchar *markup,
  *
  */
 GscItem *
-gsc_completion_item_new_from_stock (const gchar *label,
+gsc_item_new_from_stock (const gchar *label,
 					   const gchar *text,
 					   const gchar *stock,
 					   const gchar *info)
@@ -397,7 +396,7 @@ gsc_completion_item_new_from_stock (const gchar *label,
 		icon = NULL;
 	}
 	
-	item = gsc_completion_item_new (label, text, icon, info);
+	item = gsc_item_new (label, text, icon, info);
 	
 	if (icon != NULL)
 	{

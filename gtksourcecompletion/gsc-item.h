@@ -20,21 +20,21 @@
  * Boston, MA  02110-1301  USA
  */
 
-#ifndef __GSC_COMPLETION_ITEM_H__
-#define __GSC_COMPLETION_ITEM_H__
+#ifndef __GSC_ITEM_H__
+#define __GSC_ITEM_H__
 
 #include <glib-object.h>
 #include "gsc-proposal.h"
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_ITEM			(gsc_completion_item_get_type ())
-#define GSC_COMPLETION_ITEM(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_ITEM, GscItem))
-#define GSC_COMPLETION_ITEM_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_ITEM, GscItem const))
-#define GSC_COMPLETION_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_ITEM, GscItemClass))
-#define GTK_IS_SOURCE_COMPLETION_ITEM(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_ITEM))
-#define GTK_IS_SOURCE_COMPLETION_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_ITEM))
-#define GSC_COMPLETION_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_ITEM, GscItemClass))
+#define GSC_TYPE_ITEM			(gsc_item_get_type ())
+#define GSC_ITEM(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_ITEM, GscItem))
+#define GSC_ITEM_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_ITEM, GscItem const))
+#define GSC_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_ITEM, GscItemClass))
+#define GSC_IS_ITEM(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_ITEM))
+#define GSC_IS_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_ITEM))
+#define GSC_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_ITEM, GscItemClass))
 
 typedef struct _GscItem		GscItem;
 typedef struct _GscItemClass	GscItemClass;
@@ -50,23 +50,23 @@ struct _GscItemClass {
 	GObjectClass parent_class;
 };
 
-GType 			 gsc_completion_item_get_type 		(void) G_GNUC_CONST;
+GType 			 gsc_item_get_type 		(void) G_GNUC_CONST;
 
-GscItem *gsc_completion_item_new 		(const gchar *label,
+GscItem *gsc_item_new 		(const gchar *label,
 									 const gchar *action,
 									 GdkPixbuf   *icon,
 									 const gchar *info);
 
-GscItem *gsc_completion_item_new_with_markup	(const gchar *markup,
+GscItem *gsc_item_new_with_markup	(const gchar *markup,
 									 const gchar *action,
 									 GdkPixbuf   *icon,
 									 const gchar *info);
 
-GscItem *gsc_completion_item_new_from_stock	(const gchar *label,
+GscItem *gsc_item_new_from_stock	(const gchar *label,
 								 	 const gchar *action,
 								 	 const gchar *stock,
 								 	 const gchar *info);
 
 G_END_DECLS
 
-#endif /* __GSC_COMPLETION_ITEM_H__ */
+#endif /* __GSC_ITEM_H__ */

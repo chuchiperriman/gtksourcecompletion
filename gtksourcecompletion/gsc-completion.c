@@ -43,7 +43,7 @@
 #define WINDOW_HEIGHT 200
 
 #define GSC_COMPLETION_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object),\
-						  GTK_TYPE_SOURCE_COMPLETION,           \
+						  GSC_TYPE_COMPLETION,           \
 						  GscCompletionPrivate))
 
 /* Signals */
@@ -120,6 +120,47 @@ static void update_selection_label (GscCompletion *completion);
 
 G_DEFINE_TYPE(GscCompletion, gsc_completion, G_TYPE_OBJECT);
 
+/*
+ * We save a map with a GtkTextView and his GscCompletion. If you
+ * call twice to gsc_proposal_new, the second time it returns
+ * the previous created GscCompletion, not creates a new one
+ *
+ * FIXME We will remove this functions when we will integrate
+ * Gsc in GtkSourceView
+ */
+
+static GHashTable *gsccompletion_map = NULL;
+
+static GscCompletion*
+completion_control_get_completion (GtkTextView *view)
+{
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
+						      g_direct_equal);
+	
+	return g_hash_table_lookup (gsccompletion_map, view);
+}
+
+static void
+completion_control_add_completion (GtkTextView *view,
+				   GscCompletion *comp)
+{
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
+						      g_direct_equal);
+	g_hash_table_insert (gsccompletion_map, view, comp);
+}
+
+static void
+completion_control_remove_completion (GtkTextView *view)
+{
+	if (gsccompletion_map == NULL)
+		gsccompletion_map = g_hash_table_new (g_direct_hash,
+						      g_direct_equal);
+	g_hash_table_remove (gsccompletion_map, view);
+}
+/* ********************************************************************* */
+
 static gboolean
 get_selected_proposal (GscCompletion          *completion,
                        GtkTreeIter                  *iter,
@@ -168,7 +209,7 @@ context_destroy (GscCompletion 	*completion)
 
 	if (completion->priv->context)
 	{
-		gsc_completion_context_finish (completion->priv->context);
+		gsc_context_finish (completion->priv->context);
 		g_object_unref(completion->priv->context);
 		completion->priv->context = NULL;
 	}
@@ -181,7 +222,7 @@ context_create (GscCompletion 	*completion,
 	/*Ensure there is not a completion active*/
 	context_destroy (completion);
 	
-	completion->priv->context = gsc_completion_context_new (completion->priv->model_proposals,
+	completion->priv->context = gsc_context_new (completion->priv->model_proposals,
 								       GTK_TEXT_VIEW (completion->priv->view),
 								       providers);
 }
@@ -199,8 +240,8 @@ context_populate (GscCompletion	*completion,
 	else
 	{
 		/*Update the current criteria*/
-		gsc_completion_context_update (completion->priv->context);
-		providers = gsc_completion_context_get_providers (completion->priv->context);
+		gsc_context_update (completion->priv->context);
+		providers = gsc_context_get_providers (completion->priv->context);
 	}
 	
 	/* Make sure all providers are ours */
@@ -208,17 +249,17 @@ context_populate (GscCompletion	*completion,
 	{
 		/*Check if the context has been invalidated*/
 		if (completion->priv->context &&
-		    gsc_completion_context_is_valid (completion->priv->context) &&
+		    gsc_context_is_valid (completion->priv->context) &&
 		    g_list_find (completion->priv->providers,
 		                 l->data) != NULL)
 		{
-			gsc_completion_provider_populate_completion (GSC_COMPLETION_PROVIDER (l->data),
+			gsc_completion_provider_populate_completion (GSC_PROVIDER (l->data),
 									    completion->priv->context);
 		}
 	}
 
 	if (completion->priv->context &&
-	    gsc_completion_context_is_valid (completion->priv->context))
+	    gsc_context_is_valid (completion->priv->context))
 	{
 		update_selection_label (completion);
 	}
@@ -496,8 +537,8 @@ get_num_visible_providers (GscCompletion *completion,
 	*num = 0;
 	*current = 0;
 
-	providers = gsc_completion_context_get_providers (completion->priv->context);
-	filter_provider = gsc_completion_context_get_filter_provider (completion->priv->context);
+	providers = gsc_context_get_providers (completion->priv->context);
+	filter_provider = gsc_context_get_filter_provider (completion->priv->context);
 	
 	for (item = providers; item; item = g_list_next (item))
 	{
@@ -507,8 +548,8 @@ get_num_visible_providers (GscCompletion *completion,
 		}
 		else
 		{
-			proposals = gsc_completion_context_get_proposals (completion->priv->context,
-										 GSC_COMPLETION_PROVIDER (item->data));
+			proposals = gsc_context_get_proposals (completion->priv->context,
+										 GSC_PROVIDER (item->data));
 			/* See if it has anything */
 			if (proposals != NULL)
 			{
@@ -527,7 +568,7 @@ update_selection_label (GscCompletion *completion)
 	gchar *tmp;
 	GscProvider *filter_provider;
 
-	filter_provider = gsc_completion_context_get_filter_provider (completion->priv->context);
+	filter_provider = gsc_context_get_filter_provider (completion->priv->context);
 	get_num_visible_providers (completion, &num, &pos);
 	
 	if (!filter_provider)
@@ -579,8 +620,8 @@ select_provider (GscCompletion *completion,
 	guint num;
 	guint pos;
 
-	providers = gsc_completion_context_get_providers (completion->priv->context);
-	filter_provider = gsc_completion_context_get_filter_provider (completion->priv->context);
+	providers = gsc_context_get_providers (completion->priv->context);
+	filter_provider = gsc_context_get_filter_provider (completion->priv->context);
 	/* If there is only one provider, then there is no other selection */
 	if (providers->next == NULL)
 	{
@@ -630,8 +671,8 @@ select_provider (GscCompletion *completion,
 		
 		if (current != NULL)
 		{
-			provider = GSC_COMPLETION_PROVIDER (current->data);
-			proposals = gsc_completion_context_get_proposals (completion->priv->context,
+			provider = GSC_PROVIDER (current->data);
+			proposals = gsc_context_get_proposals (completion->priv->context,
 										 provider);
 			/*We don't select the provider if it has not proposals*/
 			if (proposals != NULL)
@@ -657,7 +698,7 @@ select_provider (GscCompletion *completion,
 		filter_provider = NULL;
 	}
 	
-	gsc_completion_context_set_filter_provider (completion->priv->context,
+	gsc_context_set_filter_provider (completion->priv->context,
 							   filter_provider);
 
 	update_selection_label (completion);
@@ -1246,6 +1287,8 @@ gsc_completion_finalize (GObject *object)
 	
 	g_hash_table_destroy (completion->priv->capability_map);
 	g_list_free (completion->priv->providers);
+
+	completion_control_remove_completion(GTK_TEXT_VIEW (completion->priv->view));
 	
 	G_OBJECT_CLASS (gsc_completion_parent_class)->finalize (object);
 }
@@ -1258,7 +1301,7 @@ gsc_completion_get_property (GObject    *object,
 {
 	GscCompletion *completion;
 	
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+	g_return_if_fail (GSC_IS_COMPLETION (object));
 	
 	completion = GSC_COMPLETION (object);
 
@@ -1293,7 +1336,7 @@ gsc_completion_set_property (GObject      *object,
 {
 	GscCompletion *completion;
 	
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (object));
+	g_return_if_fail (GSC_IS_COMPLETION (object));
 	
 	completion = GSC_COMPLETION (object);
 
@@ -1919,7 +1962,7 @@ gsc_completion_show (GscCompletion *completion,
                             GList               *providers,
                             GtkTextIter         *place)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (completion), FALSE);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), FALSE);
 	
 	/* Make sure to clear any active completion */
 	gsc_completion_hide_default (completion);
@@ -1962,7 +2005,7 @@ gsc_completion_get_providers (GscCompletion  *completion,
 	gchar **orig;
 	GList *ret = NULL;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (completion), NULL);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), NULL);
 
 	if (capabilities)
 	{
@@ -2022,9 +2065,13 @@ gsc_completion_new (GtkSourceView *view)
 {
 	g_return_val_if_fail (GTK_IS_SOURCE_VIEW (view), NULL);
 
-	return g_object_new (GTK_TYPE_SOURCE_COMPLETION,
-	                     "view", view,
-	                     NULL);
+	GscCompletion *self = g_object_new (GSC_TYPE_COMPLETION,
+					    "view", view,
+					    NULL);
+
+	completion_control_add_completion (GTK_TEXT_VIEW (view), self);
+
+	return self;
 }
 
 /**
@@ -2045,8 +2092,8 @@ gsc_completion_add_provider (GscCompletion          *completion,
 				    GscProvider  *provider,
 				    GError                      **error)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (completion), FALSE);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), FALSE);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), FALSE);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), FALSE);
 	
 	if (g_list_find (completion->priv->providers, provider) != NULL)
 	{
@@ -2092,8 +2139,8 @@ gsc_completion_remove_provider (GscCompletion          *completion,
 {
 	GList *item;
 	
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (completion), FALSE);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), FALSE);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), FALSE);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), FALSE);
 
 	item = g_list_find (completion->priv->providers, provider);
 
@@ -2134,7 +2181,7 @@ gsc_completion_remove_provider (GscCompletion          *completion,
 void
 gsc_completion_hide (GscCompletion *completion)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION (completion));
+	g_return_if_fail (GSC_IS_COMPLETION (completion));
 	
 	/* Hiding the completion window will trigger the actual hide */
 	if (GTK_WIDGET_VISIBLE (completion->priv->window))
@@ -2169,7 +2216,19 @@ gsc_completion_get_info_window (GscCompletion *completion)
 GtkSourceView *
 gsc_completion_get_view (GscCompletion *completion)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION (completion), NULL);
+	g_return_val_if_fail (GSC_IS_COMPLETION (completion), NULL);
 	
 	return completion->priv->view;
+}
+
+/**
+* gsc_completion_get_from_view:
+* @view: The #GtkTextView associated with a #GscCompletion
+*
+* Returns: The #GscCompletion associated with a @view or %NULL.
+*/
+GscCompletion*
+gsc_completion_get_from_view(GtkTextView *view)
+{
+        return completion_control_get_completion(view);
 }

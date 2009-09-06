@@ -181,7 +181,7 @@ create_completion(void)
 	GscProviderTest *prov_test1;
 	GdkPixbuf *icon;
 	
-	comp = gtk_source_view_get_completion (GTK_SOURCE_VIEW (view));
+	comp = gsc_completion_new (GTK_TEXT_VIEW (view));
 
 
 	icon = get_icon_from_theme (GTK_STOCK_NETWORK);

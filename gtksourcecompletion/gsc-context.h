@@ -27,7 +27,7 @@
 G_BEGIN_DECLS
 
 #define GSC_TYPE_CONTEXT                              \
-   (gsc_completion_context_get_type())
+   (gsc_context_get_type())
 #define GSC_COMPLETION_CONTEXT(obj)                              \
    (G_TYPE_CHECK_INSTANCE_CAST ((obj),                                  \
                                 GSC_TYPE_CONTEXT,     \
@@ -36,10 +36,10 @@ G_BEGIN_DECLS
    (G_TYPE_CHECK_CLASS_CAST ((klass),                                   \
                              GSC_TYPE_CONTEXT,        \
                              GscContextClass))
-#define GTK_IS_SOURCE_COMPLETION_CONTEXT(obj)                           \
+#define GTK_IS_CONTEXT(obj)                           \
    (G_TYPE_CHECK_INSTANCE_TYPE ((obj),                                  \
                                 GSC_TYPE_CONTEXT))
-#define GTK_IS_SOURCE_COMPLETION_CONTEXT_CLASS(klass)                   \
+#define GTK_IS_CONTEXT_CLASS(klass)                   \
    (G_TYPE_CHECK_CLASS_TYPE ((klass),                                   \
                              GSC_TYPE_CONTEXT))
 #define GSC_COMPLETION_CONTEXT_GET_CLASS(obj)                    \
@@ -64,38 +64,38 @@ struct _GscContext
 	GscContextPrivate *priv;
 };
 
-GType	 			 gsc_completion_context_get_type		(void) G_GNUC_CONST;
+GType	 			 gsc_context_get_type		(void) G_GNUC_CONST;
 
-GscContext	*gsc_completion_context_new		(GscModel	*model,
+GscContext	*gsc_context_new		(GscModel	*model,
 										 GtkTextView			*view,
 										 GList				*providers);
 
-void				 gsc_completion_context_add_proposals	(GscContext	*context,
+void				 gsc_context_add_proposals	(GscContext	*context,
 										 GscProvider	*provider,
 										 GList	 			*proposals);
 
-void				 gsc_completion_context_finish		(GscContext	*context);
+void				 gsc_context_finish		(GscContext	*context);
 
-GtkTextView			*gsc_completion_context_get_view		(GscContext	*context);
+GtkTextView			*gsc_context_get_view		(GscContext	*context);
 
-void				 gsc_completion_context_get_iter		(GscContext	*context,
+void				 gsc_context_get_iter		(GscContext	*context,
 										 GtkTextIter 			*iter);
 
-gchar				*gsc_completion_context_get_criteria	(GscContext	*context);
+gchar				*gsc_context_get_criteria	(GscContext	*context);
 
-GList				*gsc_completion_context_get_proposals	(GscContext	*context,
+GList				*gsc_context_get_proposals	(GscContext	*context,
 										 GscProvider	*provider);
 
-GList				*gsc_completion_context_get_providers	(GscContext 	*context);
+GList				*gsc_context_get_providers	(GscContext 	*context);
 
-gboolean			 gsc_completion_context_is_valid		(GscContext	*context);
+gboolean			 gsc_context_is_valid		(GscContext	*context);
 
-void				 gsc_completion_context_update		(GscContext	*context);
+void				 gsc_context_update		(GscContext	*context);
 
-void				 gsc_completion_context_set_filter_provider(GscContext	*context,
+void				 gsc_context_set_filter_provider(GscContext	*context,
 										   GscProvider	*provider);
 
-GscProvider	*gsc_completion_context_get_filter_provider(GscContext *context);
+GscProvider	*gsc_context_get_filter_provider(GscContext *context);
 
 G_END_DECLS
 

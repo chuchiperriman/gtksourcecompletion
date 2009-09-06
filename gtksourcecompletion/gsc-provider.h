@@ -20,8 +20,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __GSC_COMPLETION_PROVIDER_H__
-#define __GSC_COMPLETION_PROVIDER_H__
+#ifndef __GSC_PROVIDER_H__
+#define __GSC_PROVIDER_H__
 
 #include <glib.h>
 #include <glib-object.h>
@@ -32,9 +32,9 @@
 G_BEGIN_DECLS
 
 #define GSC_TYPE_PROVIDER 			(gsc_completion_provider_get_type ())
-#define GSC_COMPLETION_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROVIDER, GscProvider))
-#define GTK_IS_SOURCE_COMPLETION_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROVIDER))
-#define GSC_COMPLETION_PROVIDER_GET_INTERFACE(obj) 	(G_TYPE_INSTANCE_GET_INTERFACE ((obj), GSC_TYPE_PROVIDER, GscProviderIface))
+#define GSC_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROVIDER, GscProvider))
+#define GSC_IS_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROVIDER))
+#define GSC_PROVIDER_GET_INTERFACE(obj) 	(G_TYPE_INSTANCE_GET_INTERFACE ((obj), GSC_TYPE_PROVIDER, GscProviderIface))
 
 #define GSC_COMPLETION_CAPABILITY_INTERACTIVE "standard::interactive"
 #define GSC_COMPLETION_CAPABILITY_AUTOMATIC "standard::automatic"

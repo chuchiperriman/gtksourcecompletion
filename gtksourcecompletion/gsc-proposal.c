@@ -210,7 +210,7 @@ gsc_completion_proposal_get_type ()
 const gchar *
 gsc_completion_proposal_get_label (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);	
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);	
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_label (proposal);
 }
 
@@ -227,7 +227,7 @@ gsc_completion_proposal_get_label (GscProposal *proposal)
 const gchar *
 gsc_completion_proposal_get_markup (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);	
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);	
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_markup (proposal);
 }
 
@@ -245,7 +245,7 @@ gsc_completion_proposal_get_markup (GscProposal *proposal)
 const gchar *
 gsc_completion_proposal_get_text (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_text (proposal);
 }
 
@@ -260,7 +260,7 @@ gsc_completion_proposal_get_text (GscProposal *proposal)
 GdkPixbuf *
 gsc_completion_proposal_get_icon (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_icon (proposal);
 }
 
@@ -278,14 +278,14 @@ gsc_completion_proposal_get_icon (GscProposal *proposal)
 const gchar *
 gsc_completion_proposal_get_info (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_info (proposal);
 }
 
 guint
 gsc_completion_proposal_get_hash (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), 0);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), 0);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_hash (proposal);
 }
 
@@ -293,8 +293,8 @@ gboolean
 gsc_completion_proposal_equals (GscProposal *proposal1,
 				       GscProposal *proposal2)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal1), FALSE);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal2), FALSE);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal1), FALSE);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal2), FALSE);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal1)->equals (proposal1, proposal2);
 }
 
@@ -309,6 +309,6 @@ gsc_completion_proposal_equals (GscProposal *proposal1,
 void
 gsc_completion_proposal_changed (GscProposal *proposal)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal));
+	g_return_if_fail (GTK_IS_PROPOSAL (proposal));
 	g_signal_emit (proposal, signals[CHANGED], 0);
 }

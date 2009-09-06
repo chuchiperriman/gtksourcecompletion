@@ -22,9 +22,11 @@ libgtksourcecompletion_headers = 	\
 	gsc-provider.h			\
 	gsc-utils.h			\
 	gsc-proposal.h			\
+	gsc-item.h			\
 	gsc-i18n.h			\
+	gsc-context.h			\
 	gsc-completion.h		\
-	gsc-completion-priv.h		\
+	gsc-model.h			\
 	gsc-info.h
 
 libgtksourcecompletion_2_0_la_SOURCES = \
@@ -32,7 +34,10 @@ libgtksourcecompletion_2_0_la_SOURCES = \
 	gsc-provider.c			\
 	gsc-utils.c			\
 	gsc-proposal.c			\
+	gsc-item.c			\
+	gsc-context.c			\
 	gsc-completion.c		\
+	gsc-model.c			\
 	gsc-info.c			\
 	$(libgtksourcecompletion_headers)
 	
@@ -52,7 +57,9 @@ INST_H_FILES = \
 	gsc-tree.h			\
 	gsc-i18n.h			\
 	gsc-completion.h		\
-	gsc-completion-priv.h		\
+	gsc-item.h			\
+	gsc-context.h			\
+	gsc-model.h			\
 	gsc-info.h
 
 gsc-marshal.h: gsc-marshal.list $(GLIB_GENMARSHAL)

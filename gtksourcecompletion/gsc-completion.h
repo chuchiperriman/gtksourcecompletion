@@ -33,12 +33,12 @@ G_BEGIN_DECLS
 /*
  * Type checking and casting macros
  */
-#define GTK_TYPE_SOURCE_COMPLETION              (gsc_completion_get_type())
-#define GSC_COMPLETION(obj)              	(G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_SOURCE_COMPLETION, GscCompletion))
-#define GSC_COMPLETION_CLASS(klass)      	(G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_SOURCE_COMPLETION, GscCompletionClass))
-#define GTK_IS_SOURCE_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_SOURCE_COMPLETION))
-#define GTK_IS_SOURCE_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_SOURCE_COMPLETION))
-#define GSC_COMPLETION_GET_CLASS(obj)    	(G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_SOURCE_COMPLETION, GscCompletionClass))
+#define GSC_TYPE_COMPLETION              (gsc_completion_get_type())
+#define GSC_COMPLETION(obj)              	(G_TYPE_CHECK_INSTANCE_CAST((obj), GSC_TYPE_COMPLETION, GscCompletion))
+#define GSC_COMPLETION_CLASS(klass)      	(G_TYPE_CHECK_CLASS_CAST((klass), GSC_TYPE_COMPLETION, GscCompletionClass))
+#define GSC_IS_COMPLETION(obj)           (G_TYPE_CHECK_INSTANCE_TYPE((obj), GSC_TYPE_COMPLETION))
+#define GSC_IS_COMPLETION_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_COMPLETION))
+#define GSC_COMPLETION_GET_CLASS(obj)    	(G_TYPE_INSTANCE_GET_CLASS((obj), GSC_TYPE_COMPLETION, GscCompletionClass))
 
 #define GSC_COMPLETION_ERROR			(gsc_completion_error_quark ())
 
@@ -73,7 +73,9 @@ struct _GscCompletionClass
 	void		(* hide)			(GscCompletion         *completion);
 };
 
-GType		 gsc_completion_get_type			(void) G_GNUC_CONST;
+GscCompletion 	*gsc_completion_get_from_view		(GtkTextView *view);
+
+GType		 gsc_completion_get_type		(void) G_GNUC_CONST;
 
 GQuark		 gsc_completion_error_quark		(void);
 

@@ -54,4 +54,4 @@ void		 gsc_completion_utils_move_to_cursor		(GtkWindow       *window,
 
 G_END_DECLS
 
-#endif /* __GSC_COMPLETION_ITEM_H__ */
+#endif /* __GSC_ITEM_H__ */

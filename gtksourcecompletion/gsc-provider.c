@@ -149,8 +149,8 @@ gsc_completion_provider_get_type ()
 const gchar *
 gsc_completion_provider_get_name (GscProvider *provider)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
-	return GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->get_name (provider);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), NULL);
+	return GSC_PROVIDER_GET_INTERFACE (provider)->get_name (provider);
 }
 
 /**
@@ -165,8 +165,8 @@ gsc_completion_provider_get_name (GscProvider *provider)
 GdkPixbuf *
 gsc_completion_provider_get_icon (GscProvider *provider)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
-	return GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->get_icon (provider);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), NULL);
+	return GSC_PROVIDER_GET_INTERFACE (provider)->get_icon (provider);
 }
 
 /**
@@ -182,10 +182,10 @@ void
 gsc_completion_provider_populate_completion (GscProvider *provider,
 						    GscContext *context)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_CONTEXT (context));
+	g_return_if_fail (GSC_IS_PROVIDER (provider));
+	g_return_if_fail (GTK_IS_CONTEXT (context));
 
-	GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->populate_completion (provider, 
+	GSC_PROVIDER_GET_INTERFACE (provider)->populate_completion (provider, 
 										      context);
 }
 
@@ -200,8 +200,8 @@ gsc_completion_provider_populate_completion (GscProvider *provider,
 const gchar *
 gsc_completion_provider_get_capabilities (GscProvider *provider)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
-	return GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->get_capabilities (provider);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), NULL);
+	return GSC_PROVIDER_GET_INTERFACE (provider)->get_capabilities (provider);
 }
 
 /**
@@ -224,10 +224,10 @@ GtkWidget *
 gsc_completion_provider_get_info_widget (GscProvider *provider,
                                                 GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), NULL);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), NULL);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
 	
-	return GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->get_info_widget (provider, proposal);
+	return GSC_PROVIDER_GET_INTERFACE (provider)->get_info_widget (provider, proposal);
 }
 
 /**
@@ -246,11 +246,11 @@ gsc_completion_provider_update_info (GscProvider *provider,
                                             GscProposal *proposal,
                                             GscInfo     *info)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal));
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (info));
+	g_return_if_fail (GSC_IS_PROVIDER (provider));
+	g_return_if_fail (GTK_IS_PROPOSAL (proposal));
+	g_return_if_fail (GTK_IS_INFO (info));
 	
-	GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->update_info (provider, proposal, info);
+	GSC_PROVIDER_GET_INTERFACE (provider)->update_info (provider, proposal, info);
 }
 
 /**
@@ -271,10 +271,10 @@ gsc_completion_provider_activate_proposal (GscProvider *provider,
                                                   GscProposal *proposal,
                                                   GtkTextIter                 *iter)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROVIDER (provider), FALSE);
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_PROPOSAL (proposal), FALSE);
+	g_return_val_if_fail (GSC_IS_PROVIDER (provider), FALSE);
+	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), FALSE);
 	
-	return GSC_COMPLETION_PROVIDER_GET_INTERFACE (provider)->activate_proposal (provider, 
+	return GSC_PROVIDER_GET_INTERFACE (provider)->activate_proposal (provider, 
 	                                                                                   proposal,
 	                                                                                   iter);
 }

@@ -410,7 +410,7 @@ gsc_completion_info_move_to_iter (GscInfo *info,
 	GtkTextMark *insert_mark;
 	GtkTextIter start;
 	
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (info));
+	g_return_if_fail (GTK_IS_INFO (info));
 	g_return_if_fail (GTK_IS_SOURCE_VIEW (view));
 	
 	if (iter == NULL)
@@ -452,7 +452,7 @@ gsc_completion_info_set_sizing (GscInfo *info,
 				       gboolean                 shrink_width,
 				       gboolean                 shrink_height)
 {
-	g_return_if_fail  (GTK_IS_SOURCE_COMPLETION_INFO (info));
+	g_return_if_fail  (GTK_IS_INFO (info));
 
 	if (info->priv->max_width == width &&
 	    info->priv->max_height == height &&
@@ -536,7 +536,7 @@ gsc_completion_info_set_widget (GscInfo *info,
 {
 	GtkWidget *child;
 
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (info));
+	g_return_if_fail (GTK_IS_INFO (info));
 	g_return_if_fail (widget == NULL || GTK_IS_WIDGET (widget));
 
 	if (info->priv->widget == widget)
@@ -614,7 +614,7 @@ gsc_completion_info_set_widget (GscInfo *info,
 GtkWidget *
 gsc_completion_info_get_widget (GscInfo* info)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (info), NULL);
+	g_return_val_if_fail (GTK_IS_INFO (info), NULL);
 
 	return info->priv->widget;
 }
@@ -622,7 +622,7 @@ gsc_completion_info_get_widget (GscInfo* info)
 void
 gsc_completion_info_process_resize (GscInfo *info)
 {
-	g_return_if_fail (GTK_IS_SOURCE_COMPLETION_INFO (info));
+	g_return_if_fail (GTK_IS_INFO (info));
 	
 	if (info->priv->idle_resize != 0)
 		window_resize (info);
