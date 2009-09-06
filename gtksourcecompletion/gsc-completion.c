@@ -253,7 +253,7 @@ context_populate (GscCompletion	*completion,
 		    g_list_find (completion->priv->providers,
 		                 l->data) != NULL)
 		{
-			gsc_completion_provider_populate_completion (GSC_PROVIDER (l->data),
+			gsc_provider_populate_completion (GSC_PROVIDER (l->data),
 									    completion->priv->context);
 		}
 	}
@@ -291,11 +291,11 @@ activate_current_proposal (GscCompletion *completion)
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (completion->priv->view));
 	get_iter_at_insert (completion, &titer);
 
-	activated = gsc_completion_provider_activate_proposal (provider, proposal, &titer);
+	activated = gsc_provider_activate_proposal (provider, proposal, &titer);
 
 	if (!activated)
 	{
-		text = gsc_completion_proposal_get_text (proposal);
+		text = gsc_proposal_get_text (proposal);
 		gsc_completion_utils_replace_current_word (GTK_SOURCE_BUFFER (buffer),
 				                                  text ? text : NULL,
 				                                  -1);
@@ -579,10 +579,10 @@ update_selection_label (GscCompletion *completion)
 	}
 	else
 	{
-		name = g_markup_escape_text (gsc_completion_provider_get_name (filter_provider), -1);
+		name = g_markup_escape_text (gsc_provider_get_name (filter_provider), -1);
 
 		gtk_image_set_from_pixbuf (GTK_IMAGE (completion->priv->selection_image),
-                           (GdkPixbuf *)gsc_completion_provider_get_icon (filter_provider));
+                           (GdkPixbuf *)gsc_provider_get_icon (filter_provider));
 	}
 	
 	if (num > 1)
@@ -793,14 +793,14 @@ update_proposal_info_real (GscCompletion         *completion,
 	}
 	else
 	{
-		info_widget = gsc_completion_provider_get_info_widget (provider, 
+		info_widget = gsc_provider_get_info_widget (provider, 
 		                                                              proposal);
 
 		/* If there is no special custom widget, use the default */
 		if (info_widget == NULL)
 		{
 			info_widget = completion->priv->default_info;
-			text = gsc_completion_proposal_get_info (proposal);
+			text = gsc_proposal_get_info (proposal);
 			
 			gtk_label_set_markup (GTK_LABEL (info_widget), text != NULL ? text : _("No extra information available"));
 		}
@@ -815,7 +815,7 @@ update_proposal_info_real (GscCompletion         *completion,
 
 	if (prov_update_info)
 	{
-		gsc_completion_provider_update_info (provider, 
+		gsc_provider_update_info (provider, 
 			                                    proposal,
 			                                    info_window);
 	}
@@ -1882,7 +1882,7 @@ static gchar **
 get_separate_capabilities (GscProvider *provider)
 {
 	const gchar *capabilities;
-	capabilities = gsc_completion_provider_get_capabilities (provider);
+	capabilities = gsc_provider_get_capabilities (provider);
 	
 	return g_strsplit_set (capabilities, " ,", -1);
 }

@@ -95,7 +95,7 @@ path_from_list (GscModel *model,
 {
 	gint index = 0;
 
-	g_assert (GTK_IS_PROPOSAL (((ProposalNode*)item->data)->proposal));
+	g_assert (GSC_IS_PROPOSAL (((ProposalNode*)item->data)->proposal));
 	index = g_list_position (model->priv->store, item);
 	
 	if (index == -1)
@@ -219,22 +219,22 @@ tree_model_get_value (GtkTreeModel *tree_model,
 			g_value_set_object (value, node->proposal);
 			break;
 		case GSC_COMPLETION_MODEL_COLUMN_LABEL:
-			g_value_set_string (value, gsc_completion_proposal_get_label (node->proposal));
+			g_value_set_string (value, gsc_proposal_get_label (node->proposal));
 			break;
 		case GSC_COMPLETION_MODEL_COLUMN_MARKUP:
-			g_value_set_string (value, gsc_completion_proposal_get_markup (node->proposal));
+			g_value_set_string (value, gsc_proposal_get_markup (node->proposal));
 			break;
 		case GSC_COMPLETION_MODEL_COLUMN_ICON:
 			if (node->proposal == NULL)
 			{
 				g_value_set_object (value, 
-				                    (gpointer)gsc_completion_provider_get_icon (
+				                    (gpointer)gsc_provider_get_icon (
 				                    	node->provider));
 			}
 			else
 			{
 				g_value_set_object (value, 
-				                    (gpointer)gsc_completion_proposal_get_icon (
+				                    (gpointer)gsc_proposal_get_icon (
 				                    	node->proposal));
 			}
 			break;
@@ -467,7 +467,7 @@ compare_nodes (gconstpointer a,
 {
 	ProposalNode *p1 = (ProposalNode *)a;
 	ProposalNode *p2 = (ProposalNode *)b;
-	return gsc_completion_proposal_equals (p1->proposal, p2->proposal);
+	return gsc_proposal_equals (p1->proposal, p2->proposal);
 }
 
 static gboolean
@@ -476,7 +476,7 @@ compare_proposals (gconstpointer a,
 {
 	GscProposal *p1 = GSC_COMPLETION_PROPOSAL (a);
 	GscProposal *p2 = GSC_COMPLETION_PROPOSAL (b);
-	return gsc_completion_proposal_equals (p1, p2);
+	return gsc_proposal_equals (p1, p2);
 }
 
 static guint
@@ -484,7 +484,7 @@ hash_node (gconstpointer v)
 {
 	ProposalNode *node = (ProposalNode *)v;
 	
-	return gsc_completion_proposal_get_hash (node->proposal);
+	return gsc_proposal_get_hash (node->proposal);
 }
 
 static void
@@ -757,7 +757,7 @@ gsc_completion_model_set_proposals (GscModel	    *model,
 		rinfo.model = model;
 		if (proposals)
 		{
-			rinfo.proposals = g_hash_table_new ((GHashFunc)gsc_completion_proposal_get_hash,
+			rinfo.proposals = g_hash_table_new ((GHashFunc)gsc_proposal_get_hash,
 							    compare_proposals);
 			for (item = proposals; item; item = g_list_next (item))
 			{
@@ -779,7 +779,7 @@ gsc_completion_model_set_proposals (GscModel	    *model,
 
 	for (item = proposals; item; item = g_list_next (item))
 	{
-		if (GTK_IS_PROPOSAL (item->data))
+		if (GSC_IS_PROPOSAL (item->data))
 		{
 			proposal = GSC_COMPLETION_PROPOSAL (item->data);
 			gsc_completion_model_append (model,
@@ -799,7 +799,7 @@ gsc_completion_model_append (GscModel    *model,
 	
 	g_return_if_fail (GSC_IS_MODEL (model));
 	g_return_if_fail (GSC_IS_PROVIDER (provider));
-	g_return_if_fail (GTK_IS_PROPOSAL (proposal));
+	g_return_if_fail (GSC_IS_PROPOSAL (proposal));
 	
 	node = g_slice_new (ProposalNode);
 	node->provider = g_object_ref (provider);

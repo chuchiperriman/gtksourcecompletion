@@ -36,10 +36,10 @@ G_BEGIN_DECLS
    (G_TYPE_CHECK_CLASS_CAST ((klass),                                   \
                              GSC_TYPE_CONTEXT,        \
                              GscContextClass))
-#define GTK_IS_CONTEXT(obj)                           \
+#define GSC_IS_CONTEXT(obj)                           \
    (G_TYPE_CHECK_INSTANCE_TYPE ((obj),                                  \
                                 GSC_TYPE_CONTEXT))
-#define GTK_IS_CONTEXT_CLASS(klass)                   \
+#define GSC_IS_CONTEXT_CLASS(klass)                   \
    (G_TYPE_CHECK_CLASS_TYPE ((klass),                                   \
                              GSC_TYPE_CONTEXT))
 #define GSC_COMPLETION_CONTEXT_GET_CLASS(obj)                    \

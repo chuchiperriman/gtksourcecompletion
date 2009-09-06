@@ -69,3 +69,9 @@ completion_custom_widgets_LDFLAGS =  \
 completion_custom_widgets_LDADD = 	\
 	$(top_builddir)/gtksourcecompletion/libgtksourcecompletion-2.0.la	\
 	$(PACKAGE_LIBS)
+
+if USE_DEVHELP
+completion_simple_SOURCES += gsc-provider-devhelp.h gsc-provider-devhelp.c
+completion_simple_LDADD += $(DEVHELP_LIBS)
+INCLUDES += $(DEVHELP_CFLAGS)
+endif

@@ -31,7 +31,7 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_PROVIDER 			(gsc_completion_provider_get_type ())
+#define GSC_TYPE_PROVIDER 			(gsc_provider_get_type ())
 #define GSC_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROVIDER, GscProvider))
 #define GSC_IS_PROVIDER(obj) 			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROVIDER))
 #define GSC_PROVIDER_GET_INTERFACE(obj) 	(G_TYPE_INSTANCE_GET_INTERFACE ((obj), GSC_TYPE_PROVIDER, GscProviderIface))
@@ -66,26 +66,26 @@ struct _GscProviderIface
 						 GtkTextIter                 *iter);
 };
 
-GType		 gsc_completion_provider_get_type		(void);
+GType		 gsc_provider_get_type		(void);
 
 
-const gchar	*gsc_completion_provider_get_name		(GscProvider *provider);
+const gchar	*gsc_provider_get_name		(GscProvider *provider);
 
-GdkPixbuf	*gsc_completion_provider_get_icon		(GscProvider *provider);
+GdkPixbuf	*gsc_provider_get_icon		(GscProvider *provider);
 
-void		 gsc_completion_provider_populate_completion	(GscProvider *provider,
+void		 gsc_provider_populate_completion	(GscProvider *provider,
 									 GscContext  *context);
 
-const gchar 	*gsc_completion_provider_get_capabilities 	(GscProvider *provider);
+const gchar 	*gsc_provider_get_capabilities 	(GscProvider *provider);
 
-GtkWidget	*gsc_completion_provider_get_info_widget		(GscProvider *provider,
+GtkWidget	*gsc_provider_get_info_widget		(GscProvider *provider,
 									 GscProposal *proposal);
 
-void 		 gsc_completion_provider_update_info		(GscProvider *provider,
+void 		 gsc_provider_update_info		(GscProvider *provider,
 									 GscProposal *proposal,
 									 GscInfo     *info);
 
-gboolean	 gsc_completion_provider_activate_proposal 	(GscProvider *provider,
+gboolean	 gsc_provider_activate_proposal 	(GscProvider *provider,
 									 GscProposal *proposal,
 									 GtkTextIter                 *iter);
 

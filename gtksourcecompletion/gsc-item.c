@@ -46,56 +46,56 @@ enum
 	PROP_INFO
 };
 
-static void gsc_completion_proposal_iface_init (gpointer g_iface, gpointer iface_data);
+static void gsc_proposal_iface_init (gpointer g_iface, gpointer iface_data);
 
 G_DEFINE_TYPE_WITH_CODE (GscItem, 
 			 gsc_item, 
 			 G_TYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (GSC_TYPE_PROPOSAL,
-			 			gsc_completion_proposal_iface_init))
+			 			gsc_proposal_iface_init))
 
 static const gchar *
-gsc_completion_proposal_get_label_impl (GscProposal *self)
+gsc_proposal_get_label_impl (GscProposal *self)
 {
 	return GSC_ITEM (self)->priv->label;
 }
 
 static const gchar *
-gsc_completion_proposal_get_markup_impl (GscProposal *self)
+gsc_proposal_get_markup_impl (GscProposal *self)
 {
 	return GSC_ITEM (self)->priv->markup;
 }
 
 static const gchar *
-gsc_completion_proposal_get_text_impl (GscProposal *self)
+gsc_proposal_get_text_impl (GscProposal *self)
 {
 	return GSC_ITEM (self)->priv->text;
 }
 
 static GdkPixbuf *
-gsc_completion_proposal_get_icon_impl (GscProposal *self)
+gsc_proposal_get_icon_impl (GscProposal *self)
 {
 	return GSC_ITEM (self)->priv->icon;
 }
 
 static const gchar *
-gsc_completion_proposal_get_info_impl (GscProposal *self)
+gsc_proposal_get_info_impl (GscProposal *self)
 {
 	return GSC_ITEM (self)->priv->info;
 }
 
 static void
-gsc_completion_proposal_iface_init (gpointer g_iface, 
+gsc_proposal_iface_init (gpointer g_iface, 
 					   gpointer iface_data)
 {
 	GscProposalIface *iface = (GscProposalIface *)g_iface;
 	
 	/* Interface data getter implementations */
-	iface->get_label = gsc_completion_proposal_get_label_impl;
-	iface->get_markup = gsc_completion_proposal_get_markup_impl;
-	iface->get_text = gsc_completion_proposal_get_text_impl;
-	iface->get_icon = gsc_completion_proposal_get_icon_impl;
-	iface->get_info = gsc_completion_proposal_get_info_impl;
+	iface->get_label = gsc_proposal_get_label_impl;
+	iface->get_markup = gsc_proposal_get_markup_impl;
+	iface->get_text = gsc_proposal_get_text_impl;
+	iface->get_icon = gsc_proposal_get_icon_impl;
+	iface->get_info = gsc_proposal_get_info_impl;
 }
 
 static void
@@ -155,7 +155,7 @@ gsc_item_get_property (GObject    *object,
 static void
 emit_changed (GscItem *item)
 {
-	gsc_completion_proposal_changed (GSC_COMPLETION_PROPOSAL (item));
+	gsc_proposal_changed (GSC_COMPLETION_PROPOSAL (item));
 }
 
 static void

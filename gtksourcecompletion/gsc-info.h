@@ -31,8 +31,8 @@ G_BEGIN_DECLS
 #define GSC_TYPE_INFO             (gsc_completion_info_get_type ())
 #define GSC_COMPLETION_INFO(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_INFO, GscInfo))
 #define GSC_COMPLETION_INFO_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_INFO, GscInfoClass)
-#define GTK_IS_INFO(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_INFO))
-#define GTK_IS_INFO_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_INFO))
+#define GSC_IS_INFO(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_INFO))
+#define GSC_IS_INFO_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_INFO))
 #define GSC_COMPLETION_INFO_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_INFO, GscInfoClass))
 
 typedef struct _GscInfoPrivate GscInfoPrivate;

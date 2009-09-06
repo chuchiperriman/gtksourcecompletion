@@ -191,7 +191,7 @@ gsc_context_add_proposals (GscContext		*context,
 	GList *item;
 	GscProposal *proposal;
 
-	g_return_if_fail (GTK_IS_CONTEXT (context));
+	g_return_if_fail (GSC_IS_CONTEXT (context));
 	g_return_if_fail (GSC_IS_PROVIDER (provider));
 	g_return_if_fail (!context->priv->invalidated);
 
@@ -229,7 +229,7 @@ gsc_context_add_proposals (GscContext		*context,
 		{
 			for (item = proposals; item; item = g_list_next (item))
 			{
-				if (GTK_IS_PROPOSAL (item->data))
+				if (GSC_IS_PROPOSAL (item->data))
 				{
 					proposal = GSC_COMPLETION_PROPOSAL (item->data);
 					gsc_completion_model_append (context->priv->model,
@@ -248,7 +248,7 @@ gsc_context_add_proposals (GscContext		*context,
 void
 gsc_context_finish (GscContext	*context)
 {
-	g_return_if_fail (GTK_IS_CONTEXT (context));
+	g_return_if_fail (GSC_IS_CONTEXT (context));
 	g_return_if_fail (!context->priv->invalidated);
 
 	g_signal_emit (context, signals[FINISHED], 0);
@@ -258,7 +258,7 @@ gsc_context_finish (GscContext	*context)
 GtkTextView*
 gsc_context_get_view (GscContext	*context)
 {
-	g_return_val_if_fail (GTK_IS_CONTEXT(context), NULL);
+	g_return_val_if_fail (GSC_IS_CONTEXT(context), NULL);
 
 	return context->priv->view;
 }
@@ -267,7 +267,7 @@ void
 gsc_context_get_iter (GscContext	*context,
 					GtkTextIter *iter)
 {
-	g_return_if_fail (GTK_IS_CONTEXT(context));
+	g_return_if_fail (GSC_IS_CONTEXT(context));
 
 	*iter = context->priv->iter;
 }
@@ -283,7 +283,7 @@ gsc_context_get_iter (GscContext	*context,
 gchar*
 gsc_context_get_criteria (GscContext	*context)
 {
-	g_return_val_if_fail (GTK_IS_CONTEXT(context), NULL);
+	g_return_val_if_fail (GSC_IS_CONTEXT(context), NULL);
 
 	return context->priv->criteria;
 }
@@ -300,7 +300,7 @@ gsc_context_get_criteria (GscContext	*context)
 GList*
 gsc_context_get_providers (GscContext *context)
 {
-	g_return_val_if_fail (GTK_IS_CONTEXT (context), NULL);
+	g_return_val_if_fail (GSC_IS_CONTEXT (context), NULL);
 	return g_hash_table_get_keys (context->priv->pinfo_table);
 }
 
@@ -318,7 +318,7 @@ gsc_context_get_proposals (GscContext		*context,
 					     GscProvider	*provider)
 {
 	ProviderInfo *pinfo;
-	g_return_val_if_fail (GTK_IS_CONTEXT (context), NULL);
+	g_return_val_if_fail (GSC_IS_CONTEXT (context), NULL);
 	g_return_val_if_fail (GSC_IS_PROVIDER (provider), NULL);
 	
 	pinfo = (ProviderInfo*)g_hash_table_lookup (context->priv->pinfo_table, provider);
@@ -329,7 +329,7 @@ gsc_context_get_proposals (GscContext		*context,
 gboolean
 gsc_context_is_valid (GscContext	*context)
 {
-	g_return_val_if_fail (GTK_IS_CONTEXT (context), FALSE);
+	g_return_val_if_fail (GSC_IS_CONTEXT (context), FALSE);
 	
 	return !context->priv->invalidated;
 }
@@ -340,7 +340,7 @@ gsc_context_update (GscContext	*context)
 	ProviderInfo *pinfo;
 	GList *pinfo_list;
 	GList *l;
-	g_return_if_fail (GTK_IS_CONTEXT (context));
+	g_return_if_fail (GSC_IS_CONTEXT (context));
 
 	pinfo_list = g_hash_table_get_values (context->priv->pinfo_table);
 	for (l = pinfo_list; l != NULL; l = g_list_next (l))
@@ -364,7 +364,7 @@ gsc_context_set_filter_provider (GscContext	*context,
 	GList *providers;
 	GList *current;
 	
-	g_return_if_fail (GTK_IS_CONTEXT (context));
+	g_return_if_fail (GSC_IS_CONTEXT (context));
 	//TODO Check if the provider is in the list of providers
 
 	if (context->priv->filter_provider == provider)
@@ -405,7 +405,7 @@ gsc_context_set_filter_provider (GscContext	*context,
 GscProvider*
 gsc_context_get_filter_provider (GscContext *context)
 {
-	g_return_val_if_fail (GTK_IS_CONTEXT (context), NULL);
+	g_return_val_if_fail (GSC_IS_CONTEXT (context), NULL);
 
 	return context->priv->filter_provider;
 }

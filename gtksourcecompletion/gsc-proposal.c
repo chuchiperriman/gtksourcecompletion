@@ -45,44 +45,44 @@ enum
 static guint signals[NUM_SIGNALS] = {0,};
 
 static const gchar *
-gsc_completion_proposal_get_label_default (GscProposal *proposal)
+gsc_proposal_get_label_default (GscProposal *proposal)
 {
 	g_return_val_if_reached (NULL);
 }
 
 static const gchar *
-gsc_completion_proposal_get_markup_default (GscProposal *proposal)
+gsc_proposal_get_markup_default (GscProposal *proposal)
 {
 	return NULL;
 }
 
 static const gchar *
-gsc_completion_proposal_get_text_default (GscProposal *proposal)
+gsc_proposal_get_text_default (GscProposal *proposal)
 {
 	return NULL;
 }
 
 static GdkPixbuf *
-gsc_completion_proposal_get_icon_default (GscProposal *proposal)
+gsc_proposal_get_icon_default (GscProposal *proposal)
 {
 	return NULL;
 }
 
 static const gchar *
-gsc_completion_proposal_get_info_default (GscProposal *proposal)
+gsc_proposal_get_info_default (GscProposal *proposal)
 {
 	return NULL;
 }
 
 static guint
-gsc_completion_proposal_get_hash_default (GscProposal *proposal)
+gsc_proposal_get_hash_default (GscProposal *proposal)
 {
 	const gchar *label;
 	
-	label = gsc_completion_proposal_get_label (proposal);
+	label = gsc_proposal_get_label (proposal);
 	
 	if (label == NULL)
-		label = gsc_completion_proposal_get_markup (proposal);
+		label = gsc_proposal_get_markup (proposal);
 	
 	if (label != NULL)
 		return g_str_hash (label);
@@ -91,13 +91,13 @@ gsc_completion_proposal_get_hash_default (GscProposal *proposal)
 }
 
 static gboolean
-gsc_completion_proposal_equals_default (GscProposal *proposal1,
+gsc_proposal_equals_default (GscProposal *proposal1,
 					       GscProposal *proposal2)
 {
 	const gchar *label1, *label2;
 	
-	label1 = gsc_completion_proposal_get_markup (proposal1);
-	label2 = gsc_completion_proposal_get_markup (proposal2);
+	label1 = gsc_proposal_get_markup (proposal1);
+	label2 = gsc_proposal_get_markup (proposal2);
 
 	if (label1 != NULL && label2 == NULL)
 	{
@@ -109,8 +109,8 @@ gsc_completion_proposal_equals_default (GscProposal *proposal1,
 	}
 	else if (label1 == NULL && label2 == NULL)
 	{
-		label1 = gsc_completion_proposal_get_label (proposal1);
-		label2 = gsc_completion_proposal_get_label (proposal2);
+		label1 = gsc_proposal_get_label (proposal1);
+		label2 = gsc_proposal_get_label (proposal2);
 	}
 
 	if (label1 != NULL && label2 != NULL)
@@ -128,19 +128,19 @@ gsc_completion_proposal_equals_default (GscProposal *proposal1,
 }
 
 static void 
-gsc_completion_proposal_init (GscProposalIface *iface)
+gsc_proposal_init (GscProposalIface *iface)
 {
 	static gboolean initialized = FALSE;
 	
-	iface->get_label = gsc_completion_proposal_get_label_default;
-	iface->get_markup = gsc_completion_proposal_get_markup_default;
-	iface->get_text = gsc_completion_proposal_get_text_default;
+	iface->get_label = gsc_proposal_get_label_default;
+	iface->get_markup = gsc_proposal_get_markup_default;
+	iface->get_text = gsc_proposal_get_text_default;
 	
-	iface->get_icon = gsc_completion_proposal_get_icon_default;
-	iface->get_info = gsc_completion_proposal_get_info_default;
+	iface->get_icon = gsc_proposal_get_icon_default;
+	iface->get_info = gsc_proposal_get_info_default;
 	
-	iface->get_hash = gsc_completion_proposal_get_hash_default;
-	iface->equals = gsc_completion_proposal_equals_default;
+	iface->get_hash = gsc_proposal_get_hash_default;
+	iface->equals = gsc_proposal_equals_default;
 	
 	if (!initialized)
 	{
@@ -168,16 +168,16 @@ gsc_completion_proposal_init (GscProposalIface *iface)
 }
 
 GType 
-gsc_completion_proposal_get_type ()
+gsc_proposal_get_type ()
 {
-	static GType gsc_completion_proposal_type_id = 0;
+	static GType gsc_proposal_type_id = 0;
 	
-	if (!gsc_completion_proposal_type_id)
+	if (!gsc_proposal_type_id)
 	{
 		static const GTypeInfo g_define_type_info =
 		{
 			sizeof (GscProposalIface),
-			(GBaseInitFunc) gsc_completion_proposal_init, 
+			(GBaseInitFunc) gsc_proposal_init, 
 			NULL,
 			NULL,
 			NULL,
@@ -187,52 +187,52 @@ gsc_completion_proposal_get_type ()
 			NULL
 		};
 		
-		gsc_completion_proposal_type_id = 
+		gsc_proposal_type_id = 
 			g_type_register_static (G_TYPE_INTERFACE,
 						"GscProposal",
 						&g_define_type_info,
 						0);
 	}
 	
-	return gsc_completion_proposal_type_id;
+	return gsc_proposal_type_id;
 }
 
 /**
- * gsc_completion_proposal_get_label:
+ * gsc_proposal_get_label:
  * @proposal: A #GscProposal
  *
  * Gets the label of @proposal. The label is shown in the list of proposals as
  * plain text. If you need any markup (such as bold or italic text), you have
- * to implement #gsc_completion_proposal_get_markup.
+ * to implement #gsc_proposal_get_markup.
  *
  * Returns: The label of @proposal.
  */
 const gchar *
-gsc_completion_proposal_get_label (GscProposal *proposal)
+gsc_proposal_get_label (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);	
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), NULL);	
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_label (proposal);
 }
 
 /**
- * gsc_completion_proposal_get_markup:
+ * gsc_proposal_get_markup:
  * @proposal: A #GscProposal
  *
  * Gets the label of @proposal with markup. The label is shown in the list of 
  * proposals and may contain markup. This will be used instead of
- * #gsc_completion_proposal_get_label if implemented.
+ * #gsc_proposal_get_label if implemented.
  *
  * Returns: The label of @proposal with markup.
  */
 const gchar *
-gsc_completion_proposal_get_markup (GscProposal *proposal)
+gsc_proposal_get_markup (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);	
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), NULL);	
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_markup (proposal);
 }
 
 /**
- * gsc_completion_proposal_get_text:
+ * gsc_proposal_get_text:
  * @proposal: A #GscProposal
  *
  * Gets the text of @proposal. The text that is inserted into
@@ -243,14 +243,14 @@ gsc_completion_proposal_get_markup (GscProposal *proposal)
  * Returns: The text of @proposal.
  */
 const gchar *
-gsc_completion_proposal_get_text (GscProposal *proposal)
+gsc_proposal_get_text (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_text (proposal);
 }
 
 /**
- * gsc_completion_proposal_get_icon:
+ * gsc_proposal_get_icon:
  * @proposal: A #GscProposal
  *
  * Gets the icon of @proposal.
@@ -258,14 +258,14 @@ gsc_completion_proposal_get_text (GscProposal *proposal)
  * Returns: The icon of @proposal.
  */
 GdkPixbuf *
-gsc_completion_proposal_get_icon (GscProposal *proposal)
+gsc_proposal_get_icon (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_icon (proposal);
 }
 
 /**
- * gsc_completion_proposal_get_info:
+ * gsc_proposal_get_info:
  * @proposal: A #GscProposal
  *
  * Gets extra information associated to the proposal. This information will be
@@ -276,30 +276,30 @@ gsc_completion_proposal_get_icon (GscProposal *proposal)
  *          is associated to @proposal.
  */
 const gchar *
-gsc_completion_proposal_get_info (GscProposal *proposal)
+gsc_proposal_get_info (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), NULL);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), NULL);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_info (proposal);
 }
 
 guint
-gsc_completion_proposal_get_hash (GscProposal *proposal)
+gsc_proposal_get_hash (GscProposal *proposal)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal), 0);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal), 0);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal)->get_hash (proposal);
 }
 
 gboolean
-gsc_completion_proposal_equals (GscProposal *proposal1,
+gsc_proposal_equals (GscProposal *proposal1,
 				       GscProposal *proposal2)
 {
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal1), FALSE);
-	g_return_val_if_fail (GTK_IS_PROPOSAL (proposal2), FALSE);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal1), FALSE);
+	g_return_val_if_fail (GSC_IS_PROPOSAL (proposal2), FALSE);
 	return GSC_COMPLETION_PROPOSAL_GET_INTERFACE (proposal1)->equals (proposal1, proposal2);
 }
 
 /**
- * gsc_completion_proposal_changed:
+ * gsc_proposal_changed:
  * @proposal: A #GscProposal
  *
  * Emits the "changed" signal on @proposal. This should be called by
@@ -307,8 +307,8 @@ gsc_completion_proposal_equals (GscProposal *proposal1,
  * changed.
  */
 void
-gsc_completion_proposal_changed (GscProposal *proposal)
+gsc_proposal_changed (GscProposal *proposal)
 {
-	g_return_if_fail (GTK_IS_PROPOSAL (proposal));
+	g_return_if_fail (GSC_IS_PROPOSAL (proposal));
 	g_signal_emit (proposal, signals[CHANGED], 0);
 }

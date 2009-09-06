@@ -58,8 +58,31 @@ GTK_DOC_CHECK(1.8)
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
-
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
+have_devhelp=no
+AC_ARG_WITH(devhelp,
+            AC_HELP_STRING([--with-devhelp],
+                           [Build with devhelp test case]),,
+            with_devhelp=auto)
+if test "x$with_devhelp" != "xno"
+then
+        PKG_CHECK_MODULES(DEVHELP, [
+                libdevhelp-1.0 >= 0.22
+                webkit-1.0
+        ], have_devhelp=yes, have_devhelp=no)
+
+        #Disable devhelp by the moment
+        #if test "x$have_devhelp" = "xyes"
+        if test "x$have_devhelp" = "xyes"
+        then
+                AC_DEFINE([HAVE_DEVHELP], 1, [Have devhelp])
+        fi
+fi
+
+AM_CONDITIONAL(USE_DEVHELP, test "x$have_devhelp" = "xyes")
+#Disable devhelp by the moment
+#AM_CONDITIONAL(USE_DEVHELP, test "x$have_devhelpno" = "xyes")
 
 AC_OUTPUT([
 Makefile

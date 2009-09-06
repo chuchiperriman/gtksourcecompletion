@@ -29,9 +29,9 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_PROPOSAL			(gsc_completion_proposal_get_type ())
+#define GSC_TYPE_PROPOSAL			(gsc_proposal_get_type ())
 #define GSC_COMPLETION_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_PROPOSAL, GscProposal))
-#define GTK_IS_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROPOSAL))
+#define GSC_IS_PROPOSAL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_PROPOSAL))
 #define GSC_COMPLETION_PROPOSAL_GET_INTERFACE(obj)	(G_TYPE_INSTANCE_GET_INTERFACE ((obj), GSC_TYPE_PROPOSAL, GscProposalIface))
 
 typedef struct _GscProposal		GscProposal;
@@ -57,20 +57,20 @@ struct _GscProposalIface
 	void		 (*changed)	(GscProposal *proposal);
 };
 
-GType 			 gsc_completion_proposal_get_type 	(void) G_GNUC_CONST;
+GType 			 gsc_proposal_get_type 	(void) G_GNUC_CONST;
 
-const gchar		*gsc_completion_proposal_get_label	(GscProposal *proposal);
-const gchar		*gsc_completion_proposal_get_markup	(GscProposal *proposal);
-const gchar		*gsc_completion_proposal_get_text	(GscProposal *proposal);
+const gchar		*gsc_proposal_get_label	(GscProposal *proposal);
+const gchar		*gsc_proposal_get_markup	(GscProposal *proposal);
+const gchar		*gsc_proposal_get_text	(GscProposal *proposal);
 
-GdkPixbuf		*gsc_completion_proposal_get_icon	(GscProposal *proposal);
-const gchar		*gsc_completion_proposal_get_info	(GscProposal *proposal);
+GdkPixbuf		*gsc_proposal_get_icon	(GscProposal *proposal);
+const gchar		*gsc_proposal_get_info	(GscProposal *proposal);
 
-guint			 gsc_completion_proposal_get_hash	(GscProposal *proposal);
-gboolean		 gsc_completion_proposal_equals		(GscProposal *proposal1,
+guint			 gsc_proposal_get_hash	(GscProposal *proposal);
+gboolean		 gsc_proposal_equals		(GscProposal *proposal1,
 									 GscProposal *proposal2);
 
-void			 gsc_completion_proposal_changed		(GscProposal *proposal);
+void			 gsc_proposal_changed		(GscProposal *proposal);
 
 G_END_DECLS
 
