@@ -30,6 +30,7 @@
 #include <gtksourcecompletion/gsc-info.h>
 
 #include "gsc-provider-test.h"
+#include "gsc-provider-words.h"
 
 #ifdef HAVE_DEVHELP
 #include <devhelp/dh-base.h>
@@ -205,9 +206,17 @@ create_completion(void)
 	
 	gsc_completion_add_provider (comp, GSC_PROVIDER (prov_test1), NULL);
 
-	icon = get_icon_from_theme (GTK_STOCK_CLOSE);
+	icon = get_icon_from_theme (GTK_STOCK_FILE);
+	prov_test1 = gsc_provider_words_new ("Document words", icon);
+	if (icon != NULL)
+	{
+		g_object_unref (icon);
+	}
+	
+	gsc_completion_add_provider (comp, GSC_PROVIDER (prov_test1), NULL);
 
 	/*
+	  icon = get_icon_from_theme (GTK_STOCK_CLOSE);
 	prov_test1 = gsc_provider_async_new ("Async", icon);
 	if (icon != NULL)
 	{

@@ -424,7 +424,7 @@ gsc_completion_info_move_to_iter (GscInfo *info,
 		start = *iter;
 	}
 	
-	gsc_completion_utils_move_to_iter (GTK_WINDOW (info),
+	gsc_utils_move_to_iter (GTK_WINDOW (info),
 						  GTK_SOURCE_VIEW (view),
 						  &start);
 }

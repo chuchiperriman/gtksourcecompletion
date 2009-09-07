@@ -29,7 +29,9 @@ gio_test_LDADD = 	\
 completion_simple_SOURCES = 		\
 	completion-simple.c		\
 	gsc-provider-test.h		\
-	gsc-provider-test.c
+	gsc-provider-test.c		\
+	gsc-provider-words.h		\
+	gsc-provider-words.c
 
 completion_simple_LDFLAGS =  \
 	`pkg-config --libs gtksourceview-2.0`	\

@@ -30,6 +30,37 @@
 #include <string.h> 
 #include "gsc-utils.h"
 
+
+void
+gsc_utils_get_iter_at_insert (GtkTextView	 *view,
+			      GtkTextIter        *iter)
+{
+        GtkTextBuffer *buffer;
+
+        buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+        gtk_text_buffer_get_iter_at_mark (buffer,
+                                          iter,
+                                          gtk_text_buffer_get_insert (buffer));
+}
+
+gchar*
+gsc_utils_clear_word (const gchar* word)
+{
+        int len = g_utf8_strlen(word,-1);
+        int i;
+        const gchar *temp = word;
+
+        for (i=0;i<len;i++)
+        {
+                if (gsc_utils_is_separator(g_utf8_get_char(temp)))
+                        temp = g_utf8_next_char(temp);
+                else
+                        return g_strdup(temp);
+
+        }
+        return NULL;
+}
+
 /**
  * gsc_utils_char_is_separator:
  * @ch: The character to check
@@ -39,7 +70,7 @@
  * Returns TRUE if the ch is a separator
  */
 gboolean
-gsc_completion_utils_is_separator(const gunichar ch)
+gsc_utils_is_separator(const gunichar ch)
 {
 	if (g_unichar_isprint(ch) && 
 	    (g_unichar_isalnum(ch) || ch == g_utf8_get_char("_")))
@@ -51,7 +82,7 @@ gsc_completion_utils_is_separator(const gunichar ch)
 }
 
 /**
- * gsc_completion_utils_get_word_iter:
+ * gsc_utils_get_word_iter:
  *
  * @source_buffer: The #GtkSourceBuffer
  * @start_word: if != NULL then assign it the start position of the word
@@ -61,7 +92,7 @@ gsc_completion_utils_is_separator(const gunichar ch)
  *
  */
 gchar *
-gsc_completion_utils_get_word_iter (GtkSourceBuffer *source_buffer, 
+gsc_utils_get_word_iter (GtkSourceBuffer *source_buffer, 
                                            GtkTextIter     *current,
 					   GtkTextIter     *start_word, 
 					   GtkTextIter     *end_word)
@@ -89,7 +120,7 @@ gsc_completion_utils_get_word_iter (GtkSourceBuffer *source_buffer,
 	{
 		ch = gtk_text_iter_get_char (start_word);
 
-		if (gsc_completion_utils_is_separator (ch))
+		if (gsc_utils_is_separator (ch))
 		{
 			break;
 		}
@@ -108,18 +139,18 @@ gsc_completion_utils_get_word_iter (GtkSourceBuffer *source_buffer,
 }
 
 /**
- * gsc_completion_utils_get_word:
+ * gsc_utils_get_word:
  * @source_buffer: The #GtkSourceBuffer
  *
  * Returns: the current word
  */
 gchar *
-gsc_completion_utils_get_word (GtkSourceBuffer *source_buffer)
+gsc_utils_get_word (GtkSourceBuffer *source_buffer)
 {
 	GtkTextIter start;
 	GtkTextIter end;
 	
-	return gsc_completion_utils_get_word_iter (source_buffer, NULL, &start, &end);
+	return gsc_utils_get_word_iter (source_buffer, NULL, &start, &end);
 }
 
 static void
@@ -157,7 +188,7 @@ get_iter_pos (GtkSourceView *source_view,
 }
 
 void
-gsc_completion_utils_replace_word (GtkSourceBuffer *source_buffer,
+gsc_utils_replace_word (GtkSourceBuffer *source_buffer,
 					  GtkTextIter     *iter,
 					  const gchar     *text,
 					  gint             len)
@@ -174,7 +205,7 @@ gsc_completion_utils_replace_word (GtkSourceBuffer *source_buffer,
 	gtk_text_buffer_begin_user_action (buffer);
 	
 	mark = gtk_text_buffer_create_mark (buffer, NULL, iter, TRUE);
-	word = gsc_completion_utils_get_word_iter (source_buffer, iter, &word_start, &word_end);
+	word = gsc_utils_get_word_iter (source_buffer, iter, &word_start, &word_end);
 	g_free (word);
 
 	gtk_text_buffer_delete (buffer, &word_start, &word_end);
@@ -199,7 +230,7 @@ gsc_completion_utils_replace_word (GtkSourceBuffer *source_buffer,
  *
  */
 void
-gsc_completion_utils_replace_current_word (GtkSourceBuffer *source_buffer, 
+gsc_utils_replace_current_word (GtkSourceBuffer *source_buffer, 
 						  const gchar     *text,
 						  gint             len)
 {
@@ -213,7 +244,7 @@ gsc_completion_utils_replace_current_word (GtkSourceBuffer *source_buffer,
 	                                  &iter,
 	                                  mark);
 
-	gsc_completion_utils_replace_word (source_buffer,
+	gsc_utils_replace_word (source_buffer,
 	                                          &iter,
 	                                          text,
 	                                          len);
@@ -293,14 +324,14 @@ move_overlap (gint     *x,
 }
 
 /**
- * gsc_completion_utils_move_to_iter:
+ * gsc_utils_move_to_iter:
  * @window: the #GtkWindow to move
  * @view: the view 
  * @iter: the iter to move @window to
  *
  */
 void
-gsc_completion_utils_move_to_iter (GtkWindow     *window,
+gsc_utils_move_to_iter (GtkWindow     *window,
 					  GtkSourceView *view,
 					  GtkTextIter   *iter)
 {
@@ -368,13 +399,13 @@ gsc_completion_utils_move_to_iter (GtkWindow     *window,
 }
 
 /**
- * gsc_completion_utils_get_pos_at_cursor:
+ * gsc_utils_get_pos_at_cursor:
  * @window: the #GtkWindow to move
  * @view: the view 
  *
  */
 void 
-gsc_completion_utils_move_to_cursor (GtkWindow     *window,
+gsc_utils_move_to_cursor (GtkWindow     *window,
 					    GtkSourceView *view)
 {
 	GtkTextBuffer *buffer;
@@ -383,7 +414,7 @@ gsc_completion_utils_move_to_cursor (GtkWindow     *window,
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 	gtk_text_buffer_get_iter_at_mark (buffer, &insert, gtk_text_buffer_get_insert (buffer));
 	
-	gsc_completion_utils_move_to_iter (window,
+	gsc_utils_move_to_iter (window,
 	                                          view,
 	                                          &insert);
 }

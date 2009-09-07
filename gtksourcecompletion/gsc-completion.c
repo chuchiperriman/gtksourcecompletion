@@ -296,7 +296,7 @@ activate_current_proposal (GscCompletion *completion)
 	if (!activated)
 	{
 		text = gsc_proposal_get_text (proposal);
-		gsc_completion_utils_replace_current_word (GTK_SOURCE_BUFFER (buffer),
+		gsc_utils_replace_current_word (GTK_SOURCE_BUFFER (buffer),
 				                                  text ? text : NULL,
 				                                  -1);
 	}
@@ -1069,7 +1069,7 @@ update_typing_offsets (GscCompletion *completion)
 	gchar *word;
 
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (completion->priv->view));
-	word = gsc_completion_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
+	word = gsc_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
 							  NULL,
 							  &start,
 							  &end);
@@ -1109,7 +1109,7 @@ show_auto_completion (GscCompletion *completion)
 		return FALSE;
 	}
 	
-	word = gsc_completion_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
+	word = gsc_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
 	                                                  &iter,
 							  &start,
 							  &end);
@@ -1977,12 +1977,12 @@ gsc_completion_show (GscCompletion *completion,
 
 	if (place == NULL)
 	{
-		gsc_completion_utils_move_to_cursor (GTK_WINDOW (completion->priv->window),
+		gsc_utils_move_to_cursor (GTK_WINDOW (completion->priv->window),
 							    GTK_SOURCE_VIEW (completion->priv->view));
 	}
 	else
 	{
-		gsc_completion_utils_move_to_iter (GTK_WINDOW (completion->priv->window),
+		gsc_utils_move_to_iter (GTK_WINDOW (completion->priv->window),
 							  GTK_SOURCE_VIEW (completion->priv->view),
 							  place);
 	}
