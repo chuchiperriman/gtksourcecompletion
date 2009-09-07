@@ -111,6 +111,7 @@ struct _GscCompletionPrivate
 	GscContext *context;
 	
 	gboolean is_interactive;
+	gboolean is_inserting;
 	gulong signals_ids[LAST_EXTERNAL_SIGNAL];
 };
 
@@ -162,8 +163,8 @@ completion_control_remove_completion (GtkTextView *view)
 /* ********************************************************************* */
 
 static gboolean
-get_selected_proposal (GscCompletion          *completion,
-                       GtkTreeIter                  *iter,
+get_selected_proposal (GscCompletion	      *completion,
+		       GtkTreeIter		    *iter,
 		       GscProposal **proposal)
 {
 	GtkTreeIter piter;
@@ -183,30 +184,30 @@ get_selected_proposal (GscCompletion          *completion,
 		if (iter != NULL)
 		{
 			*iter = piter;
-		}
-
+		}		
+		
 		return TRUE;
-	}
+	 }	
 	
 	return FALSE;
-}
+}	
 
 static void
 get_iter_at_insert (GscCompletion *completion,
-                    GtkTextIter         *iter)
+		    GtkTextIter	 *iter)
 {
 	GtkTextBuffer *buffer;
-
+	
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (completion->priv->view));
 	gtk_text_buffer_get_iter_at_mark (buffer,
-	                                  iter,
-	                                  gtk_text_buffer_get_insert (buffer));
+					  iter,
+					  gtk_text_buffer_get_insert (buffer));
 }
 
 static void
-context_destroy (GscCompletion 	*completion)
+context_destroy (GscCompletion		*completion)
 {
-
+	
 	if (completion->priv->context)
 	{
 		gsc_context_finish (completion->priv->context);
@@ -216,15 +217,15 @@ context_destroy (GscCompletion 	*completion)
 }
 
 static void
-context_create (GscCompletion 	*completion,
-		GList 			*providers)
+context_create (GscCompletion	*completion,
+		GList			*providers)
 {
 	/*Ensure there is not a completion active*/
 	context_destroy (completion);
 	
 	completion->priv->context = gsc_context_new (completion->priv->model_proposals,
-								       GTK_TEXT_VIEW (completion->priv->view),
-								       providers);
+						     GTK_TEXT_VIEW (completion->priv->view),
+						     providers);
 }
 
 static void
@@ -232,7 +233,7 @@ context_populate (GscCompletion	*completion,
 		  GList			*providers)
 {
 	GList *l;
-
+	
 	if (completion->priv->context == NULL)
 	{
 		context_create (completion, providers);
@@ -251,13 +252,13 @@ context_populate (GscCompletion	*completion,
 		if (completion->priv->context &&
 		    gsc_context_is_valid (completion->priv->context) &&
 		    g_list_find (completion->priv->providers,
-		                 l->data) != NULL)
+				 l->data) != NULL)
 		{
 			gsc_provider_populate_completion (GSC_PROVIDER (l->data),
-									    completion->priv->context);
+							  completion->priv->context);
 		}
 	}
-
+	
 	if (completion->priv->context &&
 	    gsc_context_is_valid (completion->priv->context))
 	{
@@ -282,55 +283,58 @@ activate_current_proposal (GscCompletion *completion)
 		return TRUE;
 	}
 	
+	completion->priv->is_inserting = TRUE;
 	gtk_tree_model_get (GTK_TREE_MODEL (completion->priv->model_proposals),
-	                    &iter,
-	                    GSC_COMPLETION_MODEL_COLUMN_PROVIDER, &provider,
-	                    -1);
+			    &iter,
+			    GSC_COMPLETION_MODEL_COLUMN_PROVIDER, &provider,
+			    -1);
 	
 	/* Get insert iter */
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (completion->priv->view));
 	get_iter_at_insert (completion, &titer);
-
+	
 	activated = gsc_provider_activate_proposal (provider, proposal, &titer);
-
+	
 	if (!activated)
 	{
 		text = gsc_proposal_get_text (proposal);
 		gsc_utils_replace_current_word (GTK_SOURCE_BUFFER (buffer),
-				                                  text ? text : NULL,
-				                                  -1);
+						text ? text : NULL,
+						-1);
 	}
-
+	
 	g_object_unref (provider);
 	g_object_unref (proposal);
-	
+
 	gsc_completion_hide (completion);
+
+	completion->priv->is_inserting = FALSE;
 
 	return TRUE;
 }
 
 typedef gboolean (*ProposalSelector)(GscCompletion *completion,
-                                     GtkTreeModel        *model, 
-                                     GtkTreeIter         *iter, 
-                                     gboolean             hasselection, 
-                                     gpointer             userdata);
+				     GtkTreeModel	  *model, 
+				     GtkTreeIter	  *iter, 
+				     gboolean		   hasselection, 
+				     gpointer		   userdata);
 
 static gboolean
 select_proposal (GscCompletion *completion,
-                 ProposalSelector     selector,
-                 gpointer             userdata)
+		 ProposalSelector     selector,
+		 gpointer	       userdata)
 {
 	GtkTreeSelection *selection;
 	GtkTreeIter iter;
 	GtkTreePath *path;
 	GtkTreeModel *model;
 	gboolean hasselection;
-	
+
 	if (!GTK_WIDGET_VISIBLE (completion->priv->tree_view_proposals))
 	{
 		return FALSE;
 	}
-	
+
 	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (completion->priv->tree_view_proposals));
 
 	if (gtk_tree_selection_get_mode (selection) == GTK_SELECTION_NONE)
@@ -339,13 +343,13 @@ select_proposal (GscCompletion *completion,
 	}
 
 	model = GTK_TREE_MODEL (completion->priv->model_proposals);
-	
+
 	hasselection = gtk_tree_selection_get_selected (selection, NULL, &iter);
-	
+
 	if (selector (completion, model, &iter, hasselection, userdata))
 	{
 		gtk_tree_selection_select_iter (selection, &iter);
-		
+
 		path = gtk_tree_model_get_path (model, &iter);
 		gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (completion->priv->tree_view_proposals),
 					      path, 
@@ -356,15 +360,15 @@ select_proposal (GscCompletion *completion,
 
 		gtk_tree_path_free (path);
 	}
-	
+
 	/* Always return TRUE to consume the key press event */
 	return TRUE;
 }
 
 static void
 scroll_to_iter (GscCompletion *completion,
-                GtkTreeModel        *model,
-                GtkTreeIter         *iter)
+		GtkTreeModel	     *model,
+		GtkTreeIter	     *iter)
 {
 	GtkTreePath *path;
 
@@ -380,41 +384,41 @@ scroll_to_iter (GscCompletion *completion,
 
 static gboolean
 selector_first (GscCompletion *completion,
-                GtkTreeModel        *model,
-                GtkTreeIter         *iter,
-                gboolean             hasselection,
-                gpointer             userdata)
+		GtkTreeModel	     *model,
+		GtkTreeIter	     *iter,
+		gboolean	      hasselection,
+		gpointer	      userdata)
 {
 	gboolean ret;
 	gboolean hasfirst;
 	GtkTreeIter first;
-	
+
 	ret = gtk_tree_model_get_iter_first (model, iter);
 	hasfirst = ret;
 	first = *iter;
-	
+
 	if (hasfirst && !ret)
 	{
 		scroll_to_iter (completion, model, &first);
 	}
-	
+
 	return ret;
 }
 
 static gboolean
 selector_last (GscCompletion *completion,
-               GtkTreeModel        *model,
-               GtkTreeIter         *iter,
-               gboolean             hasselection,
-               gpointer             userdata)
+	       GtkTreeModel	    *model,
+	       GtkTreeIter	    *iter,
+	       gboolean	     hasselection,
+	       gpointer	     userdata)
 {
 	gboolean ret;
 	gboolean haslast;
 	GtkTreeIter last;
 
 	ret = gsc_completion_model_iter_last (GSC_COMPLETION_MODEL (model),
-	                                             iter);
-	
+					      iter);
+
 	haslast = ret;
 	last = *iter;
 
@@ -422,16 +426,16 @@ selector_last (GscCompletion *completion,
 	{
 		scroll_to_iter (completion, model, &last);
 	}
-	
+
 	return ret;
 }
 
 static gboolean
 selector_previous (GscCompletion *completion,
-                   GtkTreeModel        *model,
-                   GtkTreeIter         *iter,
-                   gboolean             hasselection,
-                   gpointer             userdata)
+		   GtkTreeModel	*model,
+		   GtkTreeIter		*iter,
+		   gboolean		 hasselection,
+		   gpointer		 userdata)
 {
 	gint num = GPOINTER_TO_INT (userdata);
 	gboolean ret = FALSE;
@@ -442,44 +446,44 @@ selector_previous (GscCompletion *completion,
 	{
 		return selector_last (completion, model, iter, hasselection, userdata);
 	}
-	
+
 	next = *iter;
 	last = *iter;
 
 	while (num > 0 && gsc_completion_model_iter_previous (
-				GSC_COMPLETION_MODEL (model), &next))
+							      GSC_COMPLETION_MODEL (model), &next))
 	{
 		ret = TRUE;
 		*iter = next;
 		--num;
 		last = next;
 	}
-	
+
 	if (!ret)
 	{
 		scroll_to_iter (completion, model, &last);
 	}
-	
+
 	return ret;
 }
 
 static gboolean
 selector_next (GscCompletion *completion,
-               GtkTreeModel        *model,
-               GtkTreeIter         *iter,
-               gboolean             hasselection,
-               gpointer             userdata)
+	       GtkTreeModel	    *model,
+	       GtkTreeIter	    *iter,
+	       gboolean	     hasselection,
+	       gpointer	     userdata)
 {
 	gint num = GPOINTER_TO_INT (userdata);
 	gboolean ret = FALSE;
 	GtkTreeIter next;
 	GtkTreeIter last;
-	
+
 	if (!hasselection)
 	{
 		return selector_first (completion, model, iter, hasselection, userdata);
 	}
-	
+
 	next = *iter;
 	last = *iter;
 
@@ -490,12 +494,12 @@ selector_next (GscCompletion *completion,
 		--num;
 		last = next;
 	}
-	
+
 	if (!ret)
 	{
 		scroll_to_iter (completion, model, &last);
 	}
-	
+
 	return ret;
 }
 
@@ -513,22 +517,22 @@ select_last_proposal (GscCompletion *completion)
 
 static gboolean
 select_previous_proposal (GscCompletion *completion,
-			  gint                 rows)
+			  gint			rows)
 {
 	return select_proposal (completion, selector_previous, GINT_TO_POINTER (rows));
 }
 
 static gboolean
 select_next_proposal (GscCompletion *completion,
-		      gint                 rows)
+		      gint		    rows)
 {
 	return select_proposal (completion, selector_next, GINT_TO_POINTER (rows));
 }
 
 static void
 get_num_visible_providers (GscCompletion *completion,
-                           guint               *num,
-                           guint               *current)
+			   guint		*num,
+			   guint		*current)
 {
 	GscProvider *filter_provider;
 	GList *providers;
@@ -539,7 +543,7 @@ get_num_visible_providers (GscCompletion *completion,
 
 	providers = gsc_context_get_providers (completion->priv->context);
 	filter_provider = gsc_context_get_filter_provider (completion->priv->context);
-	
+
 	for (item = providers; item; item = g_list_next (item))
 	{
 		if (item->data == filter_provider)
@@ -549,7 +553,7 @@ get_num_visible_providers (GscCompletion *completion,
 		else
 		{
 			proposals = gsc_context_get_proposals (completion->priv->context,
-										 GSC_PROVIDER (item->data));
+							       GSC_PROVIDER (item->data));
 			/* See if it has anything */
 			if (proposals != NULL)
 			{
@@ -570,11 +574,11 @@ update_selection_label (GscCompletion *completion)
 
 	filter_provider = gsc_context_get_filter_provider (completion->priv->context);
 	get_num_visible_providers (completion, &num, &pos);
-	
+
 	if (!filter_provider)
 	{
 		name = g_strdup_printf("[<i>%s</i>]", _("All"));
-		
+
 		gtk_image_clear (GTK_IMAGE (completion->priv->selection_image));
 	}
 	else
@@ -582,22 +586,22 @@ update_selection_label (GscCompletion *completion)
 		name = g_markup_escape_text (gsc_provider_get_name (filter_provider), -1);
 
 		gtk_image_set_from_pixbuf (GTK_IMAGE (completion->priv->selection_image),
-                           (GdkPixbuf *)gsc_provider_get_icon (filter_provider));
+					   (GdkPixbuf *)gsc_provider_get_icon (filter_provider));
 	}
-	
+
 	if (num > 1)
 	{
 		tmp = g_strdup_printf ("%s (%d/%d)", name, pos + 1, num + 1);
 		gtk_label_set_markup (GTK_LABEL (completion->priv->selection_label),
-		                      tmp);
+				      tmp);
 		g_free (tmp);
 	}
 	else
 	{
 		gtk_label_set_markup (GTK_LABEL (completion->priv->selection_label),
-		                      name);
+				      name);
 	}
-	
+
 	g_free (name);
 }
 
@@ -605,9 +609,9 @@ typedef GList * (*ListSelector)(GList *);
 
 static gboolean
 select_provider (GscCompletion *completion,
-                 ListSelector         advance,
-                 ListSelector         cycle_first,
-                 ListSelector         cycle_last)
+		 ListSelector	       advance,
+		 ListSelector	       cycle_first,
+		 ListSelector	       cycle_last)
 {
 	GList *providers;
 	GList *first;
@@ -629,7 +633,7 @@ select_provider (GscCompletion *completion,
 	}
 
 	get_num_visible_providers (completion, &num, &pos);
-	
+
 	if (num <= 1)
 	{
 		if (filter_provider)
@@ -649,11 +653,11 @@ select_provider (GscCompletion *completion,
 	{
 		orig = NULL;
 	}
-	
+
 	first = cycle_first (providers);
 	last = cycle_last (providers);
 	current = orig;
-	
+
 	do
 	{
 		if (current == NULL)
@@ -668,12 +672,12 @@ select_provider (GscCompletion *completion,
 		{
 			current = advance (current);
 		}
-		
+
 		if (current != NULL)
 		{
 			provider = GSC_PROVIDER (current->data);
 			proposals = gsc_context_get_proposals (completion->priv->context,
-										 provider);
+							       provider);
 			/*We don't select the provider if it has not proposals*/
 			if (proposals != NULL)
 				break;
@@ -683,12 +687,12 @@ select_provider (GscCompletion *completion,
 			break;
 		}
 	} while (orig != current);
-	
+
 	if (orig == current)
 	{
 		return FALSE;
 	}
-	
+
 	if (current != NULL)
 	{
 		filter_provider = current->data;
@@ -697,12 +701,12 @@ select_provider (GscCompletion *completion,
 	{
 		filter_provider = NULL;
 	}
-	
+
 	gsc_context_set_filter_provider (completion->priv->context,
-							   filter_provider);
+					 filter_provider);
 
 	update_selection_label (completion);
-	
+
 	return TRUE;
 }
 
@@ -738,7 +742,7 @@ update_info_position (GscCompletion *completion)
 	gint sw, sh;
 	gint info_width;
 	GdkScreen *screen;
-	
+
 	gtk_window_get_position (GTK_WINDOW (completion->priv->window), &x, &y);
 	gtk_window_get_size (GTK_WINDOW (completion->priv->window),
 			     &width, &height);
@@ -747,7 +751,7 @@ update_info_position (GscCompletion *completion)
 	screen = gtk_window_get_screen (GTK_WINDOW (completion->priv->window));
 	sw = gdk_screen_get_width (screen);
 	sh = gdk_screen_get_height (screen);
-	
+
 	/* Determine on which side to place it */
 	if (x + width + info_width >= sw)
 	{
@@ -762,8 +766,8 @@ update_info_position (GscCompletion *completion)
 }
 
 static void
-row_activated_cb (GtkTreeView         *tree_view,
-		  GtkTreePath         *path,
+row_activated_cb (GtkTreeView	       *tree_view,
+		  GtkTreePath	       *path,
 		  GtkTreeViewColumn   *column,
 		  GscCompletion *completion)
 {
@@ -771,19 +775,19 @@ row_activated_cb (GtkTreeView         *tree_view,
 }
 
 static void
-update_proposal_info_real (GscCompletion         *completion,
-                           GscProvider *provider,
-                           GscProposal *proposal)
+update_proposal_info_real (GscCompletion	  *completion,
+			   GscProvider *provider,
+			   GscProposal *proposal)
 {
 	GtkWidget *info_widget;
 	const gchar *text;
 	gboolean prov_update_info = FALSE;
 	GscInfo *info_window;
-	
+
 	info_window = GSC_COMPLETION_INFO (completion->priv->info_window);
-	
+
 	gsc_completion_info_set_sizing (info_window,
-	                                       -1, -1, TRUE, TRUE);
+					-1, -1, TRUE, TRUE);
 
 	if (proposal == NULL)
 	{
@@ -794,14 +798,14 @@ update_proposal_info_real (GscCompletion         *completion,
 	else
 	{
 		info_widget = gsc_provider_get_info_widget (provider, 
-		                                                              proposal);
+							    proposal);
 
 		/* If there is no special custom widget, use the default */
 		if (info_widget == NULL)
 		{
 			info_widget = completion->priv->default_info;
 			text = gsc_proposal_get_info (proposal);
-			
+
 			gtk_label_set_markup (GTK_LABEL (info_widget), text != NULL ? text : _("No extra information available"));
 		}
 		else
@@ -809,17 +813,17 @@ update_proposal_info_real (GscCompletion         *completion,
 			prov_update_info = TRUE;
 		}
 	}
-	
+
 	gsc_completion_info_set_widget (info_window,
-	                                       info_widget);
+					info_widget);
 
 	if (prov_update_info)
 	{
 		gsc_provider_update_info (provider, 
-			                                    proposal,
-			                                    info_window);
+					  proposal,
+					  info_window);
 	}
-	
+
 	gsc_completion_info_process_resize (info_window);
 }
 
@@ -830,14 +834,14 @@ update_proposal_info (GscCompletion *completion)
 	GscProvider *provider;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-	
+
 	if (get_selected_proposal (completion, &iter, &proposal))
 	{
 		model = GTK_TREE_MODEL (completion->priv->model_proposals);
 		gtk_tree_model_get (model, &iter, GSC_COMPLETION_MODEL_COLUMN_PROVIDER, &provider, -1);
-		
+
 		update_proposal_info_real (completion, provider, proposal);
-		
+
 		g_object_unref (proposal);
 		g_object_unref (provider);
 	}
@@ -848,7 +852,7 @@ update_proposal_info (GscCompletion *completion)
 }
 
 static void 
-selection_changed_cb (GtkTreeSelection    *selection, 
+selection_changed_cb (GtkTreeSelection	   *selection, 
 		      GscCompletion *completion)
 {
 	if (GTK_WIDGET_VISIBLE (completion->priv->info_window))
@@ -872,24 +876,24 @@ info_toggled_cb (GtkToggleButton     *widget,
 }
 
 static void
-show_info_cb (GtkWidget           *widget,
+show_info_cb (GtkWidget	   *widget,
 	      GscCompletion *completion)
 {
 	g_return_if_fail (GTK_WIDGET_VISIBLE (GTK_WIDGET (completion->priv->window)));
-	
+
 	update_info_position (completion);
 	update_proposal_info (completion);
-	
+
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (completion->priv->info_button),
 				      TRUE);
 }
 
 static void
-show_info_after_cb (GtkWidget           *widget,
-	            GscCompletion *completion)
+show_info_after_cb (GtkWidget		 *widget,
+		    GscCompletion *completion)
 {
 	g_return_if_fail (GTK_WIDGET_VISIBLE (GTK_WIDGET (completion->priv->window)));
-	
+
 	/* We do this here because GtkLabel does not properly handle
 	 * can-focus = FALSE and selects all the text when it gets focus from
 	 * showing the info window for the first time */
@@ -907,17 +911,17 @@ hide_info_cb (GtkWidget *widget,
 }
 
 static void
-info_size_allocate_cb (GtkWidget           *widget,
-                       GtkAllocation       *allocation,
-                       GscCompletion *completion)
+info_size_allocate_cb (GtkWidget	    *widget,
+		       GtkAllocation	    *allocation,
+		       GscCompletion *completion)
 {
 	/* Update window position */
 	update_info_position (completion);
 }
 
 static void
-gsc_completion_realize (GtkWidget           *widget,
-                               GscCompletion *completion)
+gsc_completion_realize (GtkWidget	     *widget,
+			GscCompletion *completion)
 {
 	gtk_container_set_border_width (GTK_CONTAINER (completion->priv->window), 1);
 	gtk_widget_set_size_request (GTK_WIDGET (completion->priv->window),
@@ -926,9 +930,9 @@ gsc_completion_realize (GtkWidget           *widget,
 }
 
 static gboolean
-gsc_completion_configure_event (GtkWidget           *widget,
-                                       GdkEventConfigure   *event,
-                                       GscCompletion *completion)
+gsc_completion_configure_event (GtkWidget	     *widget,
+				GdkEventConfigure   *event,
+				GscCompletion *completion)
 {
 	if (GTK_WIDGET_VISIBLE (completion->priv->info_window))
 		update_info_position (completion);
@@ -937,9 +941,9 @@ gsc_completion_configure_event (GtkWidget           *widget,
 }
 
 static gboolean
-view_focus_out_event_cb (GtkWidget     *widget,
-                         GdkEventFocus *event,
-                         gpointer       user_data)
+view_focus_out_event_cb (GtkWidget	*widget,
+			 GdkEventFocus *event,
+			 gpointer	 user_data)
 {
 	GscCompletion *completion = GSC_COMPLETION (user_data);
 	
@@ -953,9 +957,9 @@ view_focus_out_event_cb (GtkWidget     *widget,
 }
 
 static gboolean
-view_button_press_event_cb (GtkWidget      *widget,
+view_button_press_event_cb (GtkWidget	    *widget,
 			    GdkEventButton *event,
-			    gpointer        user_data)
+			    gpointer	     user_data)
 {
 	GscCompletion *completion = GSC_COMPLETION (user_data);
 	
@@ -963,84 +967,107 @@ view_button_press_event_cb (GtkWidget      *widget,
 	{
 		gsc_completion_hide (completion);
 	}
-
+	
 	return FALSE;
 }
 
+static void
+gsc_completion_user_request (GscCompletion *completion)
+{
+	GList *providers;
+
+	completion->priv->is_interactive = TRUE;
+	providers = gsc_completion_get_providers (completion,
+						  GSC_COMPLETION_CAPABILITY_AUTOMATIC);
+	
+	gsc_completion_show (completion, providers, NULL);
+
+	g_list_foreach (providers, (GFunc)g_object_unref, NULL);
+	g_list_free (providers);
+}
+
 static gboolean
-view_key_press_event_cb (GtkSourceView       *view,
-			 GdkEventKey         *event, 
+view_key_press_event_cb (GtkSourceView	      *view,
+			 GdkEventKey	      *event, 
 			 GscCompletion *completion)
 {
 	gboolean ret = FALSE;
 	GdkModifierType mod;
-	
+
 	mod = gtk_accelerator_get_default_mod_mask () & event->state;
-	
+
+	if (!GTK_WIDGET_VISIBLE (completion->priv->window)
+	    && event->keyval == GDK_space
+	    && mod == GDK_CONTROL_MASK)
+	{
+		gsc_completion_user_request (completion);
+		ret = TRUE;
+	}
+	 
 	if (!GTK_WIDGET_VISIBLE (completion->priv->window)
 	    || !completion->priv->manage_keys)
 	{
 		return FALSE;
 	}
-	
+
 	switch (event->keyval)
- 	{
-		case GDK_Escape:
+	{
+	case GDK_Escape:
 		{
 			gsc_completion_hide (completion);
 			ret = TRUE;
 			break;
 		}
- 		case GDK_Down:
+	case GDK_Down:
 		{
 			ret = select_next_proposal (completion, 1);
 			break;
 		}
-		case GDK_Page_Down:
+	case GDK_Page_Down:
 		{
 			ret = select_next_proposal (completion, 5);
 			break;
 		}
-		case GDK_Up:
+	case GDK_Up:
 		{
 			ret = select_previous_proposal (completion, 1);
 			if (!ret)
 				ret = select_first_proposal (completion);
 			break;
 		}
-		case GDK_Page_Up:
+	case GDK_Page_Up:
 		{
 			ret = select_previous_proposal (completion, 5);
 			break;
 		}
-		case GDK_Home:
+	case GDK_Home:
 		{
 			ret = select_first_proposal (completion);
 			break;
 		}
-		case GDK_End:
+	case GDK_End:
 		{
 			ret = select_last_proposal (completion);
 			break;
 		}
-		case GDK_Return:
-		case GDK_Tab:
+	case GDK_Return:
+	case GDK_Tab:
 		{
 			ret = activate_current_proposal (completion);
 			gsc_completion_hide (completion);
 			break;
 		}
-		case GDK_i:
+	case GDK_i:
 		{
 			if (mod == GDK_CONTROL_MASK)
 			{
 				gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (completion->priv->info_button),
-					!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (completion->priv->info_button)));
+							      !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (completion->priv->info_button)));
 				ret = TRUE;
 			}
 			break;
 		}
-		case GDK_Left:
+	case GDK_Left:
 		{
 			if (mod == GDK_CONTROL_MASK)
 			{
@@ -1048,7 +1075,7 @@ view_key_press_event_cb (GtkSourceView       *view,
 			}
 			break;
 		}
-		case GDK_Right:
+	case GDK_Right:
 		{
 			if (mod == GDK_CONTROL_MASK)
 			{
@@ -1056,6 +1083,7 @@ view_key_press_event_cb (GtkSourceView       *view,
 			}
 			break;
 		}
+		
 	}
 	return ret;
 }
@@ -1092,7 +1120,7 @@ show_auto_completion (GscCompletion *completion)
 	completion->priv->show_timed_out_id = 0;
 	
 	providers = g_hash_table_lookup (completion->priv->capability_map, 
-	                                 GSC_COMPLETION_CAPABILITY_INTERACTIVE);
+					 GSC_COMPLETION_CAPABILITY_INTERACTIVE);
 	
 	if (!providers)
 	{
@@ -1110,7 +1138,7 @@ show_auto_completion (GscCompletion *completion)
 	}
 	
 	word = gsc_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
-	                                                  &iter,
+							  &iter,
 							  &start,
 							  &end);
 
@@ -1151,10 +1179,10 @@ interactive_do_show (GscCompletion *completion)
 }
 
 static gboolean
-buffer_delete_range_cb (GtkTextBuffer       *buffer,
-                        GtkTextIter         *start,
-                        GtkTextIter         *end,
-                        GscCompletion *completion)
+buffer_delete_range_cb (GtkTextBuffer	    *buffer,
+			GtkTextIter	    *start,
+			GtkTextIter	    *end,
+			GscCompletion *completion)
 {
 	if (!GTK_WIDGET_VISIBLE (completion->priv->window))
 	{
@@ -1178,12 +1206,15 @@ buffer_delete_range_cb (GtkTextBuffer       *buffer,
 }
 
 static void
-buffer_insert_text_cb (GtkTextBuffer       *buffer,
-                       GtkTextIter         *location,
-                       gchar               *text,
-                       gint                 len,
-                       GscCompletion *completion)
+buffer_insert_text_cb (GtkTextBuffer	   *buffer,
+		       GtkTextIter	   *location,
+		       gchar		   *text,
+		       gint		    len,
+		       GscCompletion *completion)
 {
+	if (completion->priv->is_inserting)
+		return;
+	
 	/* Only handle typed text */
 	if (len > 1 && completion->priv->is_interactive)
 	{
