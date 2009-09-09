@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8; coding: utf-8 -*- 
- * gscmodel.c
+ * gsc-model.c
  * This file is part of gsc
  *
  * Copyright (C) 2009 - Jesse van den Kieboom
@@ -24,24 +24,25 @@
 
 #define ITEMS_PER_CALLBACK 100
 
-#define GSC_COMPLETION_MODEL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_MODEL, GscModelPrivate))
+#define GSC_MODEL_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE((object), GSC_TYPE_MODEL, GscModelPrivate))
 
 typedef struct
 {
 	GscModel *model;
-
 	GscProvider *provider;
 	GscProposal *proposal;
-	
 	gulong changed_id;
 } ProposalNode;
 
 typedef struct
 {
-	GList *item;
-	GHashTable *hash;
+	GscProvider *provider;
+	GHashTable *proposals;
+	GList *last;
 	guint num;
-} HeaderInfo;
+	ProposalNode *header_node;
+	GList *header_item;
+} ProviderInfo;
 
 typedef struct
 {
@@ -49,16 +50,15 @@ typedef struct
 	GHashTable *proposals;
 	GtkTreePath *path;
 } RemoveInfo;
-	
 
 struct _GscModelPrivate
 {
-	GType column_types[GSC_COMPLETION_MODEL_N_COLUMNS];
+	GType column_types[GSC_MODEL_N_COLUMNS];
 	GList *store;
 	GList *last;
 	
 	guint num;
-	GHashTable *num_per_provider;
+	GHashTable *providers_info;
 	
 	guint idle_id;
 	GQueue *item_queue;
@@ -90,12 +90,11 @@ node_from_iter (GtkTreeIter *iter)
 }
 
 static GtkTreePath *
-path_from_list (GscModel *model,
-                GList                    *item)
+path_from_list (GscModel	*model,
+                GList           *item)
 {
 	gint index = 0;
 
-	g_assert (GSC_IS_PROPOSAL (((ProposalNode*)item->data)->proposal));
 	index = g_list_position (model->priv->store, item);
 	
 	if (index == -1)
@@ -121,7 +120,7 @@ tree_model_get_n_columns (GtkTreeModel *tree_model)
 {
 	g_return_val_if_fail (GSC_IS_MODEL (tree_model), 0);
 
-	return GSC_COMPLETION_MODEL_N_COLUMNS;
+	return GSC_MODEL_N_COLUMNS;
 }
 
 static GType
@@ -129,9 +128,9 @@ tree_model_get_column_type (GtkTreeModel *tree_model,
 			    gint          index)
 {
 	g_return_val_if_fail (GSC_IS_MODEL (tree_model), G_TYPE_INVALID);
-	g_return_val_if_fail (index >= 0 && index < GSC_COMPLETION_MODEL_N_COLUMNS, G_TYPE_INVALID);
+	g_return_val_if_fail (index >= 0 && index < GSC_MODEL_N_COLUMNS, G_TYPE_INVALID);
 
-	return GSC_COMPLETION_MODEL (tree_model)->priv->column_types[index];
+	return GSC_MODEL (tree_model)->priv->column_types[index];
 }
 
 static gboolean
@@ -173,7 +172,7 @@ tree_model_get_iter (GtkTreeModel *tree_model,
 	g_return_val_if_fail (iter != NULL, FALSE);
 	g_return_val_if_fail (path != NULL, FALSE);
 	
-	model = GSC_COMPLETION_MODEL (tree_model);
+	model = GSC_MODEL (tree_model);
 	indices = gtk_tree_path_get_indices (path);
 	
 	return get_iter_from_index (model, iter, indices[0]);
@@ -189,7 +188,7 @@ tree_model_get_path (GtkTreeModel *tree_model,
 	g_return_val_if_fail (iter != NULL, NULL);
 	g_return_val_if_fail (iter->user_data != NULL, NULL);
 
-	model = GSC_COMPLETION_MODEL (tree_model);
+	model = GSC_MODEL (tree_model);
 	return path_from_list (model, (GList *)iter->user_data);
 }
 
@@ -204,27 +203,27 @@ tree_model_get_value (GtkTreeModel *tree_model,
 	g_return_if_fail (GSC_IS_MODEL (tree_model));
 	g_return_if_fail (iter != NULL);
 	g_return_if_fail (iter->user_data != NULL);
-	g_return_if_fail (column >= 0 && column < GSC_COMPLETION_MODEL_N_COLUMNS);
+	g_return_if_fail (column >= 0 && column < GSC_MODEL_N_COLUMNS);
 
 	node = node_from_iter (iter);
 
-	g_value_init (value, GSC_COMPLETION_MODEL (tree_model)->priv->column_types[column]);
+	g_value_init (value, GSC_MODEL (tree_model)->priv->column_types[column]);
 
 	switch (column)
 	{
-		case GSC_COMPLETION_MODEL_COLUMN_PROVIDER:
+		case GSC_MODEL_COLUMN_PROVIDER:
 			g_value_set_object (value, node->provider);
 			break;
-		case GSC_COMPLETION_MODEL_COLUMN_PROPOSAL:
+		case GSC_MODEL_COLUMN_PROPOSAL:
 			g_value_set_object (value, node->proposal);
 			break;
-		case GSC_COMPLETION_MODEL_COLUMN_LABEL:
+		case GSC_MODEL_COLUMN_LABEL:
 			g_value_set_string (value, gsc_proposal_get_label (node->proposal));
 			break;
-		case GSC_COMPLETION_MODEL_COLUMN_MARKUP:
+		case GSC_MODEL_COLUMN_MARKUP:
 			g_value_set_string (value, gsc_proposal_get_markup (node->proposal));
 			break;
-		case GSC_COMPLETION_MODEL_COLUMN_ICON:
+		case GSC_MODEL_COLUMN_ICON:
 			if (node->proposal == NULL)
 			{
 				g_value_set_object (value, 
@@ -278,7 +277,7 @@ tree_model_iter_children (GtkTreeModel *tree_model,
 	g_return_val_if_fail (parent == NULL || parent->user_data != NULL, FALSE);
 	
 	/* FIXME: not sure if this should be: (GList *)iter->user_data, iter */
-	//return get_next_element (GSC_COMPLETION_MODEL (tree_model)->priv->store, iter);
+	//return get_next_element (GSC_MODEL (tree_model)->priv->store, iter);
 	return get_next_element ((GList *)iter->user_data, iter);
 }
 
@@ -301,7 +300,7 @@ tree_model_iter_n_children (GtkTreeModel *tree_model,
 	
 	if (iter == NULL)
 	{
-		return GSC_COMPLETION_MODEL (tree_model)->priv->num;
+		return GSC_MODEL (tree_model)->priv->num;
 	}
 	else
 	{
@@ -325,7 +324,7 @@ tree_model_iter_nth_child (GtkTreeModel *tree_model,
 	}
 	else
 	{
-		return get_iter_from_index (GSC_COMPLETION_MODEL (tree_model), 
+		return get_iter_from_index (GSC_MODEL (tree_model), 
 		                            iter,
 		                            n);
 	}
@@ -401,7 +400,7 @@ free_node (ProposalNode *node)
 static void
 gsc_completion_model_dispose (GObject *object)
 {
-	GscModel *model = GSC_COMPLETION_MODEL (object);
+	GscModel *model = GSC_MODEL (object);
 
 	gsc_completion_model_cancel_add_proposals (model);
 	
@@ -411,10 +410,10 @@ gsc_completion_model_dispose (GObject *object)
 		model->priv->item_queue = NULL;
 	}
 	
-	if (model->priv->num_per_provider != NULL)
+	if (model->priv->providers_info != NULL)
 	{
-		g_hash_table_destroy (model->priv->num_per_provider);
-		model->priv->num_per_provider = NULL;
+		g_hash_table_destroy (model->priv->providers_info);
+		model->priv->providers_info = NULL;
 	}
 	
 	g_list_foreach (model->priv->store, (GFunc)free_node, NULL);
@@ -452,13 +451,12 @@ gsc_completion_model_class_init (GscModelClass *klass)
 			      0);
 }
 
-static void
-free_num (gpointer data)
+static guint
+hash_node (gconstpointer v)
 {
-	HeaderInfo *info = (HeaderInfo *)data;
-
-	g_hash_table_destroy (info->hash);
-	g_slice_free (HeaderInfo, data);
+	ProposalNode *node = (ProposalNode *)v;
+	
+	return gsc_proposal_get_hash (node->proposal);
 }
 
 static gboolean
@@ -479,29 +477,49 @@ compare_proposals (gconstpointer a,
 	return gsc_proposal_equals (p1, p2);
 }
 
-static guint
-hash_node (gconstpointer v)
+static ProviderInfo*
+provider_info_new (GscProvider *provider)
 {
-	ProposalNode *node = (ProposalNode *)v;
-	
-	return gsc_proposal_get_hash (node->proposal);
+	ProviderInfo *info = g_slice_new (ProviderInfo);
+	info->provider = g_object_ref (provider);
+	info->num = 0;
+	info->proposals = g_hash_table_new (hash_node,
+					    compare_nodes);
+	info->last = NULL;
+
+	info->header_node = g_slice_new (ProposalNode);
+	info->header_node->provider = g_object_ref (provider);
+	info->header_node->proposal = NULL;
+	info->header_node->changed_id = 0;
+
+	return info;
+}
+
+static void
+provider_info_free (gpointer data)
+{
+	ProviderInfo *info = (ProviderInfo *)data;
+
+	g_hash_table_destroy (info->proposals);
+	g_object_unref (info->provider);
+	g_slice_free (ProviderInfo, data);
 }
 
 static void
 gsc_completion_model_init (GscModel *self)
 {
-	self->priv = GSC_COMPLETION_MODEL_GET_PRIVATE (self);
+	self->priv = GSC_MODEL_GET_PRIVATE (self);
 	
-	self->priv->column_types[GSC_COMPLETION_MODEL_COLUMN_PROVIDER] = G_TYPE_OBJECT;
-	self->priv->column_types[GSC_COMPLETION_MODEL_COLUMN_PROPOSAL] = G_TYPE_OBJECT;
-	self->priv->column_types[GSC_COMPLETION_MODEL_COLUMN_LABEL] = G_TYPE_STRING;
-	self->priv->column_types[GSC_COMPLETION_MODEL_COLUMN_MARKUP] = G_TYPE_STRING;
-	self->priv->column_types[GSC_COMPLETION_MODEL_COLUMN_ICON] = GDK_TYPE_PIXBUF;
+	self->priv->column_types[GSC_MODEL_COLUMN_PROVIDER] = G_TYPE_OBJECT;
+	self->priv->column_types[GSC_MODEL_COLUMN_PROPOSAL] = G_TYPE_OBJECT;
+	self->priv->column_types[GSC_MODEL_COLUMN_LABEL] = G_TYPE_STRING;
+	self->priv->column_types[GSC_MODEL_COLUMN_MARKUP] = G_TYPE_STRING;
+	self->priv->column_types[GSC_MODEL_COLUMN_ICON] = GDK_TYPE_PIXBUF;
 	
-	self->priv->num_per_provider = g_hash_table_new_full (g_direct_hash,
+	self->priv->providers_info = g_hash_table_new_full (g_direct_hash,
 	                                                      g_direct_equal,
 	                                                      NULL,
-	                                                      free_num);
+	                                                      provider_info_free);
 	
 	self->priv->idle_id = 0;
 	self->priv->item_queue = g_queue_new ();
@@ -510,36 +528,18 @@ gsc_completion_model_init (GscModel *self)
 
 static void
 num_inc (GscModel    *model,
-         GscProvider *provider,
-         gboolean                     header)
+         ProviderInfo *info)
 {
-	HeaderInfo *info;
-	
-	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
-	
 	++model->priv->num;
-	
-	if (info != NULL && !header)
-	{
-		++(info->num);
-	}
+	++info->num;
 }
 
 static void
 num_dec (GscModel    *model,
-         GscProvider *provider,
-         gboolean                     header)
+         ProviderInfo *info)
 {
-	HeaderInfo *info;
-	
-	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
-	
 	--model->priv->num;
-		
-	if (info != NULL && !header)
-	{
-		--(info->num);
-	}
+	--info->num;
 }
 
 /* Public */
@@ -550,20 +550,21 @@ gsc_completion_model_new (void)
 }
 
 static GList *
-append_list (GscModel *model,
-             HeaderInfo               *info,
-             ProposalNode             *node,
-             gboolean                 *inserted)
+append_list (GscModel 		*model,
+             ProviderInfo	*info,
+             ProposalNode       *node,
+             gboolean           *inserted)
 {
 	GList *item = NULL;
 	
 	g_assert (info != NULL);
 	g_assert (node != NULL);
 
-	item = g_hash_table_lookup (info->hash, node);
+	item = g_hash_table_lookup (info->proposals, node);
 	
 	if (item == NULL)
 	{
+		/*TODO Insert after the last in the ProviderInfo*/
 		item = g_list_append (model->priv->last, node);
 		
 		if (model->priv->store == NULL)
@@ -575,16 +576,13 @@ append_list (GscModel *model,
 			item = item->next;
 		}
 		
-		g_hash_table_insert (info->hash, node, item);
+		g_hash_table_insert (info->proposals, node, item);
 		
 		*inserted = TRUE;
 		model->priv->last = item;
 	}
 	else
 	{
-		/*g_hash_table_replace (model->priv->hash_store, node, item);
-		free_node (item->data);
-		item->data = node;*/
 		*inserted = FALSE;
 	}
 
@@ -592,15 +590,18 @@ append_list (GscModel *model,
 }
 
 static void
-remove_node (GscModel	*model,
+remove_node (GscModel			*model,
 	     ProposalNode 		*node,
 	     GList 			*store_node,
 	     GtkTreePath 		*path)
 {
+	ProviderInfo *info;
 	g_assert (store_node != NULL);
 	g_assert (path != NULL);
 
-	num_dec (model, node->provider, node->proposal == NULL);
+	info = g_hash_table_lookup (model->priv->providers_info, node->provider);
+	
+	num_dec (model, info);
 	free_node (node);
 	
 	if (store_node == model->priv->last)
@@ -628,7 +629,7 @@ on_proposal_changed (GscProposal *proposal,
 
 	iter.user_data = node;
 	path = path_from_list (node->model, item);
-
+	g_debug ("changed");
 	gtk_tree_model_row_changed (GTK_TREE_MODEL (node->model),
 	                            path,
 	                            &iter);
@@ -638,8 +639,8 @@ on_proposal_changed (GscProposal *proposal,
 static gboolean
 idle_append (gpointer data)
 {
-	GscModel *model = GSC_COMPLETION_MODEL (data);
-	HeaderInfo *info;
+	GscModel *model = GSC_MODEL (data);
+	ProviderInfo *info;
 	GtkTreePath *path;
 	GList *item;
 	gint i = 0;
@@ -660,17 +661,27 @@ idle_append (gpointer data)
 			return FALSE;
 		}
 		
-		info = g_hash_table_lookup (model->priv->num_per_provider, node->provider);
+		info = g_hash_table_lookup (model->priv->providers_info, node->provider);
 		
 		if (info == NULL)
 		{
-			info = g_slice_new (HeaderInfo);
-			info->item = model->priv->last;
-			info->num = 0;
-			info->hash = g_hash_table_new (hash_node,
-						       compare_nodes);
-			
-			g_hash_table_insert (model->priv->num_per_provider, node->provider, info);
+			info = provider_info_new (node->provider);
+
+			g_hash_table_insert (model->priv->providers_info, node->provider, info);
+
+			/*TODO test*/
+			item = g_list_append (model->priv->last, info->header_node);
+		
+			if (model->priv->store == NULL)
+			{
+				model->priv->store = item;
+			}
+			else
+			{
+				item = item->next;
+			}
+			model->priv->last = item;
+
 		}
 		
 		item = append_list (model, info, node, &inserted);
@@ -679,7 +690,7 @@ idle_append (gpointer data)
 		{
 			iter.user_data = item;
 
-			num_inc (model, node->provider, FALSE);
+			num_inc (model, info);
 
 			path = path_from_list (model, item);
 			gtk_tree_model_row_inserted (GTK_TREE_MODEL (model), path, &iter);
@@ -719,7 +730,6 @@ remove_old_proposals (gpointer key,
 	GList *item;
 	if (rinfo->proposals)
 	{
-	  //item = g_list_find_custom (rinfo->proposals, node, compare_proposal_node);
 		item = g_hash_table_lookup (rinfo->proposals, node->proposal);
 		if (!item)
 		{
@@ -738,19 +748,19 @@ remove_old_proposals (gpointer key,
 
 
 void
-gsc_completion_model_set_proposals (GscModel	    *model,
-					   GscProvider 	    *provider,
-					   GList		       	    *proposals)
+gsc_completion_model_set_proposals (GscModel		*model,
+				    GscProvider 	*provider,
+				    GList		*proposals)
 {
 	GList *item = NULL;
-	HeaderInfo *info;
+	ProviderInfo *info;
 	GscProposal *proposal;
 	RemoveInfo rinfo;
 
 	g_return_if_fail (GSC_IS_MODEL (model));
 	g_return_if_fail (GSC_IS_PROVIDER (provider));
 
-	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
+	info = g_hash_table_lookup (model->priv->providers_info, provider);
 	if (info)
 	{
 		rinfo.path = gtk_tree_path_new_first ();
@@ -769,7 +779,7 @@ gsc_completion_model_set_proposals (GscModel	    *model,
 			rinfo.proposals = NULL;
 		}
 		
-		g_hash_table_foreach_remove (info->hash, remove_old_proposals, &rinfo);
+		g_hash_table_foreach_remove (info->proposals, remove_old_proposals, &rinfo);
 
 		if (rinfo.proposals)
 			g_hash_table_destroy (rinfo.proposals);
@@ -849,7 +859,7 @@ gsc_completion_model_clear (GscModel *model)
 	
 	gtk_tree_path_free (path);
 	
-	g_hash_table_remove_all (model->priv->num_per_provider);
+	g_hash_table_remove_all (model->priv->providers_info);
 }
 
 gboolean
@@ -871,14 +881,14 @@ gsc_completion_model_is_empty (GscModel *model,
 
 guint
 gsc_completion_model_n_proposals (GscModel    *model,
-                                         GscProvider *provider)
+                                  GscProvider *provider)
 {
-	HeaderInfo *info;
+	ProviderInfo *info;
 	
 	g_return_val_if_fail (GSC_IS_MODEL (model), 0);
 	g_return_val_if_fail (GSC_IS_PROVIDER (provider), 0);
 	
-	info = g_hash_table_lookup (model->priv->num_per_provider, provider);
+	info = g_hash_table_lookup (model->priv->providers_info, provider);
 	
 	if (info == NULL)
 	{
@@ -936,3 +946,15 @@ gsc_completion_model_iter_last (GscModel *model,
 		return FALSE;
 	}
 }
+
+gboolean
+gsc_model_iter_is_header (GscModel	*model,
+			  GtkTreeIter	*iter)
+{
+        g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
+        g_return_val_if_fail (iter != NULL, FALSE);
+        g_return_val_if_fail (iter->user_data != NULL, FALSE);
+
+        return node_from_iter (iter)->proposal == NULL;
+}
+

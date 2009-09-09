@@ -20,8 +20,8 @@
  * Boston, MA  02110-1301  USA
  */
 
-#ifndef __GSC_COMPLETION_MODEL_H__
-#define __GSC_COMPLETION_MODEL_H__
+#ifndef __GSC_MODEL_H__
+#define __GSC_MODEL_H__
 
 #include <gtk/gtk.h>
 #include "gsc-proposal.h"
@@ -29,12 +29,12 @@
 G_BEGIN_DECLS
 
 #define GSC_TYPE_MODEL		(gsc_completion_model_get_type ())
-#define GSC_COMPLETION_MODEL(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel))
-#define GSC_COMPLETION_MODEL_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel const))
-#define GSC_COMPLETION_MODEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MODEL, GscModelClass))
+#define GSC_MODEL(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel))
+#define GSC_MODEL_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel const))
+#define GSC_MODEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MODEL, GscModelClass))
 #define GSC_IS_MODEL(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSC_TYPE_MODEL))
 #define GSC_IS_MODEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), GSC_TYPE_MODEL))
-#define GSC_COMPLETION_MODEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MODEL, GscModelClass))
+#define GSC_MODEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GSC_TYPE_MODEL, GscModelClass))
 
 typedef struct _GscModel	GscModel;
 typedef struct _GscModelClass	GscModelClass;
@@ -57,12 +57,12 @@ struct _GscModelClass {
 
 enum
 {
-	GSC_COMPLETION_MODEL_COLUMN_LABEL,
-	GSC_COMPLETION_MODEL_COLUMN_MARKUP,
-	GSC_COMPLETION_MODEL_COLUMN_ICON,
-	GSC_COMPLETION_MODEL_COLUMN_PROPOSAL,
-	GSC_COMPLETION_MODEL_COLUMN_PROVIDER,
-	GSC_COMPLETION_MODEL_N_COLUMNS
+	GSC_MODEL_COLUMN_LABEL,
+	GSC_MODEL_COLUMN_MARKUP,
+	GSC_MODEL_COLUMN_ICON,
+	GSC_MODEL_COLUMN_PROPOSAL,
+	GSC_MODEL_COLUMN_PROVIDER,
+	GSC_MODEL_N_COLUMNS
 };
 
 GType gsc_completion_model_get_type (void) G_GNUC_CONST;
@@ -96,7 +96,10 @@ gboolean 	gsc_completion_model_iter_last 	(GscModel           *model,
 
 void		gsc_completion_model_cancel_add_proposals (GscModel  *model);
 
+gboolean	gsc_model_iter_is_header			(GscModel	*model,
+								 GtkTreeIter	*iter);
+
 G_END_DECLS
 
-#endif /* __GSC_COMPLETION_MODEL_H__ */
+#endif /* __GSC_MODEL_H__ */
 

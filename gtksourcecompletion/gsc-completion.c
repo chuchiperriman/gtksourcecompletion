@@ -178,7 +178,7 @@ get_selected_proposal (GscCompletion	      *completion,
 		model = GTK_TREE_MODEL (completion->priv->model_proposals);
 		
 		gtk_tree_model_get (model, &piter,
-				    GSC_COMPLETION_MODEL_COLUMN_PROPOSAL,
+				    GSC_MODEL_COLUMN_PROPOSAL,
 				    proposal, -1);
 		
 		if (iter != NULL)
@@ -286,7 +286,7 @@ activate_current_proposal (GscCompletion *completion)
 	completion->priv->is_inserting = TRUE;
 	gtk_tree_model_get (GTK_TREE_MODEL (completion->priv->model_proposals),
 			    &iter,
-			    GSC_COMPLETION_MODEL_COLUMN_PROVIDER, &provider,
+			    GSC_MODEL_COLUMN_PROVIDER, &provider,
 			    -1);
 	
 	/* Get insert iter */
@@ -416,7 +416,7 @@ selector_last (GscCompletion *completion,
 	gboolean haslast;
 	GtkTreeIter last;
 
-	ret = gsc_completion_model_iter_last (GSC_COMPLETION_MODEL (model),
+	ret = gsc_completion_model_iter_last (GSC_MODEL (model),
 					      iter);
 
 	haslast = ret;
@@ -451,7 +451,7 @@ selector_previous (GscCompletion *completion,
 	last = *iter;
 
 	while (num > 0 && gsc_completion_model_iter_previous (
-							      GSC_COMPLETION_MODEL (model), &next))
+							      GSC_MODEL (model), &next))
 	{
 		ret = TRUE;
 		*iter = next;
@@ -838,7 +838,7 @@ update_proposal_info (GscCompletion *completion)
 	if (get_selected_proposal (completion, &iter, &proposal))
 	{
 		model = GTK_TREE_MODEL (completion->priv->model_proposals);
-		gtk_tree_model_get (model, &iter, GSC_COMPLETION_MODEL_COLUMN_PROVIDER, &provider, -1);
+		gtk_tree_model_get (model, &iter, GSC_MODEL_COLUMN_PROVIDER, &provider, -1);
 
 		update_proposal_info_real (completion, provider, proposal);
 
@@ -1570,18 +1570,31 @@ render_proposal_icon_func (GtkTreeViewColumn   *column,
                            GtkTreeIter         *iter,
                            GscCompletion *completion)
 {
+	gboolean isheader;
 	GdkPixbuf *icon;
 	GtkStyle *style;
+
+	isheader = gsc_model_iter_is_header (completion->priv->model_proposals,
+					     iter);
 	
 	style = gtk_widget_get_style (GTK_WIDGET (completion->priv->tree_view_proposals));
-	
-	g_object_set (cell,
-		      "cell-background-set", FALSE,
-		      NULL);
+
+	if (isheader)
+	{
+		g_object_set (cell,
+                              "cell-background-gdk", &(style->bg[GTK_STATE_INSENSITIVE]),
+                              NULL);
+	}
+	else
+	{
+		g_object_set (cell,
+			      "cell-background-set", FALSE,
+			      NULL);
+	}
 	
 	gtk_tree_model_get (model, 
 	                    iter, 
-	                    GSC_COMPLETION_MODEL_COLUMN_ICON,
+	                    GSC_MODEL_COLUMN_ICON,
 	                    &icon,
 	                    -1);
 
@@ -1598,32 +1611,64 @@ render_proposal_text_func (GtkTreeViewColumn   *column,
                            GtkCellRenderer     *cell,
                            GtkTreeModel        *model,
                            GtkTreeIter         *iter,
-                           GscCompletion *completion)
+                           GscCompletion       *completion)
 {
 	gchar *label;
 	gchar *markup;
-	
-	gtk_tree_model_get (model, 
-			    iter, 
-			    GSC_COMPLETION_MODEL_COLUMN_LABEL, 
-			    &label, 
-			    GSC_COMPLETION_MODEL_COLUMN_MARKUP, 
-			    &markup,
-			    -1);
+	gboolean isheader;
+	GscProvider *provider;
+	GtkStyle *style;
 
-	if (!markup)
+	isheader = gsc_model_iter_is_header (completion->priv->model_proposals,
+					     iter);
+
+	if (isheader)
 	{
-		markup = g_markup_escape_text (label ? label : "", -1);
+		gtk_tree_model_get (model,
+                                    iter,
+                                    GSC_MODEL_COLUMN_PROVIDER,
+                                    &provider,
+                                    -1);
+
+                label = g_strdup_printf ("<b>%s</b>",
+                                        g_markup_escape_text (gsc_provider_get_name (provider),
+                                                              -1));
+
+                style = gtk_widget_get_style (GTK_WIDGET (completion->priv->tree_view_proposals));
+
+                g_object_set (cell,
+                              "markup", label,
+                              "background-gdk", &(style->bg[GTK_STATE_INSENSITIVE]),
+                              "foreground-gdk", &(style->fg[GTK_STATE_INSENSITIVE]),
+                              NULL);
+                g_free (label);
+
+                g_object_unref (provider);
 	}
-	
-	g_object_set (cell, 
-		      "markup", markup, 
-		      "background-set", FALSE, 
-		      "foreground-set", FALSE,
-		      NULL);
-	
-	g_free (label);
-	g_free (markup);
+	else
+	{
+		gtk_tree_model_get (model, 
+				    iter, 
+				    GSC_MODEL_COLUMN_LABEL, 
+				    &label, 
+				    GSC_MODEL_COLUMN_MARKUP, 
+				    &markup,
+				    -1);
+		
+		if (!markup)
+		{
+			markup = g_markup_escape_text (label ? label : "", -1);
+		}
+		
+		g_object_set (cell, 
+			      "markup", markup, 
+			      "background-set", FALSE, 
+			      "foreground-set", FALSE,
+			      NULL);
+		
+		g_free (label);
+		g_free (markup);
+	}
 }
 
 static gboolean
