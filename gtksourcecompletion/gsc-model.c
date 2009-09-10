@@ -174,7 +174,7 @@ tree_model_get_iter (GtkTreeModel *tree_model,
 	
 	model = GSC_MODEL (tree_model);
 	indices = gtk_tree_path_get_indices (path);
-	
+
 	return get_iter_from_index (model, iter, indices[0]);
 }
 
@@ -183,13 +183,15 @@ tree_model_get_path (GtkTreeModel *tree_model,
 		     GtkTreeIter  *iter)
 {
 	GscModel *model;
+	GtkTreePath *path;
 	
 	g_return_val_if_fail (GSC_IS_MODEL (tree_model), NULL);
 	g_return_val_if_fail (iter != NULL, NULL);
 	g_return_val_if_fail (iter->user_data != NULL, NULL);
 
 	model = GSC_MODEL (tree_model);
-	return path_from_list (model, (GList *)iter->user_data);
+	path = path_from_list (model, (GList *)iter->user_data);
+	return path;
 }
 
 static void
@@ -573,7 +575,7 @@ append_list (GscModel 		*model,
 		}
 		else
 		{
-			item = item->next;
+			item = model->priv->last->next;
 		}
 		
 		g_hash_table_insert (info->proposals, node, item);
@@ -593,15 +595,17 @@ static void
 remove_node (GscModel			*model,
 	     ProposalNode 		*node,
 	     GList 			*store_node,
-	     GtkTreePath 		*path)
+	     GtkTreePath 		*path,
+	     gboolean			 header)
 {
 	ProviderInfo *info;
 	g_assert (store_node != NULL);
 	g_assert (path != NULL);
 
 	info = g_hash_table_lookup (model->priv->providers_info, node->provider);
+	if (!header)
+		num_dec (model, info);
 	
-	num_dec (model, info);
 	free_node (node);
 	
 	if (store_node == model->priv->last)
@@ -629,7 +633,6 @@ on_proposal_changed (GscProposal *proposal,
 
 	iter.user_data = node;
 	path = path_from_list (node->model, item);
-	g_debug ("changed");
 	gtk_tree_model_row_changed (GTK_TREE_MODEL (node->model),
 	                            path,
 	                            &iter);
@@ -678,9 +681,15 @@ idle_append (gpointer data)
 			}
 			else
 			{
-				item = item->next;
+				item = model->priv->last->next;
 			}
 			model->priv->last = item;
+			info->header_item = item;
+
+			iter.user_data = item;
+			path = path_from_list (model, item);
+			gtk_tree_model_row_inserted (GTK_TREE_MODEL (model), path, &iter);
+			gtk_tree_path_free (path);
 
 		}
 		
@@ -733,13 +742,13 @@ remove_old_proposals (gpointer key,
 		item = g_hash_table_lookup (rinfo->proposals, node->proposal);
 		if (!item)
 		{
-			remove_node (rinfo->model, node, store_node, rinfo->path);
+			remove_node (rinfo->model, node, store_node, rinfo->path, FALSE);
 			return TRUE;
 		}
 	}
 	else
 	{
-		remove_node (rinfo->model, node, store_node, rinfo->path);
+		remove_node (rinfo->model, node, store_node, rinfo->path, FALSE);
 		return TRUE;
 	}
 
@@ -782,7 +791,16 @@ gsc_completion_model_set_proposals (GscModel		*model,
 		g_hash_table_foreach_remove (info->proposals, remove_old_proposals, &rinfo);
 
 		if (rinfo.proposals)
+		{
 			g_hash_table_destroy (rinfo.proposals);
+		}
+		else
+		{
+			remove_node (model, info->header_node,
+				     info->header_item,
+				     rinfo.path,
+				     TRUE);
+		}
 		
 		gtk_tree_path_free (rinfo.path);
 	}
@@ -793,8 +811,8 @@ gsc_completion_model_set_proposals (GscModel		*model,
 		{
 			proposal = GSC_COMPLETION_PROPOSAL (item->data);
 			gsc_completion_model_append (model,
-							    provider,
-							    proposal);
+						     provider,
+						     proposal);
 		}
 	}
 	
@@ -802,8 +820,8 @@ gsc_completion_model_set_proposals (GscModel		*model,
 
 void
 gsc_completion_model_append (GscModel    *model,
-                                    GscProvider *provider,
-                                    GscProposal *proposal)
+			     GscProvider *provider,
+			     GscProposal *proposal)
 {
 	ProposalNode *node;
 	
@@ -854,7 +872,7 @@ gsc_completion_model_clear (GscModel *model)
 	while (model->priv->store)
 	{
 		node = (ProposalNode *)model->priv->store->data;
-		remove_node (model, node, model->priv->store, path);
+		remove_node (model, node, model->priv->store, path, FALSE);
 	}
 	
 	gtk_tree_path_free (path);
