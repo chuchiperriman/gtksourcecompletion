@@ -209,7 +209,7 @@ gsc_context_add_proposals (GscContext		*context,
 		pinfo->needs_update = FALSE;
 		if (context->priv->filter_provider == NULL || provider == context->priv->filter_provider)
 		{
-			gsc_completion_model_set_proposals (context->priv->model,
+			gsc_model_set_proposals (context->priv->model,
 								   provider,
 								   pinfo->proposals);
 		}
@@ -232,7 +232,7 @@ gsc_context_add_proposals (GscContext		*context,
 				if (GSC_IS_PROPOSAL (item->data))
 				{
 					proposal = GSC_COMPLETION_PROPOSAL (item->data);
-					gsc_completion_model_append (context->priv->model,
+					gsc_model_append (context->priv->model,
 									    provider,
 									    proposal);
 				}
@@ -240,7 +240,7 @@ gsc_context_add_proposals (GscContext		*context,
 		}
 	}
 	
-	gsc_completion_model_run_add_proposals (context->priv->model);
+	gsc_model_run_add_proposals (context->priv->model);
 
 	g_list_free (proposals);
 }
@@ -353,7 +353,7 @@ gsc_context_update (GscContext	*context)
 	context_clear (context);
 	update_criteria (context);
 
-	gsc_completion_model_cancel_add_proposals (context->priv->model);
+	gsc_model_cancel_add_proposals (context->priv->model);
 }
 
 void
@@ -370,7 +370,7 @@ gsc_context_set_filter_provider (GscContext	*context,
 	if (context->priv->filter_provider == provider)
 		return;
 
-	gsc_completion_model_clear (context->priv->model);
+	gsc_model_clear (context->priv->model);
 	
 	context->priv->filter_provider = provider;
 
@@ -391,7 +391,7 @@ gsc_context_set_filter_provider (GscContext	*context,
 			
 		for (;proposals != NULL; proposals = g_list_next (proposals))
 		{
-			gsc_completion_model_append (context->priv->model,
+			gsc_model_append (context->priv->model,
 							    provider,
 							    GSC_COMPLETION_PROPOSAL (proposals->data));
 		}
@@ -399,7 +399,7 @@ gsc_context_set_filter_provider (GscContext	*context,
 
 	g_list_free (providers);
 
-	gsc_completion_model_run_add_proposals (context->priv->model);
+	gsc_model_run_add_proposals (context->priv->model);
 }
 
 GscProvider*

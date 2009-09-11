@@ -28,7 +28,7 @@
 
 G_BEGIN_DECLS
 
-#define GSC_TYPE_MODEL		(gsc_completion_model_get_type ())
+#define GSC_TYPE_MODEL		(gsc_model_get_type ())
 #define GSC_MODEL(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel))
 #define GSC_MODEL_CONST(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GSC_TYPE_MODEL, GscModel const))
 #define GSC_MODEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), GSC_TYPE_MODEL, GscModelClass))
@@ -65,36 +65,36 @@ enum
 	GSC_MODEL_N_COLUMNS
 };
 
-GType gsc_completion_model_get_type (void) G_GNUC_CONST;
+GType gsc_model_get_type (void) G_GNUC_CONST;
 
 GscModel *
-		gsc_completion_model_new 	(void);
+		gsc_model_new 	(void);
 
-void		gsc_completion_model_run_add_proposals (GscModel *model);
+void		gsc_model_run_add_proposals (GscModel *model);
 
-void		gsc_completion_model_append 	(GscModel           *model,
+void		gsc_model_append 	(GscModel           *model,
 							 GscProvider        *provider,
 							 GscProposal        *proposal);
 
-void		gsc_completion_model_set_proposals (GscModel	    *model,
+void		gsc_model_set_proposals (GscModel	    *model,
 							   GscProvider 	    *provider,
 							   GList		       	    *proposals);
 
-gboolean	gsc_completion_model_is_empty 	(GscModel           *model,
+gboolean	gsc_model_is_empty 	(GscModel           *model,
                                                          gboolean                            invisible);
 
-guint		gsc_completion_model_n_proposals (GscModel           *model,
+guint		gsc_model_n_proposals (GscModel           *model,
                                                          GscProvider        *provider);
 
-void 		gsc_completion_model_clear 	(GscModel           *model);
+void 		gsc_model_clear 	(GscModel           *model);
 
-gboolean 	gsc_completion_model_iter_previous (GscModel         *model,
+gboolean 	gsc_model_iter_previous (GscModel         *model,
 							   GtkTreeIter                      *iter);
 							 
-gboolean 	gsc_completion_model_iter_last 	(GscModel           *model,
+gboolean 	gsc_model_iter_last 	(GscModel           *model,
 							 GtkTreeIter                        *iter);
 
-void		gsc_completion_model_cancel_add_proposals (GscModel  *model);
+void		gsc_model_cancel_add_proposals (GscModel  *model);
 
 gboolean	gsc_model_iter_is_header			(GscModel	*model,
 								 GtkTreeIter	*iter);

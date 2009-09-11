@@ -397,6 +397,12 @@ selector_first (GscCompletion *completion,
 	hasfirst = ret;
 	first = *iter;
 
+	while (ret && gsc_model_iter_is_header (GSC_MODEL (model), iter))
+        {
+                ret = gtk_tree_model_iter_next (model, iter);
+        }
+
+	
 	if (hasfirst && !ret)
 	{
 		scroll_to_iter (completion, model, &first);
@@ -416,12 +422,20 @@ selector_last (GscCompletion *completion,
 	gboolean haslast;
 	GtkTreeIter last;
 
-	ret = gsc_completion_model_iter_last (GSC_MODEL (model),
+	ret = gsc_model_iter_last (GSC_MODEL (model),
 					      iter);
 
 	haslast = ret;
 	last = *iter;
 
+	while (ret && gsc_model_iter_is_header (
+                        GSC_MODEL (model), iter))
+        {
+                ret = gsc_model_iter_previous (GSC_MODEL (model), iter);
+        }
+
+
+	
 	if (haslast && !ret)
 	{
 		scroll_to_iter (completion, model, &last);
@@ -450,12 +464,15 @@ selector_previous (GscCompletion *completion,
 	next = *iter;
 	last = *iter;
 
-	while (num > 0 && gsc_completion_model_iter_previous (
-							      GSC_MODEL (model), &next))
+	while (num > 0 && gsc_model_iter_previous (GSC_MODEL (model), &next))
 	{
-		ret = TRUE;
-		*iter = next;
-		--num;
+		if (!gsc_model_iter_is_header (GSC_MODEL (model), &next))
+		{
+			ret = TRUE;
+			*iter = next;
+			--num;
+		}
+		
 		last = next;
 	}
 
@@ -489,9 +506,12 @@ selector_next (GscCompletion *completion,
 
 	while (num > 0 && gtk_tree_model_iter_next (model, &next))
 	{
-		ret = TRUE;
-		*iter = next;
-		--num;
+		if (!gsc_model_iter_is_header (GSC_MODEL (model), &next))
+		{
+			ret = TRUE;
+			*iter = next;
+			--num;
+		}
 		last = next;
 	}
 
@@ -682,7 +702,7 @@ select_provider (GscCompletion *completion,
 			if (proposals != NULL)
 				break;
 		}
-		else if (!gsc_completion_model_is_empty (completion->priv->model_proposals, TRUE))
+		else if (!gsc_model_is_empty (completion->priv->model_proposals, TRUE))
 		{
 			break;
 		}
@@ -1404,7 +1424,7 @@ gsc_completion_hide_default (GscCompletion *completion)
 
 	gtk_label_set_markup (GTK_LABEL (completion->priv->default_info), "");
 
-	gsc_completion_model_clear (completion->priv->model_proposals);
+	gsc_model_clear (completion->priv->model_proposals);
 
 	context_destroy (completion);
 	
@@ -1679,8 +1699,13 @@ selection_func (GtkTreeSelection    *selection,
                 GscCompletion *completion)
 {
 	GtkTreeIter iter;
-	
+
 	gtk_tree_model_get_iter (model, &iter, path);
+
+	if (gsc_model_iter_is_header (GSC_MODEL (model), &iter))
+	{
+		return path_currently_selected;
+	}
 	
 	return TRUE;
 }
@@ -1716,7 +1741,7 @@ on_items_added_cb (GscModel *model,
 		   GscCompletion      *completion)
 {
 	/* Check if there are any completions */
-	if (gsc_completion_model_is_empty (model, FALSE))
+	if (gsc_model_is_empty (model, FALSE))
 	{
 		gsc_completion_hide (completion);
 	}
@@ -1731,7 +1756,7 @@ initialize_proposals_ui (GscCompletion *completion)
 	GtkWidget *scrolled_window;
 	GtkWidget *tree_view;
 	
-	completion->priv->model_proposals = gsc_completion_model_new ();
+	completion->priv->model_proposals = gsc_model_new ();
 	
 	g_signal_connect (completion->priv->model_proposals,
 			  "items-added",

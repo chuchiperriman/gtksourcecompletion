@@ -77,7 +77,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 static void tree_model_iface_init (gpointer g_iface, gpointer iface_data);
 
 G_DEFINE_TYPE_WITH_CODE (GscModel, 
-                         gsc_completion_model, 
+                         gsc_model, 
                          G_TYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (GTK_TYPE_TREE_MODEL,
                                                 tree_model_iface_init))
@@ -402,11 +402,11 @@ free_node (ProposalNode *node)
 }
 
 static void
-gsc_completion_model_dispose (GObject *object)
+gsc_model_dispose (GObject *object)
 {
 	GscModel *model = GSC_MODEL (object);
 
-	gsc_completion_model_cancel_add_proposals (model);
+	gsc_model_cancel_add_proposals (model);
 	
 	if (model->priv->item_queue != NULL)
 	{
@@ -424,22 +424,22 @@ gsc_completion_model_dispose (GObject *object)
 	g_list_free (model->priv->store);
 	model->priv->store = NULL;
 
-	G_OBJECT_CLASS (gsc_completion_model_parent_class)->dispose (object);
+	G_OBJECT_CLASS (gsc_model_parent_class)->dispose (object);
 }
 
 static void
-gsc_completion_model_finalize (GObject *object)
+gsc_model_finalize (GObject *object)
 {
-	G_OBJECT_CLASS (gsc_completion_model_parent_class)->finalize (object);
+	G_OBJECT_CLASS (gsc_model_parent_class)->finalize (object);
 }
 
 static void
-gsc_completion_model_class_init (GscModelClass *klass)
+gsc_model_class_init (GscModelClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	
-	object_class->finalize = gsc_completion_model_finalize;
-	object_class->dispose = gsc_completion_model_dispose;
+	object_class->finalize = gsc_model_finalize;
+	object_class->dispose = gsc_model_dispose;
 
 	g_type_class_add_private (object_class, sizeof(GscModelPrivate));
 	
@@ -514,7 +514,7 @@ provider_info_free (gpointer data)
 }
 
 static void
-gsc_completion_model_init (GscModel *self)
+gsc_model_init (GscModel *self)
 {
 	self->priv = GSC_MODEL_GET_PRIVATE (self);
 	
@@ -554,7 +554,7 @@ num_dec (GscModel    *model,
 
 /* Public */
 GscModel*
-gsc_completion_model_new (void)
+gsc_model_new (void)
 {
 	return g_object_new (GSC_TYPE_MODEL, NULL);
 }
@@ -720,7 +720,7 @@ idle_append (gpointer data)
 }
 
 void
-gsc_completion_model_run_add_proposals (GscModel *model)
+gsc_model_run_add_proposals (GscModel *model)
 {
 	if (idle_append (model))
 	{
@@ -759,7 +759,7 @@ remove_old_proposals (gpointer key,
 
 
 void
-gsc_completion_model_set_proposals (GscModel		*model,
+gsc_model_set_proposals (GscModel		*model,
 				    GscProvider 	*provider,
 				    GList		*proposals)
 {
@@ -811,7 +811,7 @@ gsc_completion_model_set_proposals (GscModel		*model,
 		if (GSC_IS_PROPOSAL (item->data))
 		{
 			proposal = GSC_COMPLETION_PROPOSAL (item->data);
-			gsc_completion_model_append (model,
+			gsc_model_append (model,
 						     provider,
 						     proposal);
 		}
@@ -820,7 +820,7 @@ gsc_completion_model_set_proposals (GscModel		*model,
 }
 
 void
-gsc_completion_model_append (GscModel    *model,
+gsc_model_append (GscModel    *model,
 			     GscProvider *provider,
 			     GscProposal *proposal)
 {
@@ -840,7 +840,7 @@ gsc_completion_model_append (GscModel    *model,
 }
 
 void
-gsc_completion_model_cancel_add_proposals (GscModel    *model)
+gsc_model_cancel_add_proposals (GscModel    *model)
 {
 	g_return_if_fail (GSC_IS_MODEL (model));
 
@@ -859,7 +859,7 @@ gsc_completion_model_cancel_add_proposals (GscModel    *model)
 }
 
 void
-gsc_completion_model_clear (GscModel *model)
+gsc_model_clear (GscModel *model)
 {
 	GtkTreePath *path;
 	ProposalNode *node;
@@ -867,7 +867,7 @@ gsc_completion_model_clear (GscModel *model)
 	g_return_if_fail (GSC_IS_MODEL (model));
 
 	/* Clear the queue of missing elements to append */
-	gsc_completion_model_cancel_add_proposals (model);
+	gsc_model_cancel_add_proposals (model);
 	
 	path = gtk_tree_path_new_first ();
 	
@@ -883,7 +883,7 @@ gsc_completion_model_clear (GscModel *model)
 }
 
 gboolean
-gsc_completion_model_is_empty (GscModel *model,
+gsc_model_is_empty (GscModel *model,
                                       gboolean                  invisible)
 {
 	g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
@@ -900,7 +900,7 @@ gsc_completion_model_is_empty (GscModel *model,
 }
 
 guint
-gsc_completion_model_n_proposals (GscModel    *model,
+gsc_model_n_proposals (GscModel    *model,
                                   GscProvider *provider)
 {
 	ProviderInfo *info;
@@ -923,7 +923,7 @@ gsc_completion_model_n_proposals (GscModel    *model,
 }
 
 gboolean
-gsc_completion_model_iter_previous (GscModel *model,
+gsc_model_iter_previous (GscModel *model,
                                            GtkTreeIter              *iter)
 {
 	GList *item;
@@ -948,7 +948,7 @@ gsc_completion_model_iter_previous (GscModel *model,
 }
 
 gboolean
-gsc_completion_model_iter_last (GscModel *model,
+gsc_model_iter_last (GscModel *model,
                                        GtkTreeIter              *iter)
 {
 	GList *item;
@@ -961,7 +961,7 @@ gsc_completion_model_iter_last (GscModel *model,
 
 	if (item != NULL)
 	{
-		return gsc_completion_model_iter_previous (model, iter);
+		return gsc_model_iter_previous (model, iter);
 	}
 	else
 	{
