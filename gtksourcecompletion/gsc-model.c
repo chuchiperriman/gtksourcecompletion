@@ -459,9 +459,7 @@ static guint
 hash_node (gconstpointer v)
 {
 	ProposalNode *node = (ProposalNode *)v;
-	g_debug ("a");
 	guint ret = gsc_proposal_get_hash (node->proposal);
-	g_debug ("b");
 	return ret;
 }
 
@@ -535,20 +533,22 @@ gsc_model_init (GscModel *self)
 }
 
 static void
-num_inc (GscModel    *model,
-         ProviderInfo *info)
+num_inc (GscModel	*model,
+         ProviderInfo	*info,
+	 ProposalNode	*node)
 {
 	++model->priv->num;
-	if (info != NULL)
+	if (!node->is_header)
 		++info->num;
 }
 
 static void
-num_dec (GscModel    *model,
-         ProviderInfo *info)
+num_dec (GscModel	*model,
+         ProviderInfo	*info,
+	 ProposalNode	*node)
 {
 	--model->priv->num;
-	if (info != NULL)
+	if (!node->is_header)
 		--info->num;
 }
 
@@ -591,7 +591,7 @@ append_list (GscModel 		*model,
 			g_hash_table_insert (info->proposals, node, item);
 		}
 
-		num_inc (model, info);
+		num_inc (model, info, node);
 		
 		*inserted = TRUE;
 		model->priv->last = item;
@@ -616,7 +616,7 @@ remove_node (GscModel			*model,
 
 	info = g_hash_table_lookup (model->priv->providers_info, node->provider);
 
-	num_dec (model, info);
+	num_dec (model, info, node);
 	
 	free_node (node);
 	
@@ -684,7 +684,6 @@ idle_append (gpointer data)
 
 			g_hash_table_insert (model->priv->providers_info, node->provider, info);
 
-			/*TODO test*/
 			item = append_list (model, info,  info->header_node, &inserted);
 
 			info->header_item = item;
@@ -796,11 +795,15 @@ gsc_model_set_proposals (GscModel		*model,
 		{
 			g_hash_table_destroy (rinfo.proposals);
 		}
-		else
+
+		g_debug ("%s> %i",gsc_provider_get_name (info->provider), info->num);
+
+		if (info->num == 0)
 		{
 			remove_node (model, info->header_node,
 				     info->header_item,
 				     rinfo.path);
+			g_hash_table_remove (model->priv->providers_info, info->provider);
 		}
 		
 		gtk_tree_path_free (rinfo.path);
