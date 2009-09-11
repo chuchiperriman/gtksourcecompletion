@@ -23,7 +23,7 @@
 #ifndef __GSC_COMPLETION_UTILS_H__
 #define __GSC_COMPLETION_UTILS_H__
 
-#include <gtksourceview/gtksourceview.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
@@ -34,28 +34,28 @@ gchar	     	*gsc_utils_clear_word			(const gchar* word);
 
 gboolean	 gsc_utils_is_separator			(gunichar         ch);
 
-gchar		*gsc_utils_get_word_iter		(GtkSourceBuffer *source_buffer, 
+gchar		*gsc_utils_get_word_iter		(GtkTextBuffer *text_buffer, 
 									 GtkTextIter     *current,
 									 GtkTextIter     *start_word, 
 									 GtkTextIter     *end_word);
 
-gchar		*gsc_utils_get_word			(GtkSourceBuffer *text_view);
+gchar		*gsc_utils_get_word			(GtkTextBuffer *text_view);
 
-void		 gsc_utils_replace_word		(GtkSourceBuffer *source_buffer,
+void		 gsc_utils_replace_word		(GtkTextBuffer *text_buffer,
 									 GtkTextIter     *iter,
 									 const gchar     *text,
 									 gint             len);
 
-void		 gsc_utils_replace_current_word	(GtkSourceBuffer *source_buffer, 
+void		 gsc_utils_replace_current_word	(GtkTextBuffer *text_buffer, 
 									 const gchar     *text,
 									 gint             len);
 
 void		 gsc_utils_move_to_iter		(GtkWindow       *window,
-									 GtkSourceView   *view,
+									 GtkTextView *view,
 									 GtkTextIter     *iter);
 
 void		 gsc_utils_move_to_cursor		(GtkWindow       *window,
-									 GtkSourceView   *view);
+									 GtkTextView   *view);
 
 G_END_DECLS
 

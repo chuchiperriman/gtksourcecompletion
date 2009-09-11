@@ -36,7 +36,6 @@
 #include "gsc-model.h"
 #include "gsc-context.h"
 #include <string.h>
-#include <gtksourceview/gtksourceview.h>
 #include <stdarg.h>
 
 #define WINDOW_WIDTH 350
@@ -97,7 +96,7 @@ struct _GscCompletionPrivate
 	gboolean select_on_show;
 	
 	/* Completion management */
-	GtkSourceView *view;
+	GtkTextView *view;
 
 	GList *providers;
 	GHashTable *capability_map;
@@ -126,8 +125,6 @@ G_DEFINE_TYPE(GscCompletion, gsc_completion, G_TYPE_OBJECT);
  * call twice to gsc_proposal_new, the second time it returns
  * the previous created GscCompletion, not creates a new one
  *
- * FIXME We will remove this functions when we will integrate
- * Gsc in GtkSourceView
  */
 
 static GHashTable *gsccompletion_map = NULL;
@@ -298,7 +295,7 @@ activate_current_proposal (GscCompletion *completion)
 	if (!activated)
 	{
 		text = gsc_proposal_get_text (proposal);
-		gsc_utils_replace_current_word (GTK_SOURCE_BUFFER (buffer),
+		gsc_utils_replace_current_word (buffer,
 						text ? text : NULL,
 						-1);
 	}
@@ -1007,7 +1004,7 @@ gsc_completion_user_request (GscCompletion *completion)
 }
 
 static gboolean
-view_key_press_event_cb (GtkSourceView	      *view,
+view_key_press_event_cb (GtkTextView	      *view,
 			 GdkEventKey	      *event, 
 			 GscCompletion *completion)
 {
@@ -1117,7 +1114,7 @@ update_typing_offsets (GscCompletion *completion)
 	gchar *word;
 
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (completion->priv->view));
-	word = gsc_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
+	word = gsc_utils_get_word_iter (buffer,
 							  NULL,
 							  &start,
 							  &end);
@@ -1157,7 +1154,7 @@ show_auto_completion (GscCompletion *completion)
 		return FALSE;
 	}
 	
-	word = gsc_utils_get_word_iter (GTK_SOURCE_BUFFER (buffer),
+	word = gsc_utils_get_word_iter (buffer,
 							  &iter,
 							  &start,
 							  &end);
@@ -1461,15 +1458,15 @@ gsc_completion_class_init (GscCompletionClass *klass)
 	/**
 	 * Gsc:view:
 	 *
-	 * The #GtkSourceView bound to the completion object.
+	 * The #GtkTextView bound to the completion object.
 	 *
 	 */
 	g_object_class_install_property (object_class,
 					 PROP_VIEW,
 					 g_param_spec_object ("view",
 							      _("View"),
-							      _("The GtkSourceView bound to the completion"),
-							      GTK_TYPE_SOURCE_VIEW,
+							      _("The GtkTextView bound to the completion"),
+							      GTK_TYPE_TEXT_VIEW,
 							      G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 	
 	/**
@@ -2079,12 +2076,12 @@ gsc_completion_show (GscCompletion *completion,
 	if (place == NULL)
 	{
 		gsc_utils_move_to_cursor (GTK_WINDOW (completion->priv->window),
-							    GTK_SOURCE_VIEW (completion->priv->view));
+						      completion->priv->view);
 	}
 	else
 	{
 		gsc_utils_move_to_iter (GTK_WINDOW (completion->priv->window),
-							  GTK_SOURCE_VIEW (completion->priv->view),
+							  completion->priv->view,
 							  place);
 	}
 
@@ -2155,16 +2152,16 @@ gsc_completion_error_quark (void)
 
 /**
  * gsc_completion_new:
- * @view: A #GtkSourceView
+ * @view: A #GtkTextView
  *
  * Create a new #GscCompletion associated with @view.
  *
  * Returns: The new #Gsc.
  */
 GscCompletion *
-gsc_completion_new (GtkSourceView *view)
+gsc_completion_new (GtkTextView *view)
 {
-	g_return_val_if_fail (GTK_IS_SOURCE_VIEW (view), NULL);
+	g_return_val_if_fail (GTK_IS_TEXT_VIEW (view), NULL);
 
 	GscCompletion *self = g_object_new (GSC_TYPE_COMPLETION,
 					    "view", view,
@@ -2310,11 +2307,11 @@ gsc_completion_get_info_window (GscCompletion *completion)
  * gsc_completion_get_view:
  * @completion: A #Gsc
  *
- * The #GtkSourceView associated with @completion.
+ * The #GtkTextView associated with @completion.
  *
- * Returns: The #GtkSourceView associated with @completion.
+ * Returns: The #GtkTextView associated with @completion.
  */
-GtkSourceView *
+GtkTextView *
 gsc_completion_get_view (GscCompletion *completion)
 {
 	g_return_val_if_fail (GSC_IS_COMPLETION (completion), NULL);

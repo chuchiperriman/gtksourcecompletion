@@ -180,6 +180,7 @@ static void
 create_completion(void)
 {
 	GscProviderTest *prov_test1;
+	GscProvider *prov_words;
 	GdkPixbuf *icon;
 	
 	comp = gsc_completion_new (GTK_TEXT_VIEW (view));
@@ -207,13 +208,13 @@ create_completion(void)
 	gsc_completion_add_provider (comp, GSC_PROVIDER (prov_test1), NULL);
 
 	icon = get_icon_from_theme (GTK_STOCK_FILE);
-	prov_test1 = gsc_provider_words_new ("Document words", icon);
+	prov_words = GSC_PROVIDER (gsc_provider_words_new ("Document words", icon));
 	if (icon != NULL)
 	{
 		g_object_unref (icon);
 	}
 	
-	gsc_completion_add_provider (comp, GSC_PROVIDER (prov_test1), NULL);
+	gsc_completion_add_provider (comp, GSC_PROVIDER (prov_words), NULL);
 
 	/*
 	  icon = get_icon_from_theme (GTK_STOCK_CLOSE);

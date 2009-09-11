@@ -24,7 +24,6 @@
 #define GSC_COMPLETION_H
 
 #include <gtk/gtk.h>
-#include <gtksourceview/gtksourceview.h>
 #include "gsc-info.h"
 #include "gsc-provider.h"
 
@@ -52,9 +51,6 @@ typedef enum
 	GSC_COMPLETION_ERROR_NOT_BOUND,
 } GscCompletionError;
 
-/* Forward declaration of GtkSourceView */
-struct _GtkSourceView;
-
 struct _GscCompletion
 {
 	GObject parent;
@@ -79,7 +75,7 @@ GType		 gsc_completion_get_type		(void) G_GNUC_CONST;
 
 GQuark		 gsc_completion_error_quark		(void);
 
-GscCompletion	*gsc_completion_new 			(GtkSourceView *source_view);
+GscCompletion	*gsc_completion_new 			(GtkTextView *source_view);
 
 gboolean	 gsc_completion_add_provider		(GscCompletion          *completion,
 							 GscProvider  *provider,
@@ -100,7 +96,7 @@ void		 gsc_completion_hide			(GscCompletion         *completion);
 GscInfo *
 		 gsc_completion_get_info_window		(GscCompletion         *completion);
 
-GtkSourceView	*gsc_completion_get_view		(GscCompletion	     *completion);
+GtkTextView	*gsc_completion_get_view		(GscCompletion	     *completion);
 
 G_END_DECLS
 

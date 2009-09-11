@@ -84,7 +84,7 @@ gsc_utils_is_separator(const gunichar ch)
 /**
  * gsc_utils_get_word_iter:
  *
- * @source_buffer: The #GtkSourceBuffer
+ * @text_buffer: The #GtkTextBuffer
  * @start_word: if != NULL then assign it the start position of the word
  * @end_word: if != NULL then assing it the end position of the word
  * 
@@ -92,16 +92,13 @@ gsc_utils_is_separator(const gunichar ch)
  *
  */
 gchar *
-gsc_utils_get_word_iter (GtkSourceBuffer *source_buffer, 
+gsc_utils_get_word_iter (GtkTextBuffer *text_buffer, 
                                            GtkTextIter     *current,
 					   GtkTextIter     *start_word, 
 					   GtkTextIter     *end_word)
 {
-	GtkTextBuffer *text_buffer;
 	gunichar ch;
 	gboolean no_doc_start;
-	
-	text_buffer = GTK_TEXT_BUFFER (source_buffer);
 	
 	if (current == NULL)
 	{
@@ -140,36 +137,33 @@ gsc_utils_get_word_iter (GtkSourceBuffer *source_buffer,
 
 /**
  * gsc_utils_get_word:
- * @source_buffer: The #GtkSourceBuffer
+ * @text_buffer: The #GtkTextBuffer
  *
  * Returns: the current word
  */
 gchar *
-gsc_utils_get_word (GtkSourceBuffer *source_buffer)
+gsc_utils_get_word (GtkTextBuffer *text_buffer)
 {
 	GtkTextIter start;
 	GtkTextIter end;
 	
-	return gsc_utils_get_word_iter (source_buffer, NULL, &start, &end);
+	return gsc_utils_get_word_iter (text_buffer, NULL, &start, &end);
 }
 
 static void
-get_iter_pos (GtkSourceView *source_view, 
+get_iter_pos (GtkTextView *text_view, 
               GtkTextIter   *iter,
               gint          *x,
               gint          *y,
               gint          *height)
 {
 	GdkWindow *win;
-	GtkTextView *text_view;
 	GdkRectangle location;
 	gint win_x;
 	gint win_y;
 	gint xx;
 	gint yy;
 
-	text_view = GTK_TEXT_VIEW (source_view);
-	
 	gtk_text_view_get_iter_location (text_view, iter, &location);
 
 	gtk_text_view_buffer_to_window_coords (text_view,
@@ -188,7 +182,7 @@ get_iter_pos (GtkSourceView *source_view,
 }
 
 void
-gsc_utils_replace_word (GtkSourceBuffer *source_buffer,
+gsc_utils_replace_word (GtkTextBuffer *text_buffer,
 					  GtkTextIter     *iter,
 					  const gchar     *text,
 					  gint             len)
@@ -199,13 +193,13 @@ gsc_utils_replace_word (GtkSourceBuffer *source_buffer,
 	GtkTextIter word_end;
 	GtkTextMark *mark;
 
-	g_return_if_fail (GTK_IS_SOURCE_BUFFER (source_buffer));
+	g_return_if_fail (GTK_IS_TEXT_BUFFER (text_buffer));
 	
-	buffer = GTK_TEXT_BUFFER (source_buffer);
+	buffer = GTK_TEXT_BUFFER (text_buffer);
 	gtk_text_buffer_begin_user_action (buffer);
 	
 	mark = gtk_text_buffer_create_mark (buffer, NULL, iter, TRUE);
-	word = gsc_utils_get_word_iter (source_buffer, iter, &word_start, &word_end);
+	word = gsc_utils_get_word_iter (text_buffer, iter, &word_start, &word_end);
 	g_free (word);
 
 	gtk_text_buffer_delete (buffer, &word_start, &word_end);
@@ -223,28 +217,28 @@ gsc_utils_replace_word (GtkSourceBuffer *source_buffer,
 
 /**
  * gsc_utils_view_replace_current_word:
- * @source_buffer: The #GtkSourceBuffer
+ * @text_buffer: The #GtkTextBuffer
  * @text: The text to be inserted instead of the current word
  * 
- * Replaces the current word in the #GtkSourceBuffer with the new word
+ * Replaces the current word in the #GtkTextBuffer with the new word
  *
  */
 void
-gsc_utils_replace_current_word (GtkSourceBuffer *source_buffer, 
+gsc_utils_replace_current_word (GtkTextBuffer *text_buffer, 
 						  const gchar     *text,
 						  gint             len)
 {
 	GtkTextIter iter;
 	GtkTextMark *mark;
 	
-	g_return_if_fail (GTK_IS_SOURCE_BUFFER (source_buffer));
+	g_return_if_fail (GTK_IS_TEXT_BUFFER (text_buffer));
 
-	mark = gtk_text_buffer_get_insert (GTK_TEXT_BUFFER (source_buffer));
-	gtk_text_buffer_get_iter_at_mark (GTK_TEXT_BUFFER (source_buffer),
+	mark = gtk_text_buffer_get_insert (GTK_TEXT_BUFFER (text_buffer));
+	gtk_text_buffer_get_iter_at_mark (GTK_TEXT_BUFFER (text_buffer),
 	                                  &iter,
 	                                  mark);
 
-	gsc_utils_replace_word (source_buffer,
+	gsc_utils_replace_word (text_buffer,
 	                                          &iter,
 	                                          text,
 	                                          len);
@@ -332,7 +326,7 @@ move_overlap (gint     *x,
  */
 void
 gsc_utils_move_to_iter (GtkWindow     *window,
-					  GtkSourceView *view,
+					  GtkTextView *view,
 					  GtkTextIter   *iter)
 {
 	gint x;
@@ -406,7 +400,7 @@ gsc_utils_move_to_iter (GtkWindow     *window,
  */
 void 
 gsc_utils_move_to_cursor (GtkWindow     *window,
-					    GtkSourceView *view)
+					    GtkTextView *view)
 {
 	GtkTextBuffer *buffer;
 	GtkTextIter insert;

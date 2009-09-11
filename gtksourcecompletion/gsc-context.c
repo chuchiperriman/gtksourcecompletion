@@ -151,7 +151,7 @@ update_criteria (GscContext	*context)
 	
 	g_free (context->priv->criteria);
         context->priv->criteria =
-                gsc_utils_get_word (GTK_SOURCE_BUFFER (gtk_text_view_get_buffer (context->priv->view)));
+                gsc_utils_get_word (gtk_text_view_get_buffer (context->priv->view));
 }
 
 GscContext*

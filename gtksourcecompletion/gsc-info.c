@@ -411,7 +411,7 @@ gsc_completion_info_move_to_iter (GscInfo *info,
 	GtkTextIter start;
 	
 	g_return_if_fail (GSC_IS_INFO (info));
-	g_return_if_fail (GTK_IS_SOURCE_VIEW (view));
+	g_return_if_fail (GTK_IS_TEXT_VIEW (view));
 	
 	if (iter == NULL)
 	{
@@ -425,7 +425,7 @@ gsc_completion_info_move_to_iter (GscInfo *info,
 	}
 	
 	gsc_utils_move_to_iter (GTK_WINDOW (info),
-						  GTK_SOURCE_VIEW (view),
+						  view,
 						  &start);
 }
 

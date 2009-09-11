@@ -303,7 +303,6 @@ tree_model_iter_n_children (GtkTreeModel *tree_model,
 	
 	if (iter == NULL)
 	{
-		g_debug ("n children num: %i", GSC_MODEL (tree_model)->priv->num);
 		return GSC_MODEL (tree_model)->priv->num;
 	}
 	else
@@ -796,8 +795,6 @@ gsc_model_set_proposals (GscModel		*model,
 			g_hash_table_destroy (rinfo.proposals);
 		}
 
-		g_debug ("%s> %i",gsc_provider_get_name (info->provider), info->num);
-
 		if (info->num == 0)
 		{
 			remove_node (model, info->header_node,
@@ -890,7 +887,6 @@ gsc_model_is_empty (GscModel *model,
                                       gboolean                  invisible)
 {
 	g_return_val_if_fail (GSC_IS_MODEL (model), FALSE);
-	g_debug ("is empty num: %i", model->priv->num);
 	if (invisible)
 	{
 		return model->priv->num == 0;
@@ -911,8 +907,6 @@ gsc_model_n_proposals (GscModel    *model,
 	g_return_val_if_fail (GSC_IS_MODEL (model), 0);
 	g_return_val_if_fail (GSC_IS_PROVIDER (provider), 0);
 
-	g_debug ("n proposals num: %i", model->priv->num);
-	
 	info = g_hash_table_lookup (model->priv->providers_info, provider);
 	
 	if (info == NULL)
