@@ -83,6 +83,19 @@ G_DEFINE_TYPE_WITH_CODE (GscModel,
                                                 tree_model_iface_init))
 
 
+static void
+list_insert_after (GList *sibling, gpointer data)
+{
+	GList *node;
+	
+	node = g_list_alloc ();
+	node->data = data;
+	node->prev = sibling;
+	node->next = sibling->next;
+	sibling->next = node;
+	
+}
+
 /* Interface implementation */
 static ProposalNode *
 node_from_iter (GtkTreeIter *iter)
@@ -574,15 +587,31 @@ append_list (GscModel 		*model,
 	
 	if (item == NULL)
 	{
-		item = g_list_append (model->priv->last, node);
-		
-		if (model->priv->store == NULL)
+		if (info->last != NULL)
 		{
-			model->priv->store = item;
+			list_insert_after (info->last, node);
+			info->last = info->last->next;
+
+			if (model->priv->last == info->last->prev)
+			{
+				model->priv->last = info->last;
+			}
+			item = info->last;
 		}
 		else
 		{
-			item = item->next;
+			item = g_list_append (model->priv->last, node);
+		
+			if (model->priv->store == NULL)
+			{
+				model->priv->store = item;
+			}
+			else
+			{
+				item = item->next;
+			}
+			model->priv->last = item;
+			info->last = model->priv->last;
 		}
 
 		if (!node->is_header)
@@ -593,7 +622,6 @@ append_list (GscModel 		*model,
 		num_inc (model, info, node);
 		
 		*inserted = TRUE;
-		model->priv->last = item;
 	}
 	else
 	{
@@ -623,6 +651,9 @@ remove_node (GscModel			*model,
 	{
 		model->priv->last = store_node->prev;
 	}
+
+	if (store_node == info->last)
+		info->last = info->last->prev;
 
 	model->priv->store = g_list_delete_link (model->priv->store,store_node);
 		
@@ -921,7 +952,7 @@ gsc_model_n_proposals (GscModel    *model,
 
 gboolean
 gsc_model_iter_previous (GscModel *model,
-                                           GtkTreeIter              *iter)
+			 GtkTreeIter              *iter)
 {
 	GList *item;
 	
@@ -946,7 +977,7 @@ gsc_model_iter_previous (GscModel *model,
 
 gboolean
 gsc_model_iter_last (GscModel *model,
-                                       GtkTreeIter              *iter)
+		     GtkTreeIter              *iter)
 {
 	GList *item;
 	
