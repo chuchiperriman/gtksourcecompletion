@@ -987,14 +987,7 @@ gsc_model_iter_last (GscModel *model,
 	item = model->priv->last;
 	iter->user_data = item;
 
-	if (item != NULL)
-	{
-		return gsc_model_iter_previous (model, iter);
-	}
-	else
-	{
-		return FALSE;
-	}
+	return item != NULL;
 }
 
 gboolean

@@ -425,13 +425,10 @@ selector_last (GscCompletion *completion,
 	haslast = ret;
 	last = *iter;
 
-	while (ret && gsc_model_iter_is_header (
-                        GSC_MODEL (model), iter))
+	while (ret && gsc_model_iter_is_header (GSC_MODEL (model), iter))
         {
                 ret = gsc_model_iter_previous (GSC_MODEL (model), iter);
         }
-
-
 	
 	if (haslast && !ret)
 	{
