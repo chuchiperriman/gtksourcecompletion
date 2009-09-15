@@ -503,12 +503,8 @@ provider_info_new (GscProvider *provider)
 	info->proposals = g_hash_table_new (hash_node,
 					    compare_nodes);
 	info->last = NULL;
-
-	info->header_node = g_slice_new (ProposalNode);
-	info->header_node->provider = g_object_ref (provider);
-	info->header_node->proposal = NULL;
-	info->header_node->changed_id = 0;
-	info->header_node->is_header = TRUE;
+	info->header_item = NULL;
+	info->header_node = NULL;
 
 	return info;
 }
@@ -655,6 +651,9 @@ remove_node (GscModel			*model,
 	if (store_node == info->last)
 		info->last = info->last->prev;
 
+	if (info->num == 0)
+		info->last = NULL;
+
 	model->priv->store = g_list_delete_link (model->priv->store,store_node);
 		
 	if (model->priv->store == NULL)
@@ -711,15 +710,26 @@ idle_append (gpointer data)
 		if (info == NULL)
 		{
 			info = provider_info_new (node->provider);
-
 			g_hash_table_insert (model->priv->providers_info, node->provider, info);
+		}
 
-			item = append_list (model, info,  info->header_node, &inserted);
+		/*We could have a ProviderInfo without header because it had filtered*/
+		if (!info->header_node)
+		{
+			info->header_node = g_slice_new (ProposalNode);
+			info->header_node->provider = g_object_ref (node->provider);
+			info->header_node->proposal = NULL;
+			info->header_node->changed_id = 0;
+			info->header_node->is_header = TRUE;
 
-			info->header_item = item;
+			append_list (model, info,  info->header_node, &inserted);
 
-			iter.user_data = item;
-			path = path_from_list (model, item);
+			g_assert (inserted);
+			
+			info->header_item = info->last;
+
+			iter.user_data = info->header_item;
+			path = path_from_list (model, info->header_item);
 			gtk_tree_model_row_inserted (GTK_TREE_MODEL (model), path, &iter);
 			gtk_tree_path_free (path);
 			
@@ -801,7 +811,7 @@ gsc_model_set_proposals (GscModel		*model,
 	g_return_if_fail (GSC_IS_PROVIDER (provider));
 
 	info = g_hash_table_lookup (model->priv->providers_info, provider);
-	if (info)
+	if (info && info->num > 0)
 	{
 		rinfo.path = gtk_tree_path_new_first ();
 		rinfo.model = model;
@@ -826,12 +836,14 @@ gsc_model_set_proposals (GscModel		*model,
 			g_hash_table_destroy (rinfo.proposals);
 		}
 
-		if (info->num == 0)
+		if (info->num == 0 && info->header_node)
 		{
 			remove_node (model, info->header_node,
 				     info->header_item,
 				     rinfo.path);
-			g_hash_table_remove (model->priv->providers_info, info->provider);
+			info->header_item = NULL;
+			info->header_node = NULL;
+			info->last = NULL;
 		}
 		
 		gtk_tree_path_free (rinfo.path);
