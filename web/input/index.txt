@@ -12,6 +12,9 @@ restindex
 GtkSourceCompletion Homepage
 ============================
 
+**NOTE** This project has been deprecated. It has been integrated into gtksourceview >= 2.9.1. 
+You can use this widget with a similar API.
+
 GtkSourceCompletion is a library to add (auto)completion and calltips support to GtkSourceView.
 The library manages all events, the popup position etc. but it doesn't complete anything, it is the base library.
 You can develop providers for GtkSourceCompletion and the library will use it to show all the 

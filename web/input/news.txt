@@ -10,6 +10,13 @@ restindex
 GtkSourceCompletion News
 ========================
 
+2009-10-19
+----------
+
+GtkSourceCompletion has been integrated into gtksourceview. GtkSourceCompletion
+has been deprecated but you can use gtksourceview instead because the API is
+very similar. Thanks all the people using GtkSourceCompletion!!!
+
 2009-02-28
 ----------
 

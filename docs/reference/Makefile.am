@@ -42,6 +42,12 @@ IGNORE_HFILES =					\
 	gsc-provider-file.c			\
 	gsc-documentwords-provider.c		\
 	gsc-documentwords-provider.h		\
+	gsc-trigger-interactive.c		\
+	gsc-trigger-interactive.h		\
+	gsc-provider-devhelp.c			\
+	gsc-provider-devhelp.h			\
+	gsc-provider-words.c			\
+	gsc-provider-words.h			\
 	gsc-marshal.h		
 
 # Extra options to supply to gtkdoc-mkdb

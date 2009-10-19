@@ -1,8 +1,7 @@
-gsc_info_get_type
-gsc_trigger_autowords_get_type
+gsc_model_get_type
 gsc_completion_get_type
+gsc_item_get_type
+gsc_context_get_type
 gsc_proposal_get_type
+gsc_completion_info_get_type
 gsc_provider_get_type
-gsc_trigger_customkey_get_type
-gsc_trigger_userrequest_get_type
-gsc_trigger_get_type
