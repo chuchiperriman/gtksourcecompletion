@@ -1,6 +1,11 @@
+
+	**************************************************************
+	This project has been deprecated. It has been integrated into
+	gtksourceview >= 2.9.1. You can use a similar API with that
+	widget
+	**************************************************************
+
 	gtksourcecompletion - Adds Completion support to GtkSourceView
-
-
 
   Copyright (C) 2007 chuchiperriman
 
